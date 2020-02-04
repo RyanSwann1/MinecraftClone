@@ -96,7 +96,14 @@ static unsigned int createShader(const std::string& vertexShaderSource, const st
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(750, 750), "Minecraft", sf::Style::Default);
+	sf::ContextSettings settings;
+	settings.depthBits = 24;
+	settings.stencilBits = 8;
+	settings.antialiasingLevel = 4;
+	settings.majorVersion = 3;
+	settings.minorVersion = 3;
+	settings.attributeFlags = sf::ContextSettings::Core;
+	sf::Window window(sf::VideoMode(750, 750), "Minecraft", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
 	gladLoadGL();
 	glViewport(0, 0, 750, 750);
@@ -129,13 +136,18 @@ int main()
 		2, 3, 0
 	};
 
+	unsigned int vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+
 	////Create Buffer
 	unsigned int bufferID;
 	glGenBuffers(1, &bufferID);
 	////Bind the buffer - only one buffer can be bound at a time
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID); //Bind == Select
 	////Fill it with stuff
-	glBufferData(GL_ARRAY_BUFFER, 9 * 2 * sizeof(float), &vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 4 * 3 * sizeof(float), &vertices, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
@@ -147,28 +159,16 @@ int main()
 
 	while (window.isOpen())
 	{
-		sf::Event sfmlEvent;
-		if (window.pollEvent(sfmlEvent))
-		{
-			if (sfmlEvent.type == sf::Event::Closed)
-			{
-				window.close();
-			}
-		}
-
-		if (r > 1.0f)
-		{
-			increment = -0.05f;
-		}
-		else if (r < 0.0f)
-		{
-			increment = 0.05f;
-		}
-		r += increment;
-		
-
-
-		window.clear();
+		//sf::Event sfmlEvent;
+		//if (window.pollEvent(sfmlEvent))
+		//{
+		//	if (sfmlEvent.type == sf::Event::Closed)
+		//	{
+		//		window.close();
+		//	}
+		//}
+	
+		//window.clear();
 		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		
