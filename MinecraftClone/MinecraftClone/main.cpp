@@ -4,28 +4,97 @@
 #include <SFML/Graphics.hpp>
 #include "glad.h"
 
-const char* vertexShaderSource = "#version 330 core\n"
-	"layout (location = 0) in vec3 aPos;\n"
-	"void main()\n"
-	"{\n"
-	"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-	"}\0";
+static unsigned int compileShader(unsigned int type, const std::string& source)
+{
+	unsigned int ID = glCreateShader(type);
+	const char* src = source.c_str();
+	glShaderSource(ID, 1, &src, nullptr);
+	glCompileShader(ID);
 
-const char* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\n\0";
+	//TODO: Error Handling
+	int result = 0;
+	glGetShaderiv(ID, GL_COMPILE_STATUS, &result);
+	if (result == GL_FALSE)
+	{
+		std::cout << "Failed\n";
+		int length = 0;
+		glGetShaderiv(ID, GL_INFO_LOG_LENGTH, &length);
+		//char message[length];
+	}
 
+	return ID;
+}
+
+static unsigned int createShader(const std::string& vertexShaderSource, const std::string& fragmentShaderSource)
+{
+	unsigned int program = glCreateProgram();
+	unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
+	unsigned int fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+
+	glAttachShader(program, vertexShader);
+	glAttachShader(program, fragmentShader);
+	glLinkProgram(program);
+	glValidateProgram(program);
+
+	//glDeleteShader(vertexShader);
+	//glDeleteShader(fragmentShader);
+
+	return program;
+}
+
+//OpenGL is a state machine
+//Select buffer - state - then draw me a triangle
+//Based off of which buffer has been selected, it determines what/how will be drawn
 
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(750, 750), "Minecraft", sf::Style::Default);
-	
+	gladLoadGL();
+	glViewport(0, 0, 750, 750);
+
+	std::string vertexShaderSource =
+		"#version 330 core\n"
+		"\n"
+		"layout(location = 0) in vec3 position;"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"	gl_Position = vec4(position.x, position.y, position.z, 1.0);"
+		"}\n";
+	std::string fragmentShaderSource =
+		"#version 330 core\n"
+		"\n"
+		"out vec4 color;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"	color = vec4(1.0, 0.0, 0.0, 1.0);\n"
+		"}\n";
+
+	unsigned int shader = createShader(vertexShaderSource, fragmentShaderSource);
+	glUseProgram(shader);
+
+	float vertices[9] =
+	{
+		//Vertex Attributes
+		-0.5f, -0.5f, 0.0f,
+		0.0f,  0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f
+	};
+
+	////Create Buffer
+	unsigned int bufferID;
+	glGenBuffers(1, &bufferID);
+	////Bind the buffer - only one buffer can be bound at a time
+	glBindBuffer(GL_ARRAY_BUFFER, bufferID); //Bind == Select
+	////Fill it with stuff
+	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), &vertices, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
 	while (window.isOpen())
 	{
-		gladLoadGL();
 		sf::Event sfmlEvent;
 		if (window.pollEvent(sfmlEvent))
 		{
@@ -34,36 +103,16 @@ int main()
 				window.close();
 			}
 		}
-		
-		float vertices[] =
-		{
-			-0.5f, -0.5f, 0.0f,
-			0.5f, -0.5f, 0.0f,
-			0.0f,  0.5f, 0.0f
-		};
 
-		//Shaders
-		unsigned int vertexShader;
-		vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
-		glCompileShader(vertexShader);
-
-
-
-		//Create Buffer
-		unsigned int VBO;
-		glGenBuffers(1, &VBO);
-
-		//Bind the buffer - only one buffer can be bound at a time
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-		//Fill it with stuff
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		window.clear();
+//		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
 		//window.clear(sf::Color::Black);
 		window.display();
 	}
+
+	glDeleteProgram(shader);
 }
