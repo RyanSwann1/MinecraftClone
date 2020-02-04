@@ -97,6 +97,7 @@ static unsigned int createShader(const std::string& vertexShaderSource, const st
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(750, 750), "Minecraft", sf::Style::Default);
+	window.setFramerateLimit(60);
 	gladLoadGL();
 	glViewport(0, 0, 750, 750);
 	
@@ -105,6 +106,12 @@ int main()
 
 	unsigned int shader = createShader(source.vertexSource, source.fragmentSource);
 	glUseProgram(shader);
+	
+	int location = glGetUniformLocation(shader, "uColor");
+	glUniform4f(location, 0.2f, 0.3f, 0.8f, 1.0f);
+	
+	float r = 0.0f;
+	float increment = 0.05f;
 
 	//Counter Clock-Wise
 	float vertices[] =
@@ -149,9 +156,22 @@ int main()
 			}
 		}
 
+		if (r > 1.0f)
+		{
+			increment = -0.05f;
+		}
+		else if (r < 0.0f)
+		{
+			increment = 0.05f;
+		}
+		r += increment;
+		
+
+
 		window.clear();
 		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+		
 
 		//Draw Calls
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
