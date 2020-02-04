@@ -133,6 +133,10 @@
     <ClInclude Include="glad.h" />
     <ClInclude Include="khrplatform.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Basic.shader" />
+    <None Include="Shaders\Basic.shader" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

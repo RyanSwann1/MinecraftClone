@@ -3,6 +3,54 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "glad.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+
+struct ShaderProgramSource
+{
+	std::string vertexSource;
+	std::string fragmentSource;
+};
+
+static ShaderProgramSource parseShader(const std::string& filePath)
+{
+	enum class eShaderType
+	{
+		eNone = -1,
+		eVertex = 0,
+		eFragment = 1,
+		eTotal = 2
+	};
+
+	std::ifstream stream(filePath);
+	std::string line;
+	std::stringstream stringStream[static_cast<int>(eShaderType::eTotal)];
+	eShaderType shaderType = eShaderType::eNone;
+
+	while (getline(stream, line))
+	{
+		if (line.find("#shader") != std::string::npos)
+		{
+			if (line.find("Vertex") != std::string::npos)
+			{
+				shaderType = eShaderType::eVertex;
+			}
+			else if (line.find("Fragment") != std::string::npos)
+			{
+				shaderType = eShaderType::eFragment;
+			}
+		}
+		else
+		{
+			stringStream[static_cast<int>(shaderType)] << line << "\n";
+		}
+	}
+
+	return { stringStream[static_cast<int>(eShaderType::eVertex)].str(),
+		stringStream[static_cast<int>(eShaderType::eFragment)].str() };
+}
 
 static unsigned int compileShader(unsigned int type, const std::string& source)
 {
@@ -51,27 +99,11 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(750, 750), "Minecraft", sf::Style::Default);
 	gladLoadGL();
 	glViewport(0, 0, 750, 750);
+	
+	ShaderProgramSource source = parseShader("Basic.shader");
+	std::cout << source.vertexSource << source.fragmentSource << "\n";
 
-	std::string vertexShaderSource =
-		"#version 330 core\n"
-		"\n"
-		"layout(location = 0) in vec3 position;"
-		"\n"
-		"void main()\n"
-		"{\n"
-		"	gl_Position = vec4(position.x, position.y, position.z, 1.0);"
-		"}\n";
-	std::string fragmentShaderSource =
-		"#version 330 core\n"
-		"\n"
-		"out vec4 color;\n"
-		"\n"
-		"void main()\n"
-		"{\n"
-		"	color = vec4(1.0, 0.0, 0.0, 1.0);\n"
-		"}\n";
-
-	unsigned int shader = createShader(vertexShaderSource, fragmentShaderSource);
+	unsigned int shader = createShader(source.vertexSource, source.fragmentSource);
 	glUseProgram(shader);
 
 	float vertices[9] =
@@ -114,5 +146,5 @@ int main()
 		window.display();
 	}
 
-	glDeleteProgram(shader);
+	//glDeleteProgram(shader);
 }
