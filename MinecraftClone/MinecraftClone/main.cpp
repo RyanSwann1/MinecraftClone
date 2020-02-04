@@ -106,12 +106,20 @@ int main()
 	unsigned int shader = createShader(source.vertexSource, source.fragmentSource);
 	glUseProgram(shader);
 
-	float vertices[9] =
+	//Counter Clock-Wise
+	float vertices[] =
 	{
-		//Vertex Attributes
-		-0.5f, -0.5f, 0.0f,
-		0.0f,  0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f
+		-0.5f, -0.5f, 0.0f, //0
+		0.5f, -0.5f, 0.0f, //1
+		0.5f,  0.5f, 0.0f, //2
+		-0.5f, 0.5f, 0.0f, //3
+	};
+
+	//Index Buffer
+	unsigned int indices[] =
+	{
+		0, 1, 2,
+		2, 3, 0
 	};
 
 	////Create Buffer
@@ -120,10 +128,15 @@ int main()
 	////Bind the buffer - only one buffer can be bound at a time
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID); //Bind == Select
 	////Fill it with stuff
-	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), &vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 9 * 2 * sizeof(float), &vertices, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
+	unsigned int ibo;
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
 	while (window.isOpen())
 	{
@@ -137,14 +150,16 @@ int main()
 		}
 
 		window.clear();
-//		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		//Draw Calls
+		//glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
 		//window.clear(sf::Color::Black);
 		window.display();
 	}
 
-	//glDeleteProgram(shader);
+	glDeleteProgram(shader);
 }
