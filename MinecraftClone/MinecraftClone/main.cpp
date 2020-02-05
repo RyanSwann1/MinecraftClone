@@ -8,6 +8,8 @@
 #include <string>
 #include <sstream>
 
+//https://www.reddit.com/r/Minecraft/comments/2ikiaw/opensimplex_noise_for_terrain_generation_instead/
+
 struct ShaderProgramSource
 {
 	std::string vertexSource;
