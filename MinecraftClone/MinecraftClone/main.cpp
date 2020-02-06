@@ -8,7 +8,19 @@
 #include <string>
 #include <sstream>
 
+#include "VertexBufferLayout.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "VertexArray.h"
+
 //https://www.reddit.com/r/Minecraft/comments/2ikiaw/opensimplex_noise_for_terrain_generation_instead/
+
+//Discourage use of VAOs all the time
+//https://www.youtube.com/watch?v=Bcs56Mm-FJY&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2&index=12
+
+//Run Tests - benchmarks/profile
+//1. One global VAO
+//2. VAO for each gameobject
 
 struct ShaderProgramSource
 {
@@ -123,7 +135,9 @@ int main()
 	float increment = 0.05f;
 
 	//Counter Clock-Wise
-	float vertices[] =
+
+	//-- Vertex Attributes
+	float positions[] =
 	{
 		-0.5f, -0.5f, 0.0f, //0
 		0.5f, -0.5f, 0.0f, //1
@@ -138,57 +152,39 @@ int main()
 		0.5f, 1.0f // Top Center
 	};
 
-	glTexParameteri()
-
-	//Index Buffer
 	unsigned int indices[] =
 	{
 		0, 1, 2,
 		2, 3, 0
 	};
+	//-- Vertex Attributes
 
-	unsigned int vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	VertexArray vertexArray;
+	VertexBuffer vertexBuffer(positions, 4 * 3 * sizeof(float));
 
+	VertexBufferLayout layout;
+	layout.push<float>(3);
 
-	////Create Buffer
-	unsigned int bufferID;
-	glGenBuffers(1, &bufferID);
-	////Bind the buffer - only one buffer can be bound at a time
-	glBindBuffer(GL_ARRAY_BUFFER, bufferID); //Bind == Select
-	////Fill it with stuff
-	glBufferData(GL_ARRAY_BUFFER, 4 * 3 * sizeof(float), &vertices, GL_STATIC_DRAW);
+	vertexArray.addBuffer(vertexBuffer, layout);
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+	IndexBuffer indexBuffer(indices, 6);
 
-	unsigned int ibo;
-	glGenBuffers(1, &ibo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
-	glBindVertexArray(vao);
 	while (window.isOpen())
 	{
-		//sf::Event sfmlEvent;
-		//if (window.pollEvent(sfmlEvent))
-		//{
-		//	if (sfmlEvent.type == sf::Event::Closed)
-		//	{
-		//		window.close();
-		//	}
-		//}
+		sf::Event sfmlEvent;
+		if (window.pollEvent(sfmlEvent))
+		{
+			if (sfmlEvent.type == sf::Event::Closed)
+			{
+				window.close();
+			}
+		}
 	
-		//window.clear();
-		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		
 
 		//Draw Calls
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
-		//window.clear(sf::Color::Black);
 		window.display();
 	}
 
