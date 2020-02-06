@@ -131,6 +131,15 @@ int main()
 		-0.5f, 0.5f, 0.0f, //3
 	};
 
+	float textCoords[] =
+	{
+		0.0f, 0.0f, //Lower Left Corner
+		1.0f, 0.0f, //Lower Right Corner
+		0.5f, 1.0f // Top Center
+	};
+
+	glTexParameteri()
+
 	//Index Buffer
 	unsigned int indices[] =
 	{
@@ -158,7 +167,7 @@ int main()
 	glGenBuffers(1, &ibo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
-
+	glBindVertexArray(vao);
 	while (window.isOpen())
 	{
 		//sf::Event sfmlEvent;
