@@ -19,7 +19,6 @@ Shader::~Shader()
 	glDeleteProgram(m_rendererID);
 }
 
-
 ShaderProgramSource Shader::parseShader()
 {
 	enum class eShaderType
@@ -51,6 +50,7 @@ ShaderProgramSource Shader::parseShader()
 		else
 		{
 			stringStream[static_cast<int>(shaderType)] << line << "\n";
+			std::cout << line << "\n";
 		}
 	}
 
@@ -71,9 +71,6 @@ unsigned int Shader::compileShader(unsigned int type, const std::string& source)
 	if (result == GL_FALSE)
 	{
 		std::cout << "Failed\n";
-		int length = 0;
-		glGetShaderiv(ID, GL_INFO_LOG_LENGTH, &length);
-		//char message[length];
 	}
 
 	return ID;
@@ -106,12 +103,17 @@ void Shader::unbind() const
 	glUseProgram(0);
 }
 
+void Shader::setUniform1i(const std::string& name, int value)
+{
+	glUniform1i(getUniformLocation(name), value);
+}
+
 void Shader::setUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
 {
 	glUniform4f(getUniformLocation(name), v0, v1, v2, v3);
 }
 
-unsigned int Shader::getUniformLocation(const std::string& name)
+int Shader::getUniformLocation(const std::string& name)
 {
 	if (m_uniformLocationCache.find(name) != m_uniformLocationCache.cend())
 	{
@@ -121,7 +123,7 @@ unsigned int Shader::getUniformLocation(const std::string& name)
 	int location = glGetUniformLocation(m_rendererID, name.c_str());
 	if (location == -1)
 	{
-		std::cout << "Warning: Uniform " << name << "Doesn't exist.\n";
+		std::cout << "Warning: Uniform " << name << " Doesn't exist.\n";
 	}
 
 	m_uniformLocationCache[name] = location;

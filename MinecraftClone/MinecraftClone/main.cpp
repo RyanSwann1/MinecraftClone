@@ -7,6 +7,8 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
+#include "Renderer.h"
+#include "Texture.h"
 
 //https://hacknplan.com/
 
@@ -35,12 +37,10 @@ int main()
 	sf::Window window(sf::VideoMode(750, 750), "Minecraft", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
 	gladLoadGL();
-	glViewport(0, 0, 750, 750);
-	
+
 	Shader shader("Basic.shader");
 	shader.bind();
 	
-	shader.setUniform4f("uColor", 0.8f, 0.3f, 0.8f, 1.0f);
 	float r = 0.0f;
 	float increment = 0.05f;
 
@@ -49,10 +49,10 @@ int main()
 	//-- Vertex Attributes
 	float positions[] =
 	{
-		-0.5f, -0.5f, 0.0f, //0
-		0.5f, -0.5f, 0.0f, //1
-		0.5f,  0.5f, 0.0f, //2
-		-0.5f, 0.5f, 0.0f, //3
+		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,//0
+		0.5f, -0.5f, 0.0f, 1.0f, 0.0f, //1
+		0.5f,  0.5f, 0.0f, 1.0f, 1.0f,//2
+		-0.5f, 0.5f, 0.0f, 0.0f, 1.0f//3
 	};
 
 	float textCoords[] =
@@ -70,20 +70,30 @@ int main()
 	//-- Vertex Attributes
 
 	VertexArray vertexArray;
-	VertexBuffer vertexBuffer(positions, 4 * 3 * sizeof(float));
+	VertexBuffer vertexBuffer(positions, 4 * 5 * sizeof(float));
 
 	VertexBufferLayout layout;
 	layout.push<float>(3);
+	layout.push<float>(2);
 
 	vertexArray.addBuffer(vertexBuffer, layout);
 
 	IndexBuffer indexBuffer(indices, 6);
-	vertexArray.unbind();
+	Renderer renderer;
 
-	vertexArray.unbind();
-	shader.unbind();
-	indexBuffer.unbind();
-	vertexBuffer.unbind();
+	//uniform vec4 uColor;
+	//uniform sampler2D uTexture;
+
+	Texture texture("America.jpg");
+	texture.bind();
+
+	shader.setUniform4f("uColor", 0.8f, 0.3f, 0.8f, 1.0f);
+	//shader.setUniform1i("uTexture", 0);
+	
+	//vertexArray.unbind();
+	//shader.unbind();
+	//indexBuffer.unbind();
+	//vertexBuffer.unbind();
 
 	while (window.isOpen())
 	{
@@ -96,13 +106,10 @@ int main()
 			}
 		}
 	
-		glClear(GL_COLOR_BUFFER_BIT);
+		renderer.clear();
 		
 		//Draw Calls
-		shader.bind();
-		vertexArray.bind();
-		indexBuffer.bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+		renderer.draw(vertexArray, indexBuffer, shader);
 
 		window.display();
 	}
