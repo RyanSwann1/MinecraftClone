@@ -2,16 +2,13 @@
 #include <string>
 #include <iostream>
 #include <SFML/Graphics.hpp>
-#include "glad.h"
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
+
 
 #include "VertexBufferLayout.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
+#include "Shader.h"
 
 //https://hacknplan.com/
 
@@ -23,88 +20,6 @@
 //Run Tests - benchmarks/profile
 //1. One global VAO
 //2. VAO for each gameobject
-
-struct ShaderProgramSource
-{
-	std::string vertexSource;
-	std::string fragmentSource;
-};
-
-static ShaderProgramSource parseShader(const std::string& filePath)
-{
-	enum class eShaderType
-	{
-		eNone = -1,
-		eVertex = 0,
-		eFragment = 1,
-		eTotal = 2
-	};
-
-	std::ifstream stream(filePath);
-	std::string line;
-	std::stringstream stringStream[static_cast<int>(eShaderType::eTotal)];
-	eShaderType shaderType = eShaderType::eNone;
-
-	while (getline(stream, line))
-	{
-		if (line.find("#shader") != std::string::npos)
-		{
-			if (line.find("Vertex") != std::string::npos)
-			{
-				shaderType = eShaderType::eVertex;
-			}
-			else if (line.find("Fragment") != std::string::npos)
-			{
-				shaderType = eShaderType::eFragment;
-			}
-		}
-		else
-		{
-			stringStream[static_cast<int>(shaderType)] << line << "\n";
-		}
-	}
-
-	return { stringStream[static_cast<int>(eShaderType::eVertex)].str(),
-		stringStream[static_cast<int>(eShaderType::eFragment)].str() };
-}
-
-static unsigned int compileShader(unsigned int type, const std::string& source)
-{
-	unsigned int ID = glCreateShader(type);
-	const char* src = source.c_str();
-	glShaderSource(ID, 1, &src, nullptr);
-	glCompileShader(ID);
-
-	//TODO: Error Handling
-	int result = 0;
-	glGetShaderiv(ID, GL_COMPILE_STATUS, &result);
-	if (result == GL_FALSE)
-	{
-		std::cout << "Failed\n";
-		int length = 0;
-		glGetShaderiv(ID, GL_INFO_LOG_LENGTH, &length);
-		//char message[length];
-	}
-
-	return ID;
-}
-
-static unsigned int createShader(const std::string& vertexShaderSource, const std::string& fragmentShaderSource)
-{
-	unsigned int program = glCreateProgram();
-	unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
-	unsigned int fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
-
-	glAttachShader(program, vertexShader);
-	glAttachShader(program, fragmentShader);
-	glLinkProgram(program);
-	glValidateProgram(program);
-
-	//glDeleteShader(vertexShader);
-	//glDeleteShader(fragmentShader);
-
-	return program;
-}
 
 //OpenGL is a state machine
 //Select buffer - state - then draw me a triangle
@@ -124,15 +39,10 @@ int main()
 	gladLoadGL();
 	glViewport(0, 0, 750, 750);
 	
-	ShaderProgramSource source = parseShader("Basic.shader");
-	std::cout << source.vertexSource << source.fragmentSource << "\n";
-
-	unsigned int shader = createShader(source.vertexSource, source.fragmentSource);
-	glUseProgram(shader);
+	Shader shader("Basic.shader");
+	shader.bind();
 	
-	int location = glGetUniformLocation(shader, "uColor");
-	glUniform4f(location, 0.2f, 0.3f, 0.8f, 1.0f);
-	
+	shader.setUniform4f("uColor", 0.8f, 0.3f, 0.8f, 1.0f);
 	float r = 0.0f;
 	float increment = 0.05f;
 
@@ -190,6 +100,4 @@ int main()
 
 		window.display();
 	}
-
-	glDeleteProgram(shader);
 }
