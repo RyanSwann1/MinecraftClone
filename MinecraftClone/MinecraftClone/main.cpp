@@ -13,6 +13,8 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 
+//https://hacknplan.com/
+
 //https://www.reddit.com/r/Minecraft/comments/2ikiaw/opensimplex_noise_for_terrain_generation_instead/
 
 //Discourage use of VAOs all the time
@@ -168,7 +170,7 @@ int main()
 	vertexArray.addBuffer(vertexBuffer, layout);
 
 	IndexBuffer indexBuffer(indices, 6);
-
+	vertexArray.unbind();
 	while (window.isOpen())
 	{
 		sf::Event sfmlEvent;
@@ -181,8 +183,9 @@ int main()
 		}
 	
 		glClear(GL_COLOR_BUFFER_BIT);
-
+		
 		//Draw Calls
+		vertexArray.bind();
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
 		window.display();
