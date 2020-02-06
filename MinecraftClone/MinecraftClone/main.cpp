@@ -2,8 +2,6 @@
 #include <string>
 #include <iostream>
 #include <SFML/Graphics.hpp>
-
-
 #include "VertexBufferLayout.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
@@ -81,6 +79,12 @@ int main()
 
 	IndexBuffer indexBuffer(indices, 6);
 	vertexArray.unbind();
+
+	vertexArray.unbind();
+	shader.unbind();
+	indexBuffer.unbind();
+	vertexBuffer.unbind();
+
 	while (window.isOpen())
 	{
 		sf::Event sfmlEvent;
@@ -95,7 +99,9 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 		
 		//Draw Calls
+		shader.bind();
 		vertexArray.bind();
+		indexBuffer.bind();
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
 		window.display();

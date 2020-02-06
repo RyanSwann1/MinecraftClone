@@ -123,10 +123,6 @@ unsigned int Shader::getUniformLocation(const std::string& name)
 	{
 		std::cout << "Warning: Uniform " << name << "Doesn't exist.\n";
 	}
-	else
-	{
-
-	}
 
 	m_uniformLocationCache[name] = location;
 	return location;
