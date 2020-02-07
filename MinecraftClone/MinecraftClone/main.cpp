@@ -186,6 +186,8 @@ unsigned int createShaderProgram(const std::string& filePath)
 	std::string vertexShaderSource;
 	std::string fragmentShaderSource;
 	parseShaderFromFile(filePath, vertexShaderSource, fragmentShaderSource);
+	std::cout << vertexShaderSource << "\n";
+	std::cout << fragmentShaderSource << "\n";
 
 	//Create Vertex Shader
 	unsigned int vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
@@ -193,19 +195,33 @@ unsigned int createShaderProgram(const std::string& filePath)
 	glShaderSource(vertexShaderID, 1, &vertexSrc, nullptr);
 	glCompileShader(vertexShaderID);
 
+	int vertexShaderResult = 0;
+	glGetShaderiv(vertexShaderID, GL_COMPILE_STATUS, &vertexShaderResult);
+	if (vertexShaderResult == GL_FALSE)
+	{
+		int messageLength = 0;
+		glGetShaderiv(vertexShaderID, GL_INFO_LOG_LENGTH, &messageLength);
+		char* errorMessage = static_cast<char*>(alloca(messageLength * sizeof(char)));
+		glGetShaderInfoLog(vertexShaderID, messageLength, &messageLength, errorMessage);
+		std::cout << "Failed to compile: " << errorMessage << "\n";
+	}
+
 	//Create Fragment Shader
 	unsigned int fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 	const char* fragSrc = vertexShaderSource.c_str();
 	glShaderSource(fragmentShaderID, 1, &fragSrc, nullptr);
 	glCompileShader(fragmentShaderID);
-	std::cout << glGetError();
 
-
-	int vertexShaderResult = 0;
-	glGetShaderiv(vertexShaderID, GL_COMPILE_STATUS, &vertexShaderResult);
 	int fragmentShaderResult = 0;
 	glGetShaderiv(fragmentShaderID, GL_COMPILE_STATUS, &fragmentShaderResult);
-	std::cout << glGetError();
+	if (fragmentShaderResult == GL_FALSE)
+	{
+		int messageLength = 0;
+		glGetShaderiv(fragmentShaderID, GL_INFO_LOG_LENGTH, &messageLength);
+		char* errorMessage = static_cast<char*>(alloca(messageLength * sizeof(char)));
+		glGetShaderInfoLog(fragmentShaderID, messageLength, &messageLength, errorMessage);
+		std::cout << "Failed to compile: " << errorMessage << "\n";
+	}
 	
 	//int logLength;
 	//if (vertexShaderResult == GL_FALSE)
@@ -219,18 +235,10 @@ unsigned int createShaderProgram(const std::string& filePath)
 	//	shader->handle = 0;
 	//	goto err;
 	//}
-
 	//	if (|| fragmentShaderResult == GL_FALSE))
 	//{
 
 	//}
-
-
-	if (vertexShaderResult == GL_FALSE || fragmentShaderResult == GL_FALSE)
-	{
-		std::cout << glGetError();
-		std::cout << "Failed\n";
-	}
 
 	glAttachShader(shaderID, vertexShaderID);
 	glAttachShader(shaderID, fragmentShaderID);
@@ -255,6 +263,7 @@ int main()
 	window.setFramerateLimit(60);
 	gladLoadGL();
 
+
 	unsigned int shaderID = createShaderProgram("Basic.shader");
 
 	unsigned int VAO;
@@ -275,6 +284,7 @@ int main()
 		2, 3, 0
 	};
 
+
 	unsigned int positionVBO;
 	glGenBuffers(1, &positionVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, positionVBO);
@@ -287,6 +297,8 @@ int main()
 	glGenBuffers(1, &indiciesVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesVBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies.size() * sizeof(float), indicies.data(), GL_STATIC_DRAW);
+
+
 
 	while (window.isOpen())
 	{
