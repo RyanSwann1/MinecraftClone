@@ -122,6 +122,35 @@
 
 void parseShaderFromFile(const std::string& filePath, std::string& vertexShaderSource, std::string& fragmentShaderSource)
 {
+	//std::ifstream stream(m_filePath);
+	//std::string line;
+	//std::stringstream stringStream[static_cast<int>(eShaderType::eTotal)];
+	//eShaderType shaderType = eShaderType::eNone;
+
+	//while (getline(stream, line))
+	//{
+	//	if (line.find("#shader") != std::string::npos)
+	//	{
+	//		if (line.find("Vertex") != std::string::npos)
+	//		{
+	//			shaderType = eShaderType::eVertex;
+	//		}
+	//		else if (line.find("Fragment") != std::string::npos)
+	//		{
+	//			shaderType = eShaderType::eFragment;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		stringStream[static_cast<int>(shaderType)] << line << "\n";
+	//		std::cout << line << "\n";
+	//	}
+	//}
+
+	//return { stringStream[static_cast<int>(eShaderType::eVertex)].str(),
+	//	stringStream[static_cast<int>(eShaderType::eFragment)].str() };
+
+
 	std::ifstream stream(filePath);
 	std::string line;
 	std::array<std::stringstream, 2> stringStream;
@@ -160,14 +189,48 @@ unsigned int createShaderProgram(const std::string& filePath)
 
 	//Create Vertex Shader
 	unsigned int vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-	const char* src = vertexShaderSource.c_str();
-	glShaderSource(vertexShaderID, 1, &src, nullptr);
+	const char* vertexSrc = vertexShaderSource.c_str();
+	glShaderSource(vertexShaderID, 1, &vertexSrc, nullptr);
 	glCompileShader(vertexShaderID);
 
 	//Create Fragment Shader
 	unsigned int fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 	const char* fragSrc = vertexShaderSource.c_str();
 	glShaderSource(fragmentShaderID, 1, &fragSrc, nullptr);
+	glCompileShader(fragmentShaderID);
+	std::cout << glGetError();
+
+
+	int vertexShaderResult = 0;
+	glGetShaderiv(vertexShaderID, GL_COMPILE_STATUS, &vertexShaderResult);
+	int fragmentShaderResult = 0;
+	glGetShaderiv(fragmentShaderID, GL_COMPILE_STATUS, &fragmentShaderResult);
+	std::cout << glGetError();
+	
+	//int logLength;
+	//if (vertexShaderResult == GL_FALSE)
+	//{
+	//	glGetShaderiv(vertexShaderID, GL_INFO_LOG_LENGTH, &logLength);
+	//	std::string s;
+	//	log_buf = malloc(log_len);
+	//	glGetShaderInfoLog( shader->handle, log_len, NULL, log_buf);
+	//	std:cout << "Compilation error in shader 's': s", id, log_buf);
+	//	free(log_buf);
+	//	shader->handle = 0;
+	//	goto err;
+	//}
+
+	//	if (|| fragmentShaderResult == GL_FALSE))
+	//{
+
+	//}
+
+
+	if (vertexShaderResult == GL_FALSE || fragmentShaderResult == GL_FALSE)
+	{
+		std::cout << glGetError();
+		std::cout << "Failed\n";
+	}
 
 	glAttachShader(shaderID, vertexShaderID);
 	glAttachShader(shaderID, fragmentShaderID);
@@ -192,7 +255,7 @@ int main()
 	window.setFramerateLimit(60);
 	gladLoadGL();
 
-	//unsigned int shaderID = createShaderProgram("Basic.shader");
+	unsigned int shaderID = createShaderProgram("Basic.shader");
 
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
@@ -213,7 +276,7 @@ int main()
 	};
 
 	unsigned int positionVBO;
-	glGenBuffers(GL_ARRAY_BUFFER, &positionVBO);
+	glGenBuffers(1, &positionVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, positionVBO);
 	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_STATIC_DRAW);
 
@@ -221,7 +284,7 @@ int main()
 	glVertexAttribPointer(0, positions.size(), GL_FLOAT, GL_FALSE, 3, 0);
 
 	unsigned int indiciesVBO;
-	glGenBuffers(GL_ELEMENT_ARRAY_BUFFER, &indiciesVBO);
+	glGenBuffers(1, &indiciesVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesVBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies.size() * sizeof(float), indicies.data(), GL_STATIC_DRAW);
 
