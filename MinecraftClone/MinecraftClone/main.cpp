@@ -151,33 +151,34 @@ void parseShaderFromFile(const std::string& filePath, std::string& vertexShaderS
 	//	stringStream[static_cast<int>(eShaderType::eFragment)].str() };
 
 
-	std::ifstream stream(filePath);
-	std::string line;
-	std::array<std::stringstream, 2> stringStream;
-	int stringStreamIndex = 0;
+	//std::ifstream stream(filePath);
+	//std::string line;
+	//std::array<std::stringstream, 2> stringStream;
+	//int stringStreamIndex = 0;
 
-	while (getline(stream, line))
-	{
-		if (line.find("#shader") != std::string::npos)
-		{
-			if (line.find("Vertex") != std::string::npos)
-			{
-				stringStreamIndex = 0;
-			}
-			else if (line.find("Fragment") != std::string::npos)
-			{
-				stringStreamIndex = 1;
-			}
-		}
-		else
-		{
-			stringStream[stringStreamIndex] << line << "\n";
-			std::cout << line << "\n";
-		}
-	}
+	//while (getline(stream, line))
+	//{
+	//	std::cout << "Print\n";
+	//	if (line.find("#shader") != std::string::npos)
+	//	{
+	//		if (line.find("Vertex") != std::string::npos)
+	//		{
+	//			stringStreamIndex = 0;
+	//		}
+	//		else if (line.find("Fragment") != std::string::npos)
+	//		{
+	//			stringStreamIndex = 1;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		stringStream[stringStreamIndex] << line << "\n";
+	//		std::cout << line << "\n";
+	//	}
+	//}
 
-	vertexShaderSource = stringStream[0].str();
-	fragmentShaderSource = stringStream[1].str();
+	//vertexShaderSource = stringStream[0].str();
+	//fragmentShaderSource = stringStream[1].str();
 }
 
 unsigned int createShaderProgram(const std::string& filePath)
@@ -263,12 +264,11 @@ int main()
 	window.setFramerateLimit(60);
 	gladLoadGL();
 
-
-	unsigned int shaderID = createShaderProgram("Basic.shader");
-
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
+
+
 
 	std::array<float, 12> positions
 	{
@@ -297,7 +297,7 @@ int main()
 	glGenBuffers(1, &indiciesVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesVBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies.size() * sizeof(float), indicies.data(), GL_STATIC_DRAW);
-
+	unsigned int shaderID = createShaderProgram("Basic.shader");
 
 
 	while (window.isOpen())
