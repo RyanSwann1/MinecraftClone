@@ -79,6 +79,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Basic.shader" />
+    <None Include="FragmentShader.shader">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="VertexShader.shader">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
