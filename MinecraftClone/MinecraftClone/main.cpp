@@ -1,11 +1,12 @@
-
 #include "glad.h"
+#include "Texture.h"
 #include <string>
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <fstream>
 #include <sstream>
 #include <array>
+#include <memory>
 
 //#include "VertexBufferLayout.h"
 //#include "VertexBuffer.h"
@@ -16,7 +17,6 @@
 //#include "Texture.h"
 
 //https://hacknplan.com/
-
 //https://www.reddit.com/r/Minecraft/comments/2ikiaw/opensimplex_noise_for_terrain_generation_instead/
 
 //Discourage use of VAOs all the time
@@ -120,6 +120,23 @@
 //	}
 //}
 
+int getUniformLocation(unsigned int shaderID, const std::string& uniformName)
+{
+	int location = glGetUniformLocation(shaderID, uniformName.c_str());
+	if (location == -1)
+	{
+		std::cout << "Failed to find uniform: " << uniformName << "\n";
+		return location;
+	}
+
+	return location;
+}
+
+void setUniform1i(unsigned int shaderID, const std::string& uniformName, int value)
+{
+	glUniform1i(getUniformLocation(shaderID, uniformName), value);
+}
+
 void parseShaderFromFile(const std::string& filePath, std::string& shaderSource)
 {
 	std::ifstream stream(filePath);
@@ -203,17 +220,27 @@ int main()
 	sf::Window window(sf::VideoMode(750, 750), "Minecraft", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
 	gladLoadGL();
-
+	unsigned int shaderID = createShaderProgram();
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
+	std::unique_ptr<Texture> texture = Texture::loadTexture("America.jpg");
+	if (!texture)
+	{
+		std::cout << "couldn't load texture: " << "America.jpg" << "\n";
+		return -1;
+	}
+
+	texture->bind();
+	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot());
+
 	std::array<float, 12> positions
 	{
-		0.5f,  0.5f, 0.0f,  // top right
-		0.5f, -0.5f, 0.0f,  // bottom right
 		-0.5f, -0.5f, 0.0f,  // bottom left
-		-0.5f,  0.5f, 0.0f   // top left 
+		0.5f, -0.5f, 0.0f,  // bottom right
+		0.5f,  0.5f, 0.0f,  // top right
+		-0.5f, 0.5f, 0.0f   // top left 
 	};
 
 	std::array<unsigned int, 6> indicies
@@ -222,7 +249,13 @@ int main()
 		2, 3, 0
 	};
 
-	unsigned int shaderID = createShaderProgram();
+	std::array<float, 8> textCoords
+	{
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f
+	};
 
 	unsigned int positionVBO;
 	glGenBuffers(1, &positionVBO);
@@ -232,10 +265,22 @@ int main()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
 
+	unsigned int textCoordsVBO;
+	glGenBuffers(1, &textCoordsVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, textCoordsVBO);
+	glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(float), textCoords.data(), GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)0);
+
 	unsigned int indiciesVBO;
 	glGenBuffers(1, &indiciesVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesVBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies.size() * sizeof(unsigned int), indicies.data(), GL_STATIC_DRAW);
+
+	std::cout << glGetError() << "\n";
+	std::cout << glGetError() << "\n";
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	while (window.isOpen())
 	{
@@ -249,9 +294,7 @@ int main()
 		}
 
 		glClear(GL_COLOR_BUFFER_BIT);
-
 		glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
-
 		window.display();
 	}
 

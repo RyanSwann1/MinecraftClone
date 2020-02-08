@@ -141,6 +141,7 @@
     <ClInclude Include="glad.h" />
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="khrplatform.h" />
+    <ClInclude Include="OpenGLErrorCheck.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />

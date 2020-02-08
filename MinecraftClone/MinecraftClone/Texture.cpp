@@ -3,56 +3,69 @@
 #include <SFML/Graphics.hpp>
 #include "stb_image.h"
 
-Texture::Texture(const std::string& filePath)
-	: m_rendererID(0),
-	m_filePath(filePath),
-	m_localBuffer(nullptr),
+Texture::Texture()
+	: m_currentSlot(0),
+	m_ID(0),
 	m_width(0),
 	m_height(0),
-	m_bytesPerPixel(0)
+	m_bytesPerPixel(0),
+	m_localBuffer(nullptr)
+{}
+
+Texture::~Texture()
 {
-	glGenTextures(1, &m_rendererID);
-	glBindTexture(GL_TEXTURE_2D, m_rendererID);
+	glDeleteTextures(1, &m_ID);
+}
 
-	stbi_set_flip_vertically_on_load(1);
-	m_localBuffer = stbi_load(filePath.c_str(), &m_width, &m_height, &m_bytesPerPixel, 4);
+std::unique_ptr<Texture> Texture::loadTexture(const std::string& name)
+{
+	Texture texture;
+	sf::Image image;
+	if (!image.loadFromFile("WoW.jpg"))
+	{
+		return std::unique_ptr<Texture>();
+	}
 
-	glGenTextures(1, &m_rendererID);
-	glBindTexture(GL_TEXTURE_2D, m_rendererID);
+
+	////stbi_set_flip_vertically_on_load(true);
+	//texture.m_localBuffer = stbi_load(name.c_str(), &texture.m_width, &texture.m_height, &texture.m_bytesPerPixel, 4);
+	//if (!texture.m_localBuffer)
+	//{
+	//	
+	//}
+
+	glGenTextures(1, &texture.m_ID);
+	glBindTexture(GL_TEXTURE_2D, texture.m_ID);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_localBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.getSize().x, image.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());
+	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	if (m_localBuffer)
-	{
-		stbi_image_free(m_localBuffer);
-	}
+	//stbi_image_free(texture.m_localBuffer);
+
+	return std::make_unique<Texture>(std::move(texture));
 }
 
-Texture::~Texture()
+unsigned int Texture::getCurrentSlot() const
 {
-	glDeleteTextures(1, &m_rendererID);
+	return m_currentSlot;
 }
 
-int Texture::getWidth() const
+unsigned int Texture::getID() const
 {
-	return 0;
+	return m_ID;
 }
 
-int Texture::getHeight() const
+void Texture::bind(unsigned int slot)
 {
-	return 0;
-}
-
-void Texture::bind(unsigned int slot) const
-{
-	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(GL_TEXTURE_2D, m_rendererID);
+	m_currentSlot = slot;
+	glActiveTexture(GL_TEXTURE0 + m_currentSlot);
+	glBindTexture(GL_TEXTURE_2D, m_ID);
 }
 
 void Texture::unbind() const
