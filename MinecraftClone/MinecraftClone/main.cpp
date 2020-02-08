@@ -150,45 +150,65 @@ void parseShaderFromFile(const std::string& filePath, std::string& vertexShaderS
 	//return { stringStream[static_cast<int>(eShaderType::eVertex)].str(),
 	//	stringStream[static_cast<int>(eShaderType::eFragment)].str() };
 
+	int i = 0;
+	std::ifstream stream(filePath);
+	std::string line;
+	std::stringstream vertexStringStream;
+	std::stringstream fragmentStringStream;
+	std::array<std::stringstream, 2> stringStream;
+	int stringStreamIndex = 0;
 
-	//std::ifstream stream(filePath);
-	//std::string line;
-	//std::array<std::stringstream, 2> stringStream;
-	//int stringStreamIndex = 0;
+	while (getline(stream, line))
+	{
+		if (line.find("#shader") != std::string::npos)
+		{
+			if (line.find("Vertex") != std::string::npos)
+			{
+				stringStreamIndex = 0;
+			}
+			else if (line.find("Fragment") != std::string::npos)
+			{
+				stringStreamIndex = 1;
+			}
+		}
 
-	//while (getline(stream, line))
-	//{
-	//	std::cout << "Print\n";
-	//	if (line.find("#shader") != std::string::npos)
-	//	{
-	//		if (line.find("Vertex") != std::string::npos)
-	//		{
-	//			stringStreamIndex = 0;
-	//		}
-	//		else if (line.find("Fragment") != std::string::npos)
-	//		{
-	//			stringStreamIndex = 1;
-	//		}
-	//	}
-	//	else
-	//	{
-	//		stringStream[stringStreamIndex] << line << "\n";
-	//		std::cout << line << "\n";
-	//	}
-	//}
+		else if (stringStreamIndex == 0)
+		{
+			vertexStringStream << line << "\n";
+		}
+		else if (stringStreamIndex == 1)
+		{
+			fragmentStringStream << line << "\n";
+		}
+		std::cout << line << "\n";
+	}
 
-	//vertexShaderSource = stringStream[0].str();
-	//fragmentShaderSource = stringStream[1].str();
+	stream.close();
+	vertexShaderSource = vertexStringStream.str();
+	fragmentShaderSource = fragmentStringStream.str();/*
+	vertexShaderSource = stringStream[0].str();
+	fragmentShaderSource = stringStream[1].str();*/
 }
 
 unsigned int createShaderProgram(const std::string& filePath)
 {
+	
+	std::cout.flush();
 	unsigned int shaderID = glCreateProgram();
 	std::string vertexShaderSource;
 	std::string fragmentShaderSource;
 	parseShaderFromFile(filePath, vertexShaderSource, fragmentShaderSource);
-	std::cout << vertexShaderSource << "\n";
-	std::cout << fragmentShaderSource << "\n";
+	
+	std::cout << "Hi" << "\n";
+	std::cout << "Hi" << "\n";
+	std::cout << "Hi" << "\n";
+	std::cout << "Hi" << "\n";
+	std::cout << "Hi" << "\n";
+	std::cout << "Hi" << "\n";
+
+	//std::cout << "Hi" << "\n";
+	//std::cout << vertexShaderSource << "\n";
+	//std::cout << fragmentShaderSource << "\n";
 
 	//Create Vertex Shader
 	unsigned int vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
@@ -209,7 +229,7 @@ unsigned int createShaderProgram(const std::string& filePath)
 
 	//Create Fragment Shader
 	unsigned int fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-	const char* fragSrc = vertexShaderSource.c_str();
+	const char* fragSrc = fragmentShaderSource.c_str();
 	glShaderSource(fragmentShaderID, 1, &fragSrc, nullptr);
 	glCompileShader(fragmentShaderID);
 
@@ -248,7 +268,13 @@ unsigned int createShaderProgram(const std::string& filePath)
 
 	glUseProgram(shaderID);
 
+	glDeleteShader(vertexShaderID);
+	glDeleteShader(fragmentShaderID);
+	
+
 	return shaderID;
+
+	return 0;
 }
 
 int main()
@@ -269,13 +295,12 @@ int main()
 	glBindVertexArray(VAO);
 
 
-
 	std::array<float, 12> positions
 	{
-		-0.5f, -0.5f, 0.0f, //0
-		0.5f, -0.5f, 0.0f, //1
-		0.5f, 0.5f, 0.0f, //2
-		-0.5f, 0.5f, 0.0f //3
+		0.5f,  0.5f, 0.0f,  // top right
+		0.5f, -0.5f, 0.0f,  // bottom right
+		-0.5f, -0.5f, 0.0f,  // bottom left
+		-0.5f,  0.5f, 0.0f   // top left 
 	};
 
 	std::array<unsigned int, 6> indicies
@@ -285,19 +310,27 @@ int main()
 	};
 
 
+	unsigned int shaderID = createShaderProgram("Basic.shader");
+
+	//glGenBuffers(1, &m_rendererID);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_rendererID);
+	//glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+
 	unsigned int positionVBO;
 	glGenBuffers(1, &positionVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, positionVBO);
 	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_STATIC_DRAW);
 
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, positions.size(), GL_FLOAT, GL_FALSE, 3, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
 
 	unsigned int indiciesVBO;
 	glGenBuffers(1, &indiciesVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesVBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies.size() * sizeof(float), indicies.data(), GL_STATIC_DRAW);
-	unsigned int shaderID = createShaderProgram("Basic.shader");
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof(unsigned int), data, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies.size() * sizeof(unsigned int), indicies.data(), GL_STATIC_DRAW);
 
 
 	while (window.isOpen())
@@ -313,10 +346,14 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glDrawElements(GL_ELEMENT_ARRAY_BUFFER, indicies.size(), GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
 
 		window.display();
 	}
+
+	glDeleteBuffers(1, &positionVBO);
+	glDeleteBuffers(1, &indiciesVBO);
+	glDeleteVertexArrays(1, &VAO);
 
 	return 0;
 }
