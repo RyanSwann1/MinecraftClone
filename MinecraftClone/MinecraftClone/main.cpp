@@ -123,7 +123,9 @@ int main()
 	sf::Window window(sf::VideoMode(750, 750), "Minecraft", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
 	gladLoadGL();
+
 	unsigned int shaderID = createShaderProgram();
+	
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
@@ -136,7 +138,6 @@ int main()
 	}
 
 	texture->bind();
-	std::cout << glGetError() << "\n";
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot());
 	
 	std::array<float, 12> positions
@@ -182,6 +183,8 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesVBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies.size() * sizeof(unsigned int), indicies.data(), GL_STATIC_DRAW);
 
+	glBindVertexArray(0);
+
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 
@@ -196,8 +199,12 @@ int main()
 			}
 		}
 
+		glBindVertexArray(VAO);
+
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
+		
+		glBindVertexArray(0);
 		window.display();
 	}
 

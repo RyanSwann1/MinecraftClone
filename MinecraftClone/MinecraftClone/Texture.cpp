@@ -9,6 +9,11 @@ Texture::Texture()
 	m_ID(0)
 {}
 
+Texture::~Texture()
+{
+	glDeleteTextures(1, &m_ID);
+}
+
 std::unique_ptr<Texture> Texture::loadTexture(const std::string& name)
 {
 	std::unique_ptr<Texture> texture(new Texture());
@@ -35,11 +40,6 @@ std::unique_ptr<Texture> Texture::loadTexture(const std::string& name)
 	return texture;
 }
 
-Texture::~Texture()
-{
-	glDeleteTextures(1, &m_ID);
-}
-
 unsigned int Texture::getCurrentSlot() const
 {
 	return m_currentSlot;
@@ -52,11 +52,9 @@ unsigned int Texture::getID() const
 
 void Texture::bind(unsigned int slot)
 {
-	std::cout << glGetError() << "No Error\n";
 	m_currentSlot = slot;
 	glActiveTexture(GL_TEXTURE0 + m_currentSlot);
 	glBindTexture(GL_TEXTURE_2D, m_ID);
-	std::cout << glGetError() << "\n";
 }
 
 void Texture::unbind() const
