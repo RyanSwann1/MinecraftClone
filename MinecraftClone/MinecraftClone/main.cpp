@@ -1,5 +1,6 @@
 #include "glad.h"
 #include "Texture.h"
+#include "glm/glm.hpp"
 #include "OpenGLErrorCheck.h"
 #include <string>
 #include <iostream>
@@ -185,8 +186,10 @@ int main()
 
 	glBindVertexArray(0);
 
-	std::cout << glGetError() << "\n";
-	std::cout << glGetError() << "\n";
+	while (GLenum error = glGetError())
+	{
+		std::cout << "Open GL Error: " << error << "\n";
+	}
 
 	while (window.isOpen())
 	{
