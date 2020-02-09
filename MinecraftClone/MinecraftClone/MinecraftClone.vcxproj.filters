@@ -21,9 +21,6 @@
     <ClCompile Include="glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VertexBufferLayout.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -33,9 +30,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="khrplatform.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexBufferLayout.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
