@@ -1,5 +1,6 @@
 #include "glad.h"
 #include "Texture.h"
+#include "OpenGLErrorCheck.h"
 #include <string>
 #include <iostream>
 #include <SFML/Graphics.hpp>
@@ -195,7 +196,7 @@ unsigned int createShaderProgram()
 		std::cout << "Failed to compile: " << errorMessage << "\n";
 	}
 
-	glAttachShader(shaderID, vertexShaderID);
+	GLCall(glAttachShader(shaderID, vertexShaderID));
 	glAttachShader(shaderID, fragmentShaderID);
 	glLinkProgram(shaderID);
 	glValidateProgram(shaderID);
