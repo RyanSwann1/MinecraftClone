@@ -4,7 +4,7 @@
 #include <iostream>
 
 #define ASSERT(x) if(!(x)) __debugbreak();
-#define GLCall(x) GLClearError();\
+#define glCall(x) GLClearError();\
 	x;\
 	ASSERT(GLLogCall())
 

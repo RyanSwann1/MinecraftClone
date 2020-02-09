@@ -2,40 +2,26 @@
 #include "glad.h"
 #include <SFML/Graphics.hpp>
 #include "stb_image.h"
+#include <iostream>
 
 Texture::Texture()
 	: m_currentSlot(0),
-	m_ID(0),
-	m_width(0),
-	m_height(0),
-	m_bytesPerPixel(0),
-	m_localBuffer(nullptr)
+	m_ID(0)
 {}
-
-Texture::~Texture()
-{
-	glDeleteTextures(1, &m_ID);
-}
 
 std::unique_ptr<Texture> Texture::loadTexture(const std::string& name)
 {
-	Texture texture;
+	std::unique_ptr<Texture> texture(new Texture());
 	sf::Image image;
-	if (!image.loadFromFile("WoW.jpg"))
+	if (!image.loadFromFile(name))
 	{
 		return std::unique_ptr<Texture>();
 	}
 
+	image.flipVertically();
 
-	////stbi_set_flip_vertically_on_load(true);
-	//texture.m_localBuffer = stbi_load(name.c_str(), &texture.m_width, &texture.m_height, &texture.m_bytesPerPixel, 4);
-	//if (!texture.m_localBuffer)
-	//{
-	//	
-	//}
-
-	glGenTextures(1, &texture.m_ID);
-	glBindTexture(GL_TEXTURE_2D, texture.m_ID);
+	glGenTextures(1, &texture->m_ID);
+	glBindTexture(GL_TEXTURE_2D, texture->m_ID);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -46,9 +32,12 @@ std::unique_ptr<Texture> Texture::loadTexture(const std::string& name)
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	//stbi_image_free(texture.m_localBuffer);
+	return texture;
+}
 
-	return std::make_unique<Texture>(std::move(texture));
+Texture::~Texture()
+{
+	glDeleteTextures(1, &m_ID);
 }
 
 unsigned int Texture::getCurrentSlot() const
@@ -63,9 +52,11 @@ unsigned int Texture::getID() const
 
 void Texture::bind(unsigned int slot)
 {
+	std::cout << glGetError() << "No Error\n";
 	m_currentSlot = slot;
 	glActiveTexture(GL_TEXTURE0 + m_currentSlot);
 	glBindTexture(GL_TEXTURE_2D, m_ID);
+	std::cout << glGetError() << "\n";
 }
 
 void Texture::unbind() const
