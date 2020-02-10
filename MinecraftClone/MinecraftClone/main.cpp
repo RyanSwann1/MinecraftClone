@@ -26,6 +26,29 @@
 //Select buffer - state - then draw me a triangle
 //Based off of which buffer has been selected, it determines what/how will be drawn
 
+struct Camera
+{
+	Camera()
+		: position(0.0f, 0.0f, 3.0f)
+	{
+		//Direction
+		glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+		direction = glm::normalize(position - cameraTarget);
+	
+		//Right Axis
+		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+		right = glm::normalize(glm::cross(up, direction));
+
+		//Up Axis
+		up = glm::cross(direction, right);
+	}
+
+	glm::vec3 position;
+	glm::vec3 direction;
+	glm::vec3 right;
+	glm::vec3 up;
+};
+
 int getUniformLocation(unsigned int shaderID, const std::string& uniformName)
 {
 	int location = glGetUniformLocation(shaderID, uniformName.c_str());
@@ -244,7 +267,6 @@ int main()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (const void*)(3 * sizeof(float)));
 
-
 	//unsigned int textCoordsVBO;
 	//glGenBuffers(1, &textCoordsVBO);
 	//glBindBuffer(GL_ARRAY_BUFFER, textCoordsVBO);
@@ -284,11 +306,16 @@ int main()
 		glClear(GL_DEPTH_BUFFER_BIT);
 		
 		//glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)clock.getElapsedTime().asSeconds() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 100.f);
-
+		//glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
 		
+		glm::mat4 view = glm::mat4(1.0f);
+		float radius = 10.0f;
+		float camX = glm::sin(clock.getElapsedTime().asSeconds()) * radius;
+		float camZ = glm::cos(clock.getElapsedTime().asSeconds()) * radius;
+		view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		setUniformMat4f(shaderID, "uView", view);
+
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 100.f);
 		setUniformMat4f(shaderID, "uProjection", projection);
 
 		//glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
