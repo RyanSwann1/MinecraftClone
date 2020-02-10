@@ -19,8 +19,7 @@
 
 //OpenGL is a state machine
 //Select buffer - state - then draw me a triangle
-//Based off of which buffer has been selected, it determines what/how will be drawn
-
+//Based off of which buffer has been selected, it determines what/how will be drawns
 
 int getUniformLocation(unsigned int shaderID, const std::string& uniformName)
 {
@@ -151,7 +150,11 @@ int main()
 	texture->bind();
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot());
 	
-	std::array<float, 180> vertices = {
+	const std::array<GLfloat, 12> FRONT_FACE = { 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1 };
+
+	std::array<float, 180> vertices = 
+	{
+		//Front Face
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
 		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -159,13 +162,15 @@ int main()
 		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
+		//Back Face
 		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
 		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
 		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
 		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
 		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
+		
+		//Left Face
 		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
 		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
@@ -173,6 +178,7 @@ int main()
 		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
+		//Right Face
 		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
 		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
@@ -180,6 +186,7 @@ int main()
 		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
+		 //Bottom Face
 		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
 		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
@@ -187,6 +194,7 @@ int main()
 		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
+		//Top Face
 		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
 		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
 		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
@@ -195,19 +203,17 @@ int main()
 		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
 
-	std::array<glm::vec3, 10> cubePositions =
+	std::array<std::array<std::array<glm::vec3, 16>, 16>, 16> chunk;
+	for (int x = 0; x < 16; ++x)
 	{
-		glm::vec3(0.0f,  0.0f,  0.0f),
-		glm::vec3(2.0f,  5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3(2.4f, -0.4f, -3.5f),
-		glm::vec3(-1.7f,  3.0f, -7.5f),
-		glm::vec3(1.3f, -2.0f, -2.5f),
-		glm::vec3(1.5f,  2.0f, -2.5f),
-		glm::vec3(1.5f,  0.2f, -1.5f),
-		glm::vec3(-1.3f,  1.0f, -1.5f)
-	};
+		for (int y = 0; y < 16; ++y)
+		{
+			for (int z = 0; z < 16; z++)
+			{
+				chunk[x][y][z] = glm::vec3(x, y, z);
+			}
+		}
+	}
 
 	std::array<float, 12> positions
 	{
@@ -289,23 +295,27 @@ int main()
 		
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
-
 		setUniformMat4f(shaderID, "uView", view);
 
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 100.f);
 		setUniformMat4f(shaderID, "uProjection", projection);
 
 		//glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
-		
-		for (int i = 0; i < cubePositions.size(); ++i)
-		{
-			glm::mat4 model = glm::translate(glm::mat4(1.0f), cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3, 0.5f));
-			setUniformMat4f(shaderID, "uModel", model);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
 
+
+		for (int x = 0; x < 16; ++x)
+		{
+			for (int y = 0; y < 16; ++y)
+			{
+				for (int z = 0; z < 16; z++)
+				{
+					glm::mat4 model = glm::translate(glm::mat4(1.0f), chunk[x][y][z]);
+					setUniformMat4f(shaderID, "uModel", model);
+					glDrawArrays(GL_TRIANGLES, 0, 36);
+				}
+			}
+		}
+		
 		glBindVertexArray(0);
 		window.display();
 	}
