@@ -277,12 +277,10 @@ int main()
 			{
 				camera.move(currentSFMLEvent, clock.restart().asSeconds());
 			}
-			else if (currentSFMLEvent.type == sf::Event::MouseMoved)
-			{
-				sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-				camera.mouse_callback(mousePosition.x, mousePosition.y);
-			}
 		}
+
+		sf::Vector2i mousePosition = sf::Mouse::getPosition();
+		camera.mouse_callback(mousePosition.x, mousePosition.y);
 
 		glBindVertexArray(VAO);
 
