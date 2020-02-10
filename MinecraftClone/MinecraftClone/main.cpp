@@ -29,7 +29,7 @@
 struct Camera
 {
 	Camera()
-		: m_speed(1.0f),
+		: m_speed(0.5f),
 		m_position(0.0f, 0.0f, 3.0f),
 		m_front(0.0f, 0.0f, -1.0f),
 		m_up(0.0f, 1.0f, 0.0f)
@@ -65,10 +65,52 @@ struct Camera
 		}
 	}
 
+	void mouse_callback(double xpos, double ypos)
+	{
+		//if (firstMouse)
+		//{
+		//	lastX = xpos;
+		//	lastY = ypos;
+		//	firstMouse = false;
+		//}
+
+		float xoffset = xpos - lastX;
+		float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+		lastX = xpos;
+		lastY = ypos;
+
+		float sensitivity = 0.1f; // change this value to your liking
+		xoffset *= sensitivity;
+		yoffset *= sensitivity;
+
+		yaw += xoffset;
+		pitch += yoffset;
+
+		// make sure that when pitch is out of bounds, screen doesn't get flipped
+		if (pitch > 89.0f)
+			pitch = 89.0f;
+		if (pitch < -89.0f)
+			pitch = -89.0f;
+
+		glm::vec3 front;
+		front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+		front.y = sin(glm::radians(pitch));
+		front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+		m_front = glm::normalize(front);
+	}
+
+
 	float m_speed;
 	glm::vec3 m_position;
 	glm::vec3 m_front;
 	glm::vec3 m_up;
+
+	float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+	float pitch = 0.0f;
+	float lastX = 800.0f / 2.0;
+	float lastY = 600.0 / 2.0;
+	float fov = 45.0f;
+
 };
 
 int getUniformLocation(unsigned int shaderID, const std::string& uniformName)
@@ -176,7 +218,7 @@ int main()
 	settings.minorVersion = 3;
 	settings.attributeFlags = sf::ContextSettings::Core;
 	sf::Vector2i windowSize(750, 750);
-	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft", sf::Style::Default, settings);
+	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(60);
 	gladLoadGL();
 
@@ -322,8 +364,15 @@ int main()
 			{
 				window.close();
 			}
-
-			camera.move(currentSFMLEvent, clock.restart().asSeconds());
+			else if (currentSFMLEvent.type == sf::Event::KeyPressed)
+			{
+				camera.move(currentSFMLEvent, clock.restart().asSeconds());
+			}
+			else if (currentSFMLEvent.type == sf::Event::MouseMoved)
+			{
+				sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+				camera.mouse_callback(mousePosition.x, mousePosition.y);
+			}
 		}
 
 		glBindVertexArray(VAO);
