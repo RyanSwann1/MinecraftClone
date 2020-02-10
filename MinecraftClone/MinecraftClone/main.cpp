@@ -29,24 +29,46 @@
 struct Camera
 {
 	Camera()
-		: position(0.0f, 0.0f, 3.0f)
+		: m_speed(1.0f),
+		m_position(0.0f, 0.0f, 3.0f),
+		m_front(0.0f, 0.0f, -1.0f),
+		m_up(0.0f, 1.0f, 0.0f)
 	{
-		//Direction
-		glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-		direction = glm::normalize(position - cameraTarget);
+		////Direction
+		//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+		//direction = glm::normalize(position - cameraTarget);
 	
-		//Right Axis
-		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-		right = glm::normalize(glm::cross(up, direction));
+		////Right Axis
+		//glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+		//right = glm::normalize(glm::cross(up, direction));
 
-		//Up Axis
-		up = glm::cross(direction, right);
+		////Up Axis
+		//up = glm::cross(direction, right);
+	}
+		
+	void move(const sf::Event& sfmlEvent, float deltaTime)
+	{
+		switch (sfmlEvent.key.code)
+		{
+		case sf::Keyboard::A :
+			m_position -= glm::normalize(glm::cross(m_front, m_up)) * m_speed;
+			break;
+		case sf::Keyboard::D:
+			m_position += glm::normalize(glm::cross(m_front, m_up)) * m_speed;
+			break;
+		case sf::Keyboard::W:
+			m_position += m_speed * m_front;
+			break;
+		case sf::Keyboard::S:
+			m_position -= m_speed * m_front;
+			break;
+		}
 	}
 
-	glm::vec3 position;
-	glm::vec3 direction;
-	glm::vec3 right;
-	glm::vec3 up;
+	float m_speed;
+	glm::vec3 m_position;
+	glm::vec3 m_front;
+	glm::vec3 m_up;
 };
 
 int getUniformLocation(unsigned int shaderID, const std::string& uniformName)
@@ -173,6 +195,8 @@ int main()
 		return -1;
 	}
 
+	Camera camera;
+
 	texture->bind();
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot());
 	
@@ -298,6 +322,8 @@ int main()
 			{
 				window.close();
 			}
+
+			camera.move(currentSFMLEvent, clock.restart().asSeconds());
 		}
 
 		glBindVertexArray(VAO);
@@ -308,11 +334,13 @@ int main()
 		//glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)clock.getElapsedTime().asSeconds() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 		//glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
 		
+		//view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 		glm::mat4 view = glm::mat4(1.0f);
-		float radius = 10.0f;
-		float camX = glm::sin(clock.getElapsedTime().asSeconds()) * radius;
-		float camZ = glm::cos(clock.getElapsedTime().asSeconds()) * radius;
-		view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
+		//float radius = 10.0f;
+		//float camX = glm::sin(clock.getElapsedTime().asSeconds()) * radius;
+		//float camZ = glm::cos(clock.getElapsedTime().asSeconds()) * radius;
+		//view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		setUniformMat4f(shaderID, "uView", view);
 
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 100.f);
