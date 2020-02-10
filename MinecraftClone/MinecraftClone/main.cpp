@@ -136,10 +136,8 @@ int main()
 	gladLoadGL();
 
 	glViewport(0, 0, windowSize.x, windowSize.y);
+	glEnable(GL_DEPTH_TEST);
 	unsigned int shaderID = createShaderProgram();
-	
-	//glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
-	glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)windowSize.x / (float)windowSize.y, 0.1f, 100.0f);
 
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
@@ -155,6 +153,50 @@ int main()
 	texture->bind();
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot());
 	
+	std::array<float, 180> vertices = {
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+	};
+
 	std::array<float, 12> positions
 	{
 		-0.5f, -0.5f, 0.0f,  // bottom left
@@ -177,21 +219,25 @@ int main()
 		0.0f, 1.0f
 	};
 
-	unsigned int positionVBO;
-	glGenBuffers(1, &positionVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, positionVBO);
-	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_STATIC_DRAW);
+	unsigned int verticesVBO;
+	glGenBuffers(1, &verticesVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, verticesVBO);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
-
-	unsigned int textCoordsVBO;
-	glGenBuffers(1, &textCoordsVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, textCoordsVBO);
-	glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(float), textCoords.data(), GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (const void*)0);
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (const void*)(3 * sizeof(float)));
+
+
+	//unsigned int textCoordsVBO;
+	//glGenBuffers(1, &textCoordsVBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, textCoordsVBO);
+	//glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(float), textCoords.data(), GL_STATIC_DRAW);
+
+	//glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)0);
 
 	unsigned int indiciesVBO;
 	glGenBuffers(1, &indiciesVBO);
@@ -200,10 +246,12 @@ int main()
 
 	glBindVertexArray(0);
 
-	while (GLenum error = glGetError())
-	{
-		std::cout << "Open GL Error: " << error << "\n";
-	}
+	std::cout << glGetError() << "\n";
+	std::cout << glGetError() << "\n";
+	std::cout << glGetError() << "\n";
+
+	sf::Clock clock;
+	clock.restart();
 
 	while (window.isOpen())
 	{
@@ -219,8 +267,9 @@ int main()
 		glBindVertexArray(VAO);
 
 		glClear(GL_COLOR_BUFFER_BIT);
-
-		glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		glClear(GL_DEPTH_BUFFER_BIT);
+		
+		glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)clock.getElapsedTime().asSeconds() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 100.f);
 
@@ -228,13 +277,14 @@ int main()
 		setUniformMat4f(shaderID, "uView", view);
 		setUniformMat4f(shaderID, "uProjection", projection);
 
-		glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
-		
+		//glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
 		glBindVertexArray(0);
 		window.display();
 	}
 
-	glDeleteBuffers(1, &positionVBO);
+	glDeleteBuffers(1, &verticesVBO);
 	glDeleteBuffers(1, &indiciesVBO);
 	glDeleteVertexArrays(1, &VAO);
 
