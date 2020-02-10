@@ -1,12 +1,7 @@
-#include "glad.h"
 #include "Texture.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include "OpenGLErrorCheck.h"
+#include "Camera.h"
 #include <string>
 #include <iostream>
-#include <SFML/Graphics.hpp>
 #include <fstream>
 #include <sstream>
 #include <array>
@@ -26,92 +21,6 @@
 //Select buffer - state - then draw me a triangle
 //Based off of which buffer has been selected, it determines what/how will be drawn
 
-struct Camera
-{
-	Camera()
-		: m_speed(0.5f),
-		m_position(0.0f, 0.0f, 3.0f),
-		m_front(0.0f, 0.0f, -1.0f),
-		m_up(0.0f, 1.0f, 0.0f)
-	{
-		////Direction
-		//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-		//direction = glm::normalize(position - cameraTarget);
-	
-		////Right Axis
-		//glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-		//right = glm::normalize(glm::cross(up, direction));
-
-		////Up Axis
-		//up = glm::cross(direction, right);
-	}
-		
-	void move(const sf::Event& sfmlEvent, float deltaTime)
-	{
-		switch (sfmlEvent.key.code)
-		{
-		case sf::Keyboard::A :
-			m_position -= glm::normalize(glm::cross(m_front, m_up)) * m_speed;
-			break;
-		case sf::Keyboard::D:
-			m_position += glm::normalize(glm::cross(m_front, m_up)) * m_speed;
-			break;
-		case sf::Keyboard::W:
-			m_position += m_speed * m_front;
-			break;
-		case sf::Keyboard::S:
-			m_position -= m_speed * m_front;
-			break;
-		}
-	}
-
-	void mouse_callback(double xpos, double ypos)
-	{
-		//if (firstMouse)
-		//{
-		//	lastX = xpos;
-		//	lastY = ypos;
-		//	firstMouse = false;
-		//}
-
-		float xoffset = xpos - lastX;
-		float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-		lastX = xpos;
-		lastY = ypos;
-
-		float sensitivity = 0.1f; // change this value to your liking
-		xoffset *= sensitivity;
-		yoffset *= sensitivity;
-
-		yaw += xoffset;
-		pitch += yoffset;
-
-		// make sure that when pitch is out of bounds, screen doesn't get flipped
-		if (pitch > 89.0f)
-			pitch = 89.0f;
-		if (pitch < -89.0f)
-			pitch = -89.0f;
-
-		glm::vec3 front;
-		front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-		front.y = sin(glm::radians(pitch));
-		front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-		m_front = glm::normalize(front);
-	}
-
-
-	float m_speed;
-	glm::vec3 m_position;
-	glm::vec3 m_front;
-	glm::vec3 m_up;
-
-	float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
-	float pitch = 0.0f;
-	float lastX = 800.0f / 2.0;
-	float lastY = 600.0 / 2.0;
-	float fov = 45.0f;
-
-};
 
 int getUniformLocation(unsigned int shaderID, const std::string& uniformName)
 {
@@ -218,7 +127,7 @@ int main()
 	settings.minorVersion = 3;
 	settings.attributeFlags = sf::ContextSettings::Core;
 	sf::Vector2i windowSize(750, 750);
-	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft", sf::Style::Fullscreen, settings);
+	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
 	gladLoadGL();
 
@@ -380,16 +289,9 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		
-		//glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)clock.getElapsedTime().asSeconds() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-		//glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
-		
-		//view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
-		//float radius = 10.0f;
-		//float camX = glm::sin(clock.getElapsedTime().asSeconds()) * radius;
-		//float camZ = glm::cos(clock.getElapsedTime().asSeconds()) * radius;
-		//view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
 		setUniformMat4f(shaderID, "uView", view);
 
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 100.f);
