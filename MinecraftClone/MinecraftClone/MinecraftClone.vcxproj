@@ -130,6 +130,7 @@
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -158,8 +159,10 @@
     <ClInclude Include="glm\vec4.hpp" />
     <ClInclude Include="glm\vector_relational.hpp" />
     <ClInclude Include="khrplatform.h" />
+    <ClInclude Include="NonCopyable.h" />
     <ClInclude Include="OpenGLErrorCheck.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="FragmentShader.shader" />
