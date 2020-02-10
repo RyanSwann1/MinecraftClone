@@ -1,6 +1,8 @@
 #include "glad.h"
 #include "Texture.h"
 #include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include "OpenGLErrorCheck.h"
 #include <string>
 #include <iostream>
@@ -34,6 +36,11 @@ int getUniformLocation(unsigned int shaderID, const std::string& uniformName)
 	}
 
 	return location;
+}
+
+void setUniformMat4f(unsigned int shaderID, const std::string& uniformName, const glm::mat4& matrix)
+{
+	glUniformMatrix4fv(getUniformLocation(shaderID, uniformName), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 void setUniform1i(unsigned int shaderID, const std::string& uniformName, int value)
@@ -112,6 +119,8 @@ unsigned int createShaderProgram()
 	return shaderID;
 }
 
+//View == Frustrum
+
 int main()
 {
 	sf::ContextSettings settings;
@@ -121,12 +130,17 @@ int main()
 	settings.majorVersion = 3;
 	settings.minorVersion = 3;
 	settings.attributeFlags = sf::ContextSettings::Core;
-	sf::Window window(sf::VideoMode(750, 750), "Minecraft", sf::Style::Default, settings);
+	sf::Vector2i windowSize(750, 750);
+	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
 	gladLoadGL();
 
+	glViewport(0, 0, windowSize.x, windowSize.y);
 	unsigned int shaderID = createShaderProgram();
 	
+	//glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
+	glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)windowSize.x / (float)windowSize.y, 0.1f, 100.0f);
+
 	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
@@ -205,6 +219,15 @@ int main()
 		glBindVertexArray(VAO);
 
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 100.f);
+
+		setUniformMat4f(shaderID, "uModel", model);
+		setUniformMat4f(shaderID, "uView", view);
+		setUniformMat4f(shaderID, "uProjection", projection);
+
 		glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
 		
 		glBindVertexArray(0);
