@@ -156,45 +156,52 @@ int main()
 	
 	const std::array<GLfloat, 12> FRONT_FACE = { 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1 };
 
-	std::array<float, 120> positions = 
+	std::array<float, 180> vertices =
 	{
-		//Back Face
-		-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
-		1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
-		1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 
-		-1.0f, 1.0f, -1.0f, 0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-		//Front Face
-		-1.0f, -1.0f, 1.0f, 0.0f, 0.0f,
-		1.0f, -1.0f, 1.0f, 1.0f, 0.0f,
-		1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-		
-		//Left Face
-		-1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 
-		-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 
-		-1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 
-		-1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-		//Right Face
-		1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
-		1.0f, 1.0f, -1.0f, 1.0f, 0.0f,
-		1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, -1.0f, 1.0f, 0.0f, 1.0f
+		//x & y
+		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
 
-		 //Bottom Face
-		-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
-		1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
-		1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
-		-1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
 
-		//Top Face
-		-1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-		1.0f, 1.0f, -1.0f, 1.0f, 0.0f,
-		1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
-
 
 	std::array<unsigned int, 36> indicies
 	{
@@ -215,7 +222,6 @@ int main()
 
 		21, 22, 23,
 		24, 25, 21
-
 	};
 
 	std::array<std::array<std::array<glm::vec3, 16>, 16>, 16> chunk;
@@ -248,10 +254,10 @@ int main()
 		0.0f, 1.0f
 	};
 
-	unsigned int positionsVBO;
-	glGenBuffers(1, &positionsVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
-	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_STATIC_DRAW);
+	unsigned int verticesVBO;
+	glGenBuffers(1, &verticesVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, verticesVBO);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (const void*)0);
@@ -312,8 +318,8 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 100.f);
 		setUniformMat4f(shaderID, "uProjection", projection);
 
-		glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
+		//glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 		
 		//for (int x = 0; x < 16; ++x)
 		//{
@@ -332,9 +338,48 @@ int main()
 		window.display();
 	}
 
-	glDeleteBuffers(1, &positionsVBO);
+	glDeleteBuffers(1, &verticesVBO);
 	glDeleteBuffers(1, &indiciesVBO);
 	glDeleteVertexArrays(1, &VAO);
 
 	return 0;
 }
+
+//std::array<float, 120> positions =
+//{
+//	//Back Face
+//	-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+//	1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
+//	1.0f, 1.0f, -1.0f, 1.0f, 1.0f,
+//	-1.0f, 1.0f, -1.0f, 0.0f, 1.0f,
+//
+//	//Front Face
+//	-1.0f, -1.0f, 1.0f, 0.0f, 0.0f,
+//	1.0f, -1.0f, 1.0f, 1.0f, 0.0f,
+//	1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+//	-1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+//
+//	//Left Face
+//	-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+//	-1.0f, 1.0f, -1.0f, 1.0f, 0.0f,
+//	-1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+//	-1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
+//
+//	//Right Face
+//	1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+//	1.0f, 1.0f, -1.0f, 1.0f, 0.0f,
+//	1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+//	1.0f, -1.0f, 1.0f, 0.0f, 1.0f
+//
+//	//Bottom Face
+//   - 1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+//   1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
+//   1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
+//   -1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
+//
+//	//Top Face
+//	-1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+//	1.0f, 1.0f, -1.0f, 1.0f, 0.0f,
+//	1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+//	-1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+//};
