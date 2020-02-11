@@ -374,7 +374,7 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
-		//
+
 		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 		setUniformMat4f(shaderID, "uModel", model);
 		glm::mat4 view = glm::mat4(1.0f);
@@ -450,42 +450,42 @@ std::array<float, 120> positions =
 };
 
 
-Vertex Vertices[]
-{
-	//Positions											//TexCoords				
-	//Front
-	glm::vec3(-0.5f, 0.5f, 0.5f),						glm::vec2(0.f, 2.f),	
-	glm::vec3(-0.5f, -0.5f, 0.5f),						glm::vec2(0.f, 0.f),	
-	glm::vec3(0.5f, -0.5f, 0.5f),						glm::vec2(2.f, 0.f),	
-	glm::vec3(0.5f, 0.5f, 0.5f),						glm::vec2(2.f, 2.f),	
-
-	//Back
-	glm::vec3(0.5f, 0.5f, -0.5f),						glm::vec2(0.f, 2.f),	
-	glm::vec3(0.5f, -0.5f, -0.5f),						glm::vec2(0.f, 0.f),	
-	glm::vec3(-0.5f, -0.5f, -0.5f),						glm::vec2(2.f, 0.f),	
-	glm::vec3(-0.5f, 0.5f, -0.5f),						glm::vec2(2.f, 2.f), 	
-
-	//Top
-	glm::vec3(-0.5f, 0.5f, 0.5f),						glm::vec2(0.f, 2.f),	
-	glm::vec3(0.5f, 0.5f, 0.5f),						glm::vec2(2.f, 2.f),	
-	glm::vec3(0.5f, 0.5f, -0.5f),						glm::vec2(0.f, 2.f),	
-	glm::vec3(-0.5f, 0.5f, -0.5f),						glm::vec2(2.f, 2.f), 	
-
-	//Bottom
-	glm::vec3(-0.5f, -0.5f, 0.5f),						glm::vec2(0.f, 0.f),	
-	glm::vec3(0.5f, -0.5f, 0.5f),						glm::vec2(2.f, 0.f),	
-	glm::vec3(0.5f, -0.5f, -0.5f),						glm::vec2(0.f, 0.f),	
-	glm::vec3(-0.5f, -0.5f, -0.5f),						glm::vec2(2.f, 0.f),	
-
-	//Left
-	glm::vec3(-0.5f, 0.5f, 0.5f),						glm::vec2(0.f, 2.f),	
-	glm::vec3(-0.5f, -0.5f, 0.5f),						glm::vec2(0.f, 0.f),	
-	glm::vec3(-0.5f, -0.5f, -0.5f),						glm::vec2(2.f, 0.f),	
-	glm::vec3(-0.5f, 0.5f, -0.5f),						glm::vec2(2.f, 2.f), 	
-
-	//Right
-	glm::vec3(0.5f, -0.5f, 0.5f),						glm::vec2(2.f, 0.f),	
-	glm::vec3(0.5f, 0.5f, 0.5f),						glm::vec2(2.f, 2.f),	
-	glm::vec3(0.5f, 0.5f, -0.5f),						glm::vec2(0.f, 2.f),	
-	glm::vec3(0.5f, -0.5f, -0.5f),						glm::vec2(0.f, 0.f),	
-};
+//Vertex Vertices[]
+//{
+//	//Positions											//TexCoords				
+//	//Front
+//	glm::vec3(-0.5f, 0.5f, 0.5f),						glm::vec2(0.f, 2.f),	
+//	glm::vec3(-0.5f, -0.5f, 0.5f),						glm::vec2(0.f, 0.f),	
+//	glm::vec3(0.5f, -0.5f, 0.5f),						glm::vec2(2.f, 0.f),	
+//	glm::vec3(0.5f, 0.5f, 0.5f),						glm::vec2(2.f, 2.f),	
+//
+//	//Back
+//	glm::vec3(0.5f, 0.5f, -0.5f),						glm::vec2(0.f, 2.f),	
+//	glm::vec3(0.5f, -0.5f, -0.5f),						glm::vec2(0.f, 0.f),	
+//	glm::vec3(-0.5f, -0.5f, -0.5f),						glm::vec2(2.f, 0.f),	
+//	glm::vec3(-0.5f, 0.5f, -0.5f),						glm::vec2(2.f, 2.f), 	
+//
+//	//Top
+//	glm::vec3(-0.5f, 0.5f, 0.5f),						glm::vec2(0.f, 2.f),	
+//	glm::vec3(0.5f, 0.5f, 0.5f),						glm::vec2(2.f, 2.f),	
+//	glm::vec3(0.5f, 0.5f, -0.5f),						glm::vec2(0.f, 2.f),	
+//	glm::vec3(-0.5f, 0.5f, -0.5f),						glm::vec2(2.f, 2.f), 	
+//
+//	//Bottom
+//	glm::vec3(-0.5f, -0.5f, 0.5f),						glm::vec2(0.f, 0.f),	
+//	glm::vec3(0.5f, -0.5f, 0.5f),						glm::vec2(2.f, 0.f),	
+//	glm::vec3(0.5f, -0.5f, -0.5f),						glm::vec2(0.f, 0.f),	
+//	glm::vec3(-0.5f, -0.5f, -0.5f),						glm::vec2(2.f, 0.f),	
+//
+//	//Left
+//	glm::vec3(-0.5f, 0.5f, 0.5f),						glm::vec2(0.f, 2.f),	
+//	glm::vec3(-0.5f, -0.5f, 0.5f),						glm::vec2(0.f, 0.f),	
+//	glm::vec3(-0.5f, -0.5f, -0.5f),						glm::vec2(2.f, 0.f),	
+//	glm::vec3(-0.5f, 0.5f, -0.5f),						glm::vec2(2.f, 2.f), 	
+//
+//	//Right
+//	glm::vec3(0.5f, -0.5f, 0.5f),						glm::vec2(2.f, 0.f),	
+//	glm::vec3(0.5f, 0.5f, 0.5f),						glm::vec2(2.f, 2.f),	
+//	glm::vec3(0.5f, 0.5f, -0.5f),						glm::vec2(0.f, 2.f),	
+//	glm::vec3(0.5f, -0.5f, -0.5f),						glm::vec2(0.f, 0.f),	
+//};
