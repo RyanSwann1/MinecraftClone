@@ -115,6 +115,10 @@ unsigned int createShaderProgram()
 }
 
 //View == Frustrum
+//The reason why it can get away with that is because of other rendering optimizations.
+//Try refraining from rendering any blocks that are not adjacent to air(less bandwidth), 
+//buildingand optimizing meshes from chunk data(less vertices to draw), 
+//or cutting down on the size of each vertex element(less bandwidth).There are plenty of other ways to increase performance with such an engine.
 
 int main()
 {
@@ -152,55 +156,66 @@ int main()
 	
 	const std::array<GLfloat, 12> FRONT_FACE = { 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1 };
 
-	std::array<float, 180> vertices = 
+	std::array<float, 120> positions = 
 	{
-		//Front Face
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
 		//Back Face
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+		1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
+		1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 
+		-1.0f, 1.0f, -1.0f, 0.0f, 1.0f,
+
+		//Front Face
+		-1.0f, -1.0f, 1.0f, 0.0f, 0.0f,
+		1.0f, -1.0f, 1.0f, 1.0f, 0.0f,
+		1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 		
 		//Left Face
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 
+		-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 
+		-1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 
+		-1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
 
 		//Right Face
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+		1.0f, 1.0f, -1.0f, 1.0f, 0.0f,
+		1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, -1.0f, 1.0f, 0.0f, 1.0f
 
 		 //Bottom Face
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+		1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
+		1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
+		-1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
 
 		//Top Face
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+		-1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+		1.0f, 1.0f, -1.0f, 1.0f, 0.0f,
+		1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+	};
+
+
+	std::array<unsigned int, 36> indicies
+	{
+		0, 1, 2,
+		2, 3, 0,
+
+		4, 5, 6,
+		6, 7, 4,
+
+		8, 9, 10,
+		10, 11, 8,
+
+		12, 13, 14,
+		14, 15, 12,
+
+		16, 17, 18,
+		19, 20, 16,
+
+		21, 22, 23,
+		24, 25, 21
+
 	};
 
 	std::array<std::array<std::array<glm::vec3, 16>, 16>, 16> chunk;
@@ -215,19 +230,15 @@ int main()
 		}
 	}
 
-	std::array<float, 12> positions
-	{
-		-0.5f, -0.5f, 0.0f,  // bottom left
-		0.5f, -0.5f, 0.0f,  // bottom right
-		0.5f,  0.5f, 0.0f,  // top right
-		-0.5f, 0.5f, 0.0f   // top left 
-	};
+	//std::array<float, 12> positions
+	//{
+	//	-1.0, -1.0, 0.0f,  // bottom left
+	//	1.0, -1.0, 0.0f,  // bottom right
+	//	1.0,  1.0, 0.0f,  // top right
+	//	-1.0, 1.0, 0.0f   // top left 
+	//};
 
-	std::array<unsigned int, 6> indicies
-	{
-		0, 1, 2,
-		2, 3, 0
-	};
+
 
 	std::array<float, 8> textCoords
 	{
@@ -237,10 +248,10 @@ int main()
 		0.0f, 1.0f
 	};
 
-	unsigned int verticesVBO;
-	glGenBuffers(1, &verticesVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, verticesVBO);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+	unsigned int positionsVBO;
+	glGenBuffers(1, &positionsVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
+	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (const void*)0);
@@ -292,35 +303,36 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
-		
+		//
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+		setUniformMat4f(shaderID, "uModel", model);
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
 		setUniformMat4f(shaderID, "uView", view);
-
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 100.f);
 		setUniformMat4f(shaderID, "uProjection", projection);
 
-		//glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
-
-
-		for (int x = 0; x < 16; ++x)
-		{
-			for (int y = 0; y < 16; ++y)
-			{
-				for (int z = 0; z < 16; z++)
-				{
-					glm::mat4 model = glm::translate(glm::mat4(1.0f), chunk[x][y][z]);
-					setUniformMat4f(shaderID, "uModel", model);
-					glDrawArrays(GL_TRIANGLES, 0, 36);
-				}
-			}
-		}
+		glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
+		
+		//for (int x = 0; x < 16; ++x)
+		//{
+		//	for (int y = 0; y < 16; ++y)
+		//	{
+		//		for (int z = 0; z < 16; z++)
+		//		{
+		//			glm::mat4 model = glm::translate(glm::mat4(1.0f), chunk[x][y][z]);
+		//			setUniformMat4f(shaderID, "uModel", model);	
+		//			glDrawArrays(GL_TRIANGLES, 0, 36);
+		//		}
+		//	}
+		//}
 		
 		glBindVertexArray(0);
 		window.display();
 	}
 
-	glDeleteBuffers(1, &verticesVBO);
+	glDeleteBuffers(1, &positionsVBO);
 	glDeleteBuffers(1, &indiciesVBO);
 	glDeleteVertexArrays(1, &VAO);
 
