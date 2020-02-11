@@ -9,4 +9,5 @@ void main()
 {
 	vec4 textColor = texture(uTexture, vTextCoord);
 	color = textColor;
+	//color = vec4(vTextCoord,1.0,1.0);
 };

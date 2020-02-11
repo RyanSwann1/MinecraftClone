@@ -156,57 +156,101 @@ int main()
 	
 	const std::array<GLfloat, 12> FRONT_FACE = { 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1 };
 
-	std::array<float, 180> vertices =
+	//std::array<float, 180> vertices =
+	//{
+	//	//Back
+	//	-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+	//	0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
+	//	0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
+	//	0.5f,  0.5f, -0.5f, 1.0f, 1.0f,
+	//	-0.5f,  0.5f, -0.5f, 0.0f, 1.0f,
+	//	-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+
+	//	//Front
+	//	-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+	//	0.5f, -0.5f,  0.5f, 1.0f, 0.0f,
+	//	0.5f,  0.5f,  0.5f, 1.0f, 1.0f,
+	//	0.5f,  0.5f,  0.5f, 1.0f, 1.0f,
+	//	-0.5f,  0.5f,  0.5f, 0.0f, 1.0f,
+	//	-0.5f, -0.5f,  0.5f, 0.0f, 0.0f,
+
+	//	//Left
+	//	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+	//	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	//	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	//	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	//	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	//	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+
+	//	//Right
+	//	0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	//	0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	//	0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+	//	0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+	//	0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	//	0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+
+	//	//Bottom
+	//	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	//	0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+	//	0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	//	0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	//	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	//	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+	//	//Top
+	//	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	//	0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	//	0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	//	0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	//	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+	//	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+	//};
+
+	std::array<float, 120> vertices =
 	{
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		//Front
+		-0.5f, 0.5f, 0.5f,						0.f, 2.f,
+		-0.5f, -0.5f, 0.5f,						0.f, 0.f,
+		0.5f, -0.5f, 0.5f,						2.f, 0.f,
+		0.5f, 0.5f, 0.5f,						2.f, 2.f,
 
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		//back
+		0.5f, 0.5f, -0.5f,						0.f, 2.f,
+		0.5f, -0.5f, -0.5f,						0.f, 0.f,
+		-0.5f, -0.5f, -0.5f,					2.f, 0.f,
+		-0.5f, 0.5f, -0.5f,						2.f, 2.f,
 
-		//x & y
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+		//Top	
+		-0.5f, 0.5f, 0.5f,						0.f, 2.f,
+		0.5f, 0.5f, 0.5f,						2.f, 2.f,
+		0.5f, 0.5f, -0.5f,						0.f, 2.f,
+		-0.5f, 0.5f, -0.5f,						2.f, 2.f,
+
+		//Bottom
+		-0.5f, -0.5f, 0.5f,						0.f, 0.f,
+		0.5f, -0.5f, 0.5f,						2.f, 0.f,
+		0.5f, -0.5f, -0.5f,						0.f, 0.f,
+		-0.5f, -0.5f, -0.5f,					2.f, 0.f,
+
+		//Left
+		-0.5f, 0.5f, 0.5f,						0.f, 2.f,
+		-0.5f, -0.5f, 0.5f,						0.f, 0.f,
+		-0.5f, -0.5f, -0.5f,					2.f, 0.f,
+		-0.5f, 0.5f, -0.5f,						2.f, 2.f,
 
 
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+		//Right
+		0.5f, -0.5f, 0.5f,						2.f, 0.f,
+		0.5f, 0.5f, 0.5f,						2.f, 2.f,
+		0.5f, 0.5f, -0.5f,						0.f, 2.f,
+		0.5f, -0.5f, -0.5f,						0.f, 0.f,
 	};
 
 	std::array<unsigned int, 36> indicies
 	{
-		0, 1, 2,
-		2, 3, 0,
+		0, 1, 3,
+		1, 2, 3
 
 		4, 5, 6,
 		6, 7, 4,
@@ -223,6 +267,27 @@ int main()
 		21, 22, 23,
 		24, 25, 21
 	};
+
+	//std::array<unsigned int, 36> indicies
+	//{
+	//	0, 1, 2,
+	//	2, 3, 0,
+
+	//	4, 5, 6,
+	//	6, 7, 4,
+
+	//	8, 9, 10,
+	//	10, 11, 8,
+
+	//	12, 13, 14,
+	//	14, 15, 12,
+
+	//	16, 17, 18,
+	//	19, 20, 16,
+
+	//	21, 22, 23,
+	//	24, 25, 21
+	//};
 
 	std::array<std::array<std::array<glm::vec3, 16>, 16>, 16> chunk;
 	for (int x = 0; x < 16; ++x)
@@ -273,10 +338,10 @@ int main()
 	//glEnableVertexAttribArray(1);
 	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)0);
 
-	unsigned int indiciesVBO;
-	glGenBuffers(1, &indiciesVBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesVBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies.size() * sizeof(unsigned int), indicies.data(), GL_STATIC_DRAW);
+	//unsigned int indiciesVBO;
+	//glGenBuffers(1, &indiciesVBO);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesVBO);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies.size() * sizeof(unsigned int), indicies.data(), GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
 
@@ -339,47 +404,88 @@ int main()
 	}
 
 	glDeleteBuffers(1, &verticesVBO);
-	glDeleteBuffers(1, &indiciesVBO);
+	//glDeleteBuffers(1, &indiciesVBO);
 	glDeleteVertexArrays(1, &VAO);
 
 	return 0;
 }
 
-//std::array<float, 120> positions =
-//{
-//	//Back Face
-//	-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
-//	1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
-//	1.0f, 1.0f, -1.0f, 1.0f, 1.0f,
-//	-1.0f, 1.0f, -1.0f, 0.0f, 1.0f,
-//
-//	//Front Face
-//	-1.0f, -1.0f, 1.0f, 0.0f, 0.0f,
-//	1.0f, -1.0f, 1.0f, 1.0f, 0.0f,
-//	1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-//	-1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-//
-//	//Left Face
-//	-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
-//	-1.0f, 1.0f, -1.0f, 1.0f, 0.0f,
-//	-1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-//	-1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
-//
-//	//Right Face
-//	1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
-//	1.0f, 1.0f, -1.0f, 1.0f, 0.0f,
-//	1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-//	1.0f, -1.0f, 1.0f, 0.0f, 1.0f
-//
-//	//Bottom Face
-//   - 1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
-//   1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
-//   1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
-//   -1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
-//
-//	//Top Face
-//	-1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
-//	1.0f, 1.0f, -1.0f, 1.0f, 0.0f,
-//	1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-//	-1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-//};
+std::array<float, 120> positions =
+{
+	//Back Face
+	-1.0f, -1.0f, -1.0f,		 0.0f, 0.0f,
+	1.0f, -1.0f, -1.0f,		 1.0f, 0.0f,
+	1.0f, 1.0f, -1.0f, 1.0f, 1.0f,
+	-1.0f, 1.0f, -1.0f, 0.0f, 1.0f,
+
+	//Front Face
+	-1.0f, -1.0f, 1.0f, 0.0f, 0.0f,
+	1.0f, -1.0f, 1.0f, 1.0f, 0.0f,
+	1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+	-1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+
+	//Left Face
+	-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+	-1.0f, 1.0f, -1.0f, 1.0f, 0.0f,
+	-1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+	-1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
+
+	//Right Face
+	1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+	1.0f, 1.0f, -1.0f, 1.0f, 0.0f,
+	1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+	1.0f, -1.0f, 1.0f, 0.0f, 1.0f
+
+	//Bottom Face
+   - 1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+   1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
+   1.0f, -1.0f, 1.0f, 1.0f, 1.0f,
+   -1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
+
+	//Top Face
+	-1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+	1.0f, 1.0f, -1.0f, 1.0f, 0.0f,
+	1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+	-1.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+};
+
+
+Vertex Vertices[]
+{
+	//Positions											//TexCoords				
+	//Front
+	glm::vec3(-0.5f, 0.5f, 0.5f),						glm::vec2(0.f, 2.f),	
+	glm::vec3(-0.5f, -0.5f, 0.5f),						glm::vec2(0.f, 0.f),	
+	glm::vec3(0.5f, -0.5f, 0.5f),						glm::vec2(2.f, 0.f),	
+	glm::vec3(0.5f, 0.5f, 0.5f),						glm::vec2(2.f, 2.f),	
+
+	//Back
+	glm::vec3(0.5f, 0.5f, -0.5f),						glm::vec2(0.f, 2.f),	
+	glm::vec3(0.5f, -0.5f, -0.5f),						glm::vec2(0.f, 0.f),	
+	glm::vec3(-0.5f, -0.5f, -0.5f),						glm::vec2(2.f, 0.f),	
+	glm::vec3(-0.5f, 0.5f, -0.5f),						glm::vec2(2.f, 2.f), 	
+
+	//Top
+	glm::vec3(-0.5f, 0.5f, 0.5f),						glm::vec2(0.f, 2.f),	
+	glm::vec3(0.5f, 0.5f, 0.5f),						glm::vec2(2.f, 2.f),	
+	glm::vec3(0.5f, 0.5f, -0.5f),						glm::vec2(0.f, 2.f),	
+	glm::vec3(-0.5f, 0.5f, -0.5f),						glm::vec2(2.f, 2.f), 	
+
+	//Bottom
+	glm::vec3(-0.5f, -0.5f, 0.5f),						glm::vec2(0.f, 0.f),	
+	glm::vec3(0.5f, -0.5f, 0.5f),						glm::vec2(2.f, 0.f),	
+	glm::vec3(0.5f, -0.5f, -0.5f),						glm::vec2(0.f, 0.f),	
+	glm::vec3(-0.5f, -0.5f, -0.5f),						glm::vec2(2.f, 0.f),	
+
+	//Left
+	glm::vec3(-0.5f, 0.5f, 0.5f),						glm::vec2(0.f, 2.f),	
+	glm::vec3(-0.5f, -0.5f, 0.5f),						glm::vec2(0.f, 0.f),	
+	glm::vec3(-0.5f, -0.5f, -0.5f),						glm::vec2(2.f, 0.f),	
+	glm::vec3(-0.5f, 0.5f, -0.5f),						glm::vec2(2.f, 2.f), 	
+
+	//Right
+	glm::vec3(0.5f, -0.5f, 0.5f),						glm::vec2(2.f, 0.f),	
+	glm::vec3(0.5f, 0.5f, 0.5f),						glm::vec2(2.f, 2.f),	
+	glm::vec3(0.5f, 0.5f, -0.5f),						glm::vec2(0.f, 2.f),	
+	glm::vec3(0.5f, -0.5f, -0.5f),						glm::vec2(0.f, 0.f),	
+};
