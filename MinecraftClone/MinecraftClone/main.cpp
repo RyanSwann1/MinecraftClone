@@ -9,6 +9,7 @@
 
 //https://hacknplan.com/
 //https://www.reddit.com/r/Minecraft/comments/2ikiaw/opensimplex_noise_for_terrain_generation_instead/
+//https://www.youtube.com/watch?v=vuK8CYzDnBk&list=PLMZ_9w2XRxiZq1vfw1lrpCMRDufe2MKV_&index=17
 
 //Discourage use of VAOs all the time
 //https://www.youtube.com/watch?v=Bcs56Mm-FJY&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2&index=12
@@ -154,81 +155,101 @@ int main()
 
 	texture->bind();
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot());
-	
-	const std::array<GLfloat, 12> FRONT_FACE = { 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1 };
 
-	std::array<float, 180> vertices =
+	std::vector<float> positions =
 	{
 		//Front Face
-		-1.0f, -1.0f, -1.0f,  0.0f, 0.0f, //bottom left
-		 1.0f, -1.0f, -1.0f,  1.0f, 0.0f, //bottom Right
-		 1.0f,  1.0f, -1.0f,  1.0f, 1.0f, //top right
-		 1.0f,  1.0f, -1.0f,  1.0f, 1.0f, //top right
-		-1.0f,  1.0f, -1.0f,  0.0f, 1.0f, //top left
-		-1.0f, -1.0f, -1.0f,  0.0f, 0.0f, //bottom left
+		-1.0, -1.0, 1.0,
+		1.0, -1.0, 1.0,
+		1.0, 1.0, 1.0, 
+		-1.0, 1.0, 1.0,
 
 		//Back Face
-		-1.0f, -1.0f,  1.0f,  0.0f, 0.0f,
-		 1.0f, -1.0f,  1.0f,  1.0f, 0.0f,
-		 1.0f,  1.0f,  1.0f,  1.0f, 1.0f,
-		 1.0f,  1.0f,  1.0f,  1.0f, 1.0f,
-		-1.0f,  1.0f,  1.0f,  0.0f, 1.0f,
-		-1.0f, -1.0f,  1.0f,  0.0f, 0.0f,
+		-1.0, -1.0, -1.0,
+		1.0, -1.0, -1.0,
+		1.0, 1.0, -1.0,
+		-1.0, 1.0, -1.0,
 
 		//Left Face
-		-1.0f, -1.0f, -1.0f,  0.0f, 0.0f, //Bottom Left
-		-1.0,  -1.0, 1.0,  1.0f, 0.0f, //Bottom Right
-		-1.0, 1.0, 1.0,  1.0f, 1.0f, //top Right 
-		-1.0, 1.0, 1.0,   1.0f, 1.0f, //Top Right
-		-1.0, 1.0, -1.0,  0.0f, 1.0f, //top left
-		-1.0,  -1.0,  -1.0,  0.0f, 0.0f, //bottom left
+		-1.0, -1.0, -1.0, 
+		-1.0, -1.0, 1.0, 
+		-1.0, 1.0, 1.0, 
+		-1.0, 1.0, -1.0,
 
 		//Right Face
-		 1.0f,  -1.0f,  -1.0f,  0.0f, 0.0f, //
-		 1.0f,  -1.0f, 1.0f,  1.0f, 0.0f,
-		 1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
-		 1.0f, 1.0f, 1.0f,  1.0f, 1.0f,
-		 1.0f, 1.0f,  -1.0f,  0.0f, 1.0f,
-		 1.0f,  -1.0f,  -1.0f,  0.0f, 0.0f,
-
-		//Bottom Face
-	   -1.0f, -1.0f, -1.0f,  0.0f, 1.0f, //Botom Left
-		1.0f, -1.0f, -1.0f,  1.0f, 1.0f, 
-		1.0f, -1.0f,  1.0f,  1.0f, 0.0f,
-		1.0f, -1.0f,  1.0f,  1.0f, 0.0f,
-	   -1.0f, -1.0f,  1.0f,  0.0f, 0.0f,
-	   -1.0f, -1.0f, -1.0f,  0.0f, 1.0f,
+		1.0, -1.0, -1.0,
+		1.0, -1.0, 1.0,
+		1.0, 1.0, 1.0,
+		1.0, 1.0, -1.0,
 
 		//Top Face
-		-1.0f,  1.0f, -1.0f,  0.0f, 1.0f, //Bottom LEft
-		 1.0f,  1.0f, -1.0f,  1.0f, 1.0f, //Bottom Right
-		 1.0f,  1.0f,  1.0f,  1.0f, 0.0f, //Top Right
-		 1.0f,  1.0f,  1.0f,  1.0f, 0.0f, //TOp Right
-		-1.0f,  1.0f,  1.0f,  0.0f, 0.0f, //Top Left
-		-1.0f,  1.0f, -1.0f,  0.0f, 1.0f //Bottom Left
+		-1.0, 1.0, -1.0,
+		-1.0, 1.0, 1.0, 
+		1.0, 1.0, 1.0, 
+		1.0, 1.0, -1.0,
+
+		//Bottom Face
+		-1.0, -1.0, -1.0,
+		-1.0, -1.0, 1.0,
+		1.0, -1.0, 1.0,
+		1.0, -1.0, -1.0,
 	};
 
-	//std::array<unsigned int, 36> indicies
-	//{
-	//	0, 1, 3,
-	//	1, 2, 3
+	std::vector<float> textCoords =
+	{
+		0.0, 0.0,
+		1.0, 0.0,
+		1.0, 1.0,
+		0.0, 1.0,
 
-	//	4, 5, 6,
-	//	6, 7, 4,
+		0.0, 0.0,
+		1.0, 0.0,
+		1.0, 1.0,
+		0.0, 1.0,
 
-	//	8, 9, 10,
-	//	10, 11, 8,
+		0.0, 0.0,
+		1.0, 0.0,
+		1.0, 1.0,
+		0.0, 1.0,
 
-	//	12, 13, 14,
-	//	14, 15, 12,
+		0.0, 0.0,
+		1.0, 0.0,
+		1.0, 1.0,
+		0.0, 1.0,
 
-	//	16, 17, 18,
-	//	19, 20, 16,
+		0.0, 0.0,
+		1.0, 0.0,
+		1.0, 1.0,
+		0.0, 1.0,
 
-	//	21, 22, 23,
-	//	24, 25, 21
-	//};
+		0.0, 0.0,
+		1.0, 0.0,
+		1.0, 1.0,
+		0.0, 1.0
+	};
 
+	std::vector<unsigned int> indicies
+	{
+		0, 1, 2,
+		2, 3, 0,
+
+		4, 5, 6,
+		6, 7, 4,
+
+		8, 9, 10,
+		10, 11, 8,
+
+		12, 13, 14,
+		14, 15, 12,
+
+		16, 17, 18,
+		18, 19, 16,
+
+		20, 21, 22,
+		22, 23, 20
+	};
+
+	//Fill in chunk
 	std::array<std::array<std::array<glm::vec3, 16>, 16>, 16> chunk;
 	for (int x = 0; x < 16; ++x)
 	{
@@ -241,47 +262,26 @@ int main()
 		}
 	}
 
-	//std::array<float, 12> positions
-	//{
-	//	-1.0, -1.0, 0.0f,  // bottom left
-	//	1.0, -1.0, 0.0f,  // bottom right
-	//	1.0,  1.0, 0.0f,  // top right
-	//	-1.0, 1.0, 0.0f   // top left 
-	//};
-
-
-
-	std::array<float, 8> textCoords
-	{
-		0.0f, 0.0f,
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-		0.0f, 1.0f
-	};
-
-	unsigned int verticesVBO;
-	glGenBuffers(1, &verticesVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, verticesVBO);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+	unsigned int positionsVBO;
+	glGenBuffers(1, &positionsVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
+	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (const void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
+
+	unsigned int textCoordsVBO;
+	glGenBuffers(1, &textCoordsVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, textCoordsVBO);
+	glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(float), textCoords.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (const void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)(0));
 
-	//unsigned int textCoordsVBO;
-	//glGenBuffers(1, &textCoordsVBO);
-	//glBindBuffer(GL_ARRAY_BUFFER, textCoordsVBO);
-	//glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(float), textCoords.data(), GL_STATIC_DRAW);
-
-	//glEnableVertexAttribArray(1);
-	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)0);
-
-	//unsigned int indiciesVBO;
-	//glGenBuffers(1, &indiciesVBO);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesVBO);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies.size() * sizeof(unsigned int), indicies.data(), GL_STATIC_DRAW);
+	unsigned int indiciesVBO;
+	glGenBuffers(1, &indiciesVBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesVBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies.size() * sizeof(unsigned int), indicies.data(), GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
 
@@ -323,8 +323,8 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 100.f);
 		setUniformMat4f(shaderID, "uProjection", projection);
 
-		//glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
 		
 		//for (int x = 0; x < 16; ++x)
 		//{
@@ -343,8 +343,8 @@ int main()
 		window.display();
 	}
 
-	glDeleteBuffers(1, &verticesVBO);
-	//glDeleteBuffers(1, &indiciesVBO);
+	glDeleteBuffers(1, &positionsVBO);
+	glDeleteBuffers(1, &indiciesVBO);
 	glDeleteVertexArrays(1, &VAO);
 
 	return 0;
