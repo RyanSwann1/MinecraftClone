@@ -3,9 +3,10 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-Texture::Texture()
+Texture::Texture(int rows)
 	: m_currentSlot(0),
-	m_ID(0)
+	m_ID(0),
+	m_rows(rows)
 {}
 
 Texture::~Texture()
@@ -13,9 +14,9 @@ Texture::~Texture()
 	glDeleteTextures(1, &m_ID);
 }
 
-std::unique_ptr<Texture> Texture::loadTexture(const std::string& name)
+std::unique_ptr<Texture> Texture::loadTexture(const std::string& name, int rows)
 {
-	std::unique_ptr<Texture> texture(new Texture());
+	std::unique_ptr<Texture> texture(new Texture(rows));
 	sf::Image image;
 	if (!image.loadFromFile(name))
 	{
@@ -47,6 +48,18 @@ unsigned int Texture::getCurrentSlot() const
 unsigned int Texture::getID() const
 {
 	return m_ID;
+}
+
+int Texture::getXOffSet(int index) const
+{
+	int col = index % m_rows;
+	return (float)col / (float)m_rows;
+}
+
+int Texture::getYOffSet(int index) const
+{
+	int row = index / m_rows;
+	return (float)row / (float)m_rows;
 }
 
 void Texture::bind(unsigned int slot)

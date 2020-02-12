@@ -34,6 +34,16 @@ int getUniformLocation(unsigned int shaderID, const std::string& uniformName)
 	return location;
 }
 
+void setUniformLocationVec2(unsigned int shaderID, const std::string& uniformName, const glm::vec2& position)
+{
+	glUniform2f(getUniformLocation(shaderID, uniformName), position.x, position.y);
+}
+
+void setUniformLocation1f(unsigned int shaderID, const std::string& uniformName, float value)
+{
+	glUniform1i(getUniformLocation(shaderID, uniformName), value);
+}
+
 void setUniformMat4f(unsigned int shaderID, const std::string& uniformName, const glm::mat4& matrix)
 {
 	glUniformMatrix4fv(getUniformLocation(shaderID, uniformName), 1, GL_FALSE, glm::value_ptr(matrix));
@@ -121,6 +131,17 @@ unsigned int createShaderProgram()
 //buildingand optimizing meshes from chunk data(less vertices to draw), 
 //or cutting down on the size of each vertex element(less bandwidth).There are plenty of other ways to increase performance with such an engine.
 
+enum class eCubeSide
+{
+	Front,
+	Back,
+	Left,
+	Right,
+	Top,
+	Down,
+	Total
+};
+
 int main()
 {
 	sf::ContextSettings settings;
@@ -144,17 +165,18 @@ int main()
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
-	std::unique_ptr<Texture> texture = Texture::loadTexture("debug.png");
+	Camera camera;
+	std::unique_ptr<Texture> texture = Texture::loadTexture("debug.png", 1);
 	if (!texture)
 	{
 		std::cout << "couldn't load texture: " << "America.jpg" << "\n";
 		return -1;
 	}
 
-	Camera camera;
-
 	texture->bind();
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot());
+
+	int textureIndex = 0;
 
 	std::vector<float> positions =
 	{
@@ -249,19 +271,6 @@ int main()
 		22, 23, 20
 	};
 
-	//Fill in chunk
-	std::array<std::array<std::array<glm::vec3, 16>, 16>, 16> chunk;
-	for (int x = 0; x < 16; ++x)
-	{
-		for (int y = 0; y < 16; ++y)
-		{
-			for (int z = 0; z < 16; z++)
-			{
-				chunk[x][y][z] = glm::vec3(x, y, z);
-			}
-		}
-	}
-
 	unsigned int positionsVBO;
 	glGenBuffers(1, &positionsVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
@@ -326,18 +335,7 @@ int main()
 		glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
 		//glDrawArrays(GL_TRIANGLES, 0, 36);
 		
-		//for (int x = 0; x < 16; ++x)
-		//{
-		//	for (int y = 0; y < 16; ++y)
-		//	{
-		//		for (int z = 0; z < 16; z++)
-		//		{
-		//			glm::mat4 model = glm::translate(glm::mat4(1.0f), chunk[x][y][z]);
-		//			setUniformMat4f(shaderID, "uModel", model);	
-		//			glDrawArrays(GL_TRIANGLES, 0, 36);
-		//		}
-		//	}
-		//}
+
 		
 		glBindVertexArray(0);
 		window.display();

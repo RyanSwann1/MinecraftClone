@@ -11,7 +11,7 @@ bool TextureManager::addTexture(const std::string& name, eTextureID textureID)
 	assert(!m_textures[static_cast<int>(textureID)]);
 	if (!m_textures[static_cast<int>(textureID)])
 	{
-		std::unique_ptr<Texture> texture = Texture::loadTexture(name);
+		std::unique_ptr<Texture> texture = Texture::loadTexture(name, 1);
 		if (texture)
 		{
 			m_textures[static_cast<int>(textureID)] = std::move(texture);
