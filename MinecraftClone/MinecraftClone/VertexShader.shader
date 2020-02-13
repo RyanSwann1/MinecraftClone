@@ -14,5 +14,5 @@ out vec2 vTextCoord;
 void main()
 {
 	gl_Position = uProjection * uView * uModel * vec4(aPos, 1.0); // note that we read the multiplication from right to left
-	vTextCoord = (textCoord / rows) + offset;
+	vTextCoord = textCoord;
 }

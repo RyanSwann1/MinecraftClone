@@ -138,9 +138,65 @@ enum class eCubeSide
 	Left,
 	Right,
 	Top,
-	Down,
+	Bottom,
 	Total
 };
+
+const std::array<float, 12> frontFace = { -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, };
+const std::array<float, 12> backFace = { -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0, };
+const std::array<float, 12> leftFace = { -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, };
+const std::array<float, 12> rightFace = { 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, };
+const std::array<float, 12> topFace = { -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, };
+const std::array<float, 12> bottomFace = { -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, };
+
+void addFace(std::vector<float>& positions, std::vector<float>& textCoords, eCubeSide cubeSide, const Texture& texture)
+{
+	switch (cubeSide)
+	{
+	case eCubeSide::Front:
+	{
+		positions.insert(positions.end(), frontFace.begin(), frontFace.end());
+		texture.getTextCoords(eTileID::DirtSide, textCoords);
+	}
+
+		break;
+	case eCubeSide::Back:
+	{
+		positions.insert(positions.end(), backFace.begin(), backFace.end());
+		texture.getTextCoords(eTileID::DirtSide, textCoords);
+	}
+
+		break;
+	case eCubeSide::Left:
+	{
+		positions.insert(positions.end(), leftFace.begin(), leftFace.end());
+		texture.getTextCoords(eTileID::DirtSide, textCoords);
+	}
+
+		break;
+	case eCubeSide::Right:
+	{
+		positions.insert(positions.end(), rightFace.begin(), rightFace.end());
+		texture.getTextCoords(eTileID::DirtSide, textCoords);
+	}
+
+		break;
+	case eCubeSide::Top:
+	{
+		positions.insert(positions.end(), topFace.begin(), topFace.end());
+		texture.getTextCoords(eTileID::Grass, textCoords);
+	}
+
+		break;
+	case eCubeSide::Bottom:
+	{
+		positions.insert(positions.end(), bottomFace.begin(), bottomFace.end());
+		texture.getTextCoords(eTileID::Dirt, textCoords);
+	}
+
+		break;
+	}
+}
 
 int main()
 {
@@ -152,7 +208,7 @@ int main()
 	settings.minorVersion = 3;
 	settings.attributeFlags = sf::ContextSettings::Core;
 	sf::Vector2i windowSize(750, 750);
-	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft", sf::Style::Default, settings);
+	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Texture_Atlas.png", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
 	gladLoadGL();
 
@@ -166,91 +222,28 @@ int main()
 	glBindVertexArray(VAO);
 
 	Camera camera;
-	std::unique_ptr<Texture> texture = Texture::loadTexture("debug.png", 1);
+	std::unique_ptr<Texture> texture = Texture::loadTexture("Texture_Atlas.png");
 	if (!texture)
 	{
 		std::cout << "couldn't load texture: " << "America.jpg" << "\n";
-		return -1;
 	}
 
 	texture->bind();
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot());
 
-	int textureIndex = 0;
+	std::cout << glGetError() << "\n";
 
-	std::vector<float> positions =
-	{
-		//Front Face
-		-1.0, -1.0, 1.0,
-		1.0, -1.0, 1.0,
-		1.0, 1.0, 1.0, 
-		-1.0, 1.0, 1.0,
+	std::vector<float> textCoords;
+	std::vector<float> positions;
 
-		//Back Face
-		-1.0, -1.0, -1.0,
-		1.0, -1.0, -1.0,
-		1.0, 1.0, -1.0,
-		-1.0, 1.0, -1.0,
+	addFace(positions, textCoords, eCubeSide::Front, *texture); 
+	addFace(positions, textCoords, eCubeSide::Back, *texture);
+	addFace(positions, textCoords, eCubeSide::Left, *texture);
+	addFace(positions, textCoords, eCubeSide::Right, *texture);
+	addFace(positions, textCoords, eCubeSide::Top, *texture);
+	addFace(positions, textCoords, eCubeSide::Bottom, *texture);
 
-		//Left Face
-		-1.0, -1.0, -1.0, 
-		-1.0, -1.0, 1.0, 
-		-1.0, 1.0, 1.0, 
-		-1.0, 1.0, -1.0,
-
-		//Right Face
-		1.0, -1.0, -1.0,
-		1.0, -1.0, 1.0,
-		1.0, 1.0, 1.0,
-		1.0, 1.0, -1.0,
-
-		//Top Face
-		-1.0, 1.0, -1.0,
-		-1.0, 1.0, 1.0, 
-		1.0, 1.0, 1.0, 
-		1.0, 1.0, -1.0,
-
-		//Bottom Face
-		-1.0, -1.0, -1.0,
-		-1.0, -1.0, 1.0,
-		1.0, -1.0, 1.0,
-		1.0, -1.0, -1.0,
-	};
-
-	std::vector<float> textCoords =
-	{
-		0.0, 0.0,
-		1.0, 0.0,
-		1.0, 1.0,
-		0.0, 1.0,
-
-		0.0, 0.0,
-		1.0, 0.0,
-		1.0, 1.0,
-		0.0, 1.0,
-
-		0.0, 0.0,
-		1.0, 0.0,
-		1.0, 1.0,
-		0.0, 1.0,
-
-		0.0, 0.0,
-		1.0, 0.0,
-		1.0, 1.0,
-		0.0, 1.0,
-
-		0.0, 0.0,
-		1.0, 0.0,
-		1.0, 1.0,
-		0.0, 1.0,
-
-		0.0, 0.0,
-		1.0, 0.0,
-		1.0, 1.0,
-		0.0, 1.0
-	};
-
-	std::vector<unsigned int> indicies
+	std::array<unsigned int, 36> indicies =
 	{
 		0, 1, 2,
 		2, 3, 0,
@@ -333,9 +326,6 @@ int main()
 		setUniformMat4f(shaderID, "uProjection", projection);
 
 		glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
-		
-
 		
 		glBindVertexArray(0);
 		window.display();

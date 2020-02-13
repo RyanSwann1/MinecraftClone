@@ -3,10 +3,9 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-Texture::Texture(int rows)
+Texture::Texture()
 	: m_currentSlot(0),
-	m_ID(0),
-	m_rows(rows)
+	m_ID(0)
 {}
 
 Texture::~Texture()
@@ -14,9 +13,9 @@ Texture::~Texture()
 	glDeleteTextures(1, &m_ID);
 }
 
-std::unique_ptr<Texture> Texture::loadTexture(const std::string& name, int rows)
+std::unique_ptr<Texture> Texture::loadTexture(const std::string& name)
 {
-	std::unique_ptr<Texture> texture(new Texture(rows));
+	std::unique_ptr<Texture> texture(new Texture());
 	sf::Image image;
 	if (!image.loadFromFile(name))
 	{
@@ -37,7 +36,7 @@ std::unique_ptr<Texture> Texture::loadTexture(const std::string& name, int rows)
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	return texture;
+	return std::unique_ptr<Texture>(std::move(texture));
 }
 
 unsigned int Texture::getCurrentSlot() const
@@ -50,16 +49,49 @@ unsigned int Texture::getID() const
 	return m_ID;
 }
 
-int Texture::getXOffSet(int index) const
+void Texture::getTextCoords(eTileID tileID, std::vector<float>& textCoords) const
 {
-	int col = index % m_rows;
-	return (float)col / (float)m_rows;
-}
+	switch (tileID)
+	{
+	case eTileID::Grass :
+		textCoords.push_back(0.0);
+		textCoords.push_back((128.0f - 16.0f) / 128.0f);
+		textCoords.push_back(16.0f / 128.0f);
+		textCoords.push_back((128.0f - 16.0f) / 128.0f);
 
-int Texture::getYOffSet(int index) const
-{
-	int row = index / m_rows;
-	return (float)row / (float)m_rows;
+		textCoords.push_back(16.0f / 128.0f);
+		textCoords.push_back(1);
+		textCoords.push_back(0);
+		textCoords.push_back(1);
+	
+		break;
+	case eTileID::DirtSide :
+		textCoords.push_back(16.0f / 128.0f);
+		textCoords.push_back((128.0f - 16.0f) / 128.0f);
+
+		textCoords.push_back(32.0f / 128.0f);
+		textCoords.push_back((128.0f - 16.0f) / 128.0f);
+		
+		textCoords.push_back(32.0f / 128.0f);
+		textCoords.push_back(1);
+		
+		textCoords.push_back(16.0f /  128.0f);
+		textCoords.push_back(1);
+		break;
+	case eTileID::Dirt :
+		textCoords.push_back(32.0f / 128.0f);
+		textCoords.push_back((128.0f - 16.0f) / 128.0f);
+
+		textCoords.push_back(48.0f / 128.0f);
+		textCoords.push_back((128.0f - 16.0f) / 128.0f);
+
+		textCoords.push_back(48.0f / 128.0f);
+		textCoords.push_back(1);
+
+		textCoords.push_back(32.0f / 128.0f);
+		textCoords.push_back(1);
+		break;
+	}
 }
 
 void Texture::bind(unsigned int slot)

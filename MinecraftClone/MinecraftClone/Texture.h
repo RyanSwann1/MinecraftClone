@@ -1,26 +1,33 @@
 #pragma once
 
 #include <string>
+#include "NonCopyable.h"
+#include "glm/glm.hpp"
 #include <memory>
+#include <vector>
 
-class Texture
+enum class eTileID
+{
+	Grass = 0,
+	DirtSide,
+	Dirt
+};
+
+class Texture : private NonCopyable
 {
 public:
-	static std::unique_ptr<Texture> loadTexture(const std::string& name, int rows);
+	static std::unique_ptr<Texture> loadTexture(const std::string& name);
 	~Texture();
 	unsigned int getCurrentSlot() const;
 	unsigned int getID() const;
 
-	int getXOffSet(int index) const;
-	int getYOffSet(int index) const;
+	void getTextCoords(eTileID tileID, std::vector<float>& textCoords) const;
 
 	void bind(unsigned int slot = 0);
 	void unbind() const;
 
 private:
-	Texture(int rows);
+	Texture();
 	unsigned int m_currentSlot;
 	unsigned int m_ID;
-
-	int m_rows;
 };
