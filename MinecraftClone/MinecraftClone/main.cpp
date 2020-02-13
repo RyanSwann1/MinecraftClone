@@ -1,5 +1,6 @@
 #include "Texture.h"
 #include "Camera.h"
+#include "Chunk.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -21,6 +22,7 @@
 //OpenGL is a state machine
 //Select buffer - state - then draw me a triangle
 //Based off of which buffer has been selected, it determines what/how will be drawns
+
 
 int getUniformLocation(unsigned int shaderID, const std::string& uniformName)
 {
@@ -235,7 +237,6 @@ int main()
 
 	std::vector<float> textCoords;
 	std::vector<float> positions;
-
 	addFace(positions, textCoords, eCubeSide::Front, *texture); 
 	addFace(positions, textCoords, eCubeSide::Back, *texture);
 	addFace(positions, textCoords, eCubeSide::Left, *texture);
@@ -291,6 +292,15 @@ int main()
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 
+	std::vector<Chunk> chunks;
+	for (int x = 0; x < 32; x += 16)
+	{
+		for (int y = 0; y < 32; y += 16)
+		{		
+			chunks.emplace_back(glm::vec2(x, y));
+		}
+	}
+
 	sf::Clock clock;
 	clock.restart();
 
@@ -325,7 +335,25 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 100.f);
 		setUniformMat4f(shaderID, "uProjection", projection);
 
-		glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
+		for (const auto& chunk : chunks)
+		{
+			for (int x = 0; x < 16; ++x)
+			{
+				for (int y = 0; y < 16; ++y)
+				{
+					for (int z = 0; z < 16; z++)
+					{
+						glm::mat4 model = glm::translate(glm::mat4(1.0f), chunk.getChunk()[x][y][z]);
+						setUniformMat4f(shaderID, "uModel", model);
+						glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
+					}
+				}
+			}
+		}
+
+
+
+
 		
 		glBindVertexArray(0);
 		window.display();

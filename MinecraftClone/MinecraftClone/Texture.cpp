@@ -77,6 +77,7 @@ void Texture::getTextCoords(eTileID tileID, std::vector<float>& textCoords) cons
 		
 		textCoords.push_back(16.0f /  128.0f);
 		textCoords.push_back(1);
+
 		break;
 	case eTileID::Dirt :
 		textCoords.push_back(32.0f / 128.0f);
@@ -90,6 +91,7 @@ void Texture::getTextCoords(eTileID tileID, std::vector<float>& textCoords) cons
 
 		textCoords.push_back(32.0f / 128.0f);
 		textCoords.push_back(1);
+		
 		break;
 	}
 }
