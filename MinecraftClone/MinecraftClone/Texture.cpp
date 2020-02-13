@@ -56,11 +56,13 @@ void Texture::getTextCoords(eTileID tileID, std::vector<float>& textCoords) cons
 	case eTileID::Grass :
 		textCoords.push_back(0.0);
 		textCoords.push_back((128.0f - 16.0f) / 128.0f);
+
 		textCoords.push_back(16.0f / 128.0f);
 		textCoords.push_back((128.0f - 16.0f) / 128.0f);
 
 		textCoords.push_back(16.0f / 128.0f);
 		textCoords.push_back(1);
+		
 		textCoords.push_back(0);
 		textCoords.push_back(1);
 	
@@ -75,7 +77,7 @@ void Texture::getTextCoords(eTileID tileID, std::vector<float>& textCoords) cons
 		textCoords.push_back(32.0f / 128.0f);
 		textCoords.push_back(1);
 		
-		textCoords.push_back(16.0f /  128.0f);
+		textCoords.push_back(16.0f / 128.0f);
 		textCoords.push_back(1);
 
 		break;

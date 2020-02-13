@@ -1,12 +1,20 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "Chunk.h"
+#include "VertexBuffer.h"
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <array>
 #include <memory>
+
+#ifdef DEBUG_GL_ERRORS
+#define glCheck(expr) expr; if(!GLAD_GL_KHR_debug){ glCheckError(__FILE__, __LINE__, #expr) };
+#else
+#define glCheck(call) call
+#endif
+#define DEBUG_GL_ERRORS
 
 //https://hacknplan.com/
 //https://www.reddit.com/r/Minecraft/comments/2ikiaw/opensimplex_noise_for_terrain_generation_instead/
@@ -144,59 +152,107 @@ enum class eCubeSide
 	Total
 };
 
-const std::array<float, 12> frontFace = { -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, };
-const std::array<float, 12> backFace = { -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0, };
-const std::array<float, 12> leftFace = { -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, };
-const std::array<float, 12> rightFace = { 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, };
-const std::array<float, 12> topFace = { -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, };
-const std::array<float, 12> bottomFace = { -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, };
-
-void addFace(std::vector<float>& positions, std::vector<float>& textCoords, eCubeSide cubeSide, const Texture& texture)
+static std::array<unsigned int, 36> vertexIndicies =
 {
-	switch (cubeSide)
+	0, 1, 2,
+	2, 3, 0,
+
+	4, 5, 6,
+	6, 7, 4,
+
+	8, 9, 10,
+	10, 11, 8,
+
+	12, 13, 14,
+	14, 15, 12,
+
+	16, 17, 18,
+	18, 19, 16,
+
+	20, 21, 22,
+	22, 23, 20
+};
+
+const std::array<glm::vec3, 4> faceFront = { glm::vec3(0, 0, 1.0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(0, 1.0, 1.0) };
+const std::array<glm::vec3, 4> faceBack = { glm::vec3(0, 0, 0), glm::vec3(1.0, 0, 0), glm::vec3(1.0, 1.0, 0), glm::vec3(0, 1.0, 0) };
+
+const std::array<glm::vec3, 4> faceLeft = { glm::vec3(0, 0, 0), glm::vec3(0, 0, 1.0), glm::vec3(0, 1.0, 1.0), glm::vec3(0, 1.0, 0) };
+const std::array<glm::vec3, 4> faceRight = { glm::vec3(1.0, 0, 0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(1.0, 1.0, 0) };
+
+const std::array<glm::vec3, 4> faceTop = { glm::vec3(0, 1.0, 0), glm::vec3(0, 1.0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(1.0, 1.0, 0) };
+const std::array<glm::vec3, 4> faceBottom = { glm::vec3(0, 0, 0), glm::vec3(0, 0, 1.0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 0, 0) };
+
+bool isAirBlock(const std::vector<Chunk>& chunks, glm::vec3 position)
+{
+	for (const auto& chunk : chunks)
 	{
-	case eCubeSide::Front:
+		return false;
+	}
+}
+
+void addCube(VertexBuffer& vertexBuffer, const Texture& texture, glm::vec3 startPosition, int elementArrayBufferIndex)
+{
+	for (glm::vec3 i : faceFront)
 	{
-		positions.insert(positions.end(), frontFace.begin(), frontFace.end());
-		texture.getTextCoords(eTileID::DirtSide, textCoords);
+		i += startPosition;
+		vertexBuffer.positions.push_back(i.x);
+		vertexBuffer.positions.push_back(i.y);
+		vertexBuffer.positions.push_back(i.z);
+	}
+	texture.getTextCoords(eTileID::DirtSide, vertexBuffer.textCoords);
+
+	for (glm::vec3 i : faceBack)
+	{
+		i += startPosition;
+		vertexBuffer.positions.push_back(i.x);
+		vertexBuffer.positions.push_back(i.y);
+		vertexBuffer.positions.push_back(i.z);
 	}
 
-		break;
-	case eCubeSide::Back:
+	texture.getTextCoords(eTileID::DirtSide, vertexBuffer.textCoords);
+
+	for (glm::vec3 i : faceLeft)
 	{
-		positions.insert(positions.end(), backFace.begin(), backFace.end());
-		texture.getTextCoords(eTileID::DirtSide, textCoords);
+		i += startPosition;
+		vertexBuffer.positions.push_back(i.x);
+		vertexBuffer.positions.push_back(i.y);
+		vertexBuffer.positions.push_back(i.z);
+	}
+	texture.getTextCoords(eTileID::DirtSide, vertexBuffer.textCoords);
+
+	for (glm::vec3 i : faceRight)
+	{
+		i += startPosition;
+		vertexBuffer.positions.push_back(i.x);
+		vertexBuffer.positions.push_back(i.y);
+		vertexBuffer.positions.push_back(i.z);
 	}
 
-		break;
-	case eCubeSide::Left:
+	texture.getTextCoords(eTileID::DirtSide, vertexBuffer.textCoords);
+
+	for (glm::vec3 i : faceTop)
 	{
-		positions.insert(positions.end(), leftFace.begin(), leftFace.end());
-		texture.getTextCoords(eTileID::DirtSide, textCoords);
+		i += startPosition;
+		vertexBuffer.positions.push_back(i.x);
+		vertexBuffer.positions.push_back(i.y);
+		vertexBuffer.positions.push_back(i.z);
 	}
 
-		break;
-	case eCubeSide::Right:
+	texture.getTextCoords(eTileID::Grass, vertexBuffer.textCoords);
+
+	for (glm::vec3 i : faceBottom)
 	{
-		positions.insert(positions.end(), rightFace.begin(), rightFace.end());
-		texture.getTextCoords(eTileID::DirtSide, textCoords);
+		i += startPosition;
+		vertexBuffer.positions.push_back(i.x);
+		vertexBuffer.positions.push_back(i.y);
+		vertexBuffer.positions.push_back(i.z);
 	}
 
-		break;
-	case eCubeSide::Top:
-	{
-		positions.insert(positions.end(), topFace.begin(), topFace.end());
-		texture.getTextCoords(eTileID::Grass, textCoords);
-	}
+	texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
 
-		break;
-	case eCubeSide::Bottom:
+	for (unsigned int i : vertexIndicies)
 	{
-		positions.insert(positions.end(), bottomFace.begin(), bottomFace.end());
-		texture.getTextCoords(eTileID::Dirt, textCoords);
-	}
-
-		break;
+		vertexBuffer.indicies.push_back(i + elementArrayBufferIndex);
 	}
 }
 
@@ -214,7 +270,9 @@ int main()
 	window.setFramerateLimit(60);
 	gladLoadGL();
 
-	glViewport(0, 0, windowSize.x, windowSize.y);
+	window.setMouseCursorVisible(false);
+
+	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
 	glEnable(GL_DEPTH_TEST);
 
 	unsigned int shaderID = createShaderProgram();
@@ -235,40 +293,24 @@ int main()
 
 	std::cout << glGetError() << "\n";
 
-	std::vector<float> textCoords;
-	std::vector<float> positions;
-	addFace(positions, textCoords, eCubeSide::Front, *texture); 
-	addFace(positions, textCoords, eCubeSide::Back, *texture);
-	addFace(positions, textCoords, eCubeSide::Left, *texture);
-	addFace(positions, textCoords, eCubeSide::Right, *texture);
-	addFace(positions, textCoords, eCubeSide::Top, *texture);
-	addFace(positions, textCoords, eCubeSide::Bottom, *texture);
-
-	std::array<unsigned int, 36> indicies =
+	int elementArrayBufferIndex = 0;
+	VertexBuffer vertexBuffer;
+	for (int y = 0; y < 16; y += 1)
 	{
-		0, 1, 2,
-		2, 3, 0,
-
-		4, 5, 6,
-		6, 7, 4,
-
-		8, 9, 10,
-		10, 11, 8,
-
-		12, 13, 14,
-		14, 15, 12,
-
-		16, 17, 18,
-		18, 19, 16,
-
-		20, 21, 22,
-		22, 23, 20
-	};
-
+		for (int x = 0; x < 16; x += 1)
+		{
+			for (int z = 0; z < 16; z += 1)
+			{
+				addCube(vertexBuffer, *texture, glm::vec3(x, y, z), elementArrayBufferIndex);
+				elementArrayBufferIndex += 24;
+			}
+		}
+	}
+	
 	unsigned int positionsVBO;
 	glGenBuffers(1, &positionsVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
-	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexBuffer.positions.size() * sizeof(float), vertexBuffer.positions.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
@@ -276,7 +318,7 @@ int main()
 	unsigned int textCoordsVBO;
 	glGenBuffers(1, &textCoordsVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, textCoordsVBO);
-	glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(float), textCoords.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexBuffer.textCoords.size() * sizeof(float), vertexBuffer.textCoords.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)(0));
@@ -284,7 +326,7 @@ int main()
 	unsigned int indiciesVBO;
 	glGenBuffers(1, &indiciesVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesVBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies.size() * sizeof(unsigned int), indicies.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexBuffer.indicies.size() * sizeof(unsigned int), vertexBuffer.indicies.data(), GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
 
@@ -292,14 +334,14 @@ int main()
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 
-	std::vector<Chunk> chunks;
-	for (int x = 0; x < 32; x += 16)
-	{
-		for (int y = 0; y < 32; y += 16)
-		{		
-			chunks.emplace_back(glm::vec2(x, y));
-		}
-	}
+	//std::vector<Chunk> chunks;
+	//for (int x = 0; x < 32; x += 8)
+	//{
+	//	for (int y = 0; y < 32; y += 8)
+	//	{		
+	//		chunks.emplace_back(glm::vec2(x, y));
+	//	}
+	//}
 
 	sf::Clock clock;
 	clock.restart();
@@ -327,34 +369,33 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-		setUniformMat4f(shaderID, "uModel", model);
+		//glm::mat4 model = glm::mat4(1.0f);
+		//setUniformMat4f(shaderID, "uModel", model);
+		//glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+		
+		//glm::mat4 model = glm::mat4(1.0);
+		//setUniformMat4f(shaderID, "uModel", model);
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
 		setUniformMat4f(shaderID, "uView", view);
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 100.f);
 		setUniformMat4f(shaderID, "uProjection", projection);
 
-		for (const auto& chunk : chunks)
-		{
-			for (int x = 0; x < 16; ++x)
-			{
-				for (int y = 0; y < 16; ++y)
-				{
-					for (int z = 0; z < 16; z++)
-					{
-						glm::mat4 model = glm::translate(glm::mat4(1.0f), chunk.getChunk()[x][y][z]);
-						setUniformMat4f(shaderID, "uModel", model);
-						glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
-					}
-				}
-			}
-		}
+		glDrawElements(GL_TRIANGLES, vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+		//for (const auto& chunk : chunks)
+		//{
+		//	for (int x = 0; x < 16; ++x)
+		//	{
+		//		for (int y = 0; y < 16; ++y)
+		//		{
+		//			for (int z = 0; z < 16; ++z)
+		//			{
+	
+		//			}
+		//		}
+		//	}
+		//}
 
-
-
-
-		
 		glBindVertexArray(0);
 		window.display();
 	}

@@ -163,6 +163,7 @@
     <ClInclude Include="NonCopyable.h" />
     <ClInclude Include="OpenGLErrorCheck.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="FragmentShader.shader" />
