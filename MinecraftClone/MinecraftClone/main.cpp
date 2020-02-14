@@ -195,9 +195,12 @@ int main()
 
 	sf::Clock clock;
 	clock.restart();
+	float messageExpiredTime = 0.5f;
+	float elaspedTime = 0.0f;
 
 	while (window.isOpen())
 	{
+		float deltaTime = clock.restart().asSeconds();
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))
 		{
@@ -207,7 +210,7 @@ int main()
 			}
 			else if (currentSFMLEvent.type == sf::Event::KeyPressed)
 			{
-				camera.move(currentSFMLEvent, clock.restart().asSeconds());
+				camera.move(currentSFMLEvent, deltaTime);
 			}
 		}
 
@@ -217,10 +220,18 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
+		elaspedTime += deltaTime;
+		if (elaspedTime >= messageExpiredTime)
+		{
+			elaspedTime = 0.0f;
+			std::cout << "Camera Position\n";
+			std::cout << camera.m_position.x << " " << camera.m_position.y << " " << camera.m_position.z << "\n";
+		}
+
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
 		setUniformMat4f(shaderID, "uView", view);
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 100.f);
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 500.f);
 		setUniformMat4f(shaderID, "uProjection", projection);
 
 		for (int i = 0; i < 6 * 6; ++i) 
