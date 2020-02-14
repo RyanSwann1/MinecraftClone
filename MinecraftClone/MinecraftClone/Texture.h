@@ -10,7 +10,8 @@ enum class eTileID
 {
 	Grass = 0,
 	GrassSide,
-	Dirt
+	Dirt,
+	Stone
 };
 
 class Texture : private NonCopyable

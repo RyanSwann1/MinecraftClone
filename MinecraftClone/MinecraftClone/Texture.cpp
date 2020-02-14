@@ -93,7 +93,20 @@ void Texture::getTextCoords(eTileID tileID, std::vector<float>& textCoords) cons
 
 		textCoords.push_back(32.0f / 128.0f);
 		textCoords.push_back(1);
-		
+		break;
+
+	case eTileID::Stone :
+		textCoords.push_back(48.0f / 128.0f);
+		textCoords.push_back((128.0f - 16.0f) / 128.0f);
+
+		textCoords.push_back(64.0f / 128.0f);
+		textCoords.push_back((128.0f - 16.0f) / 128.0f);
+
+		textCoords.push_back(64.0f / 128.0f);
+		textCoords.push_back(1);
+
+		textCoords.push_back(48.0f / 128.0f);
+		textCoords.push_back(1);
 		break;
 	}
 }

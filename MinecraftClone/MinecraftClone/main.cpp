@@ -163,7 +163,7 @@ int main()
 	settings.minorVersion = 3;
 	settings.attributeFlags = sf::ContextSettings::Core;
 	sf::Vector2i windowSize(1280, 1080);
-	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Texture_Atlas.png", sf::Style::Default, settings);
+	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft", sf::Style::Default, settings);
 	window.setFramerateLimit(120);
 	gladLoadGL();
 
@@ -188,7 +188,7 @@ int main()
 	VBOs.resize(6 * 6);
 
 	ChunkManager chunkManager;
-	chunkManager.generateChunks(glm::vec3(0, 0, 0), chunkCount);
+	chunkManager.generateChunks(glm::vec3(0, -20, 0), chunkCount);
 	chunkManager.generateChunkMeshes(VAOs, VBOs, *texture);
 
 	std::cout << glGetError() << "\n";
