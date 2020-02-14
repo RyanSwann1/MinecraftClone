@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "Chunk.h"
 #include "VertexBuffer.h"
+#include "Utilities.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -141,118 +142,17 @@ unsigned int createShaderProgram()
 //buildingand optimizing meshes from chunk data(less vertices to draw), 
 //or cutting down on the size of each vertex element(less bandwidth).There are plenty of other ways to increase performance with such an engine.
 
-enum class eCubeSide
-{
-	Front,
-	Back,
-	Left,
-	Right,
-	Top,
-	Bottom,
-	Total
-};
 
-static std::array<unsigned int, 36> vertexIndicies =
-{
-	0, 1, 2,
-	2, 3, 0,
+//https://www.youtube.com/watch?v=7hwWMUM0wZo
 
-	4, 5, 6,
-	6, 7, 4,
 
-	8, 9, 10,
-	10, 11, 8,
 
-	12, 13, 14,
-	14, 15, 12,
-
-	16, 17, 18,
-	18, 19, 16,
-
-	20, 21, 22,
-	22, 23, 20
-};
-
-const std::array<glm::vec3, 4> faceFront = { glm::vec3(0, 0, 1.0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(0, 1.0, 1.0) };
-const std::array<glm::vec3, 4> faceBack = { glm::vec3(0, 0, 0), glm::vec3(1.0, 0, 0), glm::vec3(1.0, 1.0, 0), glm::vec3(0, 1.0, 0) };
-
-const std::array<glm::vec3, 4> faceLeft = { glm::vec3(0, 0, 0), glm::vec3(0, 0, 1.0), glm::vec3(0, 1.0, 1.0), glm::vec3(0, 1.0, 0) };
-const std::array<glm::vec3, 4> faceRight = { glm::vec3(1.0, 0, 0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(1.0, 1.0, 0) };
-
-const std::array<glm::vec3, 4> faceTop = { glm::vec3(0, 1.0, 0), glm::vec3(0, 1.0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(1.0, 1.0, 0) };
-const std::array<glm::vec3, 4> faceBottom = { glm::vec3(0, 0, 0), glm::vec3(0, 0, 1.0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 0, 0) };
 
 bool isAirBlock(const std::vector<Chunk>& chunks, glm::vec3 position)
 {
 	for (const auto& chunk : chunks)
 	{
 		return false;
-	}
-}
-
-void addCube(VertexBuffer& vertexBuffer, const Texture& texture, glm::vec3 startPosition, int elementArrayBufferIndex)
-{
-	for (glm::vec3 i : faceFront)
-	{
-		i += startPosition;
-		vertexBuffer.positions.push_back(i.x);
-		vertexBuffer.positions.push_back(i.y);
-		vertexBuffer.positions.push_back(i.z);
-	}
-	texture.getTextCoords(eTileID::DirtSide, vertexBuffer.textCoords);
-
-	for (glm::vec3 i : faceBack)
-	{
-		i += startPosition;
-		vertexBuffer.positions.push_back(i.x);
-		vertexBuffer.positions.push_back(i.y);
-		vertexBuffer.positions.push_back(i.z);
-	}
-
-	texture.getTextCoords(eTileID::DirtSide, vertexBuffer.textCoords);
-
-	for (glm::vec3 i : faceLeft)
-	{
-		i += startPosition;
-		vertexBuffer.positions.push_back(i.x);
-		vertexBuffer.positions.push_back(i.y);
-		vertexBuffer.positions.push_back(i.z);
-	}
-	texture.getTextCoords(eTileID::DirtSide, vertexBuffer.textCoords);
-
-	for (glm::vec3 i : faceRight)
-	{
-		i += startPosition;
-		vertexBuffer.positions.push_back(i.x);
-		vertexBuffer.positions.push_back(i.y);
-		vertexBuffer.positions.push_back(i.z);
-	}
-
-	texture.getTextCoords(eTileID::DirtSide, vertexBuffer.textCoords);
-
-	for (glm::vec3 i : faceTop)
-	{
-		i += startPosition;
-		vertexBuffer.positions.push_back(i.x);
-		vertexBuffer.positions.push_back(i.y);
-		vertexBuffer.positions.push_back(i.z);
-	}
-
-	texture.getTextCoords(eTileID::Grass, vertexBuffer.textCoords);
-
-	for (glm::vec3 i : faceBottom)
-	{
-		i += startPosition;
-		vertexBuffer.positions.push_back(i.x);
-		vertexBuffer.positions.push_back(i.y);
-		vertexBuffer.positions.push_back(i.z);
-	}
-
-	texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
-
-	for (unsigned int i : vertexIndicies)
-	{
-		vertexBuffer.indicies.push_back(i + elementArrayBufferIndex);
 	}
 }
 
@@ -293,13 +193,23 @@ int main()
 
 	std::cout << glGetError() << "\n";
 
+
+	std::vector<Chunk> chunks;
+	for (int x = 0; x < 32; x += 8)
+	{
+		for (int y = 0; y < 32; y += 8)
+		{
+			chunks.emplace_back(glm::vec2(x, y));
+		}
+	}
+
 	int elementArrayBufferIndex = 0;
 	VertexBuffer vertexBuffer;
-	for (int y = 0; y < 16; y += 1)
+	for (int y = 0; y < 8; ++y)
 	{
-		for (int x = 0; x < 16; x += 1)
+		for (int x = 0; x < 8; ++x)
 		{
-			for (int z = 0; z < 16; z += 1)
+			for (int z = 0; z < 8; ++z)
 			{
 				addCube(vertexBuffer, *texture, glm::vec3(x, y, z), elementArrayBufferIndex);
 				elementArrayBufferIndex += 24;
@@ -334,14 +244,7 @@ int main()
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 
-	//std::vector<Chunk> chunks;
-	//for (int x = 0; x < 32; x += 8)
-	//{
-	//	for (int y = 0; y < 32; y += 8)
-	//	{		
-	//		chunks.emplace_back(glm::vec2(x, y));
-	//	}
-	//}
+
 
 	sf::Clock clock;
 	clock.restart();

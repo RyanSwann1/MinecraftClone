@@ -36,7 +36,7 @@ std::unique_ptr<Texture> Texture::loadTexture(const std::string& name)
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	return std::unique_ptr<Texture>(std::move(texture));
+	return texture;
 }
 
 unsigned int Texture::getCurrentSlot() const
