@@ -10,6 +10,7 @@ ChunkManager::ChunkManager()
 
 void ChunkManager::generateChunks(glm::vec3 startingPosition, int chunkCount)
 {
+	m_chunks.reserve(chunkCount * chunkCount);
 	for (int x = 0; x < 16 * chunkCount; x += 16)
 	{
 		for (int z = 0; z < 16 * chunkCount; z += 16)
@@ -145,7 +146,19 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 			vertexBuffer.positions.push_back(i.y);
 			vertexBuffer.positions.push_back(i.z);
 		}
-		texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+
+		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
+		{
+			texture.getTextCoords(eTileID::Stone, vertexBuffer.textCoords);
+		}
+		else if (startPosition.y <= Utilities::DIRT_MAX_HEIGHT)
+		{
+			texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
+		}
+		else
+		{
+			texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+		}
 		break;
 	case eCubeSide::Back:
 		for (glm::vec3 i : Utilities::CUBE_FACE_BACK)
@@ -155,7 +168,18 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 			vertexBuffer.positions.push_back(i.y);
 			vertexBuffer.positions.push_back(i.z);
 		}
-		texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
+		{
+			texture.getTextCoords(eTileID::Stone, vertexBuffer.textCoords);
+		}
+		else if (startPosition.y <= Utilities::DIRT_MAX_HEIGHT)
+		{
+			texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
+		}
+		else
+		{
+			texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+		}
 		
 		break;
 	case eCubeSide::Left:
@@ -166,7 +190,18 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 			vertexBuffer.positions.push_back(i.y);
 			vertexBuffer.positions.push_back(i.z);
 		}
-		texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
+		{
+			texture.getTextCoords(eTileID::Stone, vertexBuffer.textCoords);
+		}
+		else if (startPosition.y <= Utilities::DIRT_MAX_HEIGHT)
+		{
+			texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
+		}
+		else
+		{
+			texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+		}
 		
 		break;
 	case eCubeSide::Right:
@@ -177,7 +212,18 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 			vertexBuffer.positions.push_back(i.y);
 			vertexBuffer.positions.push_back(i.z);
 		}
-		texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
+		{
+			texture.getTextCoords(eTileID::Stone, vertexBuffer.textCoords);
+		}
+		else if (startPosition.y <= Utilities::DIRT_MAX_HEIGHT)
+		{
+			texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
+		}
+		else
+		{
+			texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+		}
 		
 		break;
 	case eCubeSide::Top:
@@ -188,7 +234,18 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 			vertexBuffer.positions.push_back(i.y);
 			vertexBuffer.positions.push_back(i.z);
 		}
-		texture.getTextCoords(eTileID::Grass, vertexBuffer.textCoords);
+		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
+		{
+			texture.getTextCoords(eTileID::Stone, vertexBuffer.textCoords);
+		}
+		else if (startPosition.y <= Utilities::DIRT_MAX_HEIGHT)
+		{
+			texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
+		}
+		else
+		{
+			texture.getTextCoords(eTileID::Grass, vertexBuffer.textCoords);
+		}
 		
 		break;
 	case eCubeSide::Bottom:
@@ -199,7 +256,14 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 			vertexBuffer.positions.push_back(i.y);
 			vertexBuffer.positions.push_back(i.z);
 		}
-		texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
+		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
+		{
+			texture.getTextCoords(eTileID::Stone, vertexBuffer.textCoords);
+		}
+		else 
+		{
+			texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
+		}
 		break;
 	}
 

@@ -34,7 +34,6 @@
 //Select buffer - state - then draw me a triangle
 //Based off of which buffer has been selected, it determines what/how will be drawns
 
-
 int getUniformLocation(unsigned int shaderID, const std::string& uniformName)
 {
 	int location = glGetUniformLocation(shaderID, uniformName.c_str());
@@ -188,7 +187,7 @@ int main()
 	VBOs.resize(6 * 6);
 
 	ChunkManager chunkManager;
-	chunkManager.generateChunks(glm::vec3(0, -20, 0), chunkCount);
+	chunkManager.generateChunks(glm::vec3(0, 0, 0), chunkCount);
 	chunkManager.generateChunkMeshes(VAOs, VBOs, *texture);
 
 	std::cout << glGetError() << "\n";
@@ -214,7 +213,6 @@ int main()
 
 		sf::Vector2i mousePosition = sf::Mouse::getPosition();
 		camera.mouse_callback(mousePosition.x, mousePosition.y);
-
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
