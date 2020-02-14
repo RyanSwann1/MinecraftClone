@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "Chunk.h"
+#include "ChunkManager.h"
 #include "VertexBuffer.h"
 #include "Utilities.h"
 #include <string>
@@ -142,12 +143,6 @@ unsigned int createShaderProgram()
 //buildingand optimizing meshes from chunk data(less vertices to draw), 
 //or cutting down on the size of each vertex element(less bandwidth).There are plenty of other ways to increase performance with such an engine.
 
-
-//https://www.youtube.com/watch?v=7hwWMUM0wZo
-
-
-
-
 bool isAirBlock(const std::vector<Chunk>& chunks, glm::vec3 position)
 {
 	for (const auto& chunk : chunks)
@@ -165,7 +160,7 @@ int main()
 	settings.majorVersion = 3;
 	settings.minorVersion = 3;
 	settings.attributeFlags = sf::ContextSettings::Core;
-	sf::Vector2i windowSize(750, 750);
+	sf::Vector2i windowSize(1280, 1080);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Texture_Atlas.png", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
 	gladLoadGL();
@@ -191,31 +186,25 @@ int main()
 	texture->bind();
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot());
 
-	std::cout << glGetError() << "\n";
-
-
-	std::vector<Chunk> chunks;
-	for (int x = 0; x < 32; x += 8)
-	{
-		for (int y = 0; y < 32; y += 8)
-		{
-			chunks.emplace_back(glm::vec2(x, y));
-		}
-	}
-
 	int elementArrayBufferIndex = 0;
 	VertexBuffer vertexBuffer;
-	for (int y = 0; y < 8; ++y)
-	{
-		for (int x = 0; x < 8; ++x)
-		{
-			for (int z = 0; z < 8; ++z)
-			{
-				addCube(vertexBuffer, *texture, glm::vec3(x, y, z), elementArrayBufferIndex);
-				elementArrayBufferIndex += 24;
-			}
-		}
-	}
+	ChunkManager chunkManager;
+	chunkManager.generateChunks(glm::vec3(0, 0, 0));
+	chunkManager.generateChunkMeshes(vertexBuffer, *texture, elementArrayBufferIndex);
+
+	std::cout << glGetError() << "\n";
+
+	//for (int y = 0; y < 8; ++y)
+	//{
+	//	for (int x = 0; x < 8; ++x)
+	//	{
+	//		for (int z = 0; z < 8; ++z)
+	//		{
+	//			addCube(vertexBuffer, *texture, glm::vec3(x, y, z), elementArrayBufferIndex);
+	//			elementArrayBufferIndex += 24;
+	//		}
+	//	}
+	//}
 	
 	unsigned int positionsVBO;
 	glGenBuffers(1, &positionsVBO);
@@ -244,8 +233,6 @@ int main()
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 
-
-
 	sf::Clock clock;
 	clock.restart();
 
@@ -272,12 +259,6 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		//glm::mat4 model = glm::mat4(1.0f);
-		//setUniformMat4f(shaderID, "uModel", model);
-		//glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-		
-		//glm::mat4 model = glm::mat4(1.0);
-		//setUniformMat4f(shaderID, "uModel", model);
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
 		setUniformMat4f(shaderID, "uView", view);
@@ -285,19 +266,6 @@ int main()
 		setUniformMat4f(shaderID, "uProjection", projection);
 
 		glDrawElements(GL_TRIANGLES, vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
-		//for (const auto& chunk : chunks)
-		//{
-		//	for (int x = 0; x < 16; ++x)
-		//	{
-		//		for (int y = 0; y < 16; ++y)
-		//		{
-		//			for (int z = 0; z < 16; ++z)
-		//			{
-	
-		//			}
-		//		}
-		//	}
-		//}
 
 		glBindVertexArray(0);
 		window.display();
