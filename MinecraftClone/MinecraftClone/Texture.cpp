@@ -1,5 +1,6 @@
 #include "Texture.h"
 #include "glad.h"
+#include "CubeID.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
@@ -49,11 +50,11 @@ unsigned int Texture::getID() const
 	return m_ID;
 }
 
-void Texture::getTextCoords(eTileID tileID, std::vector<float>& textCoords) const
+void Texture::getTextCoords(eCubeID tileID, std::vector<float>& textCoords) const
 {
 	switch (tileID)
 	{
-	case eTileID::Grass :
+	case eCubeID::Grass :
 		textCoords.push_back(0.0);
 		textCoords.push_back((128.0f - 16.0f) / 128.0f);
 
@@ -67,7 +68,7 @@ void Texture::getTextCoords(eTileID tileID, std::vector<float>& textCoords) cons
 		textCoords.push_back(1);
 	
 		break;
-	case eTileID::GrassSide :
+	case eCubeID::GrassSide :
 		textCoords.push_back(16.0f / 128.0f);
 		textCoords.push_back((128.0f - 16.0f) / 128.0f);
 
@@ -81,7 +82,7 @@ void Texture::getTextCoords(eTileID tileID, std::vector<float>& textCoords) cons
 		textCoords.push_back(1);
 
 		break;
-	case eTileID::Dirt :
+	case eCubeID::Dirt :
 		textCoords.push_back(32.0f / 128.0f);
 		textCoords.push_back((128.0f - 16.0f) / 128.0f);
 
@@ -95,7 +96,7 @@ void Texture::getTextCoords(eTileID tileID, std::vector<float>& textCoords) cons
 		textCoords.push_back(1);
 		break;
 
-	case eTileID::Stone :
+	case eCubeID::Stone :
 		textCoords.push_back(48.0f / 128.0f);
 		textCoords.push_back((128.0f - 16.0f) / 128.0f);
 

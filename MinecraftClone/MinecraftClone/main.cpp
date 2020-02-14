@@ -201,6 +201,19 @@ int main()
 	while (window.isOpen())
 	{
 		float deltaTime = clock.restart().asSeconds();
+		glm::vec3 rayPosition = camera.m_frontInverse + camera.m_position;
+		elaspedTime += deltaTime;
+		if (elaspedTime >= messageExpiredTime)
+		{
+			//std::cout << "Ray Position: \n";
+			//glm::vec3 rayPos = camera.m_frontInverse + camera.m_position;
+			//std::cout << rayPos.x << " " << rayPos.y << " " << rayPos.z << "\n";
+			elaspedTime = 0.0f;
+
+			std::cout << "Camera Position\n";
+			std::cout << camera.m_position.x << " " << camera.m_position.y << " " << camera.m_position.z << "\n";
+		}
+
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))
 		{
@@ -212,21 +225,19 @@ int main()
 			{
 				camera.move(currentSFMLEvent, deltaTime);
 			}
+			else if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
+			{
+				chunkManager.isPositionInChunk(rayPosition);
+			}
 		}
 
 		sf::Vector2i mousePosition = sf::Mouse::getPosition();
 		camera.mouse_callback(mousePosition.x, mousePosition.y);
+		sf::Vector2i relativeMousePosition = sf::Mouse::getPosition(window);
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		elaspedTime += deltaTime;
-		if (elaspedTime >= messageExpiredTime)
-		{
-			elaspedTime = 0.0f;
-			std::cout << "Camera Position\n";
-			std::cout << camera.m_position.x << " " << camera.m_position.y << " " << camera.m_position.z << "\n";
-		}
 
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);

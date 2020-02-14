@@ -13,8 +13,10 @@ class ChunkManager : private NonCopyable
 public:
 	ChunkManager();
 
+	bool isPositionInChunk(glm::vec3 position) const;
 	void generateChunks(glm::vec3 startingPosition, int chunkCount);
 	void generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture) const;
+
 
 private:
 	std::vector<Chunk> m_chunks;
@@ -23,4 +25,6 @@ private:
 	void addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, glm::vec3 startPosition, eCubeSide cubeSide, 
 		int& elementArrayBufferIndex) const;
 	bool isCubeAtPosition(glm::vec3 position) const;
+
+	void removeCubeFromChunk(glm::vec3 position);
 };

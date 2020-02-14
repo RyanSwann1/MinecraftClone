@@ -4,6 +4,7 @@ Camera::Camera()
 	: m_speed(0.5f),
 	m_position(0.0f, 0.0f, 3.0f),
 	m_front(0.0f, 0.0f, -1.0f),
+	m_frontInverse(0.0f, 0.0f, 1.0f),
 	m_up(0.0f, 1.0f, 0.0f)
 {}
 
@@ -58,4 +59,8 @@ void Camera::mouse_callback(double xpos, double ypos)
 	front.y = sin(glm::radians(pitch));
 	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 	m_front = glm::normalize(front);
+	
+	m_frontInverse.x = -glm::normalize(front).x * 5;
+	m_frontInverse.y = -glm::normalize(front).y * 5;
+	m_frontInverse.z = -glm::normalize(front).z * 5;
 }

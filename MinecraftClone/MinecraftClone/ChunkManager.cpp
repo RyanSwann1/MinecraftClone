@@ -3,10 +3,29 @@
 #include "VertexBuffer.h"
 #include "Texture.h"
 #include "VertexArray.h"
+#include "CubeID.h"
+#include <iostream>
 
 ChunkManager::ChunkManager()
 	: m_chunks()
 {}
+
+bool ChunkManager::isPositionInChunk(glm::vec3 position) const
+{
+	glm::ivec3 positionOnGrid((position.x / 1), (position.y / 1), (position.z / 1));
+	std::cout << "Position On Grid\n";
+	std::cout << positionOnGrid.x << " " << positionOnGrid.y << " " << positionOnGrid.z << "\n";
+
+	for (const Chunk& chunk : m_chunks)
+	{
+		if (chunk.isPositionInBounds(positionOnGrid))
+		{
+			int i = 0;
+		}
+	}
+
+	return false;
+}
 
 void ChunkManager::generateChunks(glm::vec3 startingPosition, int chunkCount)
 {
@@ -74,7 +93,7 @@ void ChunkManager::addCube(VertexBuffer& vertexBuffer, const Texture& texture, g
 		vertexBuffer.positions.push_back(i.y);
 		vertexBuffer.positions.push_back(i.z);
 	}
-	texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+	texture.getTextCoords(eCubeID::GrassSide, vertexBuffer.textCoords);
 
 	for (glm::vec3 i : Utilities::CUBE_FACE_BACK)
 	{
@@ -84,7 +103,7 @@ void ChunkManager::addCube(VertexBuffer& vertexBuffer, const Texture& texture, g
 		vertexBuffer.positions.push_back(i.z);
 	}
 
-	texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+	texture.getTextCoords(eCubeID::GrassSide, vertexBuffer.textCoords);
 
 	for (glm::vec3 i : Utilities::CUBE_FACE_LEFT)
 	{
@@ -93,7 +112,7 @@ void ChunkManager::addCube(VertexBuffer& vertexBuffer, const Texture& texture, g
 		vertexBuffer.positions.push_back(i.y);
 		vertexBuffer.positions.push_back(i.z);
 	}
-	texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+	texture.getTextCoords(eCubeID::GrassSide, vertexBuffer.textCoords);
 
 	for (glm::vec3 i : Utilities::CUBE_FACE_RIGHT)
 	{
@@ -103,7 +122,7 @@ void ChunkManager::addCube(VertexBuffer& vertexBuffer, const Texture& texture, g
 		vertexBuffer.positions.push_back(i.z);
 	}
 
-	texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+	texture.getTextCoords(eCubeID::GrassSide, vertexBuffer.textCoords);
 
 	for (glm::vec3 i : Utilities::CUBE_FACE_TOP)
 	{
@@ -113,7 +132,7 @@ void ChunkManager::addCube(VertexBuffer& vertexBuffer, const Texture& texture, g
 		vertexBuffer.positions.push_back(i.z);
 	}
 
-	texture.getTextCoords(eTileID::Grass, vertexBuffer.textCoords);
+	texture.getTextCoords(eCubeID::Grass, vertexBuffer.textCoords);
 
 	for (glm::vec3 i : Utilities::CUBE_FACE_BOTTOM)
 	{
@@ -123,7 +142,7 @@ void ChunkManager::addCube(VertexBuffer& vertexBuffer, const Texture& texture, g
 		vertexBuffer.positions.push_back(i.z);
 	}
 
-	texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
+	texture.getTextCoords(eCubeID::Dirt, vertexBuffer.textCoords);
 
 	for (unsigned int i : Utilities::CUBE_INDICIES)
 	{
@@ -149,15 +168,15 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 
 		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
 		{
-			texture.getTextCoords(eTileID::Stone, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::Stone, vertexBuffer.textCoords);
 		}
 		else if (startPosition.y <= Utilities::DIRT_MAX_HEIGHT)
 		{
-			texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::Dirt, vertexBuffer.textCoords);
 		}
 		else
 		{
-			texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::GrassSide, vertexBuffer.textCoords);
 		}
 		break;
 	case eCubeSide::Back:
@@ -170,15 +189,15 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 		}
 		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
 		{
-			texture.getTextCoords(eTileID::Stone, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::Stone, vertexBuffer.textCoords);
 		}
 		else if (startPosition.y <= Utilities::DIRT_MAX_HEIGHT)
 		{
-			texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::Dirt, vertexBuffer.textCoords);
 		}
 		else
 		{
-			texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::GrassSide, vertexBuffer.textCoords);
 		}
 		
 		break;
@@ -192,15 +211,15 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 		}
 		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
 		{
-			texture.getTextCoords(eTileID::Stone, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::Stone, vertexBuffer.textCoords);
 		}
 		else if (startPosition.y <= Utilities::DIRT_MAX_HEIGHT)
 		{
-			texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::Dirt, vertexBuffer.textCoords);
 		}
 		else
 		{
-			texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::GrassSide, vertexBuffer.textCoords);
 		}
 		
 		break;
@@ -214,15 +233,15 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 		}
 		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
 		{
-			texture.getTextCoords(eTileID::Stone, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::Stone, vertexBuffer.textCoords);
 		}
 		else if (startPosition.y <= Utilities::DIRT_MAX_HEIGHT)
 		{
-			texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::Dirt, vertexBuffer.textCoords);
 		}
 		else
 		{
-			texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::GrassSide, vertexBuffer.textCoords);
 		}
 		
 		break;
@@ -236,15 +255,15 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 		}
 		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
 		{
-			texture.getTextCoords(eTileID::Stone, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::Stone, vertexBuffer.textCoords);
 		}
 		else if (startPosition.y <= Utilities::DIRT_MAX_HEIGHT)
 		{
-			texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::Dirt, vertexBuffer.textCoords);
 		}
 		else
 		{
-			texture.getTextCoords(eTileID::Grass, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::Grass, vertexBuffer.textCoords);
 		}
 		
 		break;
@@ -258,11 +277,11 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 		}
 		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
 		{
-			texture.getTextCoords(eTileID::Stone, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::Stone, vertexBuffer.textCoords);
 		}
 		else 
 		{
-			texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeID::Dirt, vertexBuffer.textCoords);
 		}
 		break;
 	}
@@ -286,6 +305,14 @@ bool ChunkManager::isCubeAtPosition(glm::vec3 position) const
 	}
 
 	return false;
+}
+
+void ChunkManager::removeCubeFromChunk(glm::vec3 position)
+{
+	for (const Chunk& chunk : m_chunks)
+	{
+
+	}
 }
 
 //glm::vec3 startPosition(x, y, z);
