@@ -164,7 +164,7 @@ int main()
 	settings.attributeFlags = sf::ContextSettings::Core;
 	sf::Vector2i windowSize(1280, 1080);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Texture_Atlas.png", sf::Style::Default, settings);
-	window.setFramerateLimit(60);
+	window.setFramerateLimit(120);
 	gladLoadGL();
 
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));

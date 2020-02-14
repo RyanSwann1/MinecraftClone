@@ -20,6 +20,7 @@ private:
 	std::vector<Chunk> m_chunks;
 
 	void addCube(VertexBuffer& vertexBuffer, const Texture& texture, glm::vec3 startPosition, int& elementArrayBufferIndex) const;
-	void addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, glm::vec3 startPosition, eCubeSide cubeSide) const;
-	bool isBlockAir(glm::vec3 position) const;
+	void addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, glm::vec3 startPosition, eCubeSide cubeSide, 
+		int& elementArrayBufferIndex) const;
+	bool isCubeAtPosition(glm::vec3 position) const;
 };

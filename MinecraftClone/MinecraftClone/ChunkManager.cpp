@@ -32,7 +32,30 @@ void ChunkManager::generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vect
 			{
 				for (int z = chunkStartingPosition.z; z < chunkStartingPosition.z + 16; ++z)
 				{
-					addCube(VBOs[i], texture, glm::vec3(x, y, z), elementArrayBufferIndex);
+					if (!isCubeAtPosition(glm::vec3(x - 1, y, z)))
+					{
+						addCubeFace(VBOs[i], texture, glm::vec3(x, y, z), eCubeSide::Left, elementArrayBufferIndex);
+					}
+					if (!isCubeAtPosition(glm::vec3(x + 1, y, z)))
+					{
+						addCubeFace(VBOs[i], texture, glm::vec3(x, y, z), eCubeSide::Right, elementArrayBufferIndex);
+					}
+					if (!isCubeAtPosition(glm::vec3(x, y - 1, z)))
+					{
+						addCubeFace(VBOs[i], texture, glm::vec3(x, y, z), eCubeSide::Bottom, elementArrayBufferIndex);
+					}
+					if (!isCubeAtPosition(glm::vec3(x, y + 1, z)))
+					{
+						addCubeFace(VBOs[i], texture, glm::vec3(x, y, z), eCubeSide::Top, elementArrayBufferIndex);
+					}
+					if (!isCubeAtPosition(glm::vec3(x, y, z - 1)))
+					{
+						addCubeFace(VBOs[i], texture, glm::vec3(x, y, z), eCubeSide::Back, elementArrayBufferIndex);
+					}
+					if (!isCubeAtPosition(glm::vec3(x, y, z + 1)))
+					{
+						addCubeFace(VBOs[i], texture, glm::vec3(x, y, z), eCubeSide::Front, elementArrayBufferIndex);
+					}
 				}
 			}
 		}
@@ -109,7 +132,8 @@ void ChunkManager::addCube(VertexBuffer& vertexBuffer, const Texture& texture, g
 	elementArrayBufferIndex += 24;
 }
 
-void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, glm::vec3 startPosition, eCubeSide cubeSide) const
+void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, glm::vec3 startPosition, eCubeSide cubeSide,
+	int& elementArrayBufferIndex) const
 {
 	switch (cubeSide)
 	{
@@ -164,7 +188,7 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 			vertexBuffer.positions.push_back(i.y);
 			vertexBuffer.positions.push_back(i.z);
 		}
-		texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+		texture.getTextCoords(eTileID::Grass, vertexBuffer.textCoords);
 		
 		break;
 	case eCubeSide::Bottom:
@@ -175,16 +199,23 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 			vertexBuffer.positions.push_back(i.y);
 			vertexBuffer.positions.push_back(i.z);
 		}
-		texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
+		texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
 		break;
 	}
+
+	for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
+	{
+		vertexBuffer.indicies.push_back(i + elementArrayBufferIndex);
+	}
+
+	elementArrayBufferIndex += 4;
 }
 
-bool ChunkManager::isBlockAir(glm::vec3 position) const
+bool ChunkManager::isCubeAtPosition(glm::vec3 position) const
 {
 	for (const Chunk& chunk : m_chunks)
 	{
-		if (chunk.isPositionInChunk(position))
+		if (chunk.isPositionInBounds(position))
 		{
 			return true;
 		}

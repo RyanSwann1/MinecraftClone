@@ -19,6 +19,18 @@ Chunk::Chunk(glm::vec3 startingPosition)
 			}
 		}
 	}
+
+	m_endingPosition = m_chunk[15][15][15];
+}
+
+bool Chunk::isPositionInBounds(glm::vec3 position) const
+{
+	return (position.x >= m_startingPosition.x &&
+		position.y >= m_startingPosition.y &&
+		position.z >= m_startingPosition.z &&
+		position.x <= m_endingPosition.x &&
+		position.y <= m_endingPosition.y &&
+		position.z <= m_endingPosition.z);
 }
 
 glm::vec3 Chunk::getStartingPosition() const
