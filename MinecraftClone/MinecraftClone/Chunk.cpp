@@ -3,6 +3,7 @@
 #include "Texture.h"
 #include "VertexBuffer.h"
 #include "Utilities.h"
+#include <iostream>
 
 Chunk::Chunk(glm::vec3 startingPosition)
 	: m_chunk(),
@@ -31,7 +32,7 @@ bool Chunk::isPositionInChunk(glm::vec3 position) const
 	{
 		for (int y = 0; y < 16; ++y)
 		{
-			for (int z = 0; z < 16; z++)
+			for (int z = 0; z < 16; ++z)
 			{
 				if (m_chunk[x][y][z] == position)
 				{

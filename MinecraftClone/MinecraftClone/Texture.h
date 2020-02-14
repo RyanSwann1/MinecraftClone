@@ -9,7 +9,7 @@
 enum class eTileID
 {
 	Grass = 0,
-	DirtSide,
+	GrassSide,
 	Dirt
 };
 

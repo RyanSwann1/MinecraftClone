@@ -4,6 +4,7 @@
 #include "ChunkManager.h"
 #include "VertexBuffer.h"
 #include "Utilities.h"
+#include "VertexArray.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -151,6 +152,7 @@ bool isAirBlock(const std::vector<Chunk>& chunks, glm::vec3 position)
 	}
 }
 
+//x + (y * width)
 int main()
 {
 	sf::ContextSettings settings;
@@ -165,17 +167,10 @@ int main()
 	window.setFramerateLimit(60);
 	gladLoadGL();
 
-	window.setMouseCursorVisible(false);
-
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
 	glEnable(GL_DEPTH_TEST);
 
 	unsigned int shaderID = createShaderProgram();
-
-	unsigned int VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
 	Camera camera;
 	std::unique_ptr<Texture> texture = Texture::loadTexture("Texture_Atlas.png");
 	if (!texture)
@@ -186,50 +181,16 @@ int main()
 	texture->bind();
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot());
 
-	int elementArrayBufferIndex = 0;
-	VertexBuffer vertexBuffer;
+	int chunkCount = 6;
+	std::vector<VertexArray> VAOs;
+	VAOs.resize(6 * 6);
+	std::vector<VertexBuffer> VBOs;
+	VBOs.resize(6 * 6);
+
 	ChunkManager chunkManager;
-	chunkManager.generateChunks(glm::vec3(0, 0, 0));
-	chunkManager.generateChunkMeshes(vertexBuffer, *texture, elementArrayBufferIndex);
+	chunkManager.generateChunks(glm::vec3(0, 0, 0), chunkCount);
+	chunkManager.generateChunkMeshes(VAOs, VBOs, *texture);
 
-	std::cout << glGetError() << "\n";
-
-	//for (int y = 0; y < 8; ++y)
-	//{
-	//	for (int x = 0; x < 8; ++x)
-	//	{
-	//		for (int z = 0; z < 8; ++z)
-	//		{
-	//			addCube(vertexBuffer, *texture, glm::vec3(x, y, z), elementArrayBufferIndex);
-	//			elementArrayBufferIndex += 24;
-	//		}
-	//	}
-	//}
-	
-	unsigned int positionsVBO;
-	glGenBuffers(1, &positionsVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
-	glBufferData(GL_ARRAY_BUFFER, vertexBuffer.positions.size() * sizeof(float), vertexBuffer.positions.data(), GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
-
-	unsigned int textCoordsVBO;
-	glGenBuffers(1, &textCoordsVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, textCoordsVBO);
-	glBufferData(GL_ARRAY_BUFFER, vertexBuffer.textCoords.size() * sizeof(float), vertexBuffer.textCoords.data(), GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)(0));
-
-	unsigned int indiciesVBO;
-	glGenBuffers(1, &indiciesVBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesVBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexBuffer.indicies.size() * sizeof(unsigned int), vertexBuffer.indicies.data(), GL_STATIC_DRAW);
-
-	glBindVertexArray(0);
-
-	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 
@@ -254,7 +215,6 @@ int main()
 		sf::Vector2i mousePosition = sf::Mouse::getPosition();
 		camera.mouse_callback(mousePosition.x, mousePosition.y);
 
-		glBindVertexArray(VAO);
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -265,15 +225,15 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 100.f);
 		setUniformMat4f(shaderID, "uProjection", projection);
 
-		glDrawElements(GL_TRIANGLES, vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+		for (int i = 0; i < 6 * 6; ++i) 
+		{
+			VAOs[i].bind();
+			glDrawElements(GL_TRIANGLES, VBOs[i].indicies.size(), GL_UNSIGNED_INT, nullptr);
+			VAOs[i].unbind();
+		}
 
-		glBindVertexArray(0);
 		window.display();
 	}
-
-	glDeleteBuffers(1, &positionsVBO);
-	glDeleteBuffers(1, &indiciesVBO);
-	glDeleteVertexArrays(1, &VAO);
 
 	return 0;
 }
