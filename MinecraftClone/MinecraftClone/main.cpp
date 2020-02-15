@@ -193,18 +193,27 @@ int main()
 	while (window.isOpen())
 	{
 		float deltaTime = clock.restart().asSeconds();
-		glm::vec3 rayPosition = camera.m_frontInverse + camera.m_position;
-		elaspedTime += deltaTime;
+
 		if (elaspedTime >= messageExpiredTime)
 		{
-			//std::cout << "Ray Position: \n";
-			//glm::vec3 rayPos = camera.m_frontInverse + camera.m_position;
-			//std::cout << rayPos.x << " " << rayPos.y << " " << rayPos.z << "\n";
+			std::cout << "Position\n";
+			std::cout << camera.m_position.x << " " << camera.m_position.y << " " << camera.m_position.z << "\n";
+			std::cout << "Ray Position: \n";
+			glm::vec3 rayPos = camera.m_front + camera.m_position;
+			std::cout << rayPos.x << " " << rayPos.y << " " << rayPos.z << "\n";
+			std::cout << "\n";
+			std::cout << "\n";
 			elaspedTime = 0.0f;
 
-			std::cout << "Camera Position\n";
-			std::cout << camera.m_position.x << " " << camera.m_position.y << " " << camera.m_position.z << "\n";
+			//std::cout << "Camera Position\n";
+			//std::cout << camera.m_position.x << " " << camera.m_position.y << " " << camera.m_position.z << "\n";
 		}
+
+		//sf::Vector2i mousePosition = sf::Mouse::getPosition();
+		sf::Vector2i relativeMousePosition = sf::Mouse::getPosition(window);
+		camera.mouse_callback(relativeMousePosition.x, relativeMousePosition.y);
+		glm::vec3 rayPosition = camera.m_frontInverse + camera.m_position;
+		elaspedTime += deltaTime;
 
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))
@@ -219,13 +228,13 @@ int main()
 			}
 			else if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
 			{
-				chunkManager.removeCubeAtPosition(rayPosition);
+				//chunkManager.removeCubeAtPosition(rayPosition);
 			}
 		}
 
-		sf::Vector2i mousePosition = sf::Mouse::getPosition();
-		camera.mouse_callback(mousePosition.x, mousePosition.y);
-		sf::Vector2i relativeMousePosition = sf::Mouse::getPosition(window);
+		//chunkManager.handleQueue(VAOs, VBOs, *texture);
+
+
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);

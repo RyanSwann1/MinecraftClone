@@ -67,7 +67,10 @@ CubeDetails Chunk::getCubeDetails(glm::vec3 position) const
 
 void Chunk::removeCubeAtPosition(glm::vec3 position)
 {
-	assert(isPositionInBounds(position));
+	std::floor(position.x);
+	std::floor(position.y);
+	std::floor(position.z);
+		assert(isPositionInBounds(position));
 	glm::vec3 positionOnGrid = position - m_startingPosition;
 	m_chunk[positionOnGrid.x][positionOnGrid.y][positionOnGrid.z].type = eCubeType::Invalid;
 }

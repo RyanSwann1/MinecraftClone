@@ -131,6 +131,7 @@
     <ClCompile Include="ChunkManager.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Raycast.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="VertexArray.cpp" />
   </ItemGroup>
@@ -166,6 +167,7 @@
     <ClInclude Include="khrplatform.h" />
     <ClInclude Include="NonCopyable.h" />
     <ClInclude Include="OpenGLErrorCheck.h" />
+    <ClInclude Include="Raycast.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="VertexArray.h" />

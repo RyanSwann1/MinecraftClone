@@ -21,6 +21,7 @@ glm::vec3 VertexArray::getOwningChunkStartingPosition() const
 void VertexArray::init(VertexBuffer& vertexBuffer)
 {
 	bind();
+	m_owningChunkStartingPosition = vertexBuffer.m_owningChunkStartingPosition;
 
 	glGenBuffers(1, &vertexBuffer.positionsID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.positionsID);

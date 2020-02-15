@@ -20,7 +20,9 @@ void ChunkManager::removeCubeAtPosition(glm::vec3 position)
 	{
 		if (chunk.isPositionInBounds(positionOnGrid))
 		{
+
 			chunk.removeCubeAtPosition(position);
+			m_chunkQueue.push(&chunk);
 			break;
 		}
 	}
@@ -48,10 +50,11 @@ void ChunkManager::generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vect
 
 void ChunkManager::handleQueue(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& texture)
 {
-	while (m_chunkQueue.empty())
+	while (!m_chunkQueue.empty())
 	{
 		Chunk* chunk = m_chunkQueue.front();
 		m_chunkQueue.pop();
+		assert(chunk);
 		if (!chunk)
 		{
 			continue;
@@ -61,6 +64,9 @@ void ChunkManager::handleQueue(std::vector<VertexArray>& VAOs, std::vector<Verte
 		auto VBO = std::find_if(VBOs.begin(), VBOs.end(), [chunkStartingPosition](const auto& vertexBuffer)
 			{ return vertexBuffer.m_owningChunkStartingPosition == chunkStartingPosition; });
 		assert(VBO != VBOs.end());
+		glDeleteBuffers(1, &VBO->positionsID);
+		glDeleteBuffers(1, &VBO->textCoordsID);
+		glDeleteBuffers(1, &VBO->indiciesID);
 		VBO->clear();
 
 		auto VAO = std::find_if(VAOs.begin(), VAOs.end(), [chunkStartingPosition](const auto& vertexArray)
@@ -251,6 +257,11 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, VertexBuffer& ver
 		{
 			for (int z = chunkStartingPosition.z; z < chunkStartingPosition.z + 16; ++z)
 			{
+				if (chunk.getCubeDetails(glm::vec3(x, y, z)).type == eCubeType::Invalid)
+				{
+					continue;
+				}
+
 				if (!isCubeAtPosition(glm::vec3(x - 1, y, z)))
 				{
 					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Left, elementArrayBufferIndex);
