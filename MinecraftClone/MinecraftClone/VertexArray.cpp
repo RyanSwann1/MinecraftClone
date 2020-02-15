@@ -13,6 +13,11 @@ VertexArray::~VertexArray()
 	glDeleteVertexArrays(1, &m_ID);
 }
 
+glm::vec3 VertexArray::getOwningChunkStartingPosition() const
+{
+	return m_owningChunkStartingPosition;
+}
+
 void VertexArray::init(VertexBuffer& vertexBuffer)
 {
 	bind();

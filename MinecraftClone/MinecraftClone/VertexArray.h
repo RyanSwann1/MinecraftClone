@@ -9,6 +9,8 @@ public:
 	VertexArray();
 	~VertexArray();
 	
+	glm::vec3 getOwningChunkStartingPosition() const;
+
 	void init(VertexBuffer& vertexBuffer);
 	void bind() const;
 	void unbind() const;

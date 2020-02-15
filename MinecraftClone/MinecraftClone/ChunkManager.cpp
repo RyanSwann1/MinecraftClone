@@ -42,49 +42,11 @@ void ChunkManager::generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vect
 {
 	for (int i = 0; i < 6 * 6; ++i)
 	{
-		int elementArrayBufferIndex = 0;
-
-		glm::vec3 chunkStartingPosition = m_chunks[i].getStartingPosition();
-		VBOs[i].m_owningChunkStartingPosition = chunkStartingPosition;
-		for (int y = chunkStartingPosition.y; y < chunkStartingPosition.y + 16; ++y)
-		{
-			for (int x = chunkStartingPosition.x; x < chunkStartingPosition.x + 16; ++x)
-			{
-				for (int z = chunkStartingPosition.z; z < chunkStartingPosition.z + 16; ++z)
-				{
-					if (!isCubeAtPosition(glm::vec3(x - 1, y, z)))
-					{
-						addCubeFace(VBOs[i], texture, m_chunks[i].getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Left, elementArrayBufferIndex);
-					}
-					if (!isCubeAtPosition(glm::vec3(x + 1, y, z)))
-					{
-						addCubeFace(VBOs[i], texture, m_chunks[i].getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Right, elementArrayBufferIndex);
-					}
-					if (!isCubeAtPosition(glm::vec3(x, y - 1, z)))
-					{
-						addCubeFace(VBOs[i], texture, m_chunks[i].getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Bottom, elementArrayBufferIndex);
-					}
-					if (!isCubeAtPosition(glm::vec3(x, y + 1, z)))
-					{
-						addCubeFace(VBOs[i], texture, m_chunks[i].getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Top, elementArrayBufferIndex);
-					}
-					if (!isCubeAtPosition(glm::vec3(x, y, z - 1)))
-					{
-						addCubeFace(VBOs[i], texture, m_chunks[i].getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Back, elementArrayBufferIndex);
-					}
-					if (!isCubeAtPosition(glm::vec3(x, y, z + 1)))
-					{
-						addCubeFace(VBOs[i], texture, m_chunks[i].getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Front, elementArrayBufferIndex);
-					}
-				}
-			}
-		}
-
-		VAOs[i].init(VBOs[i]);
+		generateChunkMesh(VAOs[i], VBOs[i], texture, m_chunks[i]);
 	}
 }
 
-void ChunkManager::handleQueue(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture)
+void ChunkManager::handleQueue(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& texture)
 {
 	while (m_chunkQueue.empty())
 	{
@@ -95,7 +57,17 @@ void ChunkManager::handleQueue(std::vector<VertexArray>& VAOs, std::vector<Verte
 			continue;
 		}
 
-		
+		glm::vec3 chunkStartingPosition = chunk->getStartingPosition();
+		auto VBO = std::find_if(VBOs.begin(), VBOs.end(), [chunkStartingPosition](const auto& vertexBuffer)
+			{ return vertexBuffer.m_owningChunkStartingPosition == chunkStartingPosition; });
+		assert(VBO != VBOs.end());
+		VBO->clear();
+
+		auto VAO = std::find_if(VAOs.begin(), VAOs.end(), [chunkStartingPosition](const auto& vertexArray)
+			{ return vertexArray.getOwningChunkStartingPosition() == chunkStartingPosition; });
+		assert(VAO != VAOs.end());
+
+		generateChunkMesh(*VAO, *VBO, texture, *chunk);
 	}
 }
 
@@ -267,7 +239,45 @@ void ChunkManager::removeCubeFromChunk(glm::vec3 position)
 	}
 }
 
-void ChunkManager::generateChunkMesh()
+void ChunkManager::generateChunkMesh(VertexArray& vertexArray, VertexBuffer& vertexBuffer, const Texture& texture, const Chunk& chunk) const
 {
+	int elementArrayBufferIndex = 0;
 
+	glm::vec3 chunkStartingPosition = chunk.getStartingPosition();
+	vertexBuffer.m_owningChunkStartingPosition = chunkStartingPosition;
+	for (int y = chunkStartingPosition.y; y < chunkStartingPosition.y + 16; ++y)
+	{
+		for (int x = chunkStartingPosition.x; x < chunkStartingPosition.x + 16; ++x)
+		{
+			for (int z = chunkStartingPosition.z; z < chunkStartingPosition.z + 16; ++z)
+			{
+				if (!isCubeAtPosition(glm::vec3(x - 1, y, z)))
+				{
+					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Left, elementArrayBufferIndex);
+				}
+				if (!isCubeAtPosition(glm::vec3(x + 1, y, z)))
+				{
+					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Right, elementArrayBufferIndex);
+				}
+				if (!isCubeAtPosition(glm::vec3(x, y - 1, z)))
+				{
+					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Bottom, elementArrayBufferIndex);
+				}
+				if (!isCubeAtPosition(glm::vec3(x, y + 1, z)))
+				{
+					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Top, elementArrayBufferIndex);
+				}
+				if (!isCubeAtPosition(glm::vec3(x, y, z - 1)))
+				{
+					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Back, elementArrayBufferIndex);
+				}
+				if (!isCubeAtPosition(glm::vec3(x, y, z + 1)))
+				{
+					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Front, elementArrayBufferIndex);
+				}
+			}
+		}
+	}
+
+	vertexArray.init(vertexBuffer);
 }

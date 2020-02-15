@@ -30,5 +30,5 @@ private:
 	bool isCubeAtPosition(glm::vec3 position) const;
 
 	void removeCubeFromChunk(glm::vec3 position);
-	void generateChunkMesh();
+	void generateChunkMesh(VertexArray& vertexArray, VertexBuffer& vertexBuffer, const Texture& texture, const Chunk& chunk) const;
 };
