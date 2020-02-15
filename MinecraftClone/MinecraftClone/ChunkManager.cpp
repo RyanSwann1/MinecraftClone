@@ -54,27 +54,27 @@ void ChunkManager::generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vect
 				{
 					if (!isCubeAtPosition(glm::vec3(x - 1, y, z)))
 					{
-						addCubeFace(VBOs[i], texture, glm::vec3(x, y, z), eCubeSide::Left, elementArrayBufferIndex);
+						addCubeFace(VBOs[i], texture, m_chunks[i].getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Left, elementArrayBufferIndex);
 					}
 					if (!isCubeAtPosition(glm::vec3(x + 1, y, z)))
 					{
-						addCubeFace(VBOs[i], texture, glm::vec3(x, y, z), eCubeSide::Right, elementArrayBufferIndex);
+						addCubeFace(VBOs[i], texture, m_chunks[i].getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Right, elementArrayBufferIndex);
 					}
 					if (!isCubeAtPosition(glm::vec3(x, y - 1, z)))
 					{
-						addCubeFace(VBOs[i], texture, glm::vec3(x, y, z), eCubeSide::Bottom, elementArrayBufferIndex);
+						addCubeFace(VBOs[i], texture, m_chunks[i].getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Bottom, elementArrayBufferIndex);
 					}
 					if (!isCubeAtPosition(glm::vec3(x, y + 1, z)))
 					{
-						addCubeFace(VBOs[i], texture, glm::vec3(x, y, z), eCubeSide::Top, elementArrayBufferIndex);
+						addCubeFace(VBOs[i], texture, m_chunks[i].getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Top, elementArrayBufferIndex);
 					}
 					if (!isCubeAtPosition(glm::vec3(x, y, z - 1)))
 					{
-						addCubeFace(VBOs[i], texture, glm::vec3(x, y, z), eCubeSide::Back, elementArrayBufferIndex);
+						addCubeFace(VBOs[i], texture, m_chunks[i].getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Back, elementArrayBufferIndex);
 					}
 					if (!isCubeAtPosition(glm::vec3(x, y, z + 1)))
 					{
-						addCubeFace(VBOs[i], texture, glm::vec3(x, y, z), eCubeSide::Front, elementArrayBufferIndex);
+						addCubeFace(VBOs[i], texture, m_chunks[i].getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Front, elementArrayBufferIndex);
 					}
 				}
 			}
@@ -84,75 +84,7 @@ void ChunkManager::generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vect
 	}
 }
 
-void ChunkManager::addCube(VertexBuffer& vertexBuffer, const Texture& texture, glm::vec3 startPosition, int& elementArrayBufferIndex) const
-{
-	for (glm::vec3 i : Utilities::CUBE_FACE_FRONT)
-	{
-		i += startPosition;
-		vertexBuffer.positions.push_back(i.x);
-		vertexBuffer.positions.push_back(i.y);
-		vertexBuffer.positions.push_back(i.z);
-	}
-	texture.getTextCoords(eCubeID::GrassSide, vertexBuffer.textCoords);
-
-	for (glm::vec3 i : Utilities::CUBE_FACE_BACK)
-	{
-		i += startPosition;
-		vertexBuffer.positions.push_back(i.x);
-		vertexBuffer.positions.push_back(i.y);
-		vertexBuffer.positions.push_back(i.z);
-	}
-
-	texture.getTextCoords(eCubeID::GrassSide, vertexBuffer.textCoords);
-
-	for (glm::vec3 i : Utilities::CUBE_FACE_LEFT)
-	{
-		i += startPosition;
-		vertexBuffer.positions.push_back(i.x);
-		vertexBuffer.positions.push_back(i.y);
-		vertexBuffer.positions.push_back(i.z);
-	}
-	texture.getTextCoords(eCubeID::GrassSide, vertexBuffer.textCoords);
-
-	for (glm::vec3 i : Utilities::CUBE_FACE_RIGHT)
-	{
-		i += startPosition;
-		vertexBuffer.positions.push_back(i.x);
-		vertexBuffer.positions.push_back(i.y);
-		vertexBuffer.positions.push_back(i.z);
-	}
-
-	texture.getTextCoords(eCubeID::GrassSide, vertexBuffer.textCoords);
-
-	for (glm::vec3 i : Utilities::CUBE_FACE_TOP)
-	{
-		i += startPosition;
-		vertexBuffer.positions.push_back(i.x);
-		vertexBuffer.positions.push_back(i.y);
-		vertexBuffer.positions.push_back(i.z);
-	}
-
-	texture.getTextCoords(eCubeID::Grass, vertexBuffer.textCoords);
-
-	for (glm::vec3 i : Utilities::CUBE_FACE_BOTTOM)
-	{
-		i += startPosition;
-		vertexBuffer.positions.push_back(i.x);
-		vertexBuffer.positions.push_back(i.y);
-		vertexBuffer.positions.push_back(i.z);
-	}
-
-	texture.getTextCoords(eCubeID::Dirt, vertexBuffer.textCoords);
-
-	for (unsigned int i : Utilities::CUBE_INDICIES)
-	{
-		vertexBuffer.indicies.push_back(i + elementArrayBufferIndex);
-	}
-
-	elementArrayBufferIndex += 24;
-}
-
-void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, glm::vec3 startPosition, eCubeSide cubeSide,
+void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,
 	int& elementArrayBufferIndex) const
 {
 	switch (cubeSide)
@@ -160,128 +92,134 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 	case eCubeSide::Front:
 		for (glm::vec3 i : Utilities::CUBE_FACE_FRONT)
 		{
-			i += startPosition;
+			i += cubeDetails.position;
 			vertexBuffer.positions.push_back(i.x);
 			vertexBuffer.positions.push_back(i.y);
 			vertexBuffer.positions.push_back(i.z);
 		}
 
-		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
+		switch (cubeDetails.type)
 		{
-			texture.getTextCoords(eCubeID::Stone, vertexBuffer.textCoords);
-		}
-		else if (startPosition.y <= Utilities::DIRT_MAX_HEIGHT)
-		{
-			texture.getTextCoords(eCubeID::Dirt, vertexBuffer.textCoords);
-		}
-		else
-		{
-			texture.getTextCoords(eCubeID::GrassSide, vertexBuffer.textCoords);
+		case eCubeType::Stone :
+			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
+			break;
+		case eCubeType::Dirt :
+			texture.getTextCoords(eCubeFaceID::Dirt, vertexBuffer.textCoords);
+			break;
+		case eCubeType::Grass :
+			texture.getTextCoords(eCubeFaceID::GrassSide, vertexBuffer.textCoords);
+			break;
 		}
 		break;
 	case eCubeSide::Back:
 		for (glm::vec3 i : Utilities::CUBE_FACE_BACK)
 		{
-			i += startPosition;
+			i += cubeDetails.position;
 			vertexBuffer.positions.push_back(i.x);
 			vertexBuffer.positions.push_back(i.y);
 			vertexBuffer.positions.push_back(i.z);
 		}
-		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
+
+		switch (cubeDetails.type)
 		{
-			texture.getTextCoords(eCubeID::Stone, vertexBuffer.textCoords);
+		case eCubeType::Stone:
+			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
+			break;
+		case eCubeType::Dirt:
+			texture.getTextCoords(eCubeFaceID::Dirt, vertexBuffer.textCoords);
+			break;
+		case eCubeType::Grass:
+			texture.getTextCoords(eCubeFaceID::GrassSide, vertexBuffer.textCoords);
+			break;
 		}
-		else if (startPosition.y <= Utilities::DIRT_MAX_HEIGHT)
-		{
-			texture.getTextCoords(eCubeID::Dirt, vertexBuffer.textCoords);
-		}
-		else
-		{
-			texture.getTextCoords(eCubeID::GrassSide, vertexBuffer.textCoords);
-		}
-		
 		break;
 	case eCubeSide::Left:
 		for (glm::vec3 i : Utilities::CUBE_FACE_LEFT)
 		{
-			i += startPosition;
+			i += cubeDetails.position;
 			vertexBuffer.positions.push_back(i.x);
 			vertexBuffer.positions.push_back(i.y);
 			vertexBuffer.positions.push_back(i.z);
 		}
-		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
+
+		switch (cubeDetails.type)
 		{
-			texture.getTextCoords(eCubeID::Stone, vertexBuffer.textCoords);
+		case eCubeType::Stone:
+			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
+			break;
+		case eCubeType::Dirt:
+			texture.getTextCoords(eCubeFaceID::Dirt, vertexBuffer.textCoords);
+			break;
+		case eCubeType::Grass:
+			texture.getTextCoords(eCubeFaceID::GrassSide, vertexBuffer.textCoords);
+			break;
 		}
-		else if (startPosition.y <= Utilities::DIRT_MAX_HEIGHT)
-		{
-			texture.getTextCoords(eCubeID::Dirt, vertexBuffer.textCoords);
-		}
-		else
-		{
-			texture.getTextCoords(eCubeID::GrassSide, vertexBuffer.textCoords);
-		}
-		
 		break;
 	case eCubeSide::Right:
 		for (glm::vec3 i : Utilities::CUBE_FACE_RIGHT)
 		{
-			i += startPosition;
+			i += cubeDetails.position;
 			vertexBuffer.positions.push_back(i.x);
 			vertexBuffer.positions.push_back(i.y);
 			vertexBuffer.positions.push_back(i.z);
 		}
-		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
+
+		switch (cubeDetails.type)
 		{
-			texture.getTextCoords(eCubeID::Stone, vertexBuffer.textCoords);
+		case eCubeType::Stone:
+			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
+			break;
+		case eCubeType::Dirt:
+			texture.getTextCoords(eCubeFaceID::Dirt, vertexBuffer.textCoords);
+			break;
+		case eCubeType::Grass:
+			texture.getTextCoords(eCubeFaceID::GrassSide, vertexBuffer.textCoords);
+			break;
 		}
-		else if (startPosition.y <= Utilities::DIRT_MAX_HEIGHT)
-		{
-			texture.getTextCoords(eCubeID::Dirt, vertexBuffer.textCoords);
-		}
-		else
-		{
-			texture.getTextCoords(eCubeID::GrassSide, vertexBuffer.textCoords);
-		}
-		
 		break;
 	case eCubeSide::Top:
 		for (glm::vec3 i : Utilities::CUBE_FACE_TOP)
 		{
-			i += startPosition;
+			i += cubeDetails.position;
 			vertexBuffer.positions.push_back(i.x);
 			vertexBuffer.positions.push_back(i.y);
 			vertexBuffer.positions.push_back(i.z);
 		}
-		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
+
+
+		switch (cubeDetails.type)
 		{
-			texture.getTextCoords(eCubeID::Stone, vertexBuffer.textCoords);
+		case eCubeType::Stone:
+			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
+			break;
+		case eCubeType::Dirt:
+			texture.getTextCoords(eCubeFaceID::Dirt, vertexBuffer.textCoords);
+			break;
+		case eCubeType::Grass:
+			texture.getTextCoords(eCubeFaceID::Grass, vertexBuffer.textCoords);
+			break;
 		}
-		else if (startPosition.y <= Utilities::DIRT_MAX_HEIGHT)
-		{
-			texture.getTextCoords(eCubeID::Dirt, vertexBuffer.textCoords);
-		}
-		else
-		{
-			texture.getTextCoords(eCubeID::Grass, vertexBuffer.textCoords);
-		}
-		
 		break;
 	case eCubeSide::Bottom:
 		for (glm::vec3 i : Utilities::CUBE_FACE_BOTTOM)
 		{
-			i += startPosition;
+			i += cubeDetails.position;
 			vertexBuffer.positions.push_back(i.x);
 			vertexBuffer.positions.push_back(i.y);
 			vertexBuffer.positions.push_back(i.z);
 		}
-		if (startPosition.y <= Utilities::STONE_MAX_HEIGHT)
+
+		switch (cubeDetails.type)
 		{
-			texture.getTextCoords(eCubeID::Stone, vertexBuffer.textCoords);
-		}
-		else 
-		{
-			texture.getTextCoords(eCubeID::Dirt, vertexBuffer.textCoords);
+		case eCubeType::Stone:
+			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
+			break;
+		case eCubeType::Dirt:
+			texture.getTextCoords(eCubeFaceID::Dirt, vertexBuffer.textCoords);
+			break;
+		case eCubeType::Grass:
+			texture.getTextCoords(eCubeFaceID::Grass, vertexBuffer.textCoords);
+			break;
 		}
 		break;
 	}
@@ -314,105 +252,3 @@ void ChunkManager::removeCubeFromChunk(glm::vec3 position)
 
 	}
 }
-
-//glm::vec3 startPosition(x, y, z);
-//std::array<bool, static_cast<int>(eCubeSide::Total)> facesGenerated = 
-//	{ false, false, false, false, false, false };
-//left
-//if (isBlockAir(glm::vec3(x - 1, y, z)))
-//{
-//	facesGenerated[static_cast<int>(eCubeSide::Left)] = true;
-//	for (glm::vec3 i : Utilities::CUBE_FACE_LEFT)
-//	{
-//		i += startPosition;
-//		vertexBuffer.positions.push_back(i.x);
-//		vertexBuffer.positions.push_back(i.y);
-//		vertexBuffer.positions.push_back(i.z);
-//	}
-//				
-//	texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
-//}
-//Right
-//if (isBlockAir(glm::vec3(x + 1, y, z)))
-//{
-//	facesGenerated[static_cast<int>(eCubeSide::Right)] = true;
-//	for (glm::vec3 i : Utilities::CUBE_FACE_RIGHT)
-//	{
-//		i += startPosition;
-//		vertexBuffer.positions.push_back(i.x);
-//		vertexBuffer.positions.push_back(i.y);
-//		vertexBuffer.positions.push_back(i.z);
-//	}
-
-//	texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
-//}
-//Bottom
-//if (isBlockAir(glm::vec3(x, y - 1, z)))
-//{
-//	facesGenerated[static_cast<int>(eCubeSide::Bottom)] = true;
-//	for (glm::vec3 i : Utilities::CUBE_FACE_BOTTOM)
-//	{
-//		i += startPosition;
-//		vertexBuffer.positions.push_back(i.x);
-//		vertexBuffer.positions.push_back(i.y);
-//		vertexBuffer.positions.push_back(i.z);
-//	}
-
-//	texture.getTextCoords(eTileID::Dirt, vertexBuffer.textCoords);
-//}
-//Top
-//if (isBlockAir(glm::vec3(x, y + 1, z)))
-//{
-//	facesGenerated[static_cast<int>(eCubeSide::Top)] = true;
-//	for (glm::vec3 i : Utilities::CUBE_FACE_TOP)
-//	{
-//		i += startPosition;
-//		vertexBuffer.positions.push_back(i.x);
-//		vertexBuffer.positions.push_back(i.y);
-//		vertexBuffer.positions.push_back(i.z);
-//	}
-
-//	texture.getTextCoords(eTileID::Grass, vertexBuffer.textCoords);
-//}
-//Front
-//if (isBlockAir(glm::vec3(x, y, z - 1)))
-//{
-//	facesGenerated[static_cast<int>(eCubeSide::Back)] = true;
-//	for (glm::vec3 i : Utilities::CUBE_FACE_BACK)
-//	{
-//		i += startPosition;
-//		vertexBuffer.positions.push_back(i.x);
-//		vertexBuffer.positions.push_back(i.y);
-//		vertexBuffer.positions.push_back(i.z);
-//	}
-
-//	texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
-//}
-//Back
-//if (isBlockAir(glm::vec3(x, y, z + 1)))
-//{
-//	facesGenerated[static_cast<int>(eCubeSide::Front)] = true;
-//	for (glm::vec3 i : Utilities::CUBE_FACE_FRONT)
-//	{
-//		i += startPosition;
-//		vertexBuffer.positions.push_back(i.x);
-//		vertexBuffer.positions.push_back(i.y);
-//		vertexBuffer.positions.push_back(i.z);
-//	}
-
-//	texture.getTextCoords(eTileID::GrassSide, vertexBuffer.textCoords);
-//}
-
-//for (int i = 0; i < static_cast<int>(eCubeSide::Total); ++i)
-//{
-//	if (!facesGenerated[i])
-//	{
-//		eCubeSide cubeSide = static_cast<eCubeSide>(i);
-//		addCubeFace(vertexBuffer, texture, startPosition, cubeSide);
-//	}
-//}
-
-//for (unsigned int i : Utilities::CUBE_INDICIES)
-//{
-//	vertexBuffer.indicies.push_back(i + elementArrayBufferIndex);
-//}

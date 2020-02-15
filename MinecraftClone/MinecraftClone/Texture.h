@@ -6,8 +6,7 @@
 #include <memory>
 #include <vector>
 
-
-
+enum class eCubeFaceID;
 class Texture : private NonCopyable
 {
 public:
@@ -16,7 +15,7 @@ public:
 	unsigned int getCurrentSlot() const;
 	unsigned int getID() const;
 
-	void getTextCoords(eCubeID tileID, std::vector<float>& textCoords) const;
+	void getTextCoords(eCubeFaceID tileID, std::vector<float>& textCoords) const;
 
 	void bind(unsigned int slot = 0);
 	void unbind() const;

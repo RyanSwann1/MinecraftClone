@@ -15,12 +15,27 @@ Chunk::Chunk(glm::vec3 startingPosition)
 		{
 			for (int z = 0; z < 16; z++)
 			{
-				m_chunk[x][y][z] = glm::vec3(x + startingPosition.x, y + startingPosition.y, z + startingPosition.z);	
+				eCubeType cubeType;
+				if (y <= Utilities::STONE_MAX_HEIGHT)
+				{
+					cubeType = eCubeType::Stone;
+				}
+				else if (y <= Utilities::DIRT_MAX_HEIGHT)
+				{
+					cubeType = eCubeType::Dirt;
+				}
+				else
+				{
+					cubeType = eCubeType::Grass;
+				}
+
+				m_chunk[x][y][z] = CubeDetails(cubeType, 
+					glm::vec3(x + startingPosition.x, y + startingPosition.y, z + startingPosition.z));	
 			}
 		}
 	}
 
-	m_endingPosition = m_chunk[15][15][15];
+	m_endingPosition = m_chunk[15][15][15].position;
 }
 
 bool Chunk::isPositionInBounds(glm::vec3 position) const
@@ -38,26 +53,14 @@ glm::vec3 Chunk::getStartingPosition() const
 	return m_startingPosition;
 }
 
-bool Chunk::isPositionInChunk(glm::vec3 position) const
-{
-	for (int x = 0; x < 16; ++x)
-	{
-		for (int y = 0; y < 16; ++y)
-		{
-			for (int z = 0; z < 16; ++z)
-			{
-				if (m_chunk[x][y][z] == position)
-				{
-					return true;
-				}
-			}
-		}
-	}
-
-	return false;
-}
-
-const std::array<std::array<std::array<glm::vec3, 16>, 16>, 16> & Chunk::getChunk() const
+const std::array<std::array<std::array<CubeDetails, 16>, 16>, 16> & Chunk::getChunk() const
 {
 	return m_chunk;
+}
+
+CubeDetails Chunk::getCubeDetails(glm::vec3 position) const
+{
+	assert(isPositionInBounds(position));
+	glm::vec3 positionOnGrid = position - m_startingPosition;
+	return m_chunk[positionOnGrid.x][positionOnGrid.y][positionOnGrid.z];
 }

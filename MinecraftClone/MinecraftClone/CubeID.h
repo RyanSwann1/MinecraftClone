@@ -1,9 +1,16 @@
 #pragma once
 
-enum class eCubeID
+enum class eCubeType
 {
-	eInvalid = 0,
+	Invalid = 0,
 	Grass,
+	Dirt,
+	Stone
+};
+
+enum class eCubeFaceID
+{
+	Grass = 0,
 	GrassSide,
 	Dirt,
 	Stone

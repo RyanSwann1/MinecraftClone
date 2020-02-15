@@ -1,7 +1,24 @@
 #pragma once
 
 #include "glm/glm.hpp"
+#include "CubeID.h"
 #include <array>
+
+struct CubeDetails
+{
+	CubeDetails()
+		: type(eCubeType::Invalid),
+		position()
+	{}
+
+	CubeDetails(eCubeType type, glm::vec3 position)
+		: type(type),
+		position(position)
+	{}
+
+	eCubeType type;
+	glm::vec3 position;
+};
 
 class Chunk
 {
@@ -10,15 +27,13 @@ public:
 
 	bool isPositionInBounds(glm::vec3 position) const;
 	glm::vec3 getStartingPosition() const;
-	bool isPositionInChunk(glm::vec3 position) const;
-	const std::array<std::array<std::array<glm::vec3, 16>, 16>, 16> & getChunk() const;
+	const std::array<std::array<std::array<CubeDetails, 16>, 16>, 16> & getChunk() const;
 
-	
-
+	CubeDetails getCubeDetails(glm::vec3 position) const;
 
 private:
 	glm::vec3 m_startingPosition;
 	glm::vec3 m_endingPosition;
 
-	std::array<std::array<std::array<glm::vec3, 16>, 16>, 16> m_chunk;
+	std::array<std::array<std::array<CubeDetails, 16>, 16>, 16> m_chunk;
 };
