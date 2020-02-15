@@ -143,14 +143,6 @@ unsigned int createShaderProgram()
 //buildingand optimizing meshes from chunk data(less vertices to draw), 
 //or cutting down on the size of each vertex element(less bandwidth).There are plenty of other ways to increase performance with such an engine.
 
-bool isAirBlock(const std::vector<Chunk>& chunks, glm::vec3 position)
-{
-	for (const auto& chunk : chunks)
-	{
-		return false;
-	}
-}
-
 //x + (y * width)
 int main()
 {
@@ -227,7 +219,7 @@ int main()
 			}
 			else if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
 			{
-				chunkManager.isPositionInChunk(rayPosition);
+				chunkManager.removeCubeAtPosition(rayPosition);
 			}
 		}
 
@@ -253,6 +245,13 @@ int main()
 		}
 
 		window.display();
+	}
+
+	for (auto& i : VBOs)
+	{
+		glDeleteBuffers(1, &i.positionsID);
+		glDeleteBuffers(1, &i.textCoordsID);
+		glDeleteBuffers(1, &i.indiciesID);
 	}
 
 	return 0;

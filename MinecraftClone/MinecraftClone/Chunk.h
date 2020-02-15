@@ -20,6 +20,7 @@ struct CubeDetails
 	glm::vec3 position;
 };
 
+//position.y * (CHUNK_AREA) + position.z * CHUNK_SIZE + position.x;
 class Chunk
 {
 public:
@@ -28,8 +29,9 @@ public:
 	bool isPositionInBounds(glm::vec3 position) const;
 	glm::vec3 getStartingPosition() const;
 	const std::array<std::array<std::array<CubeDetails, 16>, 16>, 16> & getChunk() const;
-
 	CubeDetails getCubeDetails(glm::vec3 position) const;
+	
+	void removeCubeAtPosition(glm::vec3 position);
 
 private:
 	glm::vec3 m_startingPosition;
