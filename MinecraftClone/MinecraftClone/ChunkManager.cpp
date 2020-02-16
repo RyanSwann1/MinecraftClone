@@ -10,20 +10,27 @@ ChunkManager::ChunkManager()
 	: m_chunks()
 {}
 
-void ChunkManager::removeCubeAtPosition(glm::vec3 position)
+void ChunkManager::removeCubeAtPosition(glm::vec3 cameraPosition, glm::vec3 rayCastPosition)
 {
-	glm::ivec3 positionOnGrid((position.x / 1), (position.y / 1), (position.z / 1));
-	std::cout << "Position On Grid\n";
-	std::cout << positionOnGrid.x << " " << positionOnGrid.y << " " << positionOnGrid.z << "\n";
+	glm::vec3 vBetween = rayCastPosition - cameraPosition;
 
-	for (Chunk& chunk : m_chunks)
+	for (int i = 10; i > 0; --i)
 	{
-		if (chunk.isPositionInBounds(positionOnGrid))
+		glm::vec3 distance = vBetween / static_cast<float>(i);
+		glm::vec3 position = cameraPosition + distance;
+		for (Chunk& chunk : m_chunks)
 		{
+			if (chunk.isPositionInBounds(position))
+			{
+				std::cout << "Camera Position\n";
+				std::cout << cameraPosition.x << " " << cameraPosition.y << " " << cameraPosition.z << "\n";
 
-			chunk.removeCubeAtPosition(position);
-			m_chunkQueue.push(&chunk);
-			break;
+				std::cout << "Racyast Position\n";
+				std::cout << position.x << " " << position.y << " " << position.z << "\n";
+				chunk.removeCubeAtPosition(position);
+				m_chunkMeshRegenerateQueue.push(&chunk);
+				break;
+			}
 		}
 	}
 }
@@ -50,10 +57,10 @@ void ChunkManager::generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vect
 
 void ChunkManager::handleQueue(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& texture)
 {
-	while (!m_chunkQueue.empty())
+	while (!m_chunkMeshRegenerateQueue.empty())
 	{
-		Chunk* chunk = m_chunkQueue.front();
-		m_chunkQueue.pop();
+		Chunk* chunk = m_chunkMeshRegenerateQueue.front();
+		m_chunkMeshRegenerateQueue.pop();
 		assert(chunk);
 		if (!chunk)
 		{
@@ -224,6 +231,9 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 	elementArrayBufferIndex += 4;
 }
 
+//glm::ivec3 roundedPosition = glm::ivec3(position.x, position.y, position.z);
+//glm::vec3 positionOnGrid = roundedPosition - glm::ivec3(m_startingPosition.x, m_startingPosition.y, m_startingPosition.z);
+
 bool ChunkManager::isCubeAtPosition(glm::vec3 position) const
 {
 	for (const Chunk& chunk : m_chunks)
@@ -233,6 +243,15 @@ bool ChunkManager::isCubeAtPosition(glm::vec3 position) const
 			return true;
 		}
 	}
+
+	//for (const Chunk& chunk : m_chunks)
+	//{
+	//	if (chunk.isPositionInBounds(position) && 
+	//		chunk.getCubeDetails(glm::ivec3(position.x, position.y, position.z)).type != eCubeType::Invalid)
+	//	{
+	//		return true;
+	//	}
+	//}
 
 	return false;
 }

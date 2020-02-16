@@ -13,6 +13,7 @@ struct Camera
 
 	void move(const sf::Event& sfmlEvent, float deltaTime);
 
+	glm::vec3 getRaycastPosition() const;
 	void mouse_callback(double xpos, double ypos);
 
 	float m_speed;

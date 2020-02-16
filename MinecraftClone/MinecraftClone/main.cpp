@@ -187,15 +187,14 @@ int main()
 
 	sf::Clock clock;
 	clock.restart();
-	float messageExpiredTime = 0.5f;
+	float messageExpiredTime = 2.5f;
 	float elaspedTime = 0.0f;
 
 	while (window.isOpen())
 	{
 		float deltaTime = clock.restart().asSeconds();
-		sf::Vector2i relativeMousePosition = sf::Mouse::getPosition(window);
-		camera.mouse_callback(relativeMousePosition.x, relativeMousePosition.y);
-		glm::vec3 rayPosition = camera.m_frontInverse + camera.m_position;
+		sf::Vector2i mousePosition = sf::Mouse::getPosition();
+		camera.mouse_callback(mousePosition.x, mousePosition.y);
 
 		if (elaspedTime >= messageExpiredTime)
 		{
@@ -207,8 +206,7 @@ int main()
 			
 
 
-			std::cout << "\n";
-			std::cout << "\n";
+			//std::cout << camera.getRaycastPosition().x << " " << camera.getRaycastPosition().y << " " << camera.getRaycastPosition().z << " \n";
 			elaspedTime = 0.0f;
 
 			//std::cout << "Camera Position\n";
@@ -226,23 +224,21 @@ int main()
 			{
 				window.close();
 			}
-			else if (currentSFMLEvent.type == sf::Event::KeyPressed)
+			if (currentSFMLEvent.type == sf::Event::KeyPressed)
 			{
 				camera.move(currentSFMLEvent, deltaTime);
 			}
-			else if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
+			if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
 			{
-				//chunkManager.removeCubeAtPosition(rayPosition);
+
+				chunkManager.removeCubeAtPosition(camera.m_position, camera.getRaycastPosition());
 			}
 		}
 
-		//chunkManager.handleQueue(VAOs, VBOs, *texture);
-
-
+		chunkManager.handleQueue(VAOs, VBOs, *texture);
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
-
 
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
@@ -250,14 +246,14 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 500.f);
 		setUniformMat4f(shaderID, "uProjection", projection);
 
-		float x = (2.0f * (windowSize.x / 2.0f)) / windowSize.x - 1.0f;
-		float y = 1.0f - (2.0f * (windowSize.y / 2.0f)) / windowSize.y;
-		float z = 1.0f;
-		glm::vec3 ray_nds = glm::vec3(x, y, z);
-		std::cout << ray_nds.x << " " << ray_nds.y << ray_nds.z << "\n";
-		glm::vec4 rayClip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
-		glm::vec4 rayEye = glm::inverse(projection) * rayClip;
-		rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0, 0.0);
+		//float x = (2.0f * (windowSize.x / 2.0f)) / windowSize.x - 1.0f;
+		//float y = 1.0f - (2.0f * (windowSize.y / 2.0f)) / windowSize.y;
+		//float z = 1.0f;
+		//glm::vec3 ray_nds = glm::vec3(x, y, z);
+		//std::cout << ray_nds.x << " " << ray_nds.y << ray_nds.z << "\n";
+		//glm::vec4 rayClip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
+		//glm::vec4 rayEye = glm::inverse(projection) * rayClip;
+		//rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0, 0.0);
 
 		for (int i = 0; i < 6 * 6; ++i) 
 		{

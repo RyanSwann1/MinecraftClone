@@ -65,12 +65,17 @@ CubeDetails Chunk::getCubeDetails(glm::vec3 position) const
 	return m_chunk[positionOnGrid.x][positionOnGrid.y][positionOnGrid.z];
 }
 
+CubeDetails Chunk::getCubeDetails(glm::ivec3 position) const
+{
+	assert(isPositionInBounds(position));
+	glm::vec3 positionOnGrid = position - glm::ivec3(m_startingPosition.x, m_startingPosition.y, m_startingPosition.z);
+	return m_chunk[positionOnGrid.x][positionOnGrid.y][positionOnGrid.z];
+}
+
 void Chunk::removeCubeAtPosition(glm::vec3 position)
 {
-	std::floor(position.x);
-	std::floor(position.y);
-	std::floor(position.z);
-		assert(isPositionInBounds(position));
-	glm::vec3 positionOnGrid = position - m_startingPosition;
+	assert(isPositionInBounds(position));
+	glm::ivec3 roundedPosition = glm::ivec3(position.x, position.y, position.z);
+	glm::vec3 positionOnGrid = roundedPosition - glm::ivec3(m_startingPosition.x, m_startingPosition.y, m_startingPosition.z);
 	m_chunk[positionOnGrid.x][positionOnGrid.y][positionOnGrid.z].type = eCubeType::Invalid;
 }
