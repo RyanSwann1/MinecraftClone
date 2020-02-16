@@ -43,7 +43,7 @@ void ChunkManager::generateChunks(glm::vec3 startingPosition, int chunkCount)
 	{
 		for (int z = 0; z < 16 * chunkCount; z += 16)
 		{
-			m_chunks.emplace_back(glm::vec3(x + startingPosition.x, startingPosition.y, z + startingPosition.z));
+			m_chunks.emplace_back(glm::ivec3(x + startingPosition.x, startingPosition.y, z + startingPosition.z));
 		}
 	}
 }

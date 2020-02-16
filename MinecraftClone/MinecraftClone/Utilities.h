@@ -16,6 +16,9 @@ enum class eCubeSide
 
 namespace Utilities
 {
+	constexpr int CHUNK_WIDTH = 16;
+	constexpr int CHUNK_HEIGHT = 16;
+	constexpr int CHUNK_DEPTH = 16;
 	constexpr int STONE_MAX_HEIGHT = 10;
 	constexpr int DIRT_MAX_HEIGHT = 14;
 
