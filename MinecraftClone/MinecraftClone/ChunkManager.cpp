@@ -219,7 +219,7 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 			texture.getTextCoords(eCubeFaceID::Dirt, vertexBuffer.textCoords);
 			break;
 		case eCubeType::Grass:
-			texture.getTextCoords(eCubeFaceID::Grass, vertexBuffer.textCoords);
+			texture.getTextCoords(eCubeFaceID::Dirt, vertexBuffer.textCoords);
 			break;
 		}
 		break;
@@ -230,7 +230,7 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 		vertexBuffer.indicies.push_back(i + elementArrayBufferIndex);
 	}
 
-	elementArrayBufferIndex += 4;
+	elementArrayBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
 }
 
 bool ChunkManager::isCubeAtPosition(glm::vec3 position) const

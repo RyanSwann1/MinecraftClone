@@ -94,7 +94,6 @@ CubeDetails Chunk::getCubeDetailsAtPosition(glm::ivec3 position) const
 
 void Chunk::removeCubeAtPosition(glm::ivec3 position)
 {
-	glm::ivec3 roundedPosition = glm::ivec3(position.x, position.y, position.z);
-	glm::ivec3 positionOnGrid = roundedPosition - glm::ivec3(m_startingPosition.x, m_startingPosition.y, m_startingPosition.z);
+	glm::ivec3 positionOnGrid = position - glm::ivec3(m_startingPosition.x, m_startingPosition.y, m_startingPosition.z);
 	m_chunk[positionOnGrid.x][positionOnGrid.y][positionOnGrid.z].type = eCubeType::Invalid;
 }
