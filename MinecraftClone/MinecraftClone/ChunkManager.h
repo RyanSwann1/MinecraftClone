@@ -23,7 +23,7 @@ public:
 
 private:
 	std::vector<Chunk> m_chunks;
-	std::queue<Chunk*> m_chunkMeshRegenerateQueue;
+	std::queue<const Chunk*> m_chunkMeshRegenerateQueue;
 
 	void addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide, 
 		int& elementArrayBufferIndex) const;
@@ -31,4 +31,5 @@ private:
 	bool isCubeAtPosition(glm::ivec3 position) const;
 
 	void generateChunkMesh(VertexArray& vertexArray, VertexBuffer& vertexBuffer, const Texture& texture, const Chunk& chunk) const;
+	void handleAdjacentDestroyedBlock(glm::ivec3 position, const Chunk& owningChunk);
 };

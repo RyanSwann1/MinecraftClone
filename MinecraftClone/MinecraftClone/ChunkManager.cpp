@@ -29,6 +29,7 @@ void ChunkManager::removeCubeAtPosition(glm::vec3 cameraPosition, glm::vec3 rayC
 				std::cout << "Racyast Position\n";
 				std::cout << position.x << " " << position.y << " " << position.z << "\n";
 				chunk.removeCubeAtPosition(position);
+				handleAdjacentDestroyedBlock(position, chunk);
 				m_chunkMeshRegenerateQueue.push(&chunk);
 				return;
 			}
@@ -60,7 +61,7 @@ void ChunkManager::handleChunkMeshRegenerationQueue(std::vector<VertexArray>& VA
 {
 	while (!m_chunkMeshRegenerateQueue.empty())
 	{
-		Chunk* chunk = m_chunkMeshRegenerateQueue.front();
+		const Chunk* chunk = m_chunkMeshRegenerateQueue.front();
 		m_chunkMeshRegenerateQueue.pop();
 		assert(chunk);
 		if (!chunk)
@@ -306,4 +307,26 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, VertexBuffer& ver
 	}
 
 	vertexArray.init(vertexBuffer);
+}
+
+void ChunkManager::handleAdjacentDestroyedBlock(glm::ivec3 position, const Chunk& owningChunk)
+{
+	for (const auto& chunk : m_chunks)
+	{
+		if (chunk.getStartingPosition() == owningChunk.getStartingPosition())
+		{
+			continue;
+		}
+		
+		if (chunk.isPositionInBounds(glm::ivec3(position.x - 1, position.y, position.z)) ||
+			chunk.isPositionInBounds(glm::ivec3(position.x + 1, position.y, position.z)) ||
+			chunk.isPositionInBounds(glm::ivec3(position.x, position.y - 1, position.z)) ||
+			chunk.isPositionInBounds(glm::ivec3(position.x, position.y + 1, position.z)) ||
+			chunk.isPositionInBounds(glm::ivec3(position.x, position.y, position.z - 1)) ||
+			chunk.isPositionInBounds(glm::ivec3(position.x, position.y, position.z + 1)))
+		{
+			m_chunkMeshRegenerateQueue.push(&chunk);
+			break;
+		}
+	}
 }
