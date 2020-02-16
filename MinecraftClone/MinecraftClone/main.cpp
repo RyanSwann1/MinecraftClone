@@ -198,22 +198,8 @@ int main()
 
 		if (elaspedTime >= messageExpiredTime)
 		{
-			//std::cout << "Position\n";
-			//std::cout << camera.m_position.x << " " << camera.m_position.y << " " << camera.m_position.z << "\n";
-			//std::cout << "Ray Position: \n";
-			//glm::vec3 rayPos = camera.m_front + camera.m_position;
-			//std::cout << rayPos.x << " " << rayPos.y << " " << rayPos.z << "\n";
-			
-
-
-			//std::cout << camera.getRaycastPosition().x << " " << camera.getRaycastPosition().y << " " << camera.getRaycastPosition().z << " \n";
 			elaspedTime = 0.0f;
-
-			//std::cout << "Camera Position\n";
-			//std::cout << camera.m_position.x << " " << camera.m_position.y << " " << camera.m_position.z << "\n";
 		}
-
-		//sf::Vector2i mousePosition = sf::Mouse::getPosition();
 
 		elaspedTime += deltaTime;
 
@@ -235,7 +221,7 @@ int main()
 			}
 		}
 
-		chunkManager.handleQueue(VAOs, VBOs, *texture);
+		chunkManager.handleChunkMeshRegenerationQueue(VAOs, VBOs, *texture);
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -245,15 +231,6 @@ int main()
 		setUniformMat4f(shaderID, "uView", view);
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 500.f);
 		setUniformMat4f(shaderID, "uProjection", projection);
-
-		//float x = (2.0f * (windowSize.x / 2.0f)) / windowSize.x - 1.0f;
-		//float y = 1.0f - (2.0f * (windowSize.y / 2.0f)) / windowSize.y;
-		//float z = 1.0f;
-		//glm::vec3 ray_nds = glm::vec3(x, y, z);
-		//std::cout << ray_nds.x << " " << ray_nds.y << ray_nds.z << "\n";
-		//glm::vec4 rayClip = glm::vec4(ray_nds.x, ray_nds.y, -1.0, 1.0);
-		//glm::vec4 rayEye = glm::inverse(projection) * rayClip;
-		//rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0, 0.0);
 
 		for (int i = 0; i < 6 * 6; ++i) 
 		{

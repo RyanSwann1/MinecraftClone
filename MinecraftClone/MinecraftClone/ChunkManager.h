@@ -19,7 +19,7 @@ public:
 	void generateChunks(glm::vec3 startingPosition, int chunkCount);
 	void generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture) const;
 
-	void handleQueue(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture);
+	void handleChunkMeshRegenerationQueue(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture);
 
 private:
 	std::vector<Chunk> m_chunks;
@@ -28,7 +28,7 @@ private:
 	void addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide, 
 		int& elementArrayBufferIndex) const;
 	bool isCubeAtPosition(glm::vec3 position) const;
+	bool isCubeAtPosition(glm::ivec3 position) const;
 
-	void removeCubeFromChunk(glm::vec3 position);
 	void generateChunkMesh(VertexArray& vertexArray, VertexBuffer& vertexBuffer, const Texture& texture, const Chunk& chunk) const;
 };

@@ -11,32 +11,33 @@ struct CubeDetails
 		position()
 	{}
 
-	CubeDetails(eCubeType type, glm::vec3 position)
+	CubeDetails(eCubeType type, glm::ivec3 position)
 		: type(type),
 		position(position)
 	{}
 
 	eCubeType type;
-	glm::vec3 position;
+	glm::ivec3 position;
 };
 
 //position.y * (CHUNK_AREA) + position.z * CHUNK_SIZE + position.x;
 class Chunk
 {
 public:
-	Chunk(glm::vec3 startingPosition);
-
-	bool isPositionInBounds(glm::vec3 position) const;
-	glm::vec3 getStartingPosition() const;
-	const std::array<std::array<std::array<CubeDetails, 16>, 16>, 16> & getChunk() const;
-	CubeDetails getCubeDetails(glm::vec3 position) const;
-	CubeDetails getCubeDetails(glm::ivec3 position) const;
+	Chunk(glm::ivec3 startingPosition);
 	
-	void removeCubeAtPosition(glm::vec3 position);
+	bool isPositionInBounds(glm::vec3 position) const;
+	bool isPositionInBounds(glm::ivec3 position) const;
+	glm::ivec3 getStartingPosition() const;
+	const std::array<std::array<std::array<CubeDetails, 16>, 16>, 16> & getChunk() const;
+	CubeDetails getCubeDetails(glm::ivec3 position) const;
+	CubeDetails getCubeDetailsAtPosition(glm::ivec3 position) const;
+
+	void removeCubeAtPosition(glm::ivec3 position);
 
 private:
-	glm::vec3 m_startingPosition;
-	glm::vec3 m_endingPosition;
+	glm::ivec3 m_startingPosition;
+	glm::ivec3 m_endingPosition;
 
 	std::array<std::array<std::array<CubeDetails, 16>, 16>, 16> m_chunk;
 };
