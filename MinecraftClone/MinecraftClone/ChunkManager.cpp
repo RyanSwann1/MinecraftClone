@@ -37,20 +37,9 @@ void ChunkManager::removeCubeAtPosition(glm::vec3 cameraPosition, glm::vec3 rayC
 	}
 }
 
-void ChunkManager::generateChunks(glm::vec3 startingPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs)
+void ChunkManager::generateInitialChunks(glm::vec3 startingPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs)
 {
-	int i = 0;
 	for (int x = 0; x < 16 * chunkCount; x += 16)
-	{
-		for (int z = 0; z < 16 * chunkCount; z += 16)
-		{
-			m_chunks.emplace_back(glm::ivec3(x + startingPosition.x, startingPosition.y, z + startingPosition.z));
-			VAOs.emplace_back();
-			VBOs.emplace_back();
-		}
-	}
-
-	for (int x = 0; x > -(16 * chunkCount); x -= 16)
 	{
 		for (int z = 0; z < 16 * chunkCount; z += 16)
 		{
@@ -69,10 +58,6 @@ void ChunkManager::generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vect
 		generateChunkMesh(VAOs[i], VBOs[i], texture, chunk);
 		++i;
 	}
-	//for (int i = 0; i < 6 * 6; ++i)
-	//{
-	//	
-	//}
 }
 
 void ChunkManager::handleChunkMeshRegenerationQueue(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& texture)
@@ -283,7 +268,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, VertexBuffer& ver
 {
 	int elementArrayBufferIndex = 0;
 
-	glm::vec3 chunkStartingPosition = chunk.getStartingPosition();
+	glm::ivec3 chunkStartingPosition = chunk.getStartingPosition();
 	vertexBuffer.m_owningChunkStartingPosition = chunkStartingPosition;
 	for (int y = chunkStartingPosition.y; y < chunkStartingPosition.y + 16; ++y)
 	{

@@ -5,6 +5,10 @@
 #include <vector>
 #include <queue>
 
+//Dyanmic Chunk Generation
+//https://gamedev.stackexchange.com/questions/173820/how-should-i-store-loaded-world-chunks-in-ram-for-my-game-similar-to-minecraft
+//https://gamedev.stackexchange.com/questions/37911/how-to-deal-with-large-open-worlds
+
 enum class eCubeSide;
 class Texture;
 class VertexArray;
@@ -16,7 +20,7 @@ public:
 	ChunkManager();
 
 	void removeCubeAtPosition(glm::vec3 cameraPosition, glm::vec3 rayCastPosition);
-	void generateChunks(glm::vec3 startingPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs);
+	void generateInitialChunks(glm::vec3 startingPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs);
 	void generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture) const;
 
 	void handleChunkMeshRegenerationQueue(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture);

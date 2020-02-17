@@ -13,7 +13,6 @@ VertexArray::~VertexArray()
 {
 	if (m_ID != Utilities::INVALID_OPENGL_ID)
 	{
-		std::cout << "Destroyed\n";
 		glDeleteVertexArrays(1, &m_ID);
 	}
 }

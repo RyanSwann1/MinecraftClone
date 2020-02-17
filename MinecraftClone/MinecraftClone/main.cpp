@@ -177,7 +177,7 @@ int main()
 	std::vector<VertexBuffer> VBOs;
 
 	ChunkManager chunkManager;
-	chunkManager.generateChunks(glm::vec3(0, 0, 0), chunkCount, VAOs, VBOs);
+	chunkManager.generateInitialChunks(glm::vec3(0, 0, 0), chunkCount, VAOs, VBOs);
 	chunkManager.generateChunkMeshes(VAOs, VBOs, *texture);
 
 	std::cout << glGetError() << "\n";
