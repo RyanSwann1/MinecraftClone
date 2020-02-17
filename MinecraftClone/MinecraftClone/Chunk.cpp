@@ -63,11 +63,6 @@ glm::ivec3 Chunk::getStartingPosition() const
 	return m_startingPosition;
 }
 
-const std::array<std::array<std::array<CubeDetails, 16>, 16>, 16> & Chunk::getChunk() const
-{
-	return m_chunk;
-}
-
 CubeDetails Chunk::getCubeDetails(glm::ivec3 position) const
 {
 	assert(isPositionInBounds(position));
