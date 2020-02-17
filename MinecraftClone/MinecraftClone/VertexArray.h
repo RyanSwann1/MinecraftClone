@@ -8,8 +8,10 @@ class VertexArray
 public:
 	VertexArray();
 	~VertexArray();
-	VertexArray(VertexArray&);
-	VertexArray(VertexArray&&);
+	VertexArray(const VertexArray&) = delete;
+	VertexArray& operator=(const VertexArray&) = delete;
+	VertexArray(VertexArray&&) noexcept;
+	VertexArray& operator=(VertexArray&&) noexcept;
 	
 	glm::vec3 getOwningChunkStartingPosition() const;
 

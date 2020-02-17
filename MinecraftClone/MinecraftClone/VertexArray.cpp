@@ -18,16 +18,20 @@ VertexArray::~VertexArray()
 	}
 }
 
-VertexArray::VertexArray(VertexArray& orig)
+VertexArray::VertexArray(VertexArray&& orig) noexcept
+	: m_ID(orig.m_ID),
+	m_owningChunkStartingPosition(orig.m_owningChunkStartingPosition)
+{
+	orig.m_ID = Utilities::INVALID_OPENGL_ID;
+}
+
+VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
 {
 	this->m_ID = orig.m_ID;
 	orig.m_ID = Utilities::INVALID_OPENGL_ID;
 	this->m_owningChunkStartingPosition = orig.m_owningChunkStartingPosition;
-}
 
-VertexArray::VertexArray(VertexArray&& orig)
-{
-
+	return *this;
 }
 
 glm::vec3 VertexArray::getOwningChunkStartingPosition() const

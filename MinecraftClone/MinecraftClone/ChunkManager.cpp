@@ -45,8 +45,6 @@ void ChunkManager::generateChunks(glm::vec3 startingPosition, int chunkCount, st
 		for (int z = 0; z < 16 * chunkCount; z += 16)
 		{
 			m_chunks.emplace_back(glm::ivec3(x + startingPosition.x, startingPosition.y, z + startingPosition.z));
-			++i;
-			std::cout << i << "\n";
 			VAOs.emplace_back();
 			VBOs.emplace_back();
 		}
@@ -65,10 +63,16 @@ void ChunkManager::generateChunks(glm::vec3 startingPosition, int chunkCount, st
 
 void ChunkManager::generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& texture) const
 {
-	for (int i = 0; i < 6 * 6; ++i)
+	int i = 0;
+	for (auto& chunk : m_chunks)
 	{
-		generateChunkMesh(VAOs[i], VBOs[i], texture, m_chunks[i]);
+		generateChunkMesh(VAOs[i], VBOs[i], texture, chunk);
+		++i;
 	}
+	//for (int i = 0; i < 6 * 6; ++i)
+	//{
+	//	
+	//}
 }
 
 void ChunkManager::handleChunkMeshRegenerationQueue(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& texture)

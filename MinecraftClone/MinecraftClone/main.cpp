@@ -175,8 +175,6 @@ int main()
 	int chunkCount = 6;
 	std::vector<VertexArray> VAOs;
 	std::vector<VertexBuffer> VBOs;
-	VAOs.reserve((6 * 6) + (6 * 6));
-	VBOs.resize((6 * 6) + (6 * 6));
 
 	ChunkManager chunkManager;
 	chunkManager.generateChunks(glm::vec3(0, 0, 0), chunkCount, VAOs, VBOs);
