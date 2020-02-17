@@ -37,14 +37,28 @@ void ChunkManager::removeCubeAtPosition(glm::vec3 cameraPosition, glm::vec3 rayC
 	}
 }
 
-void ChunkManager::generateChunks(glm::vec3 startingPosition, int chunkCount)
+void ChunkManager::generateChunks(glm::vec3 startingPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs)
 {
-	m_chunks.reserve(chunkCount * chunkCount);
+	int i = 0;
 	for (int x = 0; x < 16 * chunkCount; x += 16)
 	{
 		for (int z = 0; z < 16 * chunkCount; z += 16)
 		{
 			m_chunks.emplace_back(glm::ivec3(x + startingPosition.x, startingPosition.y, z + startingPosition.z));
+			++i;
+			std::cout << i << "\n";
+			VAOs.emplace_back();
+			VBOs.emplace_back();
+		}
+	}
+
+	for (int x = 0; x > -(16 * chunkCount); x -= 16)
+	{
+		for (int z = 0; z < 16 * chunkCount; z += 16)
+		{
+			m_chunks.emplace_back(glm::ivec3(x + startingPosition.x, startingPosition.y, z + startingPosition.z));
+			VAOs.emplace_back();
+			VBOs.emplace_back();
 		}
 	}
 }

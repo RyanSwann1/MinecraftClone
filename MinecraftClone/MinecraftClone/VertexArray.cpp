@@ -1,6 +1,7 @@
 #include "VertexArray.h"
 #include "glad.h"
 #include "VertexBuffer.h"
+#include "Utilities.h"
 #include <iostream>
 
 VertexArray::VertexArray()
@@ -10,7 +11,23 @@ VertexArray::VertexArray()
 
 VertexArray::~VertexArray()
 {
-	glDeleteVertexArrays(1, &m_ID);
+	if (m_ID != Utilities::INVALID_OPENGL_ID)
+	{
+		std::cout << "Destroyed\n";
+		glDeleteVertexArrays(1, &m_ID);
+	}
+}
+
+VertexArray::VertexArray(VertexArray& orig)
+{
+	this->m_ID = orig.m_ID;
+	orig.m_ID = Utilities::INVALID_OPENGL_ID;
+	this->m_owningChunkStartingPosition = orig.m_owningChunkStartingPosition;
+}
+
+VertexArray::VertexArray(VertexArray&& orig)
+{
+
 }
 
 glm::vec3 VertexArray::getOwningChunkStartingPosition() const

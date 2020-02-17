@@ -8,6 +8,8 @@ class VertexArray
 public:
 	VertexArray();
 	~VertexArray();
+	VertexArray(VertexArray&);
+	VertexArray(VertexArray&&);
 	
 	glm::vec3 getOwningChunkStartingPosition() const;
 

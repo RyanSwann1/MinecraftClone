@@ -16,7 +16,7 @@ public:
 	ChunkManager();
 
 	void removeCubeAtPosition(glm::vec3 cameraPosition, glm::vec3 rayCastPosition);
-	void generateChunks(glm::vec3 startingPosition, int chunkCount);
+	void generateChunks(glm::vec3 startingPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs);
 	void generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture) const;
 
 	void handleChunkMeshRegenerationQueue(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture);

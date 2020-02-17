@@ -174,12 +174,12 @@ int main()
 
 	int chunkCount = 6;
 	std::vector<VertexArray> VAOs;
-	VAOs.resize(6 * 6);
 	std::vector<VertexBuffer> VBOs;
-	VBOs.resize(6 * 6);
+	VAOs.reserve((6 * 6) + (6 * 6));
+	VBOs.resize((6 * 6) + (6 * 6));
 
 	ChunkManager chunkManager;
-	chunkManager.generateChunks(glm::vec3(0, 0, 0), chunkCount);
+	chunkManager.generateChunks(glm::vec3(0, 0, 0), chunkCount, VAOs, VBOs);
 	chunkManager.generateChunkMeshes(VAOs, VBOs, *texture);
 
 	std::cout << glGetError() << "\n";
