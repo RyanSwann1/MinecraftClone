@@ -164,7 +164,7 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	unsigned int shaderID = createShaderProgram();
-	Camera camera(glm::vec3(0.0f, 18.f, 0.0f));
+	Camera camera(glm::vec3(0.0f, 17.f, 0.0f));
 	std::unique_ptr<Texture> texture = Texture::loadTexture("Texture_Atlas.png");
 	if (!texture)
 	{
@@ -178,7 +178,7 @@ int main()
 	std::vector<VertexArray> VAOs;
 	std::vector<VertexBuffer> VBOs;
 
-	Rectangle visibilityRect(camera.m_position, Utilities::VISIBILITY_DISTANCE);
+	Rectangle visibilityRect(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
 
 	ChunkManager chunkManager;
 	chunkManager.generateInitialChunks(camera.m_position, chunkCount, VAOs, VBOs);
@@ -204,15 +204,6 @@ int main()
 			glm::ivec2 playerPosition(camera.m_position.x / 16, camera.m_position.z / 16);
 			//std::cout << playerPosition.x << "\n";
 			//std::cout << playerPosition.y << "\n";
-
-			for (int y = camera.m_position.z - Utilities::VISIBILITY_DISTANCE; y <= Utilities::VISIBILITY_DISTANCE; y += 16)
-			{
-				for (int x = camera.m_position.x - Utilities::VISIBILITY_DISTANCE; x <= Utilities::VISIBILITY_DISTANCE; x += 16)
-				{
-					/*std::cout << "x: " << x << ". y: " << y << "\n";
-					std::cout << "\n";*/
-				}
-			}
 		}
 
 		elaspedTime += deltaTime;

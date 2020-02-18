@@ -38,6 +38,17 @@ Chunk::Chunk(glm::ivec3 startingPosition)
 	m_endingPosition = m_chunk[15][15][15].position;
 }
 
+bool Chunk::isPositionInBounds(glm::ivec2 position) const
+{
+	glm::ivec2 startingPositionOnGrid(m_startingPosition.x, m_startingPosition.z);
+	glm::ivec2 endingPositionOnGrid(m_endingPosition.x, m_endingPosition.z);
+
+	return (position.x >= startingPositionOnGrid.x &&
+		position.y >= startingPositionOnGrid.y &&
+		position.x <= endingPositionOnGrid.x &&
+		position.y <= endingPositionOnGrid.y);
+}
+
 bool Chunk::isPositionInBounds(glm::vec3 position) const
 {
 	return (position.x >= m_startingPosition.x &&
