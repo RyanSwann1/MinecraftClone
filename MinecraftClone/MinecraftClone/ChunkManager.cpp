@@ -50,16 +50,6 @@ void ChunkManager::generateInitialChunks(glm::vec3 startingPosition, int chunkCo
 			VBOs.emplace_back();
 		}
 	}
-
-	//for (int x = 0; x < 16 * chunkCount; x += 16)
-	//{
-	//	for (int z = 0; z < 16 * chunkCount; z += 16)
-	//	{
-	//		m_chunks.emplace_back(glm::ivec3(x + startingPosition.x, startingPosition.y, z + startingPosition.z));
-	//		VAOs.emplace_back();
-	//		VBOs.emplace_back();
-	//	}
-	//}
 }
 
 void ChunkManager::generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& texture) const
@@ -142,15 +132,13 @@ void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArr
 	//		VBOs.emplace_back();
 	//	}
 	//}
+	
 	glm::ivec2 position(playerPosition.x / 16, playerPosition.z / 16);
-
 	for (int y = position.y - Utilities::VISIBILITY_DISTANCE; y <= Utilities::VISIBILITY_DISTANCE; y += 16)
 	{
 		for (int x = position.x - Utilities::VISIBILITY_DISTANCE; x <= Utilities::VISIBILITY_DISTANCE; x += 16)
 		{
-			std::cout << "x: " << x << ". y: " << y << "\n";
-		
-			glm::ivec2 chunkSpawnPosition(x / 16, y / 16);
+			glm::ivec2 chunkSpawnPosition(x, y);
 			auto cIter = std::find_if(m_chunks.cbegin(), m_chunks.cend(), [chunkSpawnPosition](const auto& chunk)
 				{ 
 					glm::ivec2 chunkStartingPosition(chunk.getStartingPosition().x, chunk.getStartingPosition().z);
@@ -159,14 +147,14 @@ void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArr
 
 			if (cIter == m_chunks.cend())
 			{
-				int i = 0;
+				m_chunks.emplace_back(glm::ivec3(chunkSpawnPosition.x, 0, chunkSpawnPosition.y));
+				VAOs.emplace_back();
+				VBOs.emplace_back();
 			}
-
-			//glm::ivec3 getStartingPosition() const;
 		}
 	}
 
-	std::cout << "\n\n\n";
+	//std::cout << "\n\n\n";
 }
 
 void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,

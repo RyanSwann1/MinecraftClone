@@ -182,8 +182,7 @@ int main()
 
 	ChunkManager chunkManager;
 	chunkManager.generateInitialChunks(camera.m_position, chunkCount, VAOs, VBOs);
-	chunkManager.generateChunkMeshes(VAOs, VBOs, *texture);
-
+	
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 
@@ -230,13 +229,13 @@ int main()
 			}
 			if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
 			{
-
 				chunkManager.removeCubeAtPosition(camera.m_position, camera.getRaycastPosition());
 			}
 		}
 
 		chunkManager.handleChunkMeshRegenerationQueue(VAOs, VBOs, *texture);
-		//chunkManager.update(visibilityRect, VAOs, VBOs, camera.m_position);
+		chunkManager.update(visibilityRect, VAOs, VBOs, camera.m_position);
+		chunkManager.generateChunkMeshes(VAOs, VBOs, *texture);
 		visibilityRect.update(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
 
 		glClear(GL_COLOR_BUFFER_BIT);
