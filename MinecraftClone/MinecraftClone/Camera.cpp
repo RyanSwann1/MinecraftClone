@@ -2,7 +2,7 @@
 
 Camera::Camera()
 	: m_speed(0.5f),
-	m_position(0.0f, 25.0f, 0.0f),
+	m_position(48.f, 18.0f, 48.0f),
 	m_front(0.0f, 0.0f, -1.0f),
 	m_frontInverse(0.0f, 0.0f, 1.0f),
 	m_up(0.0f, 1.0f, 0.0f)

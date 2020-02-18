@@ -4,6 +4,7 @@
 #include "Texture.h"
 #include "VertexArray.h"
 #include "CubeID.h"
+#include "Rectangle.h"
 #include <iostream>
 
 ChunkManager::ChunkManager()
@@ -87,6 +88,26 @@ void ChunkManager::handleChunkMeshRegenerationQueue(std::vector<VertexArray>& VA
 
 		generateChunkMesh(*VAO, *VBO, texture, *chunk);
 	}
+}
+
+void ChunkManager::update(const Rectangle& visibilityRect)
+{
+	//Delete out of bounds chunks
+	for (auto iter = m_chunks.begin(); iter != m_chunks.end();)
+	{
+		Rectangle chunkAABB(glm::ivec2(iter->getStartingPosition().x, iter->getStartingPosition.z) + glm::ivec2(8, 8), 8);
+		if (!visibilityRect.contains(chunkAABB))
+		{
+			iter = m_chunks.erase(iter);
+		}
+		else
+		{
+			++iter;
+		}
+	}
+
+
+
 }
 
 void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,

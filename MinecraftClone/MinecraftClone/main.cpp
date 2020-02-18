@@ -5,6 +5,7 @@
 #include "VertexBuffer.h"
 #include "Utilities.h"
 #include "VertexArray.h"
+#include "Rectangle.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -137,6 +138,7 @@ unsigned int createShaderProgram()
 	return shaderID;
 }
 
+
 //View == Frustrum
 //The reason why it can get away with that is because of other rendering optimizations.
 //Try refraining from rendering any blocks that are not adjacent to air(less bandwidth), 
@@ -175,6 +177,8 @@ int main()
 	int chunkCount = 6;
 	std::vector<VertexArray> VAOs;
 	std::vector<VertexBuffer> VBOs;
+
+	Rectangle visibilityRect(camera.m_position);
 
 	ChunkManager chunkManager;
 	chunkManager.generateInitialChunks(glm::vec3(0, 0, 0), chunkCount, VAOs, VBOs);
@@ -220,6 +224,7 @@ int main()
 		}
 
 		chunkManager.handleChunkMeshRegenerationQueue(VAOs, VBOs, *texture);
+		visibilityRect.update(camera.m_position);
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);

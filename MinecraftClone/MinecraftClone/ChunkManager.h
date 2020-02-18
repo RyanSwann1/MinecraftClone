@@ -5,10 +5,15 @@
 #include <vector>
 #include <queue>
 
+//1. Perlin Noise
+//2. Dynamic Generation
+//3. Dynamic Destruction
+
 //Dyanmic Chunk Generation
 //https://gamedev.stackexchange.com/questions/173820/how-should-i-store-loaded-world-chunks-in-ram-for-my-game-similar-to-minecraft
 //https://gamedev.stackexchange.com/questions/37911/how-to-deal-with-large-open-worlds
 
+struct Rectangle;
 enum class eCubeSide;
 class Texture;
 class VertexArray;
@@ -25,6 +30,7 @@ public:
 
 	void handleChunkMeshRegenerationQueue(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture);
 
+	void update(const Rectangle& visibilityRect);
 private:
 	std::vector<Chunk> m_chunks;
 	std::queue<const Chunk*> m_chunkMeshRegenerateQueue;
