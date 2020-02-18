@@ -164,7 +164,7 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	unsigned int shaderID = createShaderProgram();
-	Camera camera(glm::vec3(0.0f, 17.f, 0.0f));
+	Camera camera(glm::vec3(0.0f, 18.f, 0.0f));
 	std::unique_ptr<Texture> texture = Texture::loadTexture("Texture_Atlas.png");
 	if (!texture)
 	{
@@ -189,7 +189,7 @@ int main()
 
 	sf::Clock clock;
 	clock.restart();
-	float messageExpiredTime = 2.5f;
+	float messageExpiredTime = 1.0f;
 	float elaspedTime = 0.0f;
 
 	while (window.isOpen())
@@ -202,8 +202,8 @@ int main()
 		{
 			elaspedTime = 0.0f;
 			glm::ivec2 playerPosition(camera.m_position.x / 16, camera.m_position.z / 16);
-			//std::cout << playerPosition.x << "\n";
-			//std::cout << playerPosition.y << "\n";
+			std::cout << playerPosition.x << "\n";
+			std::cout << playerPosition.y << "\n";
 		}
 
 		elaspedTime += deltaTime;
