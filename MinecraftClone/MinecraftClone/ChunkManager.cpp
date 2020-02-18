@@ -6,7 +6,6 @@
 #include "CubeID.h"
 #include "Rectangle.h"
 #include <iostream>
-
 ChunkManager::ChunkManager()
 	: m_chunks()
 {}
@@ -14,7 +13,7 @@ ChunkManager::ChunkManager()
 void ChunkManager::removeCubeAtPosition(glm::vec3 cameraPosition, glm::vec3 rayCastPosition)
 {
 	glm::vec3 vBetween = rayCastPosition - cameraPosition;
-
+	
 	for (int i = 20; i > 0; --i)
 	{
 		glm::vec3 distance = vBetween / static_cast<float>(i);
@@ -90,24 +89,37 @@ void ChunkManager::handleChunkMeshRegenerationQueue(std::vector<VertexArray>& VA
 	}
 }
 
-void ChunkManager::update(const Rectangle& visibilityRect)
+void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs)
 {
 	//Delete out of bounds chunks
-	for (auto iter = m_chunks.begin(); iter != m_chunks.end();)
+	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
 	{
-		Rectangle chunkAABB(glm::ivec2(iter->getStartingPosition().x, iter->getStartingPosition.z) + glm::ivec2(8, 8), 8);
+		Rectangle chunkAABB(glm::ivec2(chunk->getStartingPosition().x, chunk->getStartingPosition().z) + 
+			glm::ivec2(Utilities::CHUNK_WIDTH / 2.0f, Utilities::CHUNK_DEPTH / 2.0f), 8);
 		if (!visibilityRect.contains(chunkAABB))
 		{
-			iter = m_chunks.erase(iter);
+			std::cout << "Chunk Deleted\n";
+			glm::vec3 chunkStartingPosition = chunk->getStartingPosition();
+			auto VBO = std::find_if(VBOs.begin(), VBOs.end(), [chunkStartingPosition](const auto& vertexBuffer)
+				{ return vertexBuffer.m_owningChunkStartingPosition == chunkStartingPosition; });
+			assert(VBO != VBOs.end());
+			glDeleteBuffers(1, &VBO->positionsID);
+			glDeleteBuffers(1, &VBO->textCoordsID);
+			glDeleteBuffers(1, &VBO->indiciesID);
+			VBOs.erase(VBO);
+
+			auto VAO = std::find_if(VAOs.begin(), VAOs.end(), [chunkStartingPosition](const auto& vertexArray)
+				{ return vertexArray.getOwningChunkStartingPosition() == chunkStartingPosition; });
+			assert(VAO != VAOs.end());
+			VAOs.erase(VAO);
+			
+			chunk = m_chunks.erase(chunk);
 		}
 		else
 		{
-			++iter;
+			++chunk;
 		}
 	}
-
-
-
 }
 
 void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,

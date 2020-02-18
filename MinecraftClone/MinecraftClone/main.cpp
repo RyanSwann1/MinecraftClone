@@ -178,7 +178,7 @@ int main()
 	std::vector<VertexArray> VAOs;
 	std::vector<VertexBuffer> VBOs;
 
-	Rectangle visibilityRect(camera.m_position);
+	Rectangle visibilityRect(camera.m_position, Utilities::VISIBILITY_DISTANCE);
 
 	ChunkManager chunkManager;
 	chunkManager.generateInitialChunks(glm::vec3(0, 0, 0), chunkCount, VAOs, VBOs);
@@ -224,7 +224,8 @@ int main()
 		}
 
 		chunkManager.handleChunkMeshRegenerationQueue(VAOs, VBOs, *texture);
-		visibilityRect.update(camera.m_position);
+		chunkManager.update(visibilityRect, VAOs, VBOs);
+		visibilityRect.update(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -235,7 +236,7 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 500.f);
 		setUniformMat4f(shaderID, "uProjection", projection);
 
-		for (int i = 0; i < 6 * 6; ++i) 
+		for (int i = 0; i < VAOs.size(); ++i) 
 		{
 			VAOs[i].bind();
 			glDrawElements(GL_TRIANGLES, VBOs[i].indicies.size(), GL_UNSIGNED_INT, nullptr);

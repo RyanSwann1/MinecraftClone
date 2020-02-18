@@ -20,9 +20,12 @@ struct Rectangle
 		bottom = position.y - distance;
 	}
 
-	bool contains(Rectangle rectangle) const
+	bool contains(Rectangle other) const
 	{
-
+		return left <= other.right &&
+			right >= other.left &&
+			top >= other.bottom &&
+			bottom <= other.top;
 	}
 
 	float left;
