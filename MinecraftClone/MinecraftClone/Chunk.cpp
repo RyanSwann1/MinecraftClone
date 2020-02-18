@@ -13,7 +13,7 @@ Chunk::Chunk(glm::ivec3 startingPosition)
 	{
 		for (int y = 0; y < 16; ++y)
 		{
-			for (int z = 0; z < 16; z++)
+			for (int z = 0; z < 16; ++z)
 			{
 				eCubeType cubeType;
 				if (y <= Utilities::STONE_MAX_HEIGHT)

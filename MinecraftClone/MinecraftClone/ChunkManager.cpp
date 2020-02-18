@@ -40,12 +40,15 @@ void ChunkManager::removeCubeAtPosition(glm::vec3 cameraPosition, glm::vec3 rayC
 
 void ChunkManager::generateInitialChunks(glm::vec3 startingPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs)
 {
-	glm::ivec2 position(startingPosition.x / 16, startingPosition.z / 16);
-	for (int y = position.y - Utilities::VISIBILITY_DISTANCE; y <= Utilities::VISIBILITY_DISTANCE; y += 16)
+	for (int y = startingPosition.z - Utilities::VISIBILITY_DISTANCE; y < Utilities::VISIBILITY_DISTANCE; ++y)
 	{
-		for (int x = position.x - Utilities::VISIBILITY_DISTANCE; x <= Utilities::VISIBILITY_DISTANCE; x += 16)
+		for (int x = startingPosition.x - Utilities::VISIBILITY_DISTANCE; x < Utilities::VISIBILITY_DISTANCE; ++x)
 		{
-			m_chunks.emplace_back(glm::ivec3(x, 0, y));
+			glm::ivec3 position((x ) / 16, 0.0f, (y * 16) / 16);
+
+			std::cout << "Spawn Position: \n";
+			std::cout << position.x << " " << position.y << "\n";
+			m_chunks.emplace_back(glm::ivec3(position.x, 0, position.z));
 			VAOs.emplace_back();
 			VBOs.emplace_back();
 		}
@@ -96,60 +99,60 @@ void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArr
 {
 	//https://silentmatt.com/rectangle-intersection/
 	//Delete out of bounds chunks
-	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
-	{
-		Rectangle chunkAABB(glm::ivec2(chunk->getStartingPosition().x, chunk->getStartingPosition().z) +
-			glm::ivec2(Utilities::CHUNK_WIDTH / 2.0f, Utilities::CHUNK_DEPTH / 2.0f), 8);
-		if (!visibilityRect.contains(chunkAABB))
-		{
-			glm::vec3 chunkStartingPosition = chunk->getStartingPosition();
-			auto VBO = std::find_if(VBOs.begin(), VBOs.end(), [chunkStartingPosition](const auto& vertexBuffer)
-				{ return vertexBuffer.m_owningChunkStartingPosition == chunkStartingPosition; });
+	//for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
+	//{
+	//	Rectangle chunkAABB(glm::ivec2(chunk->getStartingPosition().x, chunk->getStartingPosition().z) +
+	//		glm::ivec2(Utilities::CHUNK_WIDTH / 2.0f, Utilities::CHUNK_DEPTH / 2.0f), 8);
+	//	if (!visibilityRect.contains(chunkAABB))
+	//	{
+	//		glm::vec3 chunkStartingPosition = chunk->getStartingPosition();
+	//		auto VBO = std::find_if(VBOs.begin(), VBOs.end(), [chunkStartingPosition](const auto& vertexBuffer)
+	//			{ return vertexBuffer.m_owningChunkStartingPosition == chunkStartingPosition; });
 
-			assert(VBO != VBOs.end());
-			glDeleteBuffers(1, &VBO->positionsID);
-			glDeleteBuffers(1, &VBO->textCoordsID);
-			glDeleteBuffers(1, &VBO->indiciesID);
-			VBOs.erase(VBO);
+	//		assert(VBO != VBOs.end());
+	//		glDeleteBuffers(1, &VBO->positionsID);
+	//		glDeleteBuffers(1, &VBO->textCoordsID);
+	//		glDeleteBuffers(1, &VBO->indiciesID);
+	//		VBOs.erase(VBO);
 
-			auto VAO = std::find_if(VAOs.begin(), VAOs.end(), [chunkStartingPosition](const auto& vertexArray)
-				{ return vertexArray.getOwningChunkStartingPosition() == chunkStartingPosition; });
-			assert(VAO != VAOs.end());
-			VAOs.erase(VAO);
+	//		auto VAO = std::find_if(VAOs.begin(), VAOs.end(), [chunkStartingPosition](const auto& vertexArray)
+	//			{ return vertexArray.getOwningChunkStartingPosition() == chunkStartingPosition; });
+	//		assert(VAO != VAOs.end());
+	//		VAOs.erase(VAO);
 
-			std::cout << "Chunk Deleted\n";
-			std::cout << chunkStartingPosition.x << " " << chunkStartingPosition.z << "\n";
-			chunk = m_chunks.erase(chunk);
-		}
-		else
-		{
-			++chunk;
-		}
-	}
+	//		std::cout << "Chunk Deleted\n";
+	//		std::cout << chunkStartingPosition.x << " " << chunkStartingPosition.z << "\n";
+	//		chunk = m_chunks.erase(chunk);
+	//	}
+	//	else
+	//	{
+	//		++chunk;
+	//	}
+	//}
 
-	glm::ivec2 position(playerPosition.x / 16, playerPosition.z / 16);
-	for (int y = position.y - Utilities::VISIBILITY_DISTANCE; y <= Utilities::VISIBILITY_DISTANCE; y += 16)
-	{
-		for (int x = position.x - Utilities::VISIBILITY_DISTANCE; x <= Utilities::VISIBILITY_DISTANCE; x += 16)
-		{
-			glm::ivec2 chunkSpawnPosition(x, y);
-			auto chunk = std::find_if(m_chunks.cbegin(), m_chunks.cend(), [chunkSpawnPosition](const auto& chunk)
-			{ 
-				return chunkSpawnPosition == glm::ivec2(chunk.getStartingPosition().x, chunk.getStartingPosition().z);
-			});
+	//for (int y = playerPosition.z - Utilities::VISIBILITY_DISTANCE; y <= Utilities::VISIBILITY_DISTANCE; y += 16)
+	//{
+	//	for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x < Utilities::VISIBILITY_DISTANCE; x += 16)
+	//	{
+	//		glm::ivec2 chunkSpawnPosition((x / 16) * 16, (y / 16) * 16);
 
-			if (chunk == m_chunks.cend())
-			{
-				std::cout << "Added\n";
-				std::cout << chunkSpawnPosition.x << " " << chunkSpawnPosition.y << "\n";
-				m_chunks.emplace_back(glm::ivec3(chunkSpawnPosition.x, 0, chunkSpawnPosition.y));
-				VAOs.emplace_back();
-				VBOs.emplace_back();
+	//		auto chunk = std::find_if(m_chunks.cbegin(), m_chunks.cend(), [chunkSpawnPosition](const auto& chunk)
+	//		{ 
+	//			return chunkSpawnPosition == glm::ivec2(chunk.getStartingPosition().x, chunk.getStartingPosition().z);
+	//		});
 
-				generateChunkMesh(VAOs.back(), VBOs.back(), texture, m_chunks.back());
-			}
-		}
-	}
+	//		if (chunk == m_chunks.cend())
+	//		{
+	//			std::cout << "Added\n";
+	//			std::cout << chunkSpawnPosition.x << " " << chunkSpawnPosition.y << "\n";
+	//			m_chunks.emplace_back(glm::ivec3(chunkSpawnPosition.x, 0, chunkSpawnPosition.y));
+	//			VAOs.emplace_back();
+	//			VBOs.emplace_back();
+
+	//			generateChunkMesh(VAOs.back(), VBOs.back(), texture, m_chunks.back());
+	//		}
+	//	}
+	//}
 }
 
 void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,
