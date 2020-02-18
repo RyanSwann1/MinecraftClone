@@ -1,8 +1,8 @@
 #include "Camera.h"
 
-Camera::Camera()
+Camera::Camera(glm::vec3 startPosition)
 	: m_speed(0.5f),
-	m_position(48.f, 18.0f, 48.0f),
+	m_position(startPosition),
 	m_front(0.0f, 0.0f, -1.0f),
 	m_frontInverse(0.0f, 0.0f, 1.0f),
 	m_up(0.0f, 1.0f, 0.0f)

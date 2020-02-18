@@ -8,7 +8,7 @@
 
 struct Camera
 {
-	Camera();
+	Camera(glm::vec3 startPosition);
 
 	void move(const sf::Event& sfmlEvent, float deltaTime);
 

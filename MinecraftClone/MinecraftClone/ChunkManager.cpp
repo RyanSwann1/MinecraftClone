@@ -45,7 +45,7 @@ void ChunkManager::generateInitialChunks(glm::vec3 startingPosition, int chunkCo
 	{
 		for (int x = position.x - Utilities::VISIBILITY_DISTANCE; x <= Utilities::VISIBILITY_DISTANCE; x += 16)
 		{
-			m_chunks.emplace_back(glm::ivec3(x + startingPosition.x, 0, y + startingPosition.z));
+			m_chunks.emplace_back(glm::ivec3(x, 0, y));
 			VAOs.emplace_back();
 			VBOs.emplace_back();
 		}
@@ -91,7 +91,8 @@ void ChunkManager::handleChunkMeshRegenerationQueue(std::vector<VertexArray>& VA
 	}
 }
 
-void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, glm::vec3 playerPosition)
+void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, glm::vec3 playerPosition,
+	const Texture& texture)
 {
 	//Delete out of bounds chunks
 	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
@@ -100,7 +101,6 @@ void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArr
 			glm::ivec2(Utilities::CHUNK_WIDTH / 2.0f, Utilities::CHUNK_DEPTH / 2.0f), 8);
 		if (!visibilityRect.contains(chunkAABB))
 		{
-			std::cout << "Chunk Deleted\n";
 			glm::vec3 chunkStartingPosition = chunk->getStartingPosition();
 			auto VBO = std::find_if(VBOs.begin(), VBOs.end(), [chunkStartingPosition](const auto& vertexBuffer)
 				{ return vertexBuffer.m_owningChunkStartingPosition == chunkStartingPosition; });
@@ -147,14 +147,16 @@ void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArr
 
 			if (cIter == m_chunks.cend())
 			{
+				std::cout << "Added\n";
+				std::cout << chunkSpawnPosition.x << " " << chunkSpawnPosition.y << "\n";
 				m_chunks.emplace_back(glm::ivec3(chunkSpawnPosition.x, 0, chunkSpawnPosition.y));
 				VAOs.emplace_back();
 				VBOs.emplace_back();
+
+				generateChunkMesh(VAOs.back(), VBOs.back(), texture, m_chunks.back());
 			}
 		}
 	}
-
-	//std::cout << "\n\n\n";
 }
 
 void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,
