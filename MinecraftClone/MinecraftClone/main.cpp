@@ -181,7 +181,7 @@ int main()
 	Rectangle visibilityRect(camera.m_position, Utilities::VISIBILITY_DISTANCE);
 
 	ChunkManager chunkManager;
-	chunkManager.generateInitialChunks(glm::vec3(0, 0, 0), chunkCount, VAOs, VBOs);
+	chunkManager.generateInitialChunks(camera.m_position, chunkCount, VAOs, VBOs);
 	chunkManager.generateChunkMeshes(VAOs, VBOs, *texture);
 
 	std::cout << glGetError() << "\n";
@@ -201,6 +201,18 @@ int main()
 		if (elaspedTime >= messageExpiredTime)
 		{
 			elaspedTime = 0.0f;
+			glm::ivec2 playerPosition(camera.m_position.x / 16, camera.m_position.z / 16);
+			//std::cout << playerPosition.x << "\n";
+			//std::cout << playerPosition.y << "\n";
+
+			for (int y = camera.m_position.z - Utilities::VISIBILITY_DISTANCE; y <= Utilities::VISIBILITY_DISTANCE; y += 16)
+			{
+				for (int x = camera.m_position.x - Utilities::VISIBILITY_DISTANCE; x <= Utilities::VISIBILITY_DISTANCE; x += 16)
+				{
+					/*std::cout << "x: " << x << ". y: " << y << "\n";
+					std::cout << "\n";*/
+				}
+			}
 		}
 
 		elaspedTime += deltaTime;
@@ -224,7 +236,7 @@ int main()
 		}
 
 		chunkManager.handleChunkMeshRegenerationQueue(VAOs, VBOs, *texture);
-		chunkManager.update(visibilityRect, VAOs, VBOs);
+		//chunkManager.update(visibilityRect, VAOs, VBOs, camera.m_position);
 		visibilityRect.update(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
 
 		glClear(GL_COLOR_BUFFER_BIT);
