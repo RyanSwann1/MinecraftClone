@@ -202,8 +202,8 @@ int main()
 		{
 			elaspedTime = 0.0f;
 			glm::ivec2 playerPosition(camera.m_position.x / 16, camera.m_position.z / 16);
-			std::cout << playerPosition.x << "\n";
-			std::cout << playerPosition.y << "\n";
+			//std::cout << playerPosition.x << "\n";
+			//std::cout << playerPosition.y << "\n";
 		}
 
 		elaspedTime += deltaTime;

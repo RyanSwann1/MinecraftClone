@@ -103,6 +103,7 @@ void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArr
 	//https://silentmatt.com/rectangle-intersection/
 	//			return chunkSpawnPosition == glm::ivec2(chunk.getStartingPosition().x, chunk.getStartingPosition().z);
 	////Delete out of bounds chunks
+	int deletedCount = 0;
 	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
 	{
 		Rectangle chunkAABB(glm::ivec2(chunk->getStartingPosition().x, chunk->getStartingPosition().z) +
@@ -124,9 +125,12 @@ void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArr
 			assert(VAO != VAOs.end());
 			VAOs.erase(VAO);
 
+			++deletedCount;
+
 			/*std::cout << "Chunk Deleted\n";
 			std::cout << chunkStartingPosition.x << " " << chunkStartingPosition.z << "\n";*/
 			chunk = m_chunks.erase(chunk);
+			std::cout << "Deleted Count: " << deletedCount << "\n";
 		}
 		else
 		{
@@ -134,6 +138,7 @@ void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArr
 		}
 	}
 
+	int addedCount = 0;
 	for (int y = playerPosition.z - Utilities::VISIBILITY_DISTANCE; y < playerPosition.z + Utilities::VISIBILITY_DISTANCE; y += 16)
 	{
 		for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x < playerPosition.x + Utilities::VISIBILITY_DISTANCE; x += 16)
@@ -146,16 +151,19 @@ void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArr
 			});
 			if (chunk == m_chunks.cend())
 			{
-				std::cout << "Added:\n";
+				//std::cout << "Added:\n";
+				++addedCount;
 					
 				m_chunks.emplace_back(glm::ivec3(position.x, 0, position.y));
 				VAOs.emplace_back();
 				VBOs.emplace_back();
 
 				generateChunkMesh(VAOs.back(), VBOs.back(), texture, m_chunks.back());
+				std::cout << "Added Count: " << addedCount << "\n";
 			}
 		}
 	}
+
 }
 
 void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,
