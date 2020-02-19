@@ -24,7 +24,6 @@ Chunk::Chunk(glm::ivec3 startingPosition)
 			elevation += std::abs(0.5 * glm::perlin(glm::vec2(nx * 2, ny * 2)));
 			elevation += std::abs(0.25 * glm::perlin(glm::vec2(nx * 4, ny * 4)));
 
-
 			//elevation = glm::pow(elevation, 5.f);
 			elevation = (float)Utilities::CHUNK_HEIGHT - 1.0f - (elevation * (float)Utilities::CHUNK_HEIGHT);
 			//elevation = glm::pow(elevation, 1.25f);

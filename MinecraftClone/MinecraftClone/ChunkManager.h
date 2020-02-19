@@ -13,6 +13,10 @@
 //https://gamedev.stackexchange.com/questions/173820/how-should-i-store-loaded-world-chunks-in-ram-for-my-game-similar-to-minecraft
 //https://gamedev.stackexchange.com/questions/37911/how-to-deal-with-large-open-worlds
 
+//https://www.reddit.com/r/VoxelGameDev/comments/4xsy0d/resources_for_terrain_generation_using/
+//http://accidentalnoise.sourceforge.net/minecraftworlds.html
+//https://learninggeekblog.wordpress.com/2013/04/25/voxel-engine-part-2/
+
 struct Rectangle;
 enum class eCubeSide;
 class Texture;
