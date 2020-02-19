@@ -384,16 +384,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, VertexBuffer& ver
 			}
 		}
 	}
-	//for (int y = chunkStartingPosition.y; y < chunkStartingPosition.y + 16; ++y)
-	//{
-	//	for (int x = chunkStartingPosition.x; x < chunkStartingPosition.x + 16; ++x)
-	//	{
-	//		for (int z = chunkStartingPosition.z; z < chunkStartingPosition.z + 16; ++z)
-	//		{
-	//			
-	//		}
-	//	}
-	//}
+
 	vertexArray.init(vertexBuffer);
 }
 
