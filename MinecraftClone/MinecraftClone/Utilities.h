@@ -16,14 +16,14 @@ enum class eCubeSide
 
 namespace Utilities
 {
-	constexpr int CHUNK_WIDTH = 16;
-	constexpr int CHUNK_HEIGHT = 16;
-	constexpr int CHUNK_DEPTH = 16;
+	constexpr int CHUNK_WIDTH = 32;
+	constexpr int CHUNK_HEIGHT = 64;
+	constexpr int CHUNK_DEPTH = 32;
 	constexpr int STONE_MAX_HEIGHT = 10;
 	constexpr int DIRT_MAX_HEIGHT = 14;
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr int INVALID_OPENGL_ID = -1;
-	constexpr int VISIBILITY_DISTANCE = 32;
+	constexpr int VISIBILITY_DISTANCE = 80;
 
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_FRONT = { glm::vec3(0, 0, 1.0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(0, 1.0, 1.0) };
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_BACK = { glm::vec3(0, 0, 0), glm::vec3(1.0, 0, 0), glm::vec3(1.0, 1.0, 0), glm::vec3(0, 1.0, 0) };
@@ -33,6 +33,20 @@ namespace Utilities
 
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_TOP = { glm::vec3(0, 1.0, 0), glm::vec3(0, 1.0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(1.0, 1.0, 0) };
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_BOTTOM = { glm::vec3(0, 0, 0), glm::vec3(0, 0, 1.0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 0, 0) };
+
+	inline float clampTo(float value, float min, float max)
+	{
+		if (value < min)
+		{
+			value = min;
+		}
+		else if (value > max)
+		{
+			value = max;
+		}
+
+		return value;
+	}
 
 	static const std::array<unsigned int, 6> CUBE_FACE_INDICIES =
 	{

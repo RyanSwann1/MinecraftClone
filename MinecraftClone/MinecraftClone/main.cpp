@@ -6,12 +6,14 @@
 #include "Utilities.h"
 #include "VertexArray.h"
 #include "Rectangle.h"
+#include "glm/gtc/noise.hpp"
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <array>
 #include <memory>
+#include <unordered_map>
 
 #ifdef DEBUG_GL_ERRORS
 #define glCheck(expr) expr; if(!GLAD_GL_KHR_debug){ glCheckError(__FILE__, __LINE__, #expr) };
@@ -35,36 +37,46 @@
 //Select buffer - state - then draw me a triangle
 //Based off of which buffer has been selected, it determines what/how will be drawns
 
-int getUniformLocation(unsigned int shaderID, const std::string& uniformName)
+int getUniformLocation(unsigned int shaderID, const std::string& uniformName, std::unordered_map<std::string, int>& uniformLocations)
 {
-	int location = glGetUniformLocation(shaderID, uniformName.c_str());
-	if (location == -1)
+	if (uniformLocations.find(uniformName) != uniformLocations.cend())
 	{
-		std::cout << "Failed to find uniform: " << uniformName << "\n";
+		return uniformLocations[uniformName];
+	}
+	else
+	{
+		int location = glGetUniformLocation(shaderID, uniformName.c_str());
+		if (location == -1)
+		{
+			std::cout << "Failed to find uniform: " << uniformName << "\n";
+		}
+		else
+		{
+			uniformLocations[uniformName] = location;
+		}
+
 		return location;
 	}
-
-	return location;
 }
 
-void setUniformLocationVec2(unsigned int shaderID, const std::string& uniformName, const glm::vec2& position)
+void setUniformLocationVec2(unsigned int shaderID, const std::string& uniformName, glm::vec2 position, std::unordered_map<std::string, int>& uniformLocations)
 {
-	glUniform2f(getUniformLocation(shaderID, uniformName), position.x, position.y);
+	glUniform2f(getUniformLocation(shaderID, uniformName, uniformLocations), position.x, position.y);
 }
 
-void setUniformLocation1f(unsigned int shaderID, const std::string& uniformName, float value)
+void setUniformLocation1f(unsigned int shaderID, const std::string& uniformName, float value, std::unordered_map<std::string, int>& uniformLocations)
 {
-	glUniform1i(getUniformLocation(shaderID, uniformName), value);
+	glUniform1i(getUniformLocation(shaderID, uniformName, uniformLocations), value);
 }
 
-void setUniformMat4f(unsigned int shaderID, const std::string& uniformName, const glm::mat4& matrix)
+void setUniformMat4f(unsigned int shaderID, const std::string& uniformName, glm::mat4 matrix, std::unordered_map<std::string, int>& uniformLocations)
 {
-	glUniformMatrix4fv(getUniformLocation(shaderID, uniformName), 1, GL_FALSE, glm::value_ptr(matrix));
+	glUniformMatrix4fv(getUniformLocation(shaderID, uniformName, uniformLocations), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void setUniform1i(unsigned int shaderID, const std::string& uniformName, int value)
+void setUniform1i(unsigned int shaderID, const std::string& uniformName, int value, std::unordered_map<std::string, int>& uniformLocations)
 {
-	glUniform1i(getUniformLocation(shaderID, uniformName), value);
+	glUniform1i(getUniformLocation(shaderID, uniformName, uniformLocations), value);
 }
 
 void parseShaderFromFile(const std::string& filePath, std::string& shaderSource)
@@ -164,15 +176,16 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	unsigned int shaderID = createShaderProgram();
-	Camera camera(glm::vec3(0.0f, 18.f, 0.0f));
+	Camera camera(glm::vec3(0.0f, 150.f, 0.0f));
 	std::unique_ptr<Texture> texture = Texture::loadTexture("Texture_Atlas.png");
 	if (!texture)
 	{
 		std::cout << "couldn't load texture: " << "America.jpg" << "\n";
 	}
+	std::unordered_map<std::string, int> uniformLocations;
 
 	texture->bind();
-	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot());
+	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot(), uniformLocations);
 
 	int chunkCount = 6;
 	std::vector<VertexArray> VAOs;
@@ -226,7 +239,7 @@ int main()
 		}
 
 		chunkManager.handleChunkMeshRegenerationQueue(VAOs, VBOs, *texture);
-		chunkManager.update(visibilityRect, VAOs, VBOs, camera.m_position, *texture);
+		//chunkManager.update(visibilityRect, VAOs, VBOs, camera.m_position, *texture);
 		
 		visibilityRect.update(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
 
@@ -235,9 +248,9 @@ int main()
 
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
-		setUniformMat4f(shaderID, "uView", view);
+		setUniformMat4f(shaderID, "uView", view, uniformLocations);
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 500.f);
-		setUniformMat4f(shaderID, "uProjection", projection);
+		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
 
 		for (int i = 0; i < VAOs.size(); ++i) 
 		{

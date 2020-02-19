@@ -2,6 +2,7 @@
 
 #include "glm/glm.hpp"
 #include "CubeID.h"
+#include "Utilities.h"
 #include <array>
 
 struct CubeDetails
@@ -40,5 +41,5 @@ private:
 	glm::ivec3 m_startingPosition;
 	glm::ivec3 m_endingPosition;
 
-	std::array<std::array<std::array<CubeDetails, 16>, 16>, 16> m_chunk;
+	std::array<std::array<std::array<CubeDetails, Utilities::CHUNK_DEPTH>, Utilities::CHUNK_HEIGHT>, Utilities::CHUNK_WIDTH> m_chunk;
 };
