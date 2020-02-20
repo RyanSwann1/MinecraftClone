@@ -38,24 +38,49 @@ void ChunkManager::removeCubeAtPosition(glm::vec3 cameraPosition, glm::vec3 rayC
 	}
 }
 
-void ChunkManager::generateInitialChunks(glm::vec3 startingPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs)
+void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs)
 {
-	for (int y = startingPosition.z - Utilities::VISIBILITY_DISTANCE; y < Utilities::VISIBILITY_DISTANCE; y += Utilities::CHUNK_DEPTH)
+	for (int y = playerPosition.z - Utilities::VISIBILITY_DISTANCE; y < playerPosition.z + Utilities::VISIBILITY_DISTANCE; y += Utilities::CHUNK_DEPTH)
 	{
-		for (int x = startingPosition.x - Utilities::VISIBILITY_DISTANCE; x < Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
+		for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x < playerPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
-			glm::ivec3 position(x, 0, y);
-			assert(x % 16 == 0 && y % 16 == 0);
-			if(x % 16 == 0 && y % 16 == 0)
-			{ 
-				std::cout << "Spawn Position: \n";
-				std::cout << position.x << " " << position.y << "\n";
-				m_chunks.emplace_back(glm::ivec3(position.x, 0, position.z));
+			//if (x % 16 == 0 && y % 16 == 0)
+			glm::ivec2 position((x / Utilities::CHUNK_WIDTH) * Utilities::CHUNK_WIDTH, (y / Utilities::CHUNK_DEPTH) * Utilities::CHUNK_DEPTH);
+			auto chunk = std::find_if(m_chunks.cbegin(), m_chunks.cend(), [position](const auto& chunk)
+			{
+				return position == glm::ivec2(chunk.getStartingPosition().x, chunk.getStartingPosition().z);
+			});
+			if (chunk == m_chunks.cend())
+			{
+				//std::cout << "Added:\n";
+
+				m_chunks.emplace_back(glm::ivec3(position.x, 0, position.y));
 				VAOs.emplace_back();
 				VBOs.emplace_back();
+
+				std::cout << position.x << " " << position.y << "\n";
 			}
 		}
 	}
+
+	//for (int y = startingPosition.z - Utilities::VISIBILITY_DISTANCE; y < Utilities::VISIBILITY_DISTANCE; y += Utilities::CHUNK_DEPTH)
+	//{
+	//	for (int x = startingPosition.x - Utilities::VISIBILITY_DISTANCE; x < Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
+	//	{
+	//		glm::ivec3 position(x, 0, y);
+	//		std::cout << "Spawn Position: \n";
+	//		std::cout << position.x << " " << position.y << "\n";
+	//		m_chunks.emplace_back(glm::ivec3(position.x, 0, position.z));
+	//		VAOs.emplace_back();
+	//		VBOs.emplace_back();
+	//
+	//		assert(x % 16 == 0 && y % 16 == 0);
+	//		if(x % 16 == 0 && y % 16 == 0)
+	//		{ 
+
+	//		}
+	//	}
+	//}
 }
 
 void ChunkManager::generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& texture) const
@@ -160,6 +185,7 @@ void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArr
 
 				generateChunkMesh(VAOs.back(), VBOs.back(), texture, m_chunks.back());
 				std::cout << "Added Count: " << addedCount << "\n";
+				std::cout << position.x << " " << position.y << "\n";
 			}
 		}
 	}

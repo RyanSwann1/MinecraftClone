@@ -17,6 +17,12 @@
 //http://accidentalnoise.sourceforge.net/minecraftworlds.html
 //https://learninggeekblog.wordpress.com/2013/04/25/voxel-engine-part-2/
 
+//https://www.reddit.com/r/VoxelGameDev/comments/btt0hz/octrees_and_chunks/
+
+//https://www.reddit.com/r/proceduralgeneration/comments/2gy05g/creating_biomes_in_an_infinite_world_like_in/
+//https://www.seedofandromeda.com/blogs/1-creating-a-region-file-system-for-a-voxel-game
+//https://www.reddit.com/r/VoxelGameDev/comments/95hqrb/how_to_get_started_with_terrain_generation/
+
 struct Rectangle;
 enum class eCubeSide;
 class Texture;
@@ -29,7 +35,7 @@ public:
 	ChunkManager();
 
 	void removeCubeAtPosition(glm::vec3 cameraPosition, glm::vec3 rayCastPosition);
-	void generateInitialChunks(glm::vec3 startingPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs);
+	void generateInitialChunks(glm::vec3 playerPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs);
 	void generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture) const;
 
 	void handleChunkMeshRegenerationQueue(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture);
