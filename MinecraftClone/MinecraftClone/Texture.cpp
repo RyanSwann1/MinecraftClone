@@ -3,6 +3,7 @@
 #include "CubeID.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include "Utilities.h"
 
 Texture::Texture()
 	: m_currentSlot(0),
@@ -55,33 +56,17 @@ void Texture::getTextCoords(eCubeFaceID tileID, std::vector<glm::vec2>& textCoor
 	switch (tileID)
 	{
 	case eCubeFaceID::Grass :
-		textCoords.push_back(glm::vec2(0.0f, (128.0f - 16.0f) / 128.0f));
-		textCoords.push_back(glm::vec2(16.0f / 128.0f, (128.0f - 16.0f) / 128.0f));
-		textCoords.push_back(glm::vec2(16.0f / 128.0f, 1.0f));		
-		textCoords.push_back(glm::vec2(0.0f, 1.0f));
-	
+		textCoords.insert(textCoords.end(), Utilities::GRASS_TEXT_COORDS.begin(), Utilities::GRASS_TEXT_COORDS.end());
 		break;
 	case eCubeFaceID::GrassSide :
-		textCoords.push_back(glm::vec2(16.0f / 128.0f, (128.0f - 16.0f) / 128.0f));
-		textCoords.push_back(glm::vec2(32.0f / 128.0f, (128.0f - 16.0f) / 128.0f));
-		textCoords.push_back(glm::vec2(32.0f / 128.0f, 1));
-		textCoords.push_back(glm::vec2(16.0f / 128.0f, 1));
-
+		textCoords.insert(textCoords.end(), Utilities::GRASS_SIDE_TEXT_COORDS.begin(), Utilities::GRASS_SIDE_TEXT_COORDS.end());
 		break;
 	case eCubeFaceID::Dirt :
-		textCoords.push_back(glm::vec2(32.0f / 128.0f, (128.0f - 16.0f) / 128.0f));
-		textCoords.push_back(glm::vec2(48.0f / 128.0f, (128.0f - 16.0f) / 128.0f));
-		textCoords.push_back(glm::vec2(48.0f / 128.0f, 1));
-		textCoords.push_back(glm::vec2(32.0f / 128.0f, 1));
-
+		textCoords.insert(textCoords.end(), Utilities::DIRT_TEXT_COORDS.begin(), Utilities::DIRT_TEXT_COORDS.end());
 		break;
 
 	case eCubeFaceID::Stone :
-		textCoords.push_back(glm::vec2(48.0f / 128.0f, (128.0f - 16.0f) / 128.0f));
-		textCoords.push_back(glm::vec2(64.0f / 128.0f, (128.0f - 16.0f) / 128.0f));
-		textCoords.push_back(glm::vec2(64.0f / 128.0f, 1));
-		textCoords.push_back(glm::vec2(48.0f / 128.0f, 1));
-
+		textCoords.insert(textCoords.end(), Utilities::STONE_TEXT_COORDS.begin(), Utilities::STONE_TEXT_COORDS.end());
 		break;
 	}
 }

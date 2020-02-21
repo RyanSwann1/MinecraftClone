@@ -2,6 +2,7 @@
 
 #include "glm/glm.hpp"
 #include <array>
+#include <vector>
 
 enum class eCubeSide
 {
@@ -24,7 +25,38 @@ namespace Utilities
 	constexpr int DIRT_MAX_HEIGHT = 14;
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr int INVALID_OPENGL_ID = -1;
-	constexpr int VISIBILITY_DISTANCE = 64;
+	constexpr int VISIBILITY_DISTANCE = 160;
+
+	static constexpr std::array<glm::vec2, 4> GRASS_TEXT_COORDS =
+	{ glm::vec2(0.0f, (128.0f - 16.0f) / 128.0f),
+		glm::vec2(16.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
+		glm::vec2(16.0f / 128.0f, 1.0f),
+		glm::vec2(0.0f, 1.0f)
+	};
+
+	static constexpr std::array<glm::vec2, 4> GRASS_SIDE_TEXT_COORDS =
+	{
+		glm::vec2(16.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
+		glm::vec2(32.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
+		glm::vec2(32.0f / 128.0f, 1),
+		glm::vec2(16.0f / 128.0f, 1)
+	};
+
+	static constexpr std::array<glm::vec2, 4> DIRT_TEXT_COORDS =
+	{
+		glm::vec2(32.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
+		glm::vec2(48.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
+		glm::vec2(48.0f / 128.0f, 1),
+		glm::vec2(32.0f / 128.0f, 1)
+	};
+
+	static constexpr std::array<glm::vec2, 4> STONE_TEXT_COORDS =
+	{
+		glm::vec2(48.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
+		glm::vec2(64.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
+		glm::vec2(64.0f / 128.0f, 1),
+		glm::vec2(48.0f / 128.0f, 1)
+	};
 
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_FRONT = { glm::vec3(0, 0, 1.0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(0, 1.0, 1.0) };
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_BACK = { glm::vec3(0, 0, 0), glm::vec3(1.0, 0, 0), glm::vec3(1.0, 1.0, 0), glm::vec3(0, 1.0, 0) };
