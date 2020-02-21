@@ -30,7 +30,6 @@ public:
 	bool isPositionInBounds(glm::ivec2 position) const;
 	bool isPositionInBounds(glm::vec3 position) const;
 	bool isPositionInBounds(glm::ivec3 position) const;
-	glm::ivec3 getEndingPosition() const;
 	glm::ivec3 getStartingPosition() const;
 	CubeDetails getCubeDetails(glm::ivec3 position) const;
 	CubeDetails getCubeDetailsAtPosition(glm::ivec3 position) const;
