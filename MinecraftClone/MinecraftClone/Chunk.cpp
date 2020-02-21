@@ -69,32 +69,11 @@ Chunk::Chunk(glm::ivec3 startingPosition)
 		}
 	}
 
-	m_endingPosition = glm::ivec3(startingPosition.x + Utilities::CHUNK_WIDTH - 1, startingPosition.y + Utilities::CHUNK_HEIGHT - 1, 
-		startingPosition.z + Utilities::CHUNK_DEPTH - 1);
-}
-
-bool Chunk::isPositionInBounds(glm::ivec2 position) const
-{
-	glm::ivec2 startingPositionOnGrid(m_startingPosition.x, m_startingPosition.z);
-	glm::ivec2 endingPositionOnGrid(m_endingPosition.x, m_endingPosition.z);
-
-	return (position.x >= startingPositionOnGrid.x &&
-		position.y >= startingPositionOnGrid.y &&
-		position.x <= endingPositionOnGrid.x &&
-		position.y <= endingPositionOnGrid.y);
+	m_endingPosition = glm::ivec3(startingPosition.x + Utilities::CHUNK_WIDTH, startingPosition.y + Utilities::CHUNK_HEIGHT, 
+		startingPosition.z + Utilities::CHUNK_DEPTH);
 }
 
 bool Chunk::isPositionInBounds(glm::vec3 position) const
-{
-	return (position.x >= m_startingPosition.x &&
-		position.y >= m_startingPosition.y &&
-		position.z >= m_startingPosition.z &&
-		position.x <= m_endingPosition.x + 1 &&
-		position.y <= m_endingPosition.y + 1 &&
-		position.z <= m_endingPosition.z + 1);
-}
-
-bool Chunk::isPositionInBounds(glm::ivec3 position) const
 {
 	return (position.x >= m_startingPosition.x &&
 		position.y >= m_startingPosition.y &&
@@ -104,9 +83,14 @@ bool Chunk::isPositionInBounds(glm::ivec3 position) const
 		position.z <= m_endingPosition.z);
 }
 
-glm::ivec3 Chunk::getEndingPosition() const
+bool Chunk::isPositionInBounds(glm::ivec3 position) const
 {
-	return m_endingPosition;
+	return (position.x >= m_startingPosition.x &&
+		position.y >= m_startingPosition.y &&
+		position.z >= m_startingPosition.z &&
+		position.x <= m_endingPosition.x - 1 &&
+		position.y <= m_endingPosition.y - 1 &&
+		position.z <= m_endingPosition.z- 1);
 }
 
 glm::ivec3 Chunk::getStartingPosition() const
@@ -127,9 +111,9 @@ CubeDetails Chunk::getCubeDetailsAtPosition(glm::ivec3 position) const
 	if (position.x >= m_startingPosition.x &&
 		position.y >= m_startingPosition.y &&
 		position.z >= m_startingPosition.z &&
-		position.x <= m_endingPosition.x + 1 &&
-		position.y <= m_endingPosition.y + 1 &&
-		position.z <= m_endingPosition.z + 1)
+		position.x <= m_endingPosition.x - 1 &&
+		position.y <= m_endingPosition.y - 1 &&
+		position.z <= m_endingPosition.z - 1)
 	{
 		glm::ivec3 positionOnGrid = position - glm::ivec3(m_startingPosition.x, m_startingPosition.y, m_startingPosition.z);
 		cubeDetails = m_chunk[positionOnGrid.x][positionOnGrid.y][positionOnGrid.z];
