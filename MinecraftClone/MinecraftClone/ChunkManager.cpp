@@ -367,33 +367,34 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, VertexBuffer& ver
 		{
 			for (int x = chunkStartingPosition.x; x < chunkStartingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 			{
-				if (chunk.getCubeDetails(glm::ivec3(x, y, z)).type == eCubeType::Invalid)
+				glm::vec3 position(x, y, z);
+				if (chunk.getCubeDetails(position).type == eCubeType::Invalid)
 				{
 					continue;
 				}
 				if (!isCubeAtPosition(glm::ivec3(x - 1, y, z)))
 				{
-					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Left, elementArrayBufferIndex);
+					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Left, elementArrayBufferIndex);
 				}
 				if (!isCubeAtPosition(glm::ivec3(x + 1, y, z)))
 				{
-					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Right, elementArrayBufferIndex);
+					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Right, elementArrayBufferIndex);
 				}
 				if (!isCubeAtPosition(glm::ivec3(x, y - 1, z)))
 				{
-					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Bottom, elementArrayBufferIndex);
+					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Bottom, elementArrayBufferIndex);
 				}
 				if (!isCubeAtPosition(glm::ivec3(x, y + 1, z)))
 				{
-					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Top, elementArrayBufferIndex);
+					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Top, elementArrayBufferIndex);
 				}
 				if (!isCubeAtPosition(glm::ivec3(x, y, z - 1)))
 				{
-					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Back, elementArrayBufferIndex);
+					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Back, elementArrayBufferIndex);
 				}
 				if (!isCubeAtPosition(glm::ivec3(x, y, z + 1)))
 				{
-					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(glm::vec3(x, y, z)), eCubeSide::Front, elementArrayBufferIndex);
+					addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Front, elementArrayBufferIndex);
 				}
 			}
 		}

@@ -23,6 +23,9 @@
 //https://www.seedofandromeda.com/blogs/1-creating-a-region-file-system-for-a-voxel-game
 //https://www.reddit.com/r/VoxelGameDev/comments/95hqrb/how_to_get_started_with_terrain_generation/
 
+//https://algs4.cs.princeton.edu/34hash/
+//https://www.hackerearth.com/practice/data-structures/hash-tables/basics-of-hash-tables/tutorial/
+
 struct Rectangle;
 enum class eCubeSide;
 class Texture;
