@@ -2,9 +2,11 @@
 
 #include "NonCopyable.h"
 #include "Chunk.h"
+#include "glm/gtx/hash.hpp"
 #include <vector>
+#include <memory>
+#include <unordered_map>
 #include <queue>
-
 //1. Perlin Noise
 //2. Dynamic Generation
 //3. Dynamic Destruction
@@ -45,7 +47,8 @@ public:
 
 	void update(const Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, glm::vec3 playerPosition, const Texture& texture);
 private:
-	std::vector<Chunk> m_chunks;
+	std::unordered_map<glm::ivec2, std::shared_ptr<Chunk>> m_chunks;
+	std::queue<std::shared_ptr<Chunk>> m_recycledChunks;
 	std::queue<const Chunk*> m_chunkMeshRegenerateQueue;
 
 	void addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide, 

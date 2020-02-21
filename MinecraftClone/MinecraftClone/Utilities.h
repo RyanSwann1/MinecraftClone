@@ -35,6 +35,16 @@ namespace Utilities
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_TOP = { glm::vec3(0, 1.0, 0), glm::vec3(0, 1.0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(1.0, 1.0, 0) };
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_BOTTOM = { glm::vec3(0, 0, 0), glm::vec3(0, 0, 1.0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 0, 0) };
 
+	inline glm::ivec3 convertToGridPosition(glm::ivec3 position)
+	{
+		return glm::ivec3(position.x / CHUNK_WIDTH, position.y / CHUNK_HEIGHT, position.z / CHUNK_DEPTH);
+	}
+
+	inline glm::vec3 convertToGridPosition(glm::vec3 position)
+	{
+		return glm::vec3(position.x / CHUNK_WIDTH, position.y / CHUNK_HEIGHT, position.z / CHUNK_DEPTH);
+	}
+
 	inline float clampTo(float value, float min, float max)
 	{
 		if (value < min)
