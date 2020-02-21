@@ -50,64 +50,38 @@ unsigned int Texture::getID() const
 	return m_ID;
 }
 
-void Texture::getTextCoords(eCubeFaceID tileID, std::vector<float>& textCoords) const
+void Texture::getTextCoords(eCubeFaceID tileID, std::vector<glm::vec2>& textCoords) const
 {
 	switch (tileID)
 	{
 	case eCubeFaceID::Grass :
-		textCoords.push_back(0.0);
-		textCoords.push_back((128.0f - 16.0f) / 128.0f);
-
-		textCoords.push_back(16.0f / 128.0f);
-		textCoords.push_back((128.0f - 16.0f) / 128.0f);
-
-		textCoords.push_back(16.0f / 128.0f);
-		textCoords.push_back(1);
-		
-		textCoords.push_back(0);
-		textCoords.push_back(1);
+		textCoords.push_back(glm::vec2(0.0f, (128.0f - 16.0f) / 128.0f));
+		textCoords.push_back(glm::vec2(16.0f / 128.0f, (128.0f - 16.0f) / 128.0f));
+		textCoords.push_back(glm::vec2(16.0f / 128.0f, 1.0f));		
+		textCoords.push_back(glm::vec2(0.0f, 1.0f));
 	
 		break;
 	case eCubeFaceID::GrassSide :
-		textCoords.push_back(16.0f / 128.0f);
-		textCoords.push_back((128.0f - 16.0f) / 128.0f);
-
-		textCoords.push_back(32.0f / 128.0f);
-		textCoords.push_back((128.0f - 16.0f) / 128.0f);
-		
-		textCoords.push_back(32.0f / 128.0f);
-		textCoords.push_back(1);
-		
-		textCoords.push_back(16.0f / 128.0f);
-		textCoords.push_back(1);
+		textCoords.push_back(glm::vec2(16.0f / 128.0f, (128.0f - 16.0f) / 128.0f));
+		textCoords.push_back(glm::vec2(32.0f / 128.0f, (128.0f - 16.0f) / 128.0f));
+		textCoords.push_back(glm::vec2(32.0f / 128.0f, 1));
+		textCoords.push_back(glm::vec2(16.0f / 128.0f, 1));
 
 		break;
 	case eCubeFaceID::Dirt :
-		textCoords.push_back(32.0f / 128.0f);
-		textCoords.push_back((128.0f - 16.0f) / 128.0f);
+		textCoords.push_back(glm::vec2(32.0f / 128.0f, (128.0f - 16.0f) / 128.0f));
+		textCoords.push_back(glm::vec2(48.0f / 128.0f, (128.0f - 16.0f) / 128.0f));
+		textCoords.push_back(glm::vec2(48.0f / 128.0f, 1));
+		textCoords.push_back(glm::vec2(32.0f / 128.0f, 1));
 
-		textCoords.push_back(48.0f / 128.0f);
-		textCoords.push_back((128.0f - 16.0f) / 128.0f);
-
-		textCoords.push_back(48.0f / 128.0f);
-		textCoords.push_back(1);
-
-		textCoords.push_back(32.0f / 128.0f);
-		textCoords.push_back(1);
 		break;
 
 	case eCubeFaceID::Stone :
-		textCoords.push_back(48.0f / 128.0f);
-		textCoords.push_back((128.0f - 16.0f) / 128.0f);
+		textCoords.push_back(glm::vec2(48.0f / 128.0f, (128.0f - 16.0f) / 128.0f));
+		textCoords.push_back(glm::vec2(64.0f / 128.0f, (128.0f - 16.0f) / 128.0f));
+		textCoords.push_back(glm::vec2(64.0f / 128.0f, 1));
+		textCoords.push_back(glm::vec2(48.0f / 128.0f, 1));
 
-		textCoords.push_back(64.0f / 128.0f);
-		textCoords.push_back((128.0f - 16.0f) / 128.0f);
-
-		textCoords.push_back(64.0f / 128.0f);
-		textCoords.push_back(1);
-
-		textCoords.push_back(48.0f / 128.0f);
-		textCoords.push_back(1);
 		break;
 	}
 }

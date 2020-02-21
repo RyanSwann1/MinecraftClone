@@ -14,9 +14,9 @@ struct VertexBuffer
 	}
 
 	unsigned int positionsID;
-	std::vector<float> positions;
+	std::vector<glm::vec3> positions;
 	unsigned int textCoordsID;
-	std::vector<float> textCoords;
+	std::vector<glm::vec2> textCoords;
 	unsigned int indiciesID;
 	std::vector<unsigned int> indicies;
 	glm::vec3 m_owningChunkStartingPosition;

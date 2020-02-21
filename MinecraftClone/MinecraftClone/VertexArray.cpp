@@ -45,14 +45,14 @@ void VertexArray::init(VertexBuffer& vertexBuffer)
 
 	glGenBuffers(1, &vertexBuffer.positionsID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.positionsID);
-	glBufferData(GL_ARRAY_BUFFER, vertexBuffer.positions.size() * sizeof(float), vertexBuffer.positions.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexBuffer.positions.size() * sizeof(glm::vec3), vertexBuffer.positions.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
 
 	glGenBuffers(1, &vertexBuffer.textCoordsID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.textCoordsID);
-	glBufferData(GL_ARRAY_BUFFER, vertexBuffer.textCoords.size() * sizeof(float), vertexBuffer.textCoords.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexBuffer.textCoords.size() * sizeof(glm::vec2), vertexBuffer.textCoords.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)(0));

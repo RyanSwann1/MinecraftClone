@@ -200,9 +200,7 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 		for (glm::vec3 i : Utilities::CUBE_FACE_FRONT)
 		{
 			i += cubeDetails.position;
-			vertexBuffer.positions.push_back(i.x);
-			vertexBuffer.positions.push_back(i.y);
-			vertexBuffer.positions.push_back(i.z);
+			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 		}
 
 		switch (cubeDetails.type)
@@ -222,9 +220,7 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 		for (glm::vec3 i : Utilities::CUBE_FACE_BACK)
 		{
 			i += cubeDetails.position;
-			vertexBuffer.positions.push_back(i.x);
-			vertexBuffer.positions.push_back(i.y);
-			vertexBuffer.positions.push_back(i.z);
+			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 		}
 
 		switch (cubeDetails.type)
@@ -244,9 +240,7 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 		for (glm::vec3 i : Utilities::CUBE_FACE_LEFT)
 		{
 			i += cubeDetails.position;
-			vertexBuffer.positions.push_back(i.x);
-			vertexBuffer.positions.push_back(i.y);
-			vertexBuffer.positions.push_back(i.z);
+			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 		}
 
 		switch (cubeDetails.type)
@@ -266,9 +260,7 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 		for (glm::vec3 i : Utilities::CUBE_FACE_RIGHT)
 		{
 			i += cubeDetails.position;
-			vertexBuffer.positions.push_back(i.x);
-			vertexBuffer.positions.push_back(i.y);
-			vertexBuffer.positions.push_back(i.z);
+			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 		}
 
 		switch (cubeDetails.type)
@@ -288,9 +280,7 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 		for (glm::vec3 i : Utilities::CUBE_FACE_TOP)
 		{
 			i += cubeDetails.position;
-			vertexBuffer.positions.push_back(i.x);
-			vertexBuffer.positions.push_back(i.y);
-			vertexBuffer.positions.push_back(i.z);
+			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 		}
 
 		switch (cubeDetails.type)
@@ -310,9 +300,7 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 		for (glm::vec3 i : Utilities::CUBE_FACE_BOTTOM)
 		{
 			i += cubeDetails.position;
-			vertexBuffer.positions.push_back(i.x);
-			vertexBuffer.positions.push_back(i.y);
-			vertexBuffer.positions.push_back(i.z);
+			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 		}
 
 		switch (cubeDetails.type)

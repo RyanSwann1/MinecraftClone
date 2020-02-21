@@ -15,7 +15,7 @@ public:
 	unsigned int getCurrentSlot() const;
 	unsigned int getID() const;
 
-	void getTextCoords(eCubeFaceID tileID, std::vector<float>& textCoords) const;
+	void getTextCoords(eCubeFaceID tileID, std::vector<glm::vec2>& textCoords) const;
 
 	void bind(unsigned int slot = 0);
 	void unbind() const;
