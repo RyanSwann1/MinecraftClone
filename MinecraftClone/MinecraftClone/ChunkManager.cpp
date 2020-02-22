@@ -145,44 +145,24 @@ void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArr
 		for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x < playerPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
 			//if (x % 16 == 0 && y % 16 == 0)
-			glm::ivec2 position((x / Utilities::CHUNK_WIDTH) * Utilities::CHUNK_WIDTH, (y / Utilities::CHUNK_DEPTH) * Utilities::CHUNK_DEPTH);
-			if (m_chunks.find(position) == m_chunks.cend())
+			glm::vec2 closestChunkStartingPosition = Utilities::getClosestChunkStartingPosition(glm::vec2(x, y));
+			if (m_chunks.find(closestChunkStartingPosition) == m_chunks.cend() && !m_recycledChunks.empty())
 			{
-				std::cout << "Added:\n";
-				++addedCount;
-				
 				std::shared_ptr<Chunk> recycledChunk = m_recycledChunks.front();
 				m_recycledChunks.pop();
-
+				recycledChunk->reset(glm::ivec3(closestChunkStartingPosition.x, 0, closestChunkStartingPosition.y));
 				VAOs.emplace_back();
 				VBOs.emplace_back();
-
+				++addedCount;
+				std::cout << "Added Count\n";
+				std::cout << addedCount << "\n";
 				generateChunkMesh(VAOs.back(), VBOs.back(), texture, *recycledChunk);
-				std::cout << "Added Count: " << addedCount << "\n";
-				std::cout << position.x << " " << position.y << "\n";
-				m_chunks[recycledChunk->getStartingPosition()] = recycledChunk;
+				m_chunks[glm::ivec2(recycledChunk->getStartingPosition().x, recycledChunk->getStartingPosition().z)] = recycledChunk;
 			}
-			//auto chunk = std::find_if(m_chunks.cbegin(), m_chunks.cend(), [position](const auto& chunk)
-			//{
-			//	return position == glm::ivec2(chunk.getStartingPosition().x, chunk.getStartingPosition().z);
-			//});
-			//if (chunk == m_chunks.cend())
-			//{
-			//	//std::cout << "Added:\n";
-			//	++addedCount;
-			//	
-			//	std::shared_ptr<Chunk> recycledChunk = m_recycledChunks.front();
-			//	m_recycledChunks.pop();
-
-			//	m_chunks
-			//	m_chunks.push_back(recycledChunk);
-			//	VAOs.emplace_back();
-			//	VBOs.emplace_back();
-
-			//	generateChunkMesh(VAOs.back(), VBOs.back(), texture, m_chunks.back());
-			//	std::cout << "Added Count: " << addedCount << "\n";
-			//	std::cout << position.x << " " << position.y << "\n";
-			//}
+			else if (m_recycledChunks.empty()) 
+			{
+				return;
+			}
 		}
 	}
 }

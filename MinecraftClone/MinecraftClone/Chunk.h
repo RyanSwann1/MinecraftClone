@@ -34,6 +34,8 @@ public:
 	CubeDetails getCubeDetails(glm::ivec3 position) const;
 	CubeDetails getCubeDetailsAtPosition(glm::ivec3 position) const;
 
+	void reset(glm::ivec3 startingPosition);
+
 	void removeCubeAtPosition(glm::ivec3 position);
 
 private:
