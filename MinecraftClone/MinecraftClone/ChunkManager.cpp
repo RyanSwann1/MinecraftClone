@@ -156,8 +156,9 @@ void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArr
 				++addedCount;
 				std::cout << "Added Count\n";
 				std::cout << addedCount << "\n";
-				generateChunkMesh(VAOs.back(), VBOs.back(), texture, *recycledChunk);
+				
 				m_chunks[glm::ivec2(recycledChunk->getStartingPosition().x, recycledChunk->getStartingPosition().z)] = recycledChunk;
+				generateChunkMesh(VAOs.back(), VBOs.back(), texture, *recycledChunk);
 			}
 			else if (m_recycledChunks.empty()) 
 			{
