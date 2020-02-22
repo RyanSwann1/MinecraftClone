@@ -90,7 +90,7 @@ bool Chunk::isPositionInBounds(glm::ivec3 position) const
 		position.z >= m_startingPosition.z &&
 		position.x <= m_endingPosition.x - 1 &&
 		position.y <= m_endingPosition.y - 1 &&
-		position.z <= m_endingPosition.z- 1);
+		position.z <= m_endingPosition.z - 1);
 }
 
 glm::ivec3 Chunk::getEndingPosition() const

@@ -42,10 +42,9 @@ public:
 	void removeCubeAtPosition(glm::vec3 cameraPosition, glm::vec3 rayCastPosition);
 	void generateInitialChunks(glm::vec3 playerPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs);
 	void generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture) const;
-
 	void handleChunkMeshRegenerationQueue(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture);
-
 	void update(const Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, glm::vec3 playerPosition, const Texture& texture);
+
 private:
 	std::unordered_map<glm::ivec2, std::shared_ptr<Chunk>> m_chunks;
 	std::queue<std::shared_ptr<Chunk>> m_recycledChunks;

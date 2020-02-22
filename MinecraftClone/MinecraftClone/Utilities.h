@@ -25,7 +25,7 @@ namespace Utilities
 	constexpr int DIRT_MAX_HEIGHT = 14;
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr int INVALID_OPENGL_ID = -1;
-	constexpr int VISIBILITY_DISTANCE = 64;
+	constexpr int VISIBILITY_DISTANCE = 320;
 
 	static constexpr std::array<glm::vec2, 4> GRASS_TEXT_COORDS =
 	{ glm::vec2(0.0f, (128.0f - 16.0f) / 128.0f),
@@ -84,14 +84,29 @@ namespace Utilities
 		//}
 	}
 
-	inline glm::ivec3 convertToGridPosition(glm::ivec3 position)
+	inline glm::vec2 getClosestChunkStartingPosition(glm::vec2 position)
 	{
-		return glm::ivec3(position.x / CHUNK_WIDTH, position.y / CHUNK_HEIGHT, position.z / CHUNK_DEPTH);
-	}
+		glm::vec2 positionOnGrid(glm::vec2((position.x / CHUNK_WIDTH) * CHUNK_WIDTH, (position.y / CHUNK_DEPTH) * CHUNK_DEPTH));
+		if (position.x < 0 && static_cast<int>(position.x) % CHUNK_WIDTH < 0)
+		{
+			positionOnGrid.x += std::abs(static_cast<int>(position.x) % CHUNK_WIDTH);
+			positionOnGrid.x -= CHUNK_WIDTH;
+		}
+		else if (position.x > 0 && static_cast<int>(position.x) % CHUNK_WIDTH > 0)
+		{
+			positionOnGrid.x -= std::abs(static_cast<int>(position.x) % CHUNK_WIDTH);
+		}
+		if (position.y < 0 && static_cast<int>(position.y) % CHUNK_DEPTH < 0)
+		{
+			positionOnGrid.y += std::abs(static_cast<int>(position.y) % CHUNK_DEPTH);
+			positionOnGrid.y -= CHUNK_DEPTH;
+		}
+		else if (position.y > 0 && static_cast<int>(position.y) % CHUNK_DEPTH > 0)
+		{
+			positionOnGrid.y -= std::abs(static_cast<int>(position.y) % CHUNK_DEPTH);
+		}
 
-	inline glm::vec3 convertToGridPosition(glm::vec3 position)
-	{
-		return glm::vec3(position.x / CHUNK_WIDTH, position.y / CHUNK_HEIGHT, position.z / CHUNK_DEPTH);
+		return positionOnGrid;
 	}
 
 	inline float clampTo(float value, float min, float max)

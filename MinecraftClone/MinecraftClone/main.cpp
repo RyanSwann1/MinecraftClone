@@ -214,9 +214,9 @@ int main()
 		if (elaspedTime >= messageExpiredTime)
 		{
 			elaspedTime = 0.0f;
-			glm::ivec2 playerPosition(camera.m_position.x / 16, camera.m_position.z / 16);
-			//std::cout << playerPosition.x << "\n";
-			//std::cout << playerPosition.y << "\n";
+			glm::ivec2 playerPosition(camera.m_position.x, camera.m_position.z);
+			std::cout << playerPosition.x << "\n";
+			std::cout << playerPosition.y << "\n";
 		}
 
 		elaspedTime += deltaTime;
