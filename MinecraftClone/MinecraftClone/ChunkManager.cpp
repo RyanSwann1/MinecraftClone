@@ -45,11 +45,31 @@ void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, int chunkCoun
 		for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x < playerPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
 			//if (x % 16 == 0 && y % 16 == 0)
-			glm::ivec2 position((x / Utilities::CHUNK_WIDTH) * Utilities::CHUNK_WIDTH, (y / Utilities::CHUNK_DEPTH) * Utilities::CHUNK_DEPTH);
+			//glm::ivec2 position((x / Utilities::CHUNK_WIDTH) * Utilities::CHUNK_WIDTH, (y / Utilities::CHUNK_DEPTH) * Utilities::CHUNK_DEPTH);
+			glm::ivec3 positionOnGrid = Utilities::convertToGridPosition(glm::vec);
+			if (position.x < 0)
+			{
+
+			}
+			else
+			{
+				positionOnGrid.x += 1;
+			}
+			if (position.z < 0)
+			{
+
+			}
+			else
+			{
+				positionOnGrid.z += 1;
+			}
+			positionOnGrid.x *= 32;
+			positionOnGrid.z *= 32;
 			if (m_chunks.find(position) == m_chunks.cend())
 			{
 				//std::cout << "Added:\n";
-				m_chunks[position] = std::make_shared<Chunk>(glm::ivec3(position.x, 0, position.y));
+				std::shared_ptr<Chunk> chunk = std::make_shared<Chunk>(glm::ivec3(position.x, 0, position.y));
+				m_chunks[glm::ivec2(chunk->getEndingPosition().x, chunk->getEndingPosition().z)] = chunk;
 				VAOs.emplace_back();
 				VBOs.emplace_back();
 
@@ -327,9 +347,14 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 
 bool ChunkManager::isCubeAtPosition(glm::vec3 position) const
 {
+	//glm::ivec3 closestGridPosition(Utilities::closestInteger(position.x, 32), Utilities::closestInteger(position.y, 32), Utilities::closestInteger(position.z, 32));
+	////glm::ivec3 positionOnGrid = Utilities::convertToGridPosition(position);
+	//auto cIter = m_chunks.find(glm::ivec2(closestGridPosition.x, closestGridPosition.z));
 	glm::ivec3 positionOnGrid = Utilities::convertToGridPosition(position);
+	positionOnGrid.x *= 32;
+	positionOnGrid.z *= 32;
 	auto cIter = m_chunks.find(glm::ivec2(positionOnGrid.x, positionOnGrid.z));
-	if (cIter != m_chunks.cend() && cIter->second->getCubeDetails(position).type != eCubeType::Invalid)
+	if (cIter != m_chunks.cend() && cIter->second->isPositionInBounds(position) && cIter->second->getCubeDetails(position).type != eCubeType::Invalid)
 	{
 		return true;
 	}
@@ -339,9 +364,30 @@ bool ChunkManager::isCubeAtPosition(glm::vec3 position) const
 
 bool ChunkManager::isCubeAtPosition(glm::ivec3 position) const
 {
+	//glm::ivec3 closestGridPosition(Utilities::closestInteger(position.x, 32), Utilities::closestInteger(position.y, 32), Utilities::closestInteger(position.z, 32));
+	////glm::ivec3 positionOnGrid = Utilities::convertToGridPosition(position);
+	//auto cIter = m_chunks.find(glm::ivec2(closestGridPosition.x, closestGridPosition.z));
 	glm::ivec3 positionOnGrid = Utilities::convertToGridPosition(position);
+	if (position.x < 0)
+	{
+
+	}
+	else
+	{
+		positionOnGrid.x += 1;
+	}
+	if (position.z < 0)
+	{
+
+	}
+	else
+	{
+		positionOnGrid.z += 1;
+	}
+	positionOnGrid.x *= 32;
+	positionOnGrid.z *= 32;
 	auto cIter = m_chunks.find(glm::ivec2(positionOnGrid.x, positionOnGrid.z));
-	if (cIter != m_chunks.cend() && cIter->second->getCubeDetails(position).type != eCubeType::Invalid)
+	if (cIter != m_chunks.cend() && cIter->second->isPositionInBounds(position) && cIter->second->getCubeDetails(position).type != eCubeType::Invalid)
 	{
 		return true;
 	}

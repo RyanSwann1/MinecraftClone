@@ -93,6 +93,11 @@ bool Chunk::isPositionInBounds(glm::ivec3 position) const
 		position.z <= m_endingPosition.z- 1);
 }
 
+glm::ivec3 Chunk::getEndingPosition() const
+{
+	return m_endingPosition;
+}
+
 glm::ivec3 Chunk::getStartingPosition() const
 {
 	return m_startingPosition;
