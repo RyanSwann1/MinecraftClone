@@ -235,7 +235,7 @@ int main()
 		}
 
 		visibilityRect.update(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
-		//chunkManager.update(visibilityRect, VAOs, VBOs, camera.m_position, *texture);
+		chunkManager.update(visibilityRect, VAOs, VBOs, camera.m_position, *texture);
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);

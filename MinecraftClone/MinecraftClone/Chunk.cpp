@@ -10,65 +10,7 @@ Chunk::Chunk(glm::ivec3 startingPosition)
 	: m_chunk(),
 	m_startingPosition(startingPosition)
 {
-	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
-	{
-		for (int x = startingPosition.x; x < startingPosition.x + Utilities::CHUNK_WIDTH; ++x)
-		{
-			double nx = (x) / (Utilities::VISIBILITY_DISTANCE * 2.0f) - 0.5f;
-			double ny = (z) / (Utilities::VISIBILITY_DISTANCE * 2.0f) - 0.5f;
-
-			//float elevation = std::abs(glm::perlin(glm::vec2(nx, ny)));
-			
-			float elevation = std::abs(1 * glm::perlin(glm::vec2(1 * nx, 1 * ny)));
-			elevation += std::abs(0.5 * glm::perlin(glm::vec2(nx * 2, ny * 2)));
-			elevation += std::abs(0.25 * glm::perlin(glm::vec2(nx * 4, ny * 4)));
-
-			//elevation = glm::pow(elevation, 5.f);
-			elevation = (float)Utilities::CHUNK_HEIGHT - 1.0f - (elevation * (float)Utilities::CHUNK_HEIGHT);
-			//elevation = glm::pow(elevation, 1.25f);
-			elevation = Utilities::clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
-
-			//glm::perlin(glm::vec2(nx * 1.25f, ny * 1.25f))) * 16;
-			eCubeType cubeType;
-			if (elevation <= Utilities::STONE_MAX_HEIGHT)
-			{
-				cubeType = eCubeType::Stone;
-			}
-			else if (elevation <= Utilities::DIRT_MAX_HEIGHT)
-			{
-				cubeType = eCubeType::Dirt;
-			}
-			else
-			{
-				cubeType = eCubeType::Grass;
-			}
-
-			glm::ivec3 positionOnGrid(x - startingPosition.x, (int)elevation, z - startingPosition.z);
-			//std::cout << elevation << "\n";
-			m_chunk[positionOnGrid.x][(int)elevation][positionOnGrid.z] = CubeDetails(cubeType);	
-
-			for (int y = (int)elevation - 1; y >= 0; --y)
-			{ 
-				if (y <= Utilities::STONE_MAX_HEIGHT)
-				{
-					cubeType = eCubeType::Stone;
-				}
-				else if (y <= Utilities::DIRT_MAX_HEIGHT)
-				{
-					cubeType = eCubeType::Dirt;
-				}
-				else
-				{
-					cubeType = eCubeType::Grass;
-				}
-
-				m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = CubeDetails(cubeType);
-			}
-		}
-	}
-
-	m_endingPosition = glm::ivec3(startingPosition.x + Utilities::CHUNK_WIDTH, startingPosition.y + Utilities::CHUNK_HEIGHT, 
-		startingPosition.z + Utilities::CHUNK_DEPTH);
+	regen(m_startingPosition);
 }
 
 bool Chunk::isPositionInBounds(glm::vec3 position) const
@@ -137,8 +79,19 @@ void Chunk::reset(glm::ivec3 startingPosition)
 			}
 		}
 	}
-	m_startingPosition = startingPosition;
 
+	m_startingPosition = startingPosition;
+	regen(m_startingPosition);	
+}
+
+void Chunk::removeCubeAtPosition(glm::ivec3 position)
+{
+	glm::ivec3 positionOnGrid = position - glm::ivec3(m_startingPosition.x, m_startingPosition.y, m_startingPosition.z);
+	m_chunk[positionOnGrid.x][positionOnGrid.y][positionOnGrid.z].type = static_cast<char>(eCubeType::Invalid);
+}
+
+void Chunk::regen(glm::ivec3 startingPosition)
+{
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
 	{
 		for (int x = startingPosition.x; x < startingPosition.x + Utilities::CHUNK_WIDTH; ++x)
@@ -198,10 +151,4 @@ void Chunk::reset(glm::ivec3 startingPosition)
 
 	m_endingPosition = glm::ivec3(startingPosition.x + Utilities::CHUNK_WIDTH, startingPosition.y + Utilities::CHUNK_HEIGHT,
 		startingPosition.z + Utilities::CHUNK_DEPTH);
-}
-
-void Chunk::removeCubeAtPosition(glm::ivec3 position)
-{
-	glm::ivec3 positionOnGrid = position - glm::ivec3(m_startingPosition.x, m_startingPosition.y, m_startingPosition.z);
-	m_chunk[positionOnGrid.x][positionOnGrid.y][positionOnGrid.z].type = static_cast<char>(eCubeType::Invalid);
 }

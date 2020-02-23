@@ -38,6 +38,7 @@ public:
 private:
 	glm::ivec3 m_startingPosition;
 	glm::ivec3 m_endingPosition;
-
 	std::array<std::array<std::array<CubeDetails, Utilities::CHUNK_DEPTH>, Utilities::CHUNK_HEIGHT>, Utilities::CHUNK_WIDTH> m_chunk;
+	
+	void regen(glm::ivec3 startingPosition);
 };
