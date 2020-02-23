@@ -28,6 +28,7 @@
 //https://algs4.cs.princeton.edu/34hash/
 //https://www.hackerearth.com/practice/data-structures/hash-tables/basics-of-hash-tables/tutorial/
 
+
 struct Rectangle;
 enum class eCubeSide;
 class Texture;
@@ -41,20 +42,21 @@ public:
 
 	void removeCubeAtPosition(glm::vec3 cameraPosition, glm::vec3 rayCastPosition);
 	void generateInitialChunks(glm::vec3 playerPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs);
-	void generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture) const;
+	void generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture);
 	void handleChunkMeshRegenerationQueue(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture);
 	void update(const Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, glm::vec3 playerPosition, const Texture& texture);
 
 private:
 	std::unordered_map<glm::ivec2, std::shared_ptr<Chunk>> m_chunks;
+	std::vector<glm::ivec2> m_chunkMeshRegenerateQueue;
 	std::queue<std::shared_ptr<Chunk>> m_recycledChunks;
-	std::queue<const Chunk*> m_chunkMeshRegenerateQueue;
 
 	void addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide, 
 		int& elementArrayBufferIndex) const;
 	bool isCubeAtPosition(glm::vec3 position) const;
 	bool isCubeAtPosition(glm::ivec3 position) const;
+	bool isChunkAtPosition(glm::ivec2 position) const;
 
-	void generateChunkMesh(VertexArray& vertexArray, VertexBuffer& vertexBuffer, const Texture& texture, const Chunk& chunk) const;
+	void generateChunkMesh(VertexArray& vertexArray, VertexBuffer& vertexBuffer, const Texture& texture, const Chunk& chunk);
 	void handleAdjacentDestroyedBlock(glm::ivec3 position, const Chunk& owningChunk);
 };
