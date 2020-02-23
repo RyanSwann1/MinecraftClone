@@ -242,7 +242,7 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 		}
 
-		switch (cubeDetails.type)
+		switch (static_cast<eCubeType>(cubeDetails.type))
 		{
 		case eCubeType::Stone :
 			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
@@ -263,7 +263,7 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 		}
 
-		switch (cubeDetails.type)
+		switch (static_cast<eCubeType>(cubeDetails.type))
 		{
 		case eCubeType::Stone:
 			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
@@ -284,7 +284,7 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 		}
 
-		switch (cubeDetails.type)
+		switch (static_cast<eCubeType>(cubeDetails.type))
 		{
 		case eCubeType::Stone:
 			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
@@ -305,7 +305,7 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 		}
 
-		switch (cubeDetails.type)
+		switch (static_cast<eCubeType>(cubeDetails.type))
 		{
 		case eCubeType::Stone:
 			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
@@ -326,7 +326,7 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 		}
 
-		switch (cubeDetails.type)
+		switch (static_cast<eCubeType>(cubeDetails.type))
 		{
 		case eCubeType::Stone:
 			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
@@ -347,7 +347,7 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 		}
 
-		switch (cubeDetails.type)
+		switch (static_cast<eCubeType>(cubeDetails.type))
 		{
 		case eCubeType::Stone:
 			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
@@ -374,7 +374,8 @@ bool ChunkManager::isCubeAtPosition(glm::vec3 position) const
 {
 	glm::vec2 closestChunkStartingPosition = Utilities::getClosestChunkStartingPosition(glm::vec2(position.x, position.z));
 	auto cIter = m_chunks.find(closestChunkStartingPosition);
-	if (cIter != m_chunks.cend() && cIter->second->isPositionInBounds(position) && cIter->second->getCubeDetails(position).type != eCubeType::Invalid)
+	if (cIter != m_chunks.cend() && cIter->second->isPositionInBounds(position) && 
+		static_cast<eCubeType>(cIter->second->getCubeDetails(position).type) != eCubeType::Invalid)
 	{
 		return true;
 	}
@@ -386,7 +387,8 @@ bool ChunkManager::isCubeAtPosition(glm::ivec3 position) const
 {
 	glm::vec2 closestChunkStartingPosition = Utilities::getClosestChunkStartingPosition(glm::vec2(position.x, position.z));
 	auto cIter = m_chunks.find(closestChunkStartingPosition);
-	if (cIter != m_chunks.cend() && cIter->second->isPositionInBounds(position) && cIter->second->getCubeDetails(position).type != eCubeType::Invalid)
+	if (cIter != m_chunks.cend() && cIter->second->isPositionInBounds(position) && 
+		static_cast<eCubeType>(cIter->second->getCubeDetails(position).type) != eCubeType::Invalid)
 	{
 		return true;
 	}
@@ -417,7 +419,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, VertexBuffer& ver
 			for (int x = chunkStartingPosition.x; x < chunkStartingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 			{
 				glm::ivec3 position(x, y, z);
-				if (chunk.getCubeDetails(position).type == eCubeType::Invalid)
+				if (static_cast<eCubeType>(chunk.getCubeDetails(position).type) == eCubeType::Invalid)
 				{
 					continue;
 				}

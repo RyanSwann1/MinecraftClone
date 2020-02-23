@@ -8,14 +8,14 @@
 struct CubeDetails
 {
 	CubeDetails()
-		: type(eCubeType::Invalid)
+		: type(static_cast<char>(eCubeType::Invalid))
 	{}
 
 	CubeDetails(eCubeType type)
-		: type(type)
+		: type(static_cast<char>(type))
 	{}
 
-	eCubeType type;
+	char type;
 };
 
 //position.y * (CHUNK_AREA) + position.z * CHUNK_SIZE + position.x;

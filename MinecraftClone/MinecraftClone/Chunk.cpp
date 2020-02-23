@@ -203,5 +203,5 @@ void Chunk::reset(glm::ivec3 startingPosition)
 void Chunk::removeCubeAtPosition(glm::ivec3 position)
 {
 	glm::ivec3 positionOnGrid = position - glm::ivec3(m_startingPosition.x, m_startingPosition.y, m_startingPosition.z);
-	m_chunk[positionOnGrid.x][positionOnGrid.y][positionOnGrid.z].type = eCubeType::Invalid;
+	m_chunk[positionOnGrid.x][positionOnGrid.y][positionOnGrid.z].type = static_cast<char>(eCubeType::Invalid);
 }
