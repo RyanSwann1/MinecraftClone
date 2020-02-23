@@ -22,6 +22,7 @@ struct CubeDetails
 class Chunk
 {
 public:
+	Chunk();
 	Chunk(glm::ivec3 startingPosition);
 	
 	bool isPositionInBounds(glm::vec3 position) const;

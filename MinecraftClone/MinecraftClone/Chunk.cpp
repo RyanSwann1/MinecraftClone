@@ -6,6 +6,12 @@
 #include <iostream>
 #include <algorithm>
 
+Chunk::Chunk()
+	: m_chunk(),
+	m_startingPosition()
+{
+}
+
 Chunk::Chunk(glm::ivec3 startingPosition)
 	: m_chunk(),
 	m_startingPosition(startingPosition)

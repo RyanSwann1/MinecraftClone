@@ -44,9 +44,8 @@ public:
 	void update(const Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, glm::vec3 playerPosition, const Texture& texture);
 
 private:
-	std::unordered_map<glm::ivec2, std::shared_ptr<Chunk>> m_chunks;
+	std::unordered_map<glm::ivec2, Chunk> m_chunks;
 	std::vector<glm::ivec2> m_chunkMeshRegenerateQueue;
-	std::queue<std::shared_ptr<Chunk>> m_recycledChunks;
 
 	void addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide, 
 		int& elementArrayBufferIndex, glm::ivec3 cubePosition) const;
