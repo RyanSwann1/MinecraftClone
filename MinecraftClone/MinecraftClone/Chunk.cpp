@@ -18,7 +18,7 @@ Chunk::Chunk(glm::ivec3 startingPosition)
 			double ny = (z) / (Utilities::VISIBILITY_DISTANCE * 2.0f) - 0.5f;
 
 			//float elevation = std::abs(glm::perlin(glm::vec2(nx, ny)));
-		
+			
 			float elevation = std::abs(1 * glm::perlin(glm::vec2(1 * nx, 1 * ny)));
 			elevation += std::abs(0.5 * glm::perlin(glm::vec2(nx * 2, ny * 2)));
 			elevation += std::abs(0.25 * glm::perlin(glm::vec2(nx * 4, ny * 4)));
@@ -45,8 +45,7 @@ Chunk::Chunk(glm::ivec3 startingPosition)
 
 			glm::ivec3 positionOnGrid(x - startingPosition.x, (int)elevation, z - startingPosition.z);
 			//std::cout << elevation << "\n";
-			m_chunk[positionOnGrid.x][(int)elevation][positionOnGrid.z] = CubeDetails(cubeType, 
-				glm::ivec3(x, elevation + startingPosition.y, z));	
+			m_chunk[positionOnGrid.x][(int)elevation][positionOnGrid.z] = CubeDetails(cubeType);	
 
 			for (int y = (int)elevation - 1; y >= 0; --y)
 			{ 
@@ -63,8 +62,7 @@ Chunk::Chunk(glm::ivec3 startingPosition)
 					cubeType = eCubeType::Grass;
 				}
 
-				m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = CubeDetails(cubeType,
-					glm::ivec3(x, y + startingPosition.y, z));
+				m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = CubeDetails(cubeType);
 			}
 		}
 	}
@@ -176,8 +174,7 @@ void Chunk::reset(glm::ivec3 startingPosition)
 
 			glm::ivec3 positionOnGrid(x - startingPosition.x, (int)elevation, z - startingPosition.z);
 			//std::cout << elevation << "\n";
-			m_chunk[positionOnGrid.x][(int)elevation][positionOnGrid.z] = CubeDetails(cubeType,
-				glm::ivec3(x, elevation + startingPosition.y, z));
+			m_chunk[positionOnGrid.x][(int)elevation][positionOnGrid.z] = CubeDetails(cubeType);
 
 			for (int y = (int)elevation - 1; y >= 0; --y)
 			{
@@ -194,8 +191,7 @@ void Chunk::reset(glm::ivec3 startingPosition)
 					cubeType = eCubeType::Grass;
 				}
 
-				m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = CubeDetails(cubeType,
-					glm::ivec3(x, y + startingPosition.y, z));
+				m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = CubeDetails(cubeType);
 			}
 		}
 	}

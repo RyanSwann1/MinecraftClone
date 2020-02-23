@@ -28,7 +28,8 @@ namespace Utilities
 	constexpr int VISIBILITY_DISTANCE = 320;
 
 	static constexpr std::array<glm::vec2, 4> GRASS_TEXT_COORDS =
-	{ glm::vec2(0.0f, (128.0f - 16.0f) / 128.0f),
+	{	
+		glm::vec2(0.0f, (128.0f - 16.0f) / 128.0f),
 		glm::vec2(16.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
 		glm::vec2(16.0f / 128.0f, 1.0f),
 		glm::vec2(0.0f, 1.0f)

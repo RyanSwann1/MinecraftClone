@@ -8,17 +8,14 @@
 struct CubeDetails
 {
 	CubeDetails()
-		: type(eCubeType::Invalid),
-		position()
+		: type(eCubeType::Invalid)
 	{}
 
-	CubeDetails(eCubeType type, glm::ivec3 position)
-		: type(type),
-		position(position)
+	CubeDetails(eCubeType type)
+		: type(type)
 	{}
 
 	eCubeType type;
-	glm::ivec3 position;
 };
 
 //position.y * (CHUNK_AREA) + position.z * CHUNK_SIZE + position.x;

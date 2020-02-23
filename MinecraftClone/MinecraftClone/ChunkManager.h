@@ -28,7 +28,6 @@
 //https://algs4.cs.princeton.edu/34hash/
 //https://www.hackerearth.com/practice/data-structures/hash-tables/basics-of-hash-tables/tutorial/
 
-
 struct Rectangle;
 enum class eCubeSide;
 class Texture;
@@ -52,7 +51,7 @@ private:
 	std::queue<std::shared_ptr<Chunk>> m_recycledChunks;
 
 	void addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide, 
-		int& elementArrayBufferIndex) const;
+		int& elementArrayBufferIndex, glm::ivec3 cubePosition) const;
 	bool isCubeAtPosition(glm::vec3 position) const;
 	bool isCubeAtPosition(glm::ivec3 position) const;
 	bool isChunkAtPosition(glm::ivec2 position) const;
