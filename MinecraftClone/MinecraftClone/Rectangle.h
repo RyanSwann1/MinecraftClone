@@ -2,6 +2,7 @@
 
 #include "glm/glm.hpp"
 
+//	//https://silentmatt.com/rectangle-intersection/
 struct Rectangle
 {
 	Rectangle(glm::vec2 position, float distance)

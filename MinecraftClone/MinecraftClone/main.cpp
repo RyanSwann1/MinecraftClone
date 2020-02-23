@@ -232,16 +232,10 @@ int main()
 			{
 				camera.move(currentSFMLEvent, deltaTime);
 			}
-			if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
-			{
-				chunkManager.removeCubeAtPosition(camera.m_position, camera.getRaycastPosition());
-			}
 		}
 
-		chunkManager.handleChunkMeshRegenerationQueue(VAOs, VBOs, *texture);
-		//chunkManager.update(visibilityRect, VAOs, VBOs, camera.m_position, *texture);
-		
 		visibilityRect.update(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
+		//chunkManager.update(visibilityRect, VAOs, VBOs, camera.m_position, *texture);
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);

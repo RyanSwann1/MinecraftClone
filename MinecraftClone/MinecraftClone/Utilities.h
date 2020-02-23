@@ -68,23 +68,6 @@ namespace Utilities
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_TOP = { glm::vec3(0, 1.0, 0), glm::vec3(0, 1.0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(1.0, 1.0, 0) };
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_BOTTOM = { glm::vec3(0, 0, 0), glm::vec3(0, 0, 1.0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 0, 0) };
 
-	inline int closestInteger(int a, int b)
-	{
-		int c1 = a - (a % b);
-		int c2 = c1 + b;
-		int c = a - c1 < c2 - a ? c1 : c2;
-		return c;
-
-		//int c1 = a - (a % b);
-		//int c2 = (a + b) - (a % b);
-		//if (a - c1 > c2 - a) {
-		//	return c2;
-		//}
-		//else {
-		//	return c1;
-		//}
-	}
-
 	inline glm::vec2 getClosestChunkStartingPosition(glm::vec2 position)
 	{
 		glm::vec2 positionOnGrid(glm::vec2((position.x / CHUNK_WIDTH) * CHUNK_WIDTH, (position.y / CHUNK_DEPTH) * CHUNK_DEPTH));

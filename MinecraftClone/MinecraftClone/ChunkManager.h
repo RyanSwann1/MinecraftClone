@@ -39,10 +39,8 @@ class ChunkManager : private NonCopyable
 public:
 	ChunkManager();
 
-	void removeCubeAtPosition(glm::vec3 cameraPosition, glm::vec3 rayCastPosition);
 	void generateInitialChunks(glm::vec3 playerPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs);
 	void generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture);
-	void handleChunkMeshRegenerationQueue(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture);
 	void update(const Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, glm::vec3 playerPosition, const Texture& texture);
 
 private:
@@ -57,5 +55,4 @@ private:
 	bool isChunkAtPosition(glm::ivec2 position) const;
 
 	void generateChunkMesh(VertexArray& vertexArray, VertexBuffer& vertexBuffer, const Texture& texture, const Chunk& chunk);
-	void handleAdjacentDestroyedBlock(glm::ivec3 position, const Chunk& owningChunk);
 };
