@@ -13,11 +13,13 @@ public:
 	VertexArray(VertexArray&&) noexcept;
 	VertexArray& operator=(VertexArray&&) noexcept;
 	
+	bool isActive() const;
+	bool isReadyToAttachToVBO() const;
+	void setOwningStartingPosition(glm::vec3 owningStartingPosition);
 	glm::vec3 getOwningChunkStartingPosition() const;
-
+	
 	void deactivate();
-	void readyToBind();
-	void init(VertexBuffer& vertexBuffer);
+	void attachToVBO(VertexBuffer& vertexBuffer);
 	void bind() const;
 	void unbind() const;
 
@@ -25,5 +27,5 @@ private:
 	unsigned int m_ID;
 	glm::vec3 m_owningChunkStartingPosition;
 	bool m_active;
-	bool m_readyToBind;
+	bool m_attachToVBO;
 };

@@ -4,9 +4,15 @@
 #include "Utilities.h"
 #include <iostream>
 
+//unsigned int m_ID;
+//glm::vec3 m_owningChunkStartingPosition;
+//bool m_active;
+//bool m_attachToVBO;
+
 VertexArray::VertexArray()
-	: m_active(true),
-	m_readyToBind(false)
+	: m_owningChunkStartingPosition(),
+	m_active(true),
+	m_attachToVBO(false)
 {
 	glGenVertexArrays(1, &m_ID);
 }
@@ -22,20 +28,41 @@ VertexArray::~VertexArray()
 VertexArray::VertexArray(VertexArray&& orig) noexcept
 	: m_ID(orig.m_ID),
 	m_owningChunkStartingPosition(orig.m_owningChunkStartingPosition),
-	m_active(true)
+	m_active(orig.m_active),
+	m_attachToVBO(orig.m_attachToVBO)
 {
 	orig.m_ID = Utilities::INVALID_OPENGL_ID;
 	orig.m_active = false;
+	orig.m_attachToVBO = false;
 }
 
 VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
 {
+	this->m_attachToVBO = orig.m_attachToVBO;
+	this->m_active = orig.m_active;
 	this->m_ID = orig.m_ID;
 	orig.m_ID = Utilities::INVALID_OPENGL_ID;
 	this->m_owningChunkStartingPosition = orig.m_owningChunkStartingPosition;
 	orig.deactivate();
+	orig.m_attachToVBO = false;
 
 	return *this;
+}
+
+bool VertexArray::isActive() const
+{
+	return m_active;
+}
+
+bool VertexArray::isReadyToAttachToVBO() const
+{
+	return m_attachToVBO;
+}
+
+void VertexArray::setOwningStartingPosition(glm::vec3 owningStartingPosition)
+{
+	m_owningChunkStartingPosition = owningStartingPosition;
+	m_attachToVBO = true;
 }
 
 glm::vec3 VertexArray::getOwningChunkStartingPosition() const
@@ -48,10 +75,8 @@ void VertexArray::deactivate()
 	m_active = false;
 }
 
-void VertexArray::init(VertexBuffer& vertexBuffer)
+void VertexArray::attachToVBO(VertexBuffer& vertexBuffer)
 {
-	m_owningChunkStartingPosition = vertexBuffer.m_owningChunkStartingPosition;
-	m_readyToBind = true;
 	bind();
 	glGenBuffers(1, &vertexBuffer.positionsID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.positionsID);
@@ -73,6 +98,8 @@ void VertexArray::init(VertexBuffer& vertexBuffer)
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	unbind();
+
+	m_attachToVBO = false;
 }
 
 void VertexArray::bind() const

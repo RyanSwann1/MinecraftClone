@@ -14,6 +14,7 @@
 #include <array>
 #include <memory>
 #include <unordered_map>
+#include <thread>
 
 #ifdef DEBUG_GL_ERRORS
 #define glCheck(expr) expr; if(!GLAD_GL_KHR_debug){ glCheckError(__FILE__, __LINE__, #expr) };
@@ -236,6 +237,50 @@ int main()
 		}
 
 		chunkManager.update(visibilityRect, VAOs, VBOs, camera.m_position, *texture);
+
+		for (auto VBO = VBOs.begin(); VBO != VBOs.end();)
+		{
+			if (!VBO->active)
+			{
+				glDeleteBuffers(1, &VBO->positionsID);
+				glDeleteBuffers(1, &VBO->textCoordsID);
+				glDeleteBuffers(1, &VBO->indiciesID);
+				VBO = VBOs.erase(VBO);
+			}
+			else
+			{
+				++VBO;
+			}
+		}
+
+		for (auto VAO = VAOs.begin(); VAO != VAOs.end();)
+		{
+			if (!VAO->isActive())
+			{
+				VAO = VAOs.erase(VAO);
+			}
+			else
+			{
+				++VAO;
+			}
+		}
+
+		for (auto& vertexArray : VAOs)
+		{
+			if (vertexArray.isReadyToAttachToVBO())
+			{
+				glm::vec3 owningChunkStartingPosition(vertexArray.getOwningChunkStartingPosition());
+				auto VBO = std::find_if(VBOs.begin(), VBOs.end(), [owningChunkStartingPosition](const auto& VBO)
+					{
+						return VBO.m_owningChunkStartingPosition == owningChunkStartingPosition;
+					});
+				assert(VBO != VBOs.end());
+				if (VBO != VBOs.end()) 
+				{
+					vertexArray.attachToVBO(*VBO);
+				}
+			}
+		}
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
