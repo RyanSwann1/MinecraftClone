@@ -46,7 +46,7 @@ void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArr
 {
 	deleteChunks(visibilityRect, VAOs, VBOs);
 	addChunks(visibilityRect, VAOs, VBOs, playerPosition, texture);
-	regenChunks(visibilityRect, VAOs, VBOs, playerPosition, texture);
+	//regenChunks(visibilityRect, VAOs, VBOs, playerPosition, texture);
 }
 
 void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,
@@ -284,8 +284,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, VertexBuffer& ver
 			}
 		}
 	}
-
-
+	
 	if (regenChunk)
 	{
 		m_chunkMeshRegenerateQueue.push_back(glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.z));
@@ -362,10 +361,15 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, std::vector<Vertex
 	while (!chunksToMeshRegen.empty())
 	{
 		auto chunk = m_chunks.find(glm::ivec2(chunksToMeshRegen.front().x, chunksToMeshRegen.front().y));
+		assert(chunk != m_chunks.cend());
+		if (chunk != m_chunks.cend())
+		{
+			VAOs.emplace_back();
+			VBOs.emplace_back();
+			generateChunkMesh(VAOs.back(), VBOs.back(), texture, chunk->second);
+		}
+
 		chunksToMeshRegen.pop();
-		VAOs.emplace_back();
-		VBOs.emplace_back();
-		generateChunkMesh(VAOs.back(), VBOs.back(), texture, chunk->second);
 	}
 }
 
