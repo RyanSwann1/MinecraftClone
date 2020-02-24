@@ -15,6 +15,8 @@ public:
 	
 	glm::vec3 getOwningChunkStartingPosition() const;
 
+	void deactivate();
+	void readyToBind();
 	void init(VertexBuffer& vertexBuffer);
 	void bind() const;
 	void unbind() const;
@@ -22,4 +24,6 @@ public:
 private:
 	unsigned int m_ID;
 	glm::vec3 m_owningChunkStartingPosition;
+	bool m_active;
+	bool m_readyToBind;
 };

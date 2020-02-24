@@ -41,9 +41,12 @@ void ChunkManager::generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vect
 	}
 }
 
-void ChunkManager::update(const Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, glm::vec3 playerPosition,
+void ChunkManager::update(Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, glm::vec3 playerPosition,
 	const Texture& texture)
 {
+	//visibilityRect.update(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
+	visibilityRect.update(glm::vec2(playerPosition.x, playerPosition.z), Utilities::VISIBILITY_DISTANCE);
+
 	deleteChunks(visibilityRect, VAOs, VBOs);
 	addChunks(visibilityRect, VAOs, VBOs, playerPosition, texture);
 	regenChunks(visibilityRect, VAOs, VBOs, playerPosition, texture);
@@ -307,15 +310,18 @@ void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::vector<Ver
 			auto VBO = std::find_if(VBOs.begin(), VBOs.end(), [chunkStartingPosition](const auto& vertexBuffer)
 				{ return vertexBuffer.m_owningChunkStartingPosition == chunkStartingPosition; });
 			assert(VBO != VBOs.end());
-			glDeleteBuffers(1, &VBO->positionsID);
-			glDeleteBuffers(1, &VBO->textCoordsID);
-			glDeleteBuffers(1, &VBO->indiciesID);
-			VBOs.erase(VBO);
+			VBO->active = false;
+		
+			//glDeleteBuffers(1, &VBO->positionsID);
+			//glDeleteBuffers(1, &VBO->textCoordsID);
+			//glDeleteBuffers(1, &VBO->indiciesID);
+			//VBOs.erase(VBO);
 
 			auto VAO = std::find_if(VAOs.begin(), VAOs.end(), [chunkStartingPosition](const auto& vertexArray)
 				{ return vertexArray.getOwningChunkStartingPosition() == chunkStartingPosition; });
 			assert(VAO != VAOs.end());
-			VAOs.erase(VAO);
+			VAO->deactivate();
+			//VAOs.erase(VAO);
 
 			glm::ivec2 startPosition(chunkStartingPosition.x, chunkStartingPosition.z);
 			auto chunkToRegen = std::find_if(m_chunkMeshRegenerateQueue.begin(), m_chunkMeshRegenerateQueue.end(), [startPosition](const auto& position)
@@ -386,15 +392,17 @@ void ChunkManager::regenChunks(const Rectangle& visibilityRect, std::vector<Vert
 				auto VBO = std::find_if(VBOs.begin(), VBOs.end(), [startPosition](const auto& vertexBuffer)
 				{ return vertexBuffer.m_owningChunkStartingPosition == startPosition; });
 				assert(VBO != VBOs.end());
-				glDeleteBuffers(1, &VBO->positionsID);
-				glDeleteBuffers(1, &VBO->textCoordsID);
-				glDeleteBuffers(1, &VBO->indiciesID);
-				VBOs.erase(VBO);
+				VBO->active = false;
+				//glDeleteBuffers(1, &VBO->positionsID);
+				//glDeleteBuffers(1, &VBO->textCoordsID);
+				//glDeleteBuffers(1, &VBO->indiciesID);
+				//VBOs.erase(VBO);
 
 				auto VAO = std::find_if(VAOs.begin(), VAOs.end(), [startPosition](const auto& vertexArray)
 				{ return vertexArray.getOwningChunkStartingPosition() == startPosition; });
 				assert(VAO != VAOs.end());
-				VAOs.erase(VAO);
+				VAO->deactivate();
+				//VAOs.erase(VAO);
 
 				VAOs.emplace_back();
 				VBOs.emplace_back();

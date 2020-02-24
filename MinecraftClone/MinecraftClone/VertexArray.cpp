@@ -5,6 +5,8 @@
 #include <iostream>
 
 VertexArray::VertexArray()
+	: m_active(true),
+	m_readyToBind(false)
 {
 	glGenVertexArrays(1, &m_ID);
 }
@@ -19,9 +21,11 @@ VertexArray::~VertexArray()
 
 VertexArray::VertexArray(VertexArray&& orig) noexcept
 	: m_ID(orig.m_ID),
-	m_owningChunkStartingPosition(orig.m_owningChunkStartingPosition)
+	m_owningChunkStartingPosition(orig.m_owningChunkStartingPosition),
+	m_active(true)
 {
 	orig.m_ID = Utilities::INVALID_OPENGL_ID;
+	orig.m_active = false;
 }
 
 VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
@@ -29,6 +33,7 @@ VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
 	this->m_ID = orig.m_ID;
 	orig.m_ID = Utilities::INVALID_OPENGL_ID;
 	this->m_owningChunkStartingPosition = orig.m_owningChunkStartingPosition;
+	orig.deactivate();
 
 	return *this;
 }
@@ -38,11 +43,16 @@ glm::vec3 VertexArray::getOwningChunkStartingPosition() const
 	return m_owningChunkStartingPosition;
 }
 
+void VertexArray::deactivate()
+{
+	m_active = false;
+}
+
 void VertexArray::init(VertexBuffer& vertexBuffer)
 {
-	bind();
 	m_owningChunkStartingPosition = vertexBuffer.m_owningChunkStartingPosition;
-
+	m_readyToBind = true;
+	bind();
 	glGenBuffers(1, &vertexBuffer.positionsID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.positionsID);
 	glBufferData(GL_ARRAY_BUFFER, vertexBuffer.positions.size() * sizeof(glm::vec3), vertexBuffer.positions.data(), GL_STATIC_DRAW);

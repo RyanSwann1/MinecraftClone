@@ -13,6 +13,9 @@ struct VertexBuffer
 		indicies.clear();
 	}
 
+
+
+	bool active = true;
 	unsigned int positionsID;
 	std::vector<glm::vec3> positions;
 	unsigned int textCoordsID;

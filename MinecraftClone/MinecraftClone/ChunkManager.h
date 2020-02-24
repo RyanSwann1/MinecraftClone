@@ -41,7 +41,7 @@ public:
 
 	void generateInitialChunks(glm::vec3 playerPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs);
 	void generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture);
-	void update(const Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, glm::vec3 playerPosition, const Texture& texture);
+	void update(Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, glm::vec3 playerPosition, const Texture& texture);
 
 private:
 	std::unordered_map<glm::ivec2, Chunk> m_chunks;
