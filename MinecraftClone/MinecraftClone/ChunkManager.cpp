@@ -350,28 +350,9 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, std::vector<Vertex
 			{
 				++addedCount;
 
-				m_chunks[glm::ivec2(x, y)] =
-					Chunk(glm::ivec3(x, 0, y));
+				m_chunks[glm::ivec2(x, y)] = Chunk(glm::ivec3(x, 0, y));
 
 				chunksToMeshRegen.push(glm::ivec2(x, y));
-			}
-		}
-	}
-
-	for (int y = playerPosition.z - Utilities::VISIBILITY_DISTANCE; y < playerPosition.z + Utilities::VISIBILITY_DISTANCE; y += Utilities::CHUNK_DEPTH)
-	{
-		for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x < playerPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
-		{
-			glm::vec2 closestChunkStartingPosition = Utilities::getClosestChunkStartingPosition(glm::vec2(x, y));
-
-			if (m_chunks.find(closestChunkStartingPosition) == m_chunks.cend())
-			{
-				++addedCount;
-
-				//m_chunks[glm::ivec2(closestChunkStartingPosition.x, closestChunkStartingPosition.y)] = 
-					Chunk(glm::ivec3(closestChunkStartingPosition.x, 0, closestChunkStartingPosition.y));
-				
-				//chunksToMeshRegen.push(glm::ivec2(closestChunkStartingPosition.x, closestChunkStartingPosition.y));
 			}
 		}
 	}
