@@ -20,6 +20,7 @@ void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, int chunkCoun
 			glm::ivec2 chunkStartingPosition = Utilities::getClosestChunkStartingPosition(glm::vec2(x, y));
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend())
 			{
+				m_chunks.emplace(glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.y), Chunk(glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.y)));
 				m_chunks[glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.y)] = 
 					Chunk(glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.y));
 				VAOs.emplace_back();

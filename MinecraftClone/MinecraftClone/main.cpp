@@ -150,6 +150,7 @@ unsigned int createShaderProgram()
 	return shaderID;
 }
 
+//https://www.reddit.com/r/VoxelGameDev/comments/376vmv/how_do_you_implement_threading_in_your_game/
 
 //View == Frustrum
 //The reason why it can get away with that is because of other rendering optimizations.
