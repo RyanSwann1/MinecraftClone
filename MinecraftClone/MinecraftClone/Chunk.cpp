@@ -102,8 +102,8 @@ void Chunk::regen(glm::ivec3 startingPosition)
 	{
 		for (int x = startingPosition.x; x < startingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 		{
-			double nx = (x) / (Utilities::VISIBILITY_DISTANCE * 2.0f) - 0.5f;
-			double ny = (z) / (Utilities::VISIBILITY_DISTANCE * 2.0f) - 0.5f;
+			double nx = (x) / (Utilities::VISIBILITY_DISTANCE * 1.0f) - 0.5f;
+			double ny = (z) / (Utilities::VISIBILITY_DISTANCE * 1.0f) - 0.5f;
 
 			//float elevation = std::abs(glm::perlin(glm::vec2(nx, ny)));
 

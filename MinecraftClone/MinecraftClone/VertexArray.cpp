@@ -21,7 +21,7 @@ VertexArray::VertexArray(VertexArray&& orig) noexcept
 	: m_ID(orig.m_ID),
 	m_owningChunkStartingPosition(orig.m_owningChunkStartingPosition)
 {
-	orig.m_ID = Utilities::INVALID_OPENGL_ID;
+	*orig.m_ID = Utilities::INVALID_OPENGL_ID;
 }
 
 VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept

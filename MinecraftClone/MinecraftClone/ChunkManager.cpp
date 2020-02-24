@@ -20,7 +20,7 @@ void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, int chunkCoun
 			glm::ivec2 chunkStartingPosition = Utilities::getClosestChunkStartingPosition(glm::vec2(x, y));
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend())
 			{
-				m_chunks.emplace(glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.y), Chunk(glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.y)));
+				//m_chunks.emplace(glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.y), Chunk(glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.y)));
 				m_chunks[glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.y)] = 
 					Chunk(glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.y));
 				VAOs.emplace_back();
@@ -341,8 +341,23 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, std::vector<Vertex
 	std::queue<glm::ivec2> chunksToMeshRegen;
 	int addedCount = 0;
 
-	//glm::ivec2 startPosition = Utilities::getClosestChunkStartingPosition(glm::vec2(playerPosition.x, playerPosition.z));	
-	
+	glm::ivec2 startPosition = Utilities::getClosestChunkStartingPosition(glm::vec2(playerPosition.x, playerPosition.z));	
+	for (int y = startPosition.y - Utilities::VISIBILITY_DISTANCE; y < startPosition.y + Utilities::VISIBILITY_DISTANCE; y += Utilities::CHUNK_DEPTH)
+	{
+		for (int x = startPosition.x - Utilities::VISIBILITY_DISTANCE; x < startPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
+		{
+			if (m_chunks.find(glm::ivec2(x, y)) == m_chunks.cend())
+			{
+				++addedCount;
+
+				m_chunks[glm::ivec2(x, y)] =
+					Chunk(glm::ivec3(x, 0, y));
+
+				chunksToMeshRegen.push(glm::ivec2(x, y));
+			}
+		}
+	}
+
 	for (int y = playerPosition.z - Utilities::VISIBILITY_DISTANCE; y < playerPosition.z + Utilities::VISIBILITY_DISTANCE; y += Utilities::CHUNK_DEPTH)
 	{
 		for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x < playerPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
@@ -353,10 +368,10 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, std::vector<Vertex
 			{
 				++addedCount;
 
-				m_chunks[glm::ivec2(closestChunkStartingPosition.x, closestChunkStartingPosition.y)] = 
+				//m_chunks[glm::ivec2(closestChunkStartingPosition.x, closestChunkStartingPosition.y)] = 
 					Chunk(glm::ivec3(closestChunkStartingPosition.x, 0, closestChunkStartingPosition.y));
 				
-				chunksToMeshRegen.push(glm::ivec2(closestChunkStartingPosition.x, closestChunkStartingPosition.y));
+				//chunksToMeshRegen.push(glm::ivec2(closestChunkStartingPosition.x, closestChunkStartingPosition.y));
 			}
 		}
 	}
