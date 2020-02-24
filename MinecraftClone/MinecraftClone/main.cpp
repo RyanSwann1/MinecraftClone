@@ -198,7 +198,10 @@ int main()
 	ChunkManager chunkManager;
 	chunkManager.generateInitialChunks(camera.m_position, chunkCount, VAOs, VBOs);
 	chunkManager.generateChunkMeshes(VAOs, VBOs, *texture);
-	
+	std::mutex updateMutex;
+
+	std::thread t([&](ChunkManager* chunkManager) {chunkManager->update(visibilityRect, std::ref(VAOs), std::ref(VBOs), std::ref(camera), *texture); }, &chunkManager);
+
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 
@@ -236,8 +239,9 @@ int main()
 			}
 		}
 
-		chunkManager.update(visibilityRect, VAOs, VBOs, camera.m_position, *texture);
+		//chunkManager.update(visibilityRect, VAOs, VBOs, camera.m_position, *texture);
 
+		std::unique_lock<std::mutex> lock(updateMutex);
 		for (auto VBO = VBOs.begin(); VBO != VBOs.end();)
 		{
 			if (!VBO->active)
@@ -282,6 +286,7 @@ int main()
 			}
 		}
 
+		lock.unlock();
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -291,12 +296,14 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 500.f);
 		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
 
+		lock.lock();
 		for (int i = 0; i < VAOs.size(); ++i) 
 		{
 			VAOs[i].bind();
 			glDrawElements(GL_TRIANGLES, VBOs[i].indicies.size(), GL_UNSIGNED_INT, nullptr);
 			VAOs[i].unbind();
 		}
+		lock.unlock();
 
 		window.display();
 	}
@@ -308,5 +315,6 @@ int main()
 		glDeleteBuffers(1, &i.indiciesID);
 	}
 
+	t.join();
 	return 0;
 }

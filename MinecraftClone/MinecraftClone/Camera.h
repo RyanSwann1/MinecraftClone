@@ -5,6 +5,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include <mutex>
 
 struct Camera
 {
@@ -12,9 +13,11 @@ struct Camera
 
 	void move(const sf::Event& sfmlEvent, float deltaTime);
 
+	glm::vec2 getPosition2D();
 	glm::vec3 getRaycastPosition() const;
 	void mouse_callback(double xpos, double ypos);
 
+	std::mutex m_mutex;
 	float m_speed;
 	glm::vec3 m_position;
 	glm::vec3 m_front;

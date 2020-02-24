@@ -7,6 +7,7 @@
 #include <memory>
 #include <unordered_map>
 #include <queue>
+#include <mutex>
 //1. Perlin Noise
 //2. Dynamic Generation
 //3. Dynamic Destruction
@@ -28,6 +29,7 @@
 //https://algs4.cs.princeton.edu/34hash/
 //https://www.hackerearth.com/practice/data-structures/hash-tables/basics-of-hash-tables/tutorial/
 
+struct Camera;
 struct Rectangle;
 enum class eCubeSide;
 class Texture;
@@ -41,20 +43,21 @@ public:
 
 	void generateInitialChunks(glm::vec3 playerPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs);
 	void generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& Texture);
-	void update(Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, glm::vec3 playerPosition, const Texture& texture);
+	void update(Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, Camera& camera, const Texture& texture);
 
 private:
 	std::unordered_map<glm::ivec2, Chunk> m_chunks;
 	std::vector<glm::ivec2> m_chunkMeshRegenerateQueue;
+	std::mutex m_mutex;
 
-	void addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide, 
-		int& elementArrayBufferIndex, glm::ivec3 cubePosition) const;
+	void addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,
+		int& elementArrayBufferIndex, glm::ivec3 cubePosition);
 	bool isCubeAtPosition(glm::vec3 position) const;
 	bool isCubeAtPosition(glm::ivec3 position) const;
 	bool isChunkAtPosition(glm::ivec2 position) const;
 
 	void generateChunkMesh(VertexArray& vertexArray, VertexBuffer& vertexBuffer, const Texture& texture, const Chunk& chunk);
 	void deleteChunks(const Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs);
-	void addChunks(const Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, glm::vec3 playerPosition, const Texture& texture);
-	void regenChunks(const Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, glm::vec3 playerPosition, const Texture& texture);
+	void addChunks(const Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, glm::vec2 playerPosition, const Texture& texture);
+	void regenChunks(const Rectangle& visibilityRect, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& texture);
 };

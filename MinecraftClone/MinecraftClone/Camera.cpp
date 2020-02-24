@@ -27,6 +27,12 @@ void Camera::move(const sf::Event & sfmlEvent, float deltaTime)
 	}
 }
 
+glm::vec2 Camera::getPosition2D()
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+	return glm::vec2(m_position.x, m_position.z);
+}
+
 glm::vec3 Camera::getRaycastPosition() const
 {
 	return m_frontInverse + m_position;
