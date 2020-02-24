@@ -20,9 +20,10 @@ void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, int chunkCoun
 			glm::ivec2 chunkStartingPosition = Utilities::getClosestChunkStartingPosition(glm::vec2(x, y));
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend())
 			{
-				//m_chunks.emplace(glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.y), Chunk(glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.y)));
-				m_chunks[glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.y)] = 
-					Chunk(glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.y));
+				m_chunks.emplace(std::piecewise_construct,
+					std::forward_as_tuple(glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.y)),
+					std::forward_as_tuple(glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.y)));
+
 				VAOs.emplace_back();
 				VBOs.emplace_back();
 			}
@@ -340,7 +341,6 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, std::vector<Vertex
 {
 	std::queue<glm::ivec2> chunksToMeshRegen;
 	int addedCount = 0;
-
 	glm::ivec2 startPosition = Utilities::getClosestChunkStartingPosition(glm::vec2(playerPosition.x, playerPosition.z));	
 	for (int y = startPosition.y - Utilities::VISIBILITY_DISTANCE; y < startPosition.y + Utilities::VISIBILITY_DISTANCE; y += Utilities::CHUNK_DEPTH)
 	{
@@ -350,7 +350,9 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, std::vector<Vertex
 			{
 				++addedCount;
 
-				m_chunks[glm::ivec2(x, y)] = Chunk(glm::ivec3(x, 0, y));
+				m_chunks.emplace(std::piecewise_construct,
+					std::forward_as_tuple(glm::ivec2(x, y)),
+					std::forward_as_tuple(glm::ivec3(x, 0, y)));
 
 				chunksToMeshRegen.push(glm::ivec2(x, y));
 			}
