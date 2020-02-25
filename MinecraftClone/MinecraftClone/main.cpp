@@ -210,9 +210,7 @@ int main()
 	{
 		float deltaTime = clock.restart().asSeconds();
 		sf::Vector2i mousePosition = sf::Mouse::getPosition();
-		//std::unique_lock<std::mutex> lock(mutex);
 		camera.mouse_callback(mousePosition.x, mousePosition.y);
-		//lock.unlock();
 		if (elaspedTime >= messageExpiredTime)
 		{
 			elaspedTime = 0.0f;

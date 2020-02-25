@@ -8,7 +8,7 @@ VertexArray::VertexArray()
 	: m_init(false),
 	m_destroy(false),
 	m_display(true),
-	m_ID(0)
+	m_ID(Utilities::INVALID_OPENGL_ID)
 {}
 
 void VertexArray::reset()
