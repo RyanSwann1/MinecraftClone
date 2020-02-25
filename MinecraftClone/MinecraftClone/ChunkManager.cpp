@@ -295,7 +295,12 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 
 	if (regenChunk)
 	{
+		vertexArray.m_display = false;
 		m_chunkMeshRegenerateQueue.push_back(glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.z));
+	}
+	else
+	{
+		vertexArray.m_display = true;
 	}
 }
 

@@ -192,12 +192,8 @@ int main()
 	std::unordered_map<glm::ivec2, VertexArray> VAOs;
 	Rectangle visibilityRect(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
 
-	//void update(const Rectangle & visibilityRect, std::unordered_map<glm::ivec2, VertexArray> & VAOs, Camera & camera,
-	//	const Texture & texture, const sf::Window & window);
-
 	ChunkManager chunkManager;
 	chunkManager.generateInitialChunks(camera.m_position, VAOs, *texture);
-	//std::thread t([&](ChunkManager* chunkManager) {chunkManager->update(visibilityRect, std::ref(VAOs), std::ref(VBOs), std::ref(camera), *texture); }, &chunkManager);
 	std::thread chunkGenerationThread([&](ChunkManager* chunkManager) {chunkManager->update(std::ref(visibilityRect), std::ref(VAOs), std::ref(camera),
 		*texture, std::ref(window)); }, &chunkManager);
 	std::mutex mutex;
@@ -250,7 +246,6 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 500.f);
 		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
 
-		//lock.lock();
 		for (auto iter = VAOs.begin(); iter != VAOs.end();)
 		{
 			if (iter->second.m_destroy)
@@ -271,11 +266,14 @@ int main()
 
 		for (const auto& VAO : VAOs)
 		{
-			VAO.second.bind();
-			glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
-			VAO.second.unbind();
+			if (VAO.second.m_display)
+			{
+				VAO.second.bind();
+				glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+				VAO.second.unbind();
+			}
 		}
-		//lock.unlock();
+
 		window.display();
 	}
 

@@ -7,6 +7,7 @@
 VertexArray::VertexArray()
 	: m_init(false),
 	m_destroy(false),
+	m_display(true),
 	m_ID(0)
 {}
 

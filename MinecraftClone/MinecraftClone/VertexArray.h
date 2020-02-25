@@ -14,6 +14,7 @@ struct VertexArray : private NonCopyable
 	void bind() const;
 	void unbind() const;
 
+	bool m_display;
 	bool m_init;
 	bool m_destroy;
 	VertexBuffer m_vertexBuffer;
