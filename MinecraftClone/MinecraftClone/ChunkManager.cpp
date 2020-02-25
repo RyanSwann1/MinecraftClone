@@ -11,7 +11,7 @@ ChunkManager::ChunkManager()
 	: m_chunks()
 {}
 
-void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, int chunkCount, std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs)
+void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, int chunkCount, std::unordered_map<glm::ivec2, VertexArray>& VAOs)
 {
 	for (int y = playerPosition.z - Utilities::VISIBILITY_DISTANCE; y < playerPosition.z + Utilities::VISIBILITY_DISTANCE; y += Utilities::CHUNK_DEPTH)
 	{
@@ -24,16 +24,24 @@ void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, int chunkCoun
 					std::forward_as_tuple(glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.y)),
 					std::forward_as_tuple(glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.y)));
 
-				VAOs.emplace_back();
-				VBOs.emplace_back();
+				VAOs.emplace(std::piecewise_construct,
+					std::forward_as_tuple(),
+					std::forward_as_tuple());
 			}
 		}
 	}
+
+	for (auto& VAO : VAOs)
+	{
+
+	}
 }
 
-void ChunkManager::generateChunkMeshes(std::vector<VertexArray>& VAOs, std::vector<VertexBuffer>& VBOs, const Texture& texture)
+void ChunkManager::generateChunkMeshes(std::unordered_map<glm::ivec2, VertexArray>& VAOs, const Texture& texture)
 {
-	int i = 0;
+
+
+	
 	for (auto& chunk : m_chunks)
 	{
 		generateChunkMesh(VAOs[i], VBOs[i], texture, chunk.second);
@@ -314,7 +322,10 @@ void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::vector<Ver
 			auto VAO = std::find_if(VAOs.begin(), VAOs.end(), [chunkStartingPosition](const auto& vertexArray)
 				{ return vertexArray.getOwningChunkStartingPosition() == chunkStartingPosition; });
 			assert(VAO != VAOs.end());
-			VAOs.erase(VAO);
+			if (VAO != VAOs.end())
+			{
+				VAOs.erase(VAO);
+			}
 
 			glm::ivec2 startPosition(chunkStartingPosition.x, chunkStartingPosition.z);
 			auto chunkToRegen = std::find_if(m_chunkMeshRegenerateQueue.begin(), m_chunkMeshRegenerateQueue.end(), [startPosition](const auto& position)
@@ -398,6 +409,7 @@ void ChunkManager::regenChunks(const Rectangle& visibilityRect, std::vector<Vert
 				auto VAO = std::find_if(VAOs.begin(), VAOs.end(), [startPosition](const auto& vertexArray)
 				{ return vertexArray.getOwningChunkStartingPosition() == startPosition; });
 				assert(VAO != VAOs.end());
+			
 				VAOs.erase(VAO);
 
 				VAOs.emplace_back();

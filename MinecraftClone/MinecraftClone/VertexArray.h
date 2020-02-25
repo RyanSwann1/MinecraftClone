@@ -1,11 +1,10 @@
 #pragma once
 
+#include "VertexBuffer.h"
 #include "glm/glm.hpp"
 
-struct VertexBuffer;
-class VertexArray
+struct VertexArray
 {
-public:
 	VertexArray();
 	~VertexArray();
 	VertexArray(const VertexArray&) = delete;
@@ -19,7 +18,7 @@ public:
 	void bind() const;
 	void unbind() const;
 
-private:
+	VertexBuffer m_vertexBuffer;
 	unsigned int m_ID;
 	glm::vec3 m_owningChunkStartingPosition;
 };

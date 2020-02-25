@@ -7,13 +7,21 @@
 VertexArray::VertexArray()
 {
 	glGenVertexArrays(1, &m_ID);
+	std::cout << m_ID << "\n";
 }
 
 VertexArray::~VertexArray()
 {
 	if (m_ID != Utilities::INVALID_OPENGL_ID)
 	{
+		std::cout << "Destroyed VAO\n";
 		glDeleteVertexArrays(1, &m_ID);
+	}
+	else
+	{
+		std::cout << "Help\n";
+		std::cout << "ID: " << m_ID << "\n";
+		std::cout << m_owningChunkStartingPosition.x << "  " << m_owningChunkStartingPosition.z << "\n";
 	}
 }
 

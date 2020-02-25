@@ -24,8 +24,8 @@ namespace Utilities
 	constexpr int STONE_MAX_HEIGHT = 10;
 	constexpr int DIRT_MAX_HEIGHT = 14;
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
-	constexpr int INVALID_OPENGL_ID = -1;
-	constexpr int VISIBILITY_DISTANCE = 320;
+	constexpr unsigned int INVALID_OPENGL_ID = 0;
+	constexpr int VISIBILITY_DISTANCE = 64;
 
 	static constexpr std::array<glm::vec2, 4> GRASS_TEXT_COORDS =
 	{	

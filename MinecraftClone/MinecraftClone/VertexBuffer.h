@@ -6,13 +6,6 @@
 
 struct VertexBuffer
 {
-	void clear()
-	{
-		positions.clear();
-		textCoords.clear();
-		indicies.clear();
-	}
-
 	unsigned int positionsID;
 	std::vector<glm::vec3> positions;
 	unsigned int textCoordsID;

@@ -176,6 +176,9 @@ int main()
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
 	glEnable(GL_DEPTH_TEST);
 
+	unsigned int VBOID;
+	//glGenBuffers(1, &VBOID);
+
 	unsigned int shaderID = createShaderProgram();
 	Camera camera(glm::vec3(0.0f, 150.f, 0.0f));
 	std::unique_ptr<Texture> texture = Texture::loadTexture("Texture_Atlas.png");
@@ -189,14 +192,16 @@ int main()
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot(), uniformLocations);
 
 	int chunkCount = 6;
-	std::vector<VertexArray> VAOs;
-	std::vector<VertexBuffer> VBOs;
+	std::unordered_map<glm::ivec2, VertexArray> VAOs;
+	//std::unordered_map<glm::ivec2, VertexBuffer> VBOs;
+
+	//std::vector<VertexArray> VAOs;
+	//std::vector<VertexBuffer> VBOs;
 
 	Rectangle visibilityRect(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
 
 	ChunkManager chunkManager;
 	chunkManager.generateInitialChunks(camera.m_position, chunkCount, VAOs, VBOs);
-	chunkManager.generateChunkMeshes(VAOs, VBOs, *texture);
 	
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -216,8 +221,8 @@ int main()
 		{
 			elaspedTime = 0.0f;
 			glm::ivec2 playerPosition(camera.m_position.x, camera.m_position.z);
-			std::cout << playerPosition.x << "\n";
-			std::cout << playerPosition.y << "\n";
+			//std::cout << playerPosition.x << "\n";
+			//std::cout << playerPosition.y << "\n";
 		}
 
 		elaspedTime += deltaTime;
