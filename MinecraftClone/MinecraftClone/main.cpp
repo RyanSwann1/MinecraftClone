@@ -214,9 +214,9 @@ int main()
 	{
 		float deltaTime = clock.restart().asSeconds();
 		sf::Vector2i mousePosition = sf::Mouse::getPosition();
-		std::unique_lock<std::mutex> lock(mutex);
+		//std::unique_lock<std::mutex> lock(mutex);
 		camera.mouse_callback(mousePosition.x, mousePosition.y);
-		lock.unlock();
+		//lock.unlock();
 		if (elaspedTime >= messageExpiredTime)
 		{
 			elaspedTime = 0.0f;
@@ -250,7 +250,7 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 500.f);
 		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
 
-		lock.lock();
+		//lock.lock();
 		for (auto iter = VAOs.begin(); iter != VAOs.end();)
 		{
 			if (iter->second.m_destroy)
@@ -275,7 +275,7 @@ int main()
 			glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 			VAO.second.unbind();
 		}
-		lock.unlock();
+		//lock.unlock();
 		window.display();
 	}
 
