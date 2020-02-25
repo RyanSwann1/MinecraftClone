@@ -176,9 +176,6 @@ int main()
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
 	glEnable(GL_DEPTH_TEST);
 
-	unsigned int VBOID;
-	//glGenBuffers(1, &VBOID);
-
 	unsigned int shaderID = createShaderProgram();
 	Camera camera(glm::vec3(0.0f, 150.f, 0.0f));
 	std::unique_ptr<Texture> texture = Texture::loadTexture("Texture_Atlas.png");

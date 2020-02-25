@@ -24,6 +24,13 @@ VertexArray::~VertexArray()
 	glDeleteBuffers(1, &m_vertexBuffer.indiciesID);
 }
 
+void VertexArray::reset()
+{
+	m_vertexBuffer.positions.clear();
+	m_vertexBuffer.textCoords.clear();
+	m_vertexBuffer.indicies.clear();
+}
+
 void VertexArray::init() const
 {
 	bind();
@@ -36,7 +43,7 @@ void VertexArray::init() const
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.textCoordsID);
 	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.textCoords.size() * sizeof(glm::vec2), m_vertexBuffer.textCoords.data(), GL_STATIC_DRAW);
-
+		
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)(0));
 

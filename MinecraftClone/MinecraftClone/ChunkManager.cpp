@@ -291,6 +291,8 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 	}
 
 	vertexArray.init();
+	vertexArray.m_vertexBuffer.textCoords.clear();
+	vertexArray.m_vertexBuffer.positions.clear();
 }
 
 void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs)
@@ -379,14 +381,10 @@ void ChunkManager::regenChunks(const Rectangle& visibilityRect, std::unordered_m
 				assert(VAO != VAOs.end());
 				if (VAO != VAOs.end())
 				{
-					VAOs.erase(VAO);
+					VAO->second.reset();
+					generateChunkMesh(VAO->second, texture, chunk->second);
 				}
 
-				auto newVAO = VAOs.emplace(std::piecewise_construct,
-					std::forward_as_tuple(glm::ivec2(chunk->second.getStartingPosition().x, chunk->second.getStartingPosition().z)),
-					std::forward_as_tuple()).first;
-
-				generateChunkMesh(newVAO->second, texture, chunk->second);
 				chunkStartingPosition = m_chunkMeshRegenerateQueue.erase(chunkStartingPosition);
 			}
 			else

@@ -12,6 +12,7 @@ struct VertexArray
 	VertexArray(VertexArray&&) = delete; 
 	VertexArray& operator=(VertexArray&&) = delete; 
 	
+	void reset();
 	void init() const;
 	void bind() const;
 	void unbind() const;
