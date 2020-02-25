@@ -189,19 +189,12 @@ int main()
 	texture->bind();
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot(), uniformLocations);
 
-	int chunkCount = 6;
-	std::vector<VertexArray> VAOs;
-	std::vector<VertexBuffer> VBOs;
-
+	std::unordered_map<glm::ivec2, VertexArray> VAOs;
 	Rectangle visibilityRect(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
 
 	ChunkManager chunkManager;
-	chunkManager.generateInitialChunks(camera.m_position, chunkCount, VAOs, VBOs);
-	chunkManager.generateChunkMeshes(VAOs, VBOs, *texture);
-	std::mutex updateMutex;
-
-	std::thread t([&](ChunkManager* chunkManager) {chunkManager->update(visibilityRect, std::ref(VAOs), std::ref(VBOs), std::ref(camera), *texture); }, &chunkManager);
-
+	chunkManager.generateInitialChunks(camera.m_position, VAOs, *texture);
+	
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 
@@ -220,8 +213,8 @@ int main()
 		{
 			elaspedTime = 0.0f;
 			glm::ivec2 playerPosition(camera.m_position.x, camera.m_position.z);
-			std::cout << playerPosition.x << "\n";
-			std::cout << playerPosition.y << "\n";
+			//std::cout << playerPosition.x << "\n";
+			//std::cout << playerPosition.y << "\n";
 		}
 
 		elaspedTime += deltaTime;
@@ -239,52 +232,8 @@ int main()
 			}
 		}
 
-		//chunkManager.update(visibilityRect, VAOs, VBOs, camera.m_position, *texture);
-
-		std::unique_lock<std::mutex> lock(updateMutex);
-		for (auto VBO = VBOs.begin(); VBO != VBOs.end();)
-		{
-			if (!VBO->active)
-			{
-				glDeleteBuffers(1, &VBO->positionsID);
-				glDeleteBuffers(1, &VBO->textCoordsID);
-				glDeleteBuffers(1, &VBO->indiciesID);
-				VBO = VBOs.erase(VBO);
-			}
-			else
-			{
-				++VBO;
-			}
-		}
-
-		for (auto VAO = VAOs.begin(); VAO != VAOs.end();)
-		{
-			if (!VAO->isActive())
-			{
-				VAO = VAOs.erase(VAO);
-			}
-			else
-			{
-				++VAO;
-			}
-		}
-
-		for (auto& vertexArray : VAOs)
-		{
-			if (vertexArray.isReadyToAttachToVBO())
-			{
-				glm::vec3 owningChunkStartingPosition(vertexArray.getOwningChunkStartingPosition());
-				auto VBO = std::find_if(VBOs.begin(), VBOs.end(), [owningChunkStartingPosition](const auto& VBO)
-					{
-						return VBO.m_owningChunkStartingPosition == owningChunkStartingPosition;
-					});
-				assert(VBO != VBOs.end());
-				if (VBO != VBOs.end()) 
-				{
-					vertexArray.attachToVBO(*VBO);
-				}
-			}
-		}
+		visibilityRect.update(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
+		chunkManager.update(visibilityRect, VAOs, camera.m_position, *texture);
 
 		lock.unlock();
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -296,25 +245,16 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 500.f);
 		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
 
-		lock.lock();
-		for (int i = 0; i < VAOs.size(); ++i) 
+		for (const auto& VAO : VAOs)
 		{
-			VAOs[i].bind();
-			glDrawElements(GL_TRIANGLES, VBOs[i].indicies.size(), GL_UNSIGNED_INT, nullptr);
-			VAOs[i].unbind();
+			VAO.second.bind();
+			glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+			VAO.second.unbind();
 		}
 		lock.unlock();
 
 		window.display();
 	}
 
-	for (auto& i : VBOs)
-	{
-		glDeleteBuffers(1, &i.positionsID);
-		glDeleteBuffers(1, &i.textCoordsID);
-		glDeleteBuffers(1, &i.indiciesID);
-	}
-
-	t.join();
 	return 0;
 }
