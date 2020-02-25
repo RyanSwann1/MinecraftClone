@@ -39,8 +39,7 @@ class ChunkManager : private NonCopyable
 public:
 	ChunkManager();
 
-	void generateInitialChunks(glm::vec3 playerPosition, int chunkCount, std::unordered_map<glm::ivec2, VertexArray>& VAOs);
-	void generateChunkMeshes(std::unordered_map<glm::ivec2, VertexArray>& VAOs, const Texture& Texture);
+	void generateInitialChunks(glm::vec3 playerPosition, std::unordered_map<glm::ivec2, VertexArray>& VAOs, const Texture& texture);
 	void update(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture);
 
 private:

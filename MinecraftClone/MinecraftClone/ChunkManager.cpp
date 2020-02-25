@@ -11,7 +11,7 @@ ChunkManager::ChunkManager()
 	: m_chunks()
 {}
 
-void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, int chunkCount, std::unordered_map<glm::ivec2, VertexArray>& VAOs)
+void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, std::unordered_map<glm::ivec2, VertexArray>& VAOs, const Texture& texture)
 {
 	for (int y = playerPosition.z - Utilities::VISIBILITY_DISTANCE; y < playerPosition.z + Utilities::VISIBILITY_DISTANCE; y += Utilities::CHUNK_DEPTH)
 	{
@@ -31,14 +31,6 @@ void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, int chunkCoun
 		}
 	}
 
-	for (auto& VAO : VAOs)
-	{
-
-	}
-}
-
-void ChunkManager::generateChunkMeshes(std::unordered_map<glm::ivec2, VertexArray>& VAOs, const Texture& texture)
-{
 	for (const auto& chunk : m_chunks)
 	{
 		auto VAO = VAOs.find(glm::ivec2(chunk.second.getStartingPosition().x, chunk.second.getStartingPosition().z));
@@ -55,7 +47,7 @@ void ChunkManager::update(const Rectangle& visibilityRect, std::unordered_map<gl
 {
 	deleteChunks(visibilityRect, VAOs);
 	addChunks(visibilityRect, VAOs, playerPosition, texture);
-	//regenChunks(visibilityRect, VAOs, VBOs, playerPosition, texture);
+	regenChunks(visibilityRect, VAOs, playerPosition, texture);
 }
 
 void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,
@@ -231,7 +223,6 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 	int elementArrayBufferIndex = 0;
 
 	glm::ivec3 chunkStartingPosition = chunk.getStartingPosition();
-	//vertexBuffer.m_owningChunkStartingPosition = chunkStartingPosition;
 	
 	bool regenChunk = false;
 
@@ -312,13 +303,6 @@ void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::unordered_
 		if (!visibilityRect.contains(chunkAABB))
 		{
 			glm::vec3 chunkStartingPosition = chunk->second.getStartingPosition();
-			//auto VBO = std::find_if(VBOs.begin(), VBOs.end(), [chunkStartingPosition](const auto& vertexBuffer)
-			//	{ return vertexBuffer.m_owningChunkStartingPosition == chunkStartingPosition; });
-			//assert(VBO != VBOs.end());
-			//glDeleteBuffers(1, &VBO->positionsID);
-			//glDeleteBuffers(1, &VBO->textCoordsID);
-			//glDeleteBuffers(1, &VBO->indiciesID);
-			//VBOs.erase(VBO);
 
 			auto VAO = VAOs.find(glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.z));
 			assert(VAO != VAOs.end());
@@ -326,14 +310,6 @@ void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::unordered_
 			{
 				VAOs.erase(VAO);
 			}
-
-			//auto VAO = std::find_if(VAOs.begin(), VAOs.end(), [chunkStartingPosition](const auto& vertexArray)
-			//	{ return vertexArray.getOwningChunkStartingPosition() == chunkStartingPosition; });
-			//assert(VAO != VAOs.end());
-			//if (VAO != VAOs.end())
-			//{
-			//	VAOs.erase(VAO);
-			//}
 
 			glm::ivec2 startPosition(chunkStartingPosition.x, chunkStartingPosition.z);
 			auto chunkToRegen = std::find_if(m_chunkMeshRegenerateQueue.begin(), m_chunkMeshRegenerateQueue.end(), [startPosition](const auto& position)
@@ -383,23 +359,10 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, std::unordered_map
 		newlyAddedChunks.pop();
 
 		auto newVAO = VAOs.emplace(std::piecewise_construct,
-			std::forward_as_tuple(glm::ivec2(newChunk->getStartingPosition().x, newChunk->getStartingPosition().y)),
+			std::forward_as_tuple(glm::ivec2(newChunk->getStartingPosition().x, newChunk->getStartingPosition().z)),
 			std::forward_as_tuple()).first;
 
 		generateChunkMesh(newVAO->second, texture, *newChunk);
-
-		//auto chunk = m_chunks.find(glm::ivec2(newlyAddedChunks.front().x, newlyAddedChunks.front().y));
-		//assert(chunk != m_chunks.cend());
-		//if (chunk != m_chunks.cend())
-		//{
-		//	VAOs.emplace(std::piecewise_construct,
-		//		std::forward_as_tuple(chunkStartingPosition),
-		//		std::forward_as_tuple());
-		//	VAOs.emplace_back();
-		//	VBOs.emplace_back();
-		//	generateChunkMesh(VAOs.back(), VBOs.back(), texture, chunk->second);
-		//}
-		//newlyAddedChunks.pop();
 	}
 }
 
@@ -417,38 +380,19 @@ void ChunkManager::regenChunks(const Rectangle& visibilityRect, std::unordered_m
 			{
 				glm::vec3 startPosition(chunk->second.getStartingPosition().x, 0, chunk->second.getStartingPosition().z);
 
-				//auto VBO = std::find_if(VBOs.begin(), VBOs.end(), [startPosition](const auto& vertexBuffer)
-				//{ return vertexBuffer.m_owningChunkStartingPosition == startPosition; });
-				//assert(VBO != VBOs.end());
-				//glDeleteBuffers(1, &VBO->positionsID);
-				//glDeleteBuffers(1, &VBO->textCoordsID);
-				//glDeleteBuffers(1, &VBO->indiciesID);
-				//VBOs.erase(VBO);
-
-				auto VAO = VAOs.find(glm::ivec2(chunk->second.getStartingPosition().x, chunk->second.getStartingPosition().y));
+				auto VAO = VAOs.find(glm::ivec2(chunk->second.getStartingPosition().x, chunk->second.getStartingPosition().z));
 				assert(VAO != VAOs.end());
 				if (VAO != VAOs.end())
 				{
 					VAOs.erase(VAO);
 				}
 
-				//auto VAO = std::find_if(VAOs.begin(), VAOs.end(), [startPosition](const auto& vertexArray)
-				//{ return vertexArray.getOwningChunkStartingPosition() == startPosition; });
-				//assert(VAO != VAOs.end());
-
 				auto newVAO = VAOs.emplace(std::piecewise_construct,
-					std::forward_as_tuple(glm::ivec2(chunk->second.getStartingPosition().x, chunk->second.getStartingPosition().y)),
+					std::forward_as_tuple(glm::ivec2(chunk->second.getStartingPosition().x, chunk->second.getStartingPosition().z)),
 					std::forward_as_tuple()).first;
 
-				//VAOs.erase(VAO);
-
-				//VAOs.emplace_back();
-				//VBOs.emplace_back();
-
 				generateChunkMesh(newVAO->second, texture, chunk->second);
-				//generateChunkMesh()
-				//generateChunkMesh(VAOs.back(), VBOs.back(), texture, chunk->second);
-				//chunkStartingPosition = m_chunkMeshRegenerateQueue.erase(chunkStartingPosition);
+				chunkStartingPosition = m_chunkMeshRegenerateQueue.erase(chunkStartingPosition);
 			}
 			else
 			{

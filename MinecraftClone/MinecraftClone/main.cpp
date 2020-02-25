@@ -191,17 +191,11 @@ int main()
 	texture->bind();
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot(), uniformLocations);
 
-	int chunkCount = 6;
 	std::unordered_map<glm::ivec2, VertexArray> VAOs;
-	//std::unordered_map<glm::ivec2, VertexBuffer> VBOs;
-
-	//std::vector<VertexArray> VAOs;
-	//std::vector<VertexBuffer> VBOs;
-
 	Rectangle visibilityRect(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
 
 	ChunkManager chunkManager;
-	chunkManager.generateInitialChunks(camera.m_position, chunkCount, VAOs, VBOs);
+	chunkManager.generateInitialChunks(camera.m_position, VAOs, *texture);
 	
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -241,7 +235,7 @@ int main()
 		}
 
 		visibilityRect.update(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
-		chunkManager.update(visibilityRect, VAOs, VBOs, camera.m_position, *texture);
+		chunkManager.update(visibilityRect, VAOs, camera.m_position, *texture);
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -252,21 +246,14 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 500.f);
 		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
 
-		for (int i = 0; i < VAOs.size(); ++i) 
+		for (const auto& VAO : VAOs)
 		{
-			VAOs[i].bind();
-			glDrawElements(GL_TRIANGLES, VBOs[i].indicies.size(), GL_UNSIGNED_INT, nullptr);
-			VAOs[i].unbind();
+			VAO.second.bind();
+			glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+			VAO.second.unbind();
 		}
 
 		window.display();
-	}
-
-	for (auto& i : VBOs)
-	{
-		glDeleteBuffers(1, &i.positionsID);
-		glDeleteBuffers(1, &i.textCoordsID);
-		glDeleteBuffers(1, &i.indiciesID);
 	}
 
 	return 0;
