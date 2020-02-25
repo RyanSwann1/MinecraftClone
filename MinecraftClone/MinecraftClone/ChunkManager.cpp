@@ -295,7 +295,6 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 
 void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs)
 {
-	int deletedCount = 0;
 	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
 	{
 		Rectangle chunkAABB(glm::ivec2(chunk->second.getStartingPosition().x, chunk->second.getStartingPosition().z) +
@@ -321,7 +320,6 @@ void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::unordered_
 				m_chunkMeshRegenerateQueue.erase(chunkToRegen);
 			}
 
-			++deletedCount;
 			chunk = m_chunks.erase(chunk);
 		}
 		else
@@ -334,7 +332,6 @@ void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::unordered_
 void ChunkManager::addChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture)
 {
 	std::queue<const Chunk*> newlyAddedChunks;
-	int addedCount = 0;
 	glm::ivec2 startPosition = Utilities::getClosestChunkStartingPosition(glm::vec2(playerPosition.x, playerPosition.z));	
 	for (int y = startPosition.y - Utilities::VISIBILITY_DISTANCE; y < startPosition.y + Utilities::VISIBILITY_DISTANCE; y += Utilities::CHUNK_DEPTH)
 	{
@@ -342,8 +339,6 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, std::unordered_map
 		{
 			if (m_chunks.find(glm::ivec2(x, y)) == m_chunks.cend())
 			{
-				++addedCount;
-
 				auto newChunk = m_chunks.emplace(std::piecewise_construct,
 					std::forward_as_tuple(glm::ivec2(x, y)),
 					std::forward_as_tuple(glm::ivec3(x, 0, y))).first;
