@@ -25,7 +25,7 @@ namespace Utilities
 	constexpr int DIRT_MAX_HEIGHT = 14;
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
-	constexpr int VISIBILITY_DISTANCE = 320;
+	constexpr int VISIBILITY_DISTANCE = 64;
 
 	static constexpr std::array<glm::vec2, 4> GRASS_TEXT_COORDS =
 	{	
@@ -67,6 +67,44 @@ namespace Utilities
 
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_TOP = { glm::vec3(0, 1.0, 0), glm::vec3(0, 1.0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(1.0, 1.0, 0) };
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_BOTTOM = { glm::vec3(0, 0, 0), glm::vec3(0, 0, 1.0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 0, 0) };
+
+	inline glm::ivec3 getClosestChunkStartingPosition(glm::ivec3 position)
+	{
+		glm::ivec3 positionOnGrid(glm::ivec3((position.x / CHUNK_WIDTH) * CHUNK_WIDTH, 
+			(position.y / CHUNK_HEIGHT) * CHUNK_HEIGHT, (position.z / CHUNK_DEPTH) * CHUNK_DEPTH));
+
+		if (position.x < 0 && position.x % CHUNK_WIDTH < 0)
+		{
+			positionOnGrid.x += std::abs(position.x % CHUNK_WIDTH);
+			positionOnGrid.x -= CHUNK_WIDTH;
+		}
+		else if (position.x > 0 && position.x % CHUNK_WIDTH > 0)
+		{
+			positionOnGrid.x -= std::abs(position.x % CHUNK_WIDTH);
+		}
+
+		if (position.y < 0 && position.y % CHUNK_HEIGHT < 0)
+		{
+			positionOnGrid.y += std::abs(position.y % CHUNK_HEIGHT);
+			positionOnGrid.y -= CHUNK_HEIGHT;
+		}
+		else if (position.y > 0 && position.y % CHUNK_HEIGHT > 0)
+		{
+			positionOnGrid.y -= std::abs(position.y % CHUNK_HEIGHT);
+		}
+
+		if (position.z < 0 && position.z % CHUNK_DEPTH < 0)
+		{
+			positionOnGrid.z += std::abs(position.z % CHUNK_DEPTH);
+			positionOnGrid.z -= CHUNK_DEPTH;
+		}
+		else if (position.z > 0 && position.z % CHUNK_DEPTH > 0)
+		{
+			positionOnGrid.z -= std::abs(position.z % CHUNK_DEPTH);
+		}
+
+		return positionOnGrid;
+	}
 
 	inline glm::vec2 getClosestChunkStartingPosition(glm::vec2 position)
 	{

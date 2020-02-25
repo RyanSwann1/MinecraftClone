@@ -188,7 +188,7 @@ int main()
 	texture->bind();
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot(), uniformLocations);
 
-	std::unordered_map<glm::ivec2, VertexArray> VAOs;
+	std::unordered_map<glm::ivec3, VertexArray> VAOs;
 	Rectangle visibilityRect(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
 
 	ChunkManager chunkManager;
