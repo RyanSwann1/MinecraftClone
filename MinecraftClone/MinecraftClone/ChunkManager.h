@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <queue>
 #include <mutex>
+#include <SFML/Graphics.hpp>
 //1. Perlin Noise
 //2. Dynamic Generation
 //3. Dynamic Destruction
@@ -42,7 +43,8 @@ public:
 	ChunkManager();
 
 	void generateInitialChunks(glm::vec3 playerPosition, std::unordered_map<glm::ivec2, VertexArray>& VAOs, const Texture& texture);
-	void update(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture);
+	void update(Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs, Camera& camera, 
+		const Texture& texture, const sf::Window& window);
 
 private:
 	std::unordered_map<glm::ivec2, Chunk> m_chunks;

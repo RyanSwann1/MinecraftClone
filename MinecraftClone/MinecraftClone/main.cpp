@@ -192,9 +192,16 @@ int main()
 	std::unordered_map<glm::ivec2, VertexArray> VAOs;
 	Rectangle visibilityRect(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
 
+	//void update(const Rectangle & visibilityRect, std::unordered_map<glm::ivec2, VertexArray> & VAOs, Camera & camera,
+	//	const Texture & texture, const sf::Window & window);
+
 	ChunkManager chunkManager;
 	chunkManager.generateInitialChunks(camera.m_position, VAOs, *texture);
-	
+	//std::thread t([&](ChunkManager* chunkManager) {chunkManager->update(visibilityRect, std::ref(VAOs), std::ref(VBOs), std::ref(camera), *texture); }, &chunkManager);
+	std::thread chunkGenerationThread([&](ChunkManager* chunkManager) {chunkManager->update(std::ref(visibilityRect), std::ref(VAOs), std::ref(camera),
+		*texture, std::ref(window)); }, &chunkManager);
+	std::mutex mutex;
+
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 
@@ -207,8 +214,9 @@ int main()
 	{
 		float deltaTime = clock.restart().asSeconds();
 		sf::Vector2i mousePosition = sf::Mouse::getPosition();
+		std::unique_lock<std::mutex> lock(mutex);
 		camera.mouse_callback(mousePosition.x, mousePosition.y);
-
+		lock.unlock();
 		if (elaspedTime >= messageExpiredTime)
 		{
 			elaspedTime = 0.0f;
@@ -228,12 +236,10 @@ int main()
 			}
 			if (currentSFMLEvent.type == sf::Event::KeyPressed)
 			{
+				std::lock_guard<std::mutex> lock(mutex);
 				camera.move(currentSFMLEvent, deltaTime);
 			}
 		}
-
-		visibilityRect.update(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
-		chunkManager.update(visibilityRect, VAOs, camera.m_position, *texture);
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -244,6 +250,7 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 500.f);
 		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
 
+		lock.lock();
 		for (auto iter = VAOs.begin(); iter != VAOs.end();)
 		{
 			if (iter->second.m_destroy)
@@ -268,9 +275,10 @@ int main()
 			glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 			VAO.second.unbind();
 		}
-
+		lock.unlock();
 		window.display();
 	}
 
+	chunkGenerationThread.join();
 	return 0;
 }

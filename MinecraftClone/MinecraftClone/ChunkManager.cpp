@@ -44,12 +44,17 @@ void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, std::unordere
 	}
 }
 
-void ChunkManager::update(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs, glm::vec3 playerPosition,
-	const Texture& texture)
+void ChunkManager::update(Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs, Camera& camera,
+	const Texture& texture, const sf::Window& window)
 {
-	deleteChunks(visibilityRect, VAOs);
-	addChunks(visibilityRect, VAOs, playerPosition, texture);
-	regenChunks(visibilityRect, VAOs, playerPosition, texture);
+	while (window.isOpen())
+	{
+		visibilityRect.update(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
+
+		deleteChunks(visibilityRect, VAOs);
+		addChunks(visibilityRect, VAOs, camera.m_position, texture);
+		regenChunks(visibilityRect, VAOs, camera.m_position, texture);
+	}
 }
 
 void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,
