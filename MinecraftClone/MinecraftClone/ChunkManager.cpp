@@ -44,7 +44,6 @@ void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, std::unordere
 	}
 }
 
-
 void ChunkManager::update(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs, glm::vec3 playerPosition,
 	const Texture& texture)
 {
@@ -286,15 +285,13 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 			}
 		}
 	}
+	
+	vertexArray.m_init = true;
 
 	if (regenChunk)
 	{
 		m_chunkMeshRegenerateQueue.push_back(glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.z));
 	}
-
-	vertexArray.init();
-	vertexArray.m_vertexBuffer.textCoords.clear();
-	vertexArray.m_vertexBuffer.positions.clear();
 }
 
 void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs)
@@ -311,7 +308,7 @@ void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::unordered_
 			assert(VAO != VAOs.end());
 			if (VAO != VAOs.end())
 			{
-				VAOs.erase(VAO);
+				VAO->second.m_destroy = true;
 			}
 
 			glm::ivec2 startPosition(chunkStartingPosition.x, chunkStartingPosition.z);

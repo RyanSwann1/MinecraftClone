@@ -235,7 +235,6 @@ int main()
 		visibilityRect.update(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
 		chunkManager.update(visibilityRect, VAOs, camera.m_position, *texture);
 
-		lock.unlock();
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -245,13 +244,30 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 500.f);
 		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
 
+		for (auto iter = VAOs.begin(); iter != VAOs.end();)
+		{
+			if (iter->second.m_destroy)
+			{
+				iter->second.destroy();
+				iter = VAOs.erase(iter);
+			}
+			else if (iter->second.m_init)
+			{
+				iter->second.init();
+				++iter;
+			}
+			else
+			{
+				++iter;
+			}
+		}
+
 		for (const auto& VAO : VAOs)
 		{
 			VAO.second.bind();
 			glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 			VAO.second.unbind();
 		}
-		lock.unlock();
 
 		window.display();
 	}

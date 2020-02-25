@@ -2,11 +2,18 @@
 
 #include "glad.h"
 #include "glm/glm.hpp"
+#include "Utilities.h"
 #include <vector>
 
 struct VertexBuffer
 {
-	unsigned int positionsID;
+	VertexBuffer()
+		: positionsID(Utilities::INVALID_OPENGL_ID),
+		textCoordsID(Utilities::INVALID_OPENGL_ID),
+		indiciesID(Utilities::INVALID_OPENGL_ID)
+	{}
+
+	unsigned int positionsID =0 ;
 	std::vector<glm::vec3> positions;
 	unsigned int textCoordsID;
 	std::vector<glm::vec2> textCoords;

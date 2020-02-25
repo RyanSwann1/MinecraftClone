@@ -7,13 +7,15 @@
 struct VertexArray : private NonCopyable
 {
 	VertexArray();
-	~VertexArray();
 	
 	void reset();
-	void init() const;
+	void destroy();
+	void init();
 	void bind() const;
 	void unbind() const;
 
+	bool m_init;
+	bool m_destroy;
 	VertexBuffer m_vertexBuffer;
 	unsigned int m_ID;
 };
