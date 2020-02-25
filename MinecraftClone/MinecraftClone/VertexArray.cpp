@@ -7,16 +7,14 @@
 VertexArray::VertexArray()
 {
 	glGenVertexArrays(1, &m_ID);
+	
 	glGenBuffers(1, &m_vertexBuffer.positionsID);
 	glGenBuffers(1, &m_vertexBuffer.textCoordsID);
 	glGenBuffers(1, &m_vertexBuffer.indiciesID);
-
-	std::cout << m_ID << "\n";
 }
 
 VertexArray::~VertexArray()
 {
-	std::cout << "Destroyed VAO\n";
 	glDeleteVertexArrays(1, &m_ID);
 
 	glDeleteBuffers(1, &m_vertexBuffer.positionsID);
@@ -51,6 +49,7 @@ void VertexArray::init() const
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_vertexBuffer.indicies.size() * sizeof(unsigned int), m_vertexBuffer.indicies.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
 	unbind();
 }
 

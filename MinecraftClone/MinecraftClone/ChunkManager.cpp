@@ -8,7 +8,8 @@
 #include <iostream>
 
 ChunkManager::ChunkManager()
-	: m_chunks()
+	: m_chunks(),
+	m_chunkMeshRegenerateQueue()
 {}
 
 void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, std::unordered_map<glm::ivec2, VertexArray>& VAOs, const Texture& texture)
