@@ -264,7 +264,7 @@ int main()
 
 		for (const auto& VAO : VAOs)
 		{
-			if (VAO.second.m_display)
+			if (VAO.second.m_display && VAO.second.m_ID != 0)
 			{
 				VAO.second.bind();
 				glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
