@@ -286,10 +286,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 					{
 						regenChunk = true;
 					}
-					//if (!isCubeAtPosition(glm::ivec3(x, y - 1, z)))
-					//{
-					//	addCubeFace(vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Bottom, elementArrayBufferIndex);
-					//}
+
 					if (!isCubeAtPosition(glm::ivec3(x, y + 1, z)))
 					{
 						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Top, elementArrayBufferIndex, position);
