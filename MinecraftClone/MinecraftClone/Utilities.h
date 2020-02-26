@@ -22,7 +22,7 @@ namespace Utilities
 	constexpr int CHUNK_DEPTH = 32;
 	constexpr int CHUNK_SIZE = (CHUNK_WIDTH + CHUNK_DEPTH) / 2.0f;
 
-	constexpr int DIRT_MAX_HEIGHT = 17;
+	constexpr int SAND_MAX_HEIGHT = 17;
 	constexpr int WATER_MAX_HEIGHT = 13;
 	constexpr int STONE_MAX_HEIGHT = 12; 
 	

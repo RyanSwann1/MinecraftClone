@@ -126,7 +126,7 @@ void Chunk::regen(glm::ivec3 startingPosition)
 			//{
 			//	cubeType = eCubeType::Water;
 			//}
-			else if (elevation <= Utilities::DIRT_MAX_HEIGHT)
+			else if (elevation <= Utilities::SAND_MAX_HEIGHT)
 			{
 				cubeType = eCubeType::Sand;
 			}
@@ -145,7 +145,7 @@ void Chunk::regen(glm::ivec3 startingPosition)
 				{
 					cubeType = eCubeType::Stone;
 				}
-				else if (y <= Utilities::DIRT_MAX_HEIGHT)
+				else if (y <= Utilities::SAND_MAX_HEIGHT)
 				{
 					cubeType = eCubeType::Sand;
 				}
