@@ -24,7 +24,6 @@ std::unique_ptr<Texture> Texture::loadTexture(const std::string& name)
 	{
 		return std::unique_ptr<Texture>();
 	}
-
 	image.flipVertically();
 
 	glGenTextures(1, &texture->m_ID);
@@ -61,15 +60,21 @@ void Texture::getTextCoords(eCubeFaceID tileID, std::vector<glm::vec2>& textCoor
 	case eCubeFaceID::Grass :
 		textCoords.insert(textCoords.end(), Utilities::GRASS_TEXT_COORDS.begin(), Utilities::GRASS_TEXT_COORDS.end());
 		break;
+
 	case eCubeFaceID::GrassSide :
 		textCoords.insert(textCoords.end(), Utilities::GRASS_SIDE_TEXT_COORDS.begin(), Utilities::GRASS_SIDE_TEXT_COORDS.end());
 		break;
-	case eCubeFaceID::Dirt :
-		textCoords.insert(textCoords.end(), Utilities::DIRT_TEXT_COORDS.begin(), Utilities::DIRT_TEXT_COORDS.end());
+
+	case eCubeFaceID::Sand :
+		textCoords.insert(textCoords.end(), Utilities::SAND_TEXT_COORDS.begin(), Utilities::SAND_TEXT_COORDS.end());
 		break;
 
 	case eCubeFaceID::Stone :
 		textCoords.insert(textCoords.end(), Utilities::STONE_TEXT_COORDS.begin(), Utilities::STONE_TEXT_COORDS.end());
+		break;
+
+	case eCubeFaceID::Water:
+		textCoords.insert(textCoords.end(), Utilities::WATER_TEXT_COORDS.begin(), Utilities::WATER_TEXT_COORDS.end());
 		break;
 	}
 }

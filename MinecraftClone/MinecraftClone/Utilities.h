@@ -21,11 +21,14 @@ namespace Utilities
 	constexpr int CHUNK_HEIGHT = 64;
 	constexpr int CHUNK_DEPTH = 32;
 	constexpr int CHUNK_SIZE = (CHUNK_WIDTH + CHUNK_DEPTH) / 2.0f;
-	constexpr int STONE_MAX_HEIGHT = 10;
-	constexpr int DIRT_MAX_HEIGHT = 14;
+
+	constexpr int DIRT_MAX_HEIGHT = 17;
+	constexpr int WATER_MAX_HEIGHT = 13;
+	constexpr int STONE_MAX_HEIGHT = 12; 
+	
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
-	constexpr int VISIBILITY_DISTANCE = 64;
+	constexpr int VISIBILITY_DISTANCE = 416;
 
 	static constexpr std::array<glm::vec2, 4> GRASS_TEXT_COORDS =
 	{	
@@ -39,24 +42,32 @@ namespace Utilities
 	{
 		glm::vec2(16.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
 		glm::vec2(32.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(32.0f / 128.0f, 1),
-		glm::vec2(16.0f / 128.0f, 1)
+		glm::vec2(32.0f / 128.0f, 1.0f),
+		glm::vec2(16.0f / 128.0f, 1.0f)
 	};
 
-	static constexpr std::array<glm::vec2, 4> DIRT_TEXT_COORDS =
+	static constexpr std::array<glm::vec2, 4> SAND_TEXT_COORDS =
 	{
 		glm::vec2(32.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
 		glm::vec2(48.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(48.0f / 128.0f, 1),
-		glm::vec2(32.0f / 128.0f, 1)
+		glm::vec2(48.0f / 128.0f, 1.0f),
+		glm::vec2(32.0f / 128.0f, 1.0f)
 	};
 
 	static constexpr std::array<glm::vec2, 4> STONE_TEXT_COORDS =
 	{
 		glm::vec2(48.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
 		glm::vec2(64.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(64.0f / 128.0f, 1),
-		glm::vec2(48.0f / 128.0f, 1)
+		glm::vec2(64.0f / 128.0f, 1.0f),
+		glm::vec2(48.0f / 128.0f, 1.0f)
+	};
+
+	static constexpr std::array<glm::vec2, 4> WATER_TEXT_COORDS =
+	{
+		glm::vec2(64.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
+		glm::vec2(80.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
+		glm::vec2(80.0f / 128.0f, 1.0f),
+		glm::vec2(64.0f / 128.0f, 1.0f)
 	};
 
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_FRONT = { glm::vec3(0, 0, 1.0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(0, 1.0, 1.0) };

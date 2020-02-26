@@ -122,9 +122,13 @@ void Chunk::regen(glm::ivec3 startingPosition)
 			{
 				cubeType = eCubeType::Stone;
 			}
+			//else if (elevation <= Utilities::WATER_MAX_HEIGHT)
+			//{
+			//	cubeType = eCubeType::Water;
+			//}
 			else if (elevation <= Utilities::DIRT_MAX_HEIGHT)
 			{
-				cubeType = eCubeType::Dirt;
+				cubeType = eCubeType::Sand;
 			}
 			else
 			{
@@ -143,7 +147,7 @@ void Chunk::regen(glm::ivec3 startingPosition)
 				}
 				else if (y <= Utilities::DIRT_MAX_HEIGHT)
 				{
-					cubeType = eCubeType::Dirt;
+					cubeType = eCubeType::Sand;
 				}
 				else
 				{
@@ -157,4 +161,16 @@ void Chunk::regen(glm::ivec3 startingPosition)
 
 	m_endingPosition = glm::ivec3(startingPosition.x + Utilities::CHUNK_WIDTH, startingPosition.y + Utilities::CHUNK_HEIGHT,
 		startingPosition.z + Utilities::CHUNK_DEPTH);
+
+	//Fill with Water
+	for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
+	{
+		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
+		{
+			if (m_chunk[z][Utilities::WATER_MAX_HEIGHT][x].type == static_cast<char>(eCubeType::Invalid))
+			{
+				m_chunk[z][Utilities::WATER_MAX_HEIGHT][x].type = static_cast<char>(eCubeType::Water);
+			}
+		}
+	}
 }

@@ -4,14 +4,16 @@ enum class eCubeType
 {
 	Invalid = 0,
 	Grass,
-	Dirt,
-	Stone
+	Sand,
+	Stone,
+	Water
 };
 
 enum class eCubeFaceID
 {
 	Grass = 0,
 	GrassSide,
-	Dirt,
-	Stone
+	Sand,
+	Stone,
+	Water
 };

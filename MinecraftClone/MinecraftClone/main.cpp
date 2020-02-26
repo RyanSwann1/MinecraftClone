@@ -159,6 +159,8 @@ unsigned int createShaderProgram()
 //buildingand optimizing meshes from chunk data(less vertices to draw), 
 //or cutting down on the size of each vertex element(less bandwidth).There are plenty of other ways to increase performance with such an engine.
 
+//https://devtalk.nvidia.com/default/topic/720651/opengl/access-violation-in-nvoglv32-dll-how-do-i-track-down-the-problem-/
+
 //x + (y * width)
 int main()
 {
@@ -179,7 +181,7 @@ int main()
 
 	unsigned int shaderID = createShaderProgram();
 	Camera camera(glm::vec3(0.0f, 150.f, 0.0f));
-	std::unique_ptr<Texture> texture = Texture::loadTexture("Texture_Atlas.png");
+	std::unique_ptr<Texture> texture = Texture::loadTexture("Texture_AtlasV2.png");
 	if (!texture)
 	{
 		std::cout << "couldn't load texture: " << "America.jpg" << "\n";
