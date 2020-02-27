@@ -5,9 +5,11 @@
 #include <iostream>
 
 VertexArray::VertexArray()
-	: m_attachOpaqueVBO(false),
+	: m_displayable(false),
+	m_attachOpaqueVBO(false),
+	m_attachTransparentVBO(false),
 	m_destroy(false),
-	m_displayable(true),
+	m_vertexBuffer(),
 	m_ID(Utilities::INVALID_OPENGL_ID)
 {}
 
@@ -17,9 +19,9 @@ void VertexArray::reset()
 	m_vertexBuffer.textCoords.clear();
 	m_vertexBuffer.indicies.clear();
 
-	m_vertexBuffer.transparentIndicies.clear();
 	m_vertexBuffer.transparentPositions.clear();
 	m_vertexBuffer.transparentTextCoords.clear();
+	m_vertexBuffer.transparentIndicies.clear();
 }
 
 void VertexArray::destroy()
@@ -86,13 +88,16 @@ void VertexArray::attachOpaqueVBO()
 	unbind();
 }
 
-void VertexArray::initTransparent()
+void VertexArray::attachTransparentVBO()
 {
 	assert(m_ID != Utilities::INVALID_OPENGL_ID);
 	if (m_ID == Utilities::INVALID_OPENGL_ID)
 	{
 		return;
 	}
+
+	m_attachTransparentVBO = false;
+	
 	bind();
 
 	if (m_vertexBuffer.transparentPositionsID == Utilities::INVALID_OPENGL_ID)

@@ -248,21 +248,21 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 500.f);
 		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
 
-		for (auto iter = VAOs.begin(); iter != VAOs.end();)
+		for (auto VAO = VAOs.begin(); VAO != VAOs.end();)
 		{
-			if (iter->second.m_destroy)
+			if (VAO->second.m_destroy)
 			{
-				iter->second.destroy();
-				iter = VAOs.erase(iter);
+				VAO->second.destroy();
+				VAO = VAOs.erase(VAO);
 			}
-			else if (iter->second.m_attachOpaqueVBO)
+			else if (VAO->second.m_attachOpaqueVBO)
 			{
-				iter->second.attachOpaqueVBO();
-				++iter;
+				VAO->second.attachOpaqueVBO();
+				++VAO;
 			}
 			else
 			{
-				++iter;
+				++VAO;
 			}
 		}
 
@@ -276,20 +276,23 @@ int main()
 			}
 		}
 
-		for (auto iter = VAOs.begin(); iter != VAOs.end(); ++iter)
-		{
-			iter->second.initTransparent();
-		}
+		//for (auto VAO = VAOs.begin(); VAO != VAOs.end(); ++VAO)
+		//{
+		//	if (VAO->second.m_attachTransparentVBO)
+		//	{
+		//		VAO->second.attachTransparentVBO();
+		//	}
+		//}
 
-		for (const auto& VAO : VAOs)
-		{
-			if (VAO.second.m_display && VAO.second.m_ID != 0)
-			{
-				VAO.second.bind();
-				glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
-				VAO.second.unbind();
-			}
-		}
+		//for (const auto& VAO : VAOs)
+		//{
+		//	if (VAO.second.m_displayable && VAO.second.m_ID != 0)
+		//	{
+		//		VAO.second.bind();
+		//		glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
+		//		VAO.second.unbind();
+		//	}
+		//}
 
 		window.display();
 	}

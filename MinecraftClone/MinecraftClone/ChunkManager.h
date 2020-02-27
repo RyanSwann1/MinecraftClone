@@ -52,7 +52,7 @@ private:
 	std::mutex m_mutex;
 
 	void addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,
-		int& elementArrayBufferIndex, glm::ivec3 cubePosition);
+		int& opaqueElementBufferIndex, int& transparentElementBufferIndex, glm::ivec3 cubePosition);
 	bool isCubeAtPosition(glm::vec3 position) const;
 	bool isCubeAtPosition(glm::ivec3 position) const;
 	bool isChunkAtPosition(glm::ivec2 position) const;

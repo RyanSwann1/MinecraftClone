@@ -11,16 +11,14 @@ struct VertexArray : private NonCopyable
 	void reset();
 	void destroy();
 
-
-	void initTransparent();
-
+	void attachTransparentVBO();
 	void attachOpaqueVBO();
 	void bind() const;
 	void unbind() const;
 
 	bool m_displayable;
 	bool m_attachOpaqueVBO;
-	//bool m_init;
+	bool m_attachTransparentVBO;
 	bool m_destroy;
 	VertexBuffer m_vertexBuffer;
 	unsigned int m_ID;

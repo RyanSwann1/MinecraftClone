@@ -58,13 +58,14 @@ void ChunkManager::update(Rectangle& visibilityRect, std::unordered_map<glm::ive
 }
 
 void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,
-	int& elementArrayBufferIndex, glm::ivec3 cubePosition)
+	int& opaqueElementBufferIndex, int& transparentElementBufferIndex, glm::ivec3 cubePosition)
 {
 	if (static_cast<eCubeType>(cubeDetails.type) == eCubeType::Water)
 	{
+		assert(cubeSide == eCubeSide::Top);
 		if (cubeSide == eCubeSide::Top)
 		{
-			for (glm::vec3 i : Utilities::CUBE_FACE_FRONT)
+			for (glm::vec3 i : Utilities::CUBE_FACE_TOP)
 			{
 				i += cubePosition;
 
@@ -75,9 +76,11 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 			
 			for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
 			{
-				vertexBuffer.transparentIndicies.push_back(i + elementArrayBufferIndex);
+				vertexBuffer.transparentIndicies.push_back(i + transparentElementBufferIndex);
 			}
 		}
+
+		transparentElementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
 	}
 	else
 	{
@@ -208,11 +211,11 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 
 		for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
 		{
-			vertexBuffer.indicies.push_back(i + elementArrayBufferIndex);
+			vertexBuffer.indicies.push_back(i + opaqueElementBufferIndex);
 		}
-	}
 
-	elementArrayBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
+		opaqueElementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
+	}
 }
 
 bool ChunkManager::isCubeAtPosition(glm::vec3 position) const
@@ -252,7 +255,8 @@ bool ChunkManager::isChunkAtPosition(glm::ivec2 position) const
 
 void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& texture, const Chunk& chunk)
 {
-	int elementArrayBufferIndex = 0;
+	int opaqueElementBufferIndex = 0;
+	int transparentElementBufferIndex = 0;
 	glm::ivec3 chunkStartingPosition = chunk.getStartingPosition();
 	bool regenChunk = false;
 
@@ -269,14 +273,21 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 				}
 				else if (static_cast<eCubeType>(chunk.getCubeDetails(position).type) == eCubeType::Water)
 				{
-					addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Top, elementArrayBufferIndex, position);
-					
+					if (isChunkAtPosition(glm::ivec2(x - 1, z)) || isChunkAtPosition(glm::ivec2(x + 1, z)) ||
+						isChunkAtPosition(glm::ivec2(x, z - 1)) || isChunkAtPosition(glm::ivec2(x, z + 1)))
+					{
+						regenChunk = true;
+					}
+
+					addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Top, 
+						opaqueElementBufferIndex, transparentElementBufferIndex, position);
 				}
 				else
 				{
 					if (isChunkAtPosition(glm::ivec2(x - 1, z)) && !isCubeAtPosition(glm::ivec3(x - 1, y, z)))
 					{
-						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Left, elementArrayBufferIndex, position);
+						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Left, 
+							opaqueElementBufferIndex, transparentElementBufferIndex, position);
 					}
 					else if (!regenChunk && !isChunkAtPosition(glm::ivec2(x - 1, z)))
 					{
@@ -285,7 +296,8 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 
 					if (isChunkAtPosition(glm::ivec2(x + 1, z)) && !isCubeAtPosition(glm::ivec3(x + 1, y, z)))
 					{
-						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Right, elementArrayBufferIndex, position);
+						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Right, 
+							opaqueElementBufferIndex, transparentElementBufferIndex, position);
 					}
 					else if (!regenChunk && !isChunkAtPosition(glm::ivec2(x + 1, z)))
 					{
@@ -294,12 +306,14 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 
 					if (!isCubeAtPosition(glm::ivec3(x, y + 1, z)))
 					{
-						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Top, elementArrayBufferIndex, position);
+						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Top, 
+							opaqueElementBufferIndex, transparentElementBufferIndex, position);
 					}
 
 					if (isChunkAtPosition(glm::ivec2(x, z - 1)) && !isCubeAtPosition(glm::ivec3(x, y, z - 1)))
 					{
-						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Back, elementArrayBufferIndex, position);
+						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Back, 
+							opaqueElementBufferIndex, transparentElementBufferIndex, position);
 					}
 					else if (!regenChunk && !isChunkAtPosition(glm::ivec2(x, z - 1)))
 					{
@@ -308,7 +322,8 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 
 					if (isChunkAtPosition(glm::ivec2(x, z + 1)) && !isCubeAtPosition(glm::ivec3(x, y, z + 1)))
 					{
-						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Front, elementArrayBufferIndex, position);
+						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Front, 
+							opaqueElementBufferIndex, transparentElementBufferIndex, position);
 					}
 					else if (!regenChunk && !isChunkAtPosition(glm::ivec2(x, z + 1)))
 					{
@@ -328,7 +343,13 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 	{
 		vertexArray.m_displayable = true;
 		vertexArray.m_attachOpaqueVBO = true;
-		//vertexArray.m_init = true;
+
+		if (vertexArray.m_vertexBuffer.transparentIndicies.size() > 0 ||
+			vertexArray.m_vertexBuffer.transparentPositions.size() > 0 ||
+			vertexArray.m_vertexBuffer.transparentTextCoords.size() > 0)
+		{
+			vertexArray.m_attachTransparentVBO = true;
+		}
 	}
 }
 
