@@ -53,8 +53,6 @@ unsigned int Texture::getID() const
 
 void Texture::getTextCoords(eCubeFaceID tileID, std::vector<glm::vec2>& textCoords) const
 {
-	std::mutex mutex;
-	std::lock_guard<std::mutex> lock(mutex);
 	switch (tileID)
 	{
 	case eCubeFaceID::Grass :
