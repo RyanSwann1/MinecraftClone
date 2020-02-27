@@ -178,6 +178,7 @@ int main()
 
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
 	glEnable(GL_DEPTH_TEST);
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -268,31 +269,31 @@ int main()
 
 		for (const auto& VAO : VAOs)
 		{
-			if (VAO.second.m_displayable && VAO.second.m_ID != 0)
+			if (VAO.second.m_displayable && VAO.second.m_ID != Utilities::INVALID_OPENGL_ID)
 			{
-				VAO.second.bind();
+				VAO.second.bindOpaqueVAO();
 				glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 				VAO.second.unbind();
 			}
 		}
 
-		//for (auto VAO = VAOs.begin(); VAO != VAOs.end(); ++VAO)
-		//{
-		//	if (VAO->second.m_attachTransparentVBO)
-		//	{
-		//		VAO->second.attachTransparentVBO();
-		//	}
-		//}
+		for (auto VAO = VAOs.begin(); VAO != VAOs.end(); ++VAO)
+		{
+			if (VAO->second.m_attachTransparentVBO)
+			{
+				VAO->second.attachTransparentVBO();
+			}
+		}
 
-		//for (const auto& VAO : VAOs)
-		//{
-		//	if (VAO.second.m_displayable && VAO.second.m_ID != 0)
-		//	{
-		//		VAO.second.bind();
-		//		glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
-		//		VAO.second.unbind();
-		//	}
-		//}
+		for (const auto& VAO : VAOs)
+		{
+			if (VAO.second.m_displayable && VAO.second.m_transparentID != Utilities::INVALID_OPENGL_ID)
+			{
+				VAO.second.bindTransparentVAO();
+				glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
+				VAO.second.unbind();
+			}
+		}
 
 		window.display();
 	}

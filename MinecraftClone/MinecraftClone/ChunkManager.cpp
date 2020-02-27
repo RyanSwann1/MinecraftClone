@@ -273,8 +273,8 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 				}
 				else if (static_cast<eCubeType>(chunk.getCubeDetails(position).type) == eCubeType::Water)
 				{
-					if (isChunkAtPosition(glm::ivec2(x - 1, z)) || isChunkAtPosition(glm::ivec2(x + 1, z)) ||
-						isChunkAtPosition(glm::ivec2(x, z - 1)) || isChunkAtPosition(glm::ivec2(x, z + 1)))
+					if (!regenChunk && !isChunkAtPosition(glm::ivec2(x - 1, z)) || !isChunkAtPosition(glm::ivec2(x + 1, z)) ||
+						!isChunkAtPosition(glm::ivec2(x, z - 1)) || !isChunkAtPosition(glm::ivec2(x, z + 1)))
 					{
 						regenChunk = true;
 					}
