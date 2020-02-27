@@ -255,9 +255,9 @@ int main()
 				iter->second.destroy();
 				iter = VAOs.erase(iter);
 			}
-			else if (iter->second.m_init)
+			else if (iter->second.m_attachOpaqueVBO)
 			{
-				iter->second.init();
+				iter->second.attachOpaqueVBO();
 				++iter;
 			}
 			else
@@ -268,7 +268,7 @@ int main()
 
 		for (const auto& VAO : VAOs)
 		{
-			if (VAO.second.m_display && VAO.second.m_ID != 0)
+			if (VAO.second.m_displayable && VAO.second.m_ID != 0)
 			{
 				VAO.second.bind();
 				glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);

@@ -5,9 +5,9 @@
 #include <iostream>
 
 VertexArray::VertexArray()
-	: m_init(false),
+	: m_attachOpaqueVBO(false),
 	m_destroy(false),
-	m_display(true),
+	m_displayable(true),
 	m_ID(Utilities::INVALID_OPENGL_ID)
 {}
 
@@ -44,9 +44,9 @@ void VertexArray::destroy()
 	}
 }
 
-void VertexArray::init()
+void VertexArray::attachOpaqueVBO()
 {
-	m_init = false;
+	m_attachOpaqueVBO = false;
 	
 	if (m_ID == Utilities::INVALID_OPENGL_ID) 
 	{
