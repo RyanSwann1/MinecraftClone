@@ -178,6 +178,8 @@ int main()
 
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	unsigned int shaderID = createShaderProgram();
 	Camera camera(glm::vec3(0.0f, 150.f, 0.0f));
@@ -266,7 +268,7 @@ int main()
 
 		for (const auto& VAO : VAOs)
 		{
-			if (VAO.second.m_displayable && VAO.second.m_ID != 0)
+			if (VAO.second.m_displayable)
 			{
 				VAO.second.bind();
 				glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
