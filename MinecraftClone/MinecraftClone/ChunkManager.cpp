@@ -314,16 +314,16 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 		}
 	}
 	
-	vertexArray.m_init = true;
-
 	if (regenChunk)
 	{
-		vertexArray.m_display = false;
+		vertexArray.m_displayable = false;
 		m_chunkMeshRegenerateQueue.push_back(glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.z));
 	}
 	else
 	{
-		vertexArray.m_display = true;
+		vertexArray.m_displayable = true;
+		vertexArray.m_attachOpaqueVBO = true;
+		//vertexArray.m_init = true;
 	}
 }
 
