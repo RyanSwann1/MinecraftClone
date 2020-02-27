@@ -336,12 +336,10 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 
 	if (regenChunk)
 	{
-		vertexArray.m_displayable = false;
 		m_chunkMeshRegenerateQueue.push_back(glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.z));
 	}
 	else
 	{
-		vertexArray.m_displayable = true;
 		vertexArray.m_attachOpaqueVBO = true;
 
 		if (vertexArray.m_vertexBuffer.transparentIndicies.size() > 0 ||
@@ -410,12 +408,12 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, std::unordered_map
 		}
 	}
 
+	std::lock_guard<std::mutex> lock(m_mutex);
 	while (!newlyAddedChunks.empty())
 	{
 		const Chunk* newChunk = newlyAddedChunks.front();
 		newlyAddedChunks.pop();
 
-		std::lock_guard<std::mutex> lock(m_mutex);
 		auto newVAO = VAOs.emplace(std::piecewise_construct,
 			std::forward_as_tuple(glm::ivec2(newChunk->getStartingPosition().x, newChunk->getStartingPosition().z)),
 			std::forward_as_tuple()).first;
@@ -426,6 +424,7 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, std::unordered_map
 
 void ChunkManager::regenChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture)
 {
+	std::lock_guard<std::mutex> lock(m_mutex);
 	for (auto chunkStartingPosition = m_chunkMeshRegenerateQueue.begin(); chunkStartingPosition != m_chunkMeshRegenerateQueue.end();)
 	{
 		auto chunk = m_chunks.find(glm::ivec2(chunkStartingPosition->x, chunkStartingPosition->y));
@@ -438,7 +437,6 @@ void ChunkManager::regenChunks(const Rectangle& visibilityRect, std::unordered_m
 			{
 				glm::vec3 startPosition(chunk->second.getStartingPosition().x, 0, chunk->second.getStartingPosition().z);
 
-				std::unique_lock<std::mutex> lock(m_mutex);
 				auto VAO = VAOs.find(glm::ivec2(chunk->second.getStartingPosition().x, chunk->second.getStartingPosition().z));
 				assert(VAO != VAOs.end());
 				if (VAO != VAOs.end())
@@ -446,7 +444,6 @@ void ChunkManager::regenChunks(const Rectangle& visibilityRect, std::unordered_m
 					VAO->second.reset();
 					generateChunkMesh(VAO->second, texture, chunk->second);
 				}
-				lock.unlock();
 
 				chunkStartingPosition = m_chunkMeshRegenerateQueue.erase(chunkStartingPosition);
 			}

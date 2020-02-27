@@ -178,6 +178,8 @@ int main()
 
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -269,7 +271,7 @@ int main()
 
 		for (const auto& VAO : VAOs)
 		{
-			if (VAO.second.m_displayable && VAO.second.m_ID != Utilities::INVALID_OPENGL_ID)
+			if (VAO.second.m_displayable)
 			{
 				VAO.second.bindOpaqueVAO();
 				glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);

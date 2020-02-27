@@ -64,7 +64,7 @@ void VertexArray::destroy()
 void VertexArray::attachOpaqueVBO()
 {
 	m_attachOpaqueVBO = false;
-	
+
 	if (m_ID == Utilities::INVALID_OPENGL_ID) 
 	{
 		glGenVertexArrays(1, &m_ID);
@@ -101,6 +101,7 @@ void VertexArray::attachOpaqueVBO()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 	unbind();
+	m_displayable = true;
 }
 
 void VertexArray::attachTransparentVBO()
