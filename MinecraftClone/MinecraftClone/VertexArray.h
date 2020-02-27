@@ -17,7 +17,8 @@ struct VertexArray : private NonCopyable
 	void bindTransparentVAO() const;
 	void unbind() const;
 
-	bool m_displayable;
+	bool m_opaqueVBODisplayable;
+	bool m_transparentVBODisplayable;
 	bool m_attachOpaqueVBO;
 	bool m_attachTransparentVBO;
 	bool m_destroy;

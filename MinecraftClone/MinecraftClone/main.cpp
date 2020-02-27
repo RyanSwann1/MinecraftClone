@@ -181,9 +181,6 @@ int main()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	unsigned int shaderID = createShaderProgram();
 	Camera camera(glm::vec3(0.0f, 150.f, 0.0f));
 	std::unique_ptr<Texture> texture = Texture::loadTexture("Texture_AtlasV2.png");
@@ -271,7 +268,7 @@ int main()
 
 		for (const auto& VAO : VAOs)
 		{
-			if (VAO.second.m_displayable)
+			if (VAO.second.m_opaqueVBODisplayable)
 			{
 				VAO.second.bindOpaqueVAO();
 				glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
@@ -289,7 +286,7 @@ int main()
 
 		for (const auto& VAO : VAOs)
 		{
-			if (VAO.second.m_displayable && VAO.second.m_transparentID != Utilities::INVALID_OPENGL_ID)
+			if (VAO.second.m_transparentVBODisplayable)
 			{
 				VAO.second.bindTransparentVAO();
 				glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);

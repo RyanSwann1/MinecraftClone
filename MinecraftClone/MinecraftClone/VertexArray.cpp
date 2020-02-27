@@ -5,7 +5,8 @@
 #include <iostream>
 
 VertexArray::VertexArray()
-	: m_displayable(false),
+	: m_opaqueVBODisplayable(false),
+	m_transparentVBODisplayable(false),
 	m_attachOpaqueVBO(false),
 	m_attachTransparentVBO(false),
 	m_destroy(false),
@@ -29,35 +30,44 @@ void VertexArray::destroy()
 {
 	m_destroy = false;
 	
-	assert(m_ID != Utilities::INVALID_OPENGL_ID);
 	if (m_ID != Utilities::INVALID_OPENGL_ID)
 	{
 		glDeleteVertexArrays(1, &m_ID);
 	}
 	
-	assert(m_transparentID != Utilities::INVALID_OPENGL_ID);
 	if (m_transparentID != Utilities::INVALID_OPENGL_ID)
 	{
 		glDeleteBuffers(1, &m_transparentID);
 	}
 
-
-
-
-	assert(m_vertexBuffer.positionsID != Utilities::INVALID_OPENGL_ID);
 	if (m_vertexBuffer.positionsID != Utilities::INVALID_OPENGL_ID)
 	{
 		glDeleteBuffers(1, &m_vertexBuffer.positionsID);
 	}
-	assert(m_vertexBuffer.textCoordsID != Utilities::INVALID_OPENGL_ID);
+
 	if (m_vertexBuffer.textCoordsID != Utilities::INVALID_OPENGL_ID)
 	{
 		glDeleteBuffers(1, &m_vertexBuffer.textCoordsID);
 	}
-	assert(m_vertexBuffer.indiciesID != Utilities::INVALID_OPENGL_ID);
+
 	if (m_vertexBuffer.indiciesID != Utilities::INVALID_OPENGL_ID)
 	{
 		glDeleteBuffers(1, &m_vertexBuffer.indiciesID);
+	}
+
+	if (m_vertexBuffer.transparentPositionsID != Utilities::INVALID_OPENGL_ID)
+	{
+		glDeleteBuffers(1, &m_vertexBuffer.transparentPositionsID);
+	}
+
+	if (m_vertexBuffer.transparentTextCoordsID != Utilities::INVALID_OPENGL_ID)
+	{
+		glDeleteBuffers(1, &m_vertexBuffer.transparentTextCoordsID);
+	}
+
+	if (m_vertexBuffer.transparentIndiciesID != Utilities::INVALID_OPENGL_ID) 
+	{
+		glDeleteBuffers(1, &m_vertexBuffer.transparentIndiciesID);
 	}
 }
 
@@ -101,7 +111,7 @@ void VertexArray::attachOpaqueVBO()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 	unbind();
-	m_displayable = true;
+	m_opaqueVBODisplayable = true;
 }
 
 void VertexArray::attachTransparentVBO()
@@ -145,6 +155,7 @@ void VertexArray::attachTransparentVBO()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	unbind();
+	m_transparentVBODisplayable = true;
 }
 
 void VertexArray::bindOpaqueVAO() const
