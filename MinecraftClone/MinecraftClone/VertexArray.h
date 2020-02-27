@@ -11,6 +11,7 @@ struct VertexArray : private NonCopyable
 	void reset();
 	void destroy();
 	void init();
+	void initTransparent();
 	void bind() const;
 	void unbind() const;
 

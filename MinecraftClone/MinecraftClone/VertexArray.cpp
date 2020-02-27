@@ -16,6 +16,10 @@ void VertexArray::reset()
 	m_vertexBuffer.positions.clear();
 	m_vertexBuffer.textCoords.clear();
 	m_vertexBuffer.indicies.clear();
+
+	m_vertexBuffer.transparentIndicies.clear();
+	m_vertexBuffer.transparentPositions.clear();
+	m_vertexBuffer.transparentTextCoords.clear();
 }
 
 void VertexArray::destroy()
@@ -79,6 +83,47 @@ void VertexArray::init()
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
+	unbind();
+}
+
+void VertexArray::initTransparent()
+{
+	assert(m_ID != Utilities::INVALID_OPENGL_ID);
+	if (m_ID == Utilities::INVALID_OPENGL_ID)
+	{
+		return;
+	}
+	bind();
+
+	if (m_vertexBuffer.transparentPositionsID == Utilities::INVALID_OPENGL_ID)
+	{
+		glGenBuffers(1, &m_vertexBuffer.transparentPositionsID);
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.transparentPositionsID);
+	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.transparentPositions.size() * sizeof(glm::vec3), m_vertexBuffer.transparentPositions.data(), GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
+
+	if (m_vertexBuffer.textCoordsID == Utilities::INVALID_OPENGL_ID)
+	{
+		glGenBuffers(1, &m_vertexBuffer.transparentTextCoordsID);
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.transparentTextCoordsID);
+	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.transparentTextCoords.size() * sizeof(glm::vec2), m_vertexBuffer.transparentTextCoords.data(), GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)(0));
+
+	if (m_vertexBuffer.indiciesID == Utilities::INVALID_OPENGL_ID)
+	{
+		glGenBuffers(1, &m_vertexBuffer.transparentIndiciesID);
+	}
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vertexBuffer.transparentIndiciesID);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_vertexBuffer.transparentIndicies.size() * sizeof(unsigned int), m_vertexBuffer.transparentIndicies.data(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	unbind();
 }
 

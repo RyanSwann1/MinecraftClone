@@ -276,6 +276,21 @@ int main()
 			}
 		}
 
+		for (auto iter = VAOs.begin(); iter != VAOs.end(); ++iter)
+		{
+			iter->second.initTransparent();
+		}
+
+		for (const auto& VAO : VAOs)
+		{
+			if (VAO.second.m_display && VAO.second.m_ID != 0)
+			{
+				VAO.second.bind();
+				glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
+				VAO.second.unbind();
+			}
+		}
+
 		window.display();
 	}
 

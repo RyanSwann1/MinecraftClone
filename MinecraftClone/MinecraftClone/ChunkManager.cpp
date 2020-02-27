@@ -60,152 +60,156 @@ void ChunkManager::update(Rectangle& visibilityRect, std::unordered_map<glm::ive
 void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,
 	int& elementArrayBufferIndex, glm::ivec3 cubePosition)
 {
-	switch (cubeSide)
+	if (static_cast<eCubeType>(cubeDetails.type) == eCubeType::Water)
 	{
-	case eCubeSide::Front:
-		for (glm::vec3 i : Utilities::CUBE_FACE_FRONT)
+		if (cubeSide == eCubeSide::Top)
 		{
-			i += cubePosition;
+			for (glm::vec3 i : Utilities::CUBE_FACE_FRONT)
+			{
+				i += cubePosition;
+
+				vertexBuffer.transparentPositions.push_back({ i.x, i.y, i.z });
+			}
+
+			texture.getTextCoords(eCubeFaceID::Water, vertexBuffer.transparentTextCoords);
 			
-			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
+			for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
+			{
+				vertexBuffer.transparentIndicies.push_back(i + elementArrayBufferIndex);
+			}
 		}
-
-		switch (static_cast<eCubeType>(cubeDetails.type))
-		{
-		case eCubeType::Stone :
-			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Sand :
-			texture.getTextCoords(eCubeFaceID::Sand, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Grass :
-			texture.getTextCoords(eCubeFaceID::GrassSide, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Water :
-			texture.getTextCoords(eCubeFaceID::Water, vertexBuffer.textCoords);
-			break;
-		}
-		break;
-	case eCubeSide::Back:
-		for (glm::vec3 i : Utilities::CUBE_FACE_BACK)
-		{
-			i += cubePosition;
-			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
-		}
-
-		switch (static_cast<eCubeType>(cubeDetails.type))
-		{
-		case eCubeType::Stone:
-			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Sand:
-			texture.getTextCoords(eCubeFaceID::Sand, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Grass:
-			texture.getTextCoords(eCubeFaceID::GrassSide, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Water:
-			texture.getTextCoords(eCubeFaceID::Water, vertexBuffer.textCoords);
-			break;
-		}
-		break;
-	case eCubeSide::Left:
-		for (glm::vec3 i : Utilities::CUBE_FACE_LEFT)
-		{
-			i += cubePosition;
-			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
-		}
-
-		switch (static_cast<eCubeType>(cubeDetails.type))
-		{
-		case eCubeType::Stone:
-			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Sand:
-			texture.getTextCoords(eCubeFaceID::Sand, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Grass:
-			texture.getTextCoords(eCubeFaceID::GrassSide, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Water:
-			texture.getTextCoords(eCubeFaceID::Water, vertexBuffer.textCoords);
-			break;
-		}
-		break;
-	case eCubeSide::Right:
-		for (glm::vec3 i : Utilities::CUBE_FACE_RIGHT)
-		{
-			i += cubePosition;
-			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
-		}
-
-		switch (static_cast<eCubeType>(cubeDetails.type))
-		{
-		case eCubeType::Stone:
-			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Sand:
-			texture.getTextCoords(eCubeFaceID::Sand, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Grass:
-			texture.getTextCoords(eCubeFaceID::GrassSide, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Water:
-			texture.getTextCoords(eCubeFaceID::Water, vertexBuffer.textCoords);
-			break;
-		}
-		break;
-	case eCubeSide::Top:
-		for (glm::vec3 i : Utilities::CUBE_FACE_TOP)
-		{
-			i += cubePosition;
-			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
-		}
-
-		switch (static_cast<eCubeType>(cubeDetails.type))
-		{
-		case eCubeType::Stone:
-			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Sand:
-			texture.getTextCoords(eCubeFaceID::Sand, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Grass:
-			texture.getTextCoords(eCubeFaceID::Grass, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Water:
-			texture.getTextCoords(eCubeFaceID::Water, vertexBuffer.textCoords);
-			break;
-		}
-		break;
-	case eCubeSide::Bottom:
-		for (glm::vec3 i : Utilities::CUBE_FACE_BOTTOM)
-		{
-			i += cubePosition;
-			vertexBuffer.positions.push_back({ i.x, i.y, i.z });
-		}
-
-		switch (static_cast<eCubeType>(cubeDetails.type))
-		{
-		case eCubeType::Stone:
-			texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Sand:
-			texture.getTextCoords(eCubeFaceID::Sand, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Grass:
-			texture.getTextCoords(eCubeFaceID::Sand, vertexBuffer.textCoords);
-			break;
-		case eCubeType::Water:
-			texture.getTextCoords(eCubeFaceID::Water, vertexBuffer.textCoords);
-			break;
-		}
-		break;
 	}
-
-	for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
+	else
 	{
-		vertexBuffer.indicies.push_back(i + elementArrayBufferIndex);
+		switch (cubeSide)
+		{
+		case eCubeSide::Front:
+			for (glm::vec3 i : Utilities::CUBE_FACE_FRONT)
+			{
+				i += cubePosition;
+
+				vertexBuffer.positions.push_back({ i.x, i.y, i.z });
+			}
+
+			switch (static_cast<eCubeType>(cubeDetails.type))
+			{
+			case eCubeType::Stone:
+				texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
+				break;
+			case eCubeType::Sand:
+				texture.getTextCoords(eCubeFaceID::Sand, vertexBuffer.textCoords);
+				break;
+			case eCubeType::Grass:
+				texture.getTextCoords(eCubeFaceID::GrassSide, vertexBuffer.textCoords);
+				break;
+			}
+			break;
+		case eCubeSide::Back:
+			for (glm::vec3 i : Utilities::CUBE_FACE_BACK)
+			{
+				i += cubePosition;
+				vertexBuffer.positions.push_back({ i.x, i.y, i.z });
+			}
+
+			switch (static_cast<eCubeType>(cubeDetails.type))
+			{
+			case eCubeType::Stone:
+				texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
+				break;
+			case eCubeType::Sand:
+				texture.getTextCoords(eCubeFaceID::Sand, vertexBuffer.textCoords);
+				break;
+			case eCubeType::Grass:
+				texture.getTextCoords(eCubeFaceID::GrassSide, vertexBuffer.textCoords);
+				break;
+			}
+			break;
+		case eCubeSide::Left:
+			for (glm::vec3 i : Utilities::CUBE_FACE_LEFT)
+			{
+				i += cubePosition;
+				vertexBuffer.positions.push_back({ i.x, i.y, i.z });
+			}
+
+			switch (static_cast<eCubeType>(cubeDetails.type))
+			{
+			case eCubeType::Stone:
+				texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
+				break;
+			case eCubeType::Sand:
+				texture.getTextCoords(eCubeFaceID::Sand, vertexBuffer.textCoords);
+				break;
+			case eCubeType::Grass:
+				texture.getTextCoords(eCubeFaceID::GrassSide, vertexBuffer.textCoords);
+				break;
+			}
+			break;
+		case eCubeSide::Right:
+			for (glm::vec3 i : Utilities::CUBE_FACE_RIGHT)
+			{
+				i += cubePosition;
+				vertexBuffer.positions.push_back({ i.x, i.y, i.z });
+			}
+
+			switch (static_cast<eCubeType>(cubeDetails.type))
+			{
+			case eCubeType::Stone:
+				texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
+				break;
+			case eCubeType::Sand:
+				texture.getTextCoords(eCubeFaceID::Sand, vertexBuffer.textCoords);
+				break;
+			case eCubeType::Grass:
+				texture.getTextCoords(eCubeFaceID::GrassSide, vertexBuffer.textCoords);
+				break;
+			}
+			break;
+		case eCubeSide::Top:
+			for (glm::vec3 i : Utilities::CUBE_FACE_TOP)
+			{
+				i += cubePosition;
+				vertexBuffer.positions.push_back({ i.x, i.y, i.z });
+			}
+
+			switch (static_cast<eCubeType>(cubeDetails.type))
+			{
+			case eCubeType::Stone:
+				texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
+				break;
+			case eCubeType::Sand:
+				texture.getTextCoords(eCubeFaceID::Sand, vertexBuffer.textCoords);
+				break;
+			case eCubeType::Grass:
+				texture.getTextCoords(eCubeFaceID::Grass, vertexBuffer.textCoords);
+				break;
+			}
+			break;
+		case eCubeSide::Bottom:
+			for (glm::vec3 i : Utilities::CUBE_FACE_BOTTOM)
+			{
+				i += cubePosition;
+				vertexBuffer.positions.push_back({ i.x, i.y, i.z });
+			}
+
+			switch (static_cast<eCubeType>(cubeDetails.type))
+			{
+			case eCubeType::Stone:
+				texture.getTextCoords(eCubeFaceID::Stone, vertexBuffer.textCoords);
+				break;
+			case eCubeType::Sand:
+				texture.getTextCoords(eCubeFaceID::Sand, vertexBuffer.textCoords);
+				break;
+			case eCubeType::Grass:
+				texture.getTextCoords(eCubeFaceID::Sand, vertexBuffer.textCoords);
+				break;
+			}
+			break;
+		}
+
+		for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
+		{
+			vertexBuffer.indicies.push_back(i + elementArrayBufferIndex);
+		}
 	}
 
 	elementArrayBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
@@ -266,6 +270,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 				else if (static_cast<eCubeType>(chunk.getCubeDetails(position).type) == eCubeType::Water)
 				{
 					addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Top, elementArrayBufferIndex, position);
+					
 				}
 				else
 				{
@@ -313,7 +318,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 			}
 		}
 	}
-	
+
 	vertexArray.m_init = true;
 
 	if (regenChunk)
