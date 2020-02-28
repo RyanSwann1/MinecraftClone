@@ -67,7 +67,7 @@ void setUniformLocationVec2(unsigned int shaderID, const std::string& uniformNam
 
 void setUniformLocation1f(unsigned int shaderID, const std::string& uniformName, float value, std::unordered_map<std::string, int>& uniformLocations)
 {
-	glUniform1i(getUniformLocation(shaderID, uniformName, uniformLocations), value);
+	glUniform1f(getUniformLocation(shaderID, uniformName, uniformLocations), value);
 }
 
 void setUniformMat4f(unsigned int shaderID, const std::string& uniformName, glm::mat4 matrix, std::unordered_map<std::string, int>& uniformLocations)
@@ -211,7 +211,7 @@ int main()
 	clock.restart();
 	float messageExpiredTime = 1.0f;
 	float elaspedTime = 0.0f;
-
+	setUniformLocation1f(shaderID, "uAlpha", 1.0f, uniformLocations);
 	while (window.isOpen())
 	{
 		float deltaTime = clock.restart().asSeconds();
@@ -243,7 +243,8 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
-
+		std::cout << glGetError() << "\n";
+		std::cout << glGetError() << "\n";
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
 		setUniformMat4f(shaderID, "uView", view, uniformLocations);
@@ -286,6 +287,8 @@ int main()
 			}
 		}
 
+		//void setUniformLocation1f(unsigned int shaderID, const std::string& uniformName, float value, std::unordered_map<std::string, int>& uniformLocations)
+		setUniformLocation1f(shaderID, "uAlpha", Utilities::WATER_ALPHA_VALUE, uniformLocations);
 		for (const auto& VAO : VAOs)
 		{
 			if (VAO.second.m_transparentVBODisplayable)
@@ -295,6 +298,7 @@ int main()
 				VAO.second.unbind();
 			}
 		}
+		setUniformLocation1f(shaderID, "uAlpha", 1.0f, uniformLocations);
 
 		window.display();
 	}
