@@ -81,6 +81,7 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 		}
 
 		transparentElementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
+		//transparentElementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
 	}
 	else
 	{
@@ -273,7 +274,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 				}
 				else if (static_cast<eCubeType>(chunk.getCubeDetails(position).type) == eCubeType::Water)
 				{
-					//vertexArray.m_attachTransparentVBO = true;
+					vertexArray.m_attachTransparentVBO = true;
 					//if (!regenChunk && !isChunkAtPosition(glm::ivec2(x - 1, z)) || !isChunkAtPosition(glm::ivec2(x + 1, z)) ||
 					//	!isChunkAtPosition(glm::ivec2(x, z - 1)) || !isChunkAtPosition(glm::ivec2(x, z + 1)))
 					//{

@@ -37,7 +37,7 @@ void VertexArray::destroy()
 	
 	if (m_transparentID != Utilities::INVALID_OPENGL_ID)
 	{
-		glDeleteBuffers(1, &m_transparentID);
+		glDeleteVertexArrays(1, &m_transparentID);
 	}
 
 	if (m_vertexBuffer.positionsID != Utilities::INVALID_OPENGL_ID)
@@ -79,6 +79,7 @@ void VertexArray::attachOpaqueVBO()
 	{
 		glGenVertexArrays(1, &m_ID);
 	}
+
 	bindOpaqueVAO();
 
 	if (m_vertexBuffer.positionsID == Utilities::INVALID_OPENGL_ID)
@@ -118,7 +119,7 @@ void VertexArray::attachTransparentVBO()
 {
 	if (m_transparentID == Utilities::INVALID_OPENGL_ID)
 	{
-		glGenBuffers(1, &m_transparentID);
+		glGenVertexArrays(1, &m_transparentID);
 	}
 
 	m_attachTransparentVBO = false;

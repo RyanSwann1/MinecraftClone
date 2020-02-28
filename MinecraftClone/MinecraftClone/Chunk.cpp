@@ -167,9 +167,9 @@ void Chunk::regen(glm::ivec3 startingPosition)
 	{
 		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
 		{
-			if (m_chunk[z][Utilities::WATER_MAX_HEIGHT][x].type == static_cast<char>(eCubeType::Invalid))
+			if (m_chunk[x][Utilities::WATER_MAX_HEIGHT][z].type == static_cast<char>(eCubeType::Invalid))
 			{
-				m_chunk[z][Utilities::WATER_MAX_HEIGHT][x].type = static_cast<char>(eCubeType::Water);
+				m_chunk[x][Utilities::WATER_MAX_HEIGHT][z].type = static_cast<char>(eCubeType::Water);
 			}
 		}
 	}
