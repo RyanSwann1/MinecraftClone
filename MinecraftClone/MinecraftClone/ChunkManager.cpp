@@ -348,6 +348,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 
 void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs)
 {
+	std::lock_guard<std::mutex> lock(m_mutex);
 	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
 	{
 		Rectangle chunkAABB(glm::ivec2(chunk->second.getStartingPosition().x, chunk->second.getStartingPosition().z) +
@@ -356,14 +357,12 @@ void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::unordered_
 		{
 			glm::vec3 chunkStartingPosition = chunk->second.getStartingPosition();
 
-			std::unique_lock<std::mutex> lock(m_mutex);
 			auto VAO = VAOs.find(glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.z));
 			assert(VAO != VAOs.end());
 			if (VAO != VAOs.end())
 			{
 				VAO->second.m_destroy = true;
 			}
-			lock.unlock();
 
 			glm::ivec2 startPosition(chunkStartingPosition.x, chunkStartingPosition.z);
 			auto chunkToRegen = std::find_if(m_chunkMeshRegenerateQueue.begin(), m_chunkMeshRegenerateQueue.end(), [startPosition](const auto& position)

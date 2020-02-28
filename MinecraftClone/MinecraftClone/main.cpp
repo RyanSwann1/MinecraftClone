@@ -160,6 +160,8 @@ unsigned int createShaderProgram()
 //or cutting down on the size of each vertex element(less bandwidth).There are plenty of other ways to increase performance with such an engine.
 
 //https://devtalk.nvidia.com/default/topic/720651/opengl/access-violation-in-nvoglv32-dll-how-do-i-track-down-the-problem-/
+//https://community.khronos.org/t/how-do-you-implement-texture-arrays/75315
+
 
 //x + (y * width)
 int main()
@@ -178,6 +180,8 @@ int main()
 
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	unsigned int shaderID = createShaderProgram();
 	Camera camera(glm::vec3(0.0f, 150.f, 0.0f));
@@ -202,8 +206,7 @@ int main()
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	sf::Clock clock;
 	clock.restart();
 	float messageExpiredTime = 1.0f;
