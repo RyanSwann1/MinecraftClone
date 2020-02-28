@@ -287,7 +287,6 @@ int main()
 			}
 		}
 
-		//void setUniformLocation1f(unsigned int shaderID, const std::string& uniformName, float value, std::unordered_map<std::string, int>& uniformLocations)
 		setUniformLocation1f(shaderID, "uAlpha", Utilities::WATER_ALPHA_VALUE, uniformLocations);
 		for (const auto& VAO : VAOs)
 		{
