@@ -42,24 +42,24 @@ class ChunkManager : private NonCopyable
 public:
 	ChunkManager();
 
-	void generateInitialChunks(glm::vec3 playerPosition, std::unordered_map<glm::ivec2, VertexArray>& VAOs, const Texture& texture);
-	void update(Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs, Camera& camera, 
+	void generateInitialChunks(glm::vec3 playerPosition, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const Texture& texture);
+	void update(Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, Camera& camera, 
 		const Texture& texture, const sf::Window& window);
 
 private:
-	std::unordered_map<glm::ivec2, Chunk> m_chunks;
-	std::vector<glm::ivec2> m_chunkMeshRegenerateQueue;
+	std::unordered_map<glm::ivec3, Chunk> m_chunks;
+	std::vector<glm::ivec3> m_chunkMeshRegenerateQueue;
 	std::mutex m_mutex;
 
 	void addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,
 		int& opaqueElementBufferIndex, int& transparentElementBufferIndex, glm::ivec3 cubePosition);
-	bool isCubeAtPosition(glm::vec3 position) const;
+
 	bool isCubeAtPosition(glm::ivec3 position) const;
-	bool isChunkAtPosition(glm::ivec2 position) const;
+	bool isChunkAtPosition(glm::ivec3 position) const;
 
 	void generateChunkMesh(VertexArray& vertexArray, const Texture& texture, const Chunk& chunk);
 
-	void deleteChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs);
-	void addChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture);
-	void regenChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture);
+	void deleteChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs);
+	void addChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture);
+	void regenChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture);
 };
