@@ -19,15 +19,15 @@ void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, std::unordere
 	{
 		for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x < playerPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
-			glm::ivec2 chunkStartingPosition = Utilities::getClosestChunkStartingPosition(glm::vec2(x, y));
+			glm::ivec3 chunkStartingPosition = Utilities::getClosestChunkStartingPosition(glm::ivec3(x, 0, y));
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend())
 			{
 				m_chunks.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunkStartingPosition),
-					std::forward_as_tuple(glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.y)));
+					std::forward_as_tuple(chunkStartingPosition));
 
 				VAOs.emplace(std::piecewise_construct,
-					std::forward_as_tuple(chunkStartingPosition),
+					std::forward_as_tuple(glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.z)),
 					std::forward_as_tuple());
 			}
 		}

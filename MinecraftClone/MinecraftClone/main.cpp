@@ -243,8 +243,6 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
-		std::cout << glGetError() << "\n";
-		std::cout << glGetError() << "\n";
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
 		setUniformMat4f(shaderID, "uView", view, uniformLocations);

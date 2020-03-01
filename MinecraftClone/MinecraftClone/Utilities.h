@@ -81,30 +81,54 @@ namespace Utilities
 
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_TOP = { glm::vec3(0, 1.0, 0), glm::vec3(0, 1.0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(1.0, 1.0, 0) };
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_BOTTOM = { glm::vec3(0, 0, 0), glm::vec3(0, 0, 1.0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 0, 0) };
+	
+	//inline glm::vec2 getClosestChunkStartingPosition(glm::vec2 position)
+	//{
+	//	glm::vec2 positionOnGrid(glm::vec2((position.x / CHUNK_WIDTH) * CHUNK_WIDTH, (position.y / CHUNK_DEPTH) * CHUNK_DEPTH));
+	//	if (position.x < 0 && static_cast<int>(position.x) % CHUNK_WIDTH < 0)
+	//	{
+	//		positionOnGrid.x += std::abs(static_cast<int>(position.x) % CHUNK_WIDTH);
+	//		positionOnGrid.x -= CHUNK_WIDTH;
+	//	}
+	//	else if (position.x > 0 && static_cast<int>(position.x) % CHUNK_WIDTH > 0)
+	//	{
+	//		positionOnGrid.x -= std::abs(static_cast<int>(position.x) % CHUNK_WIDTH);
+	//	}
+	//	if (position.y < 0 && static_cast<int>(position.y) % CHUNK_DEPTH < 0)
+	//	{
+	//		positionOnGrid.y += std::abs(static_cast<int>(position.y) % CHUNK_DEPTH);
+	//		positionOnGrid.y -= CHUNK_DEPTH;
+	//	}
+	//	else if (position.y > 0 && static_cast<int>(position.y) % CHUNK_DEPTH > 0)
+	//	{
+	//		positionOnGrid.y -= std::abs(static_cast<int>(position.y) % CHUNK_DEPTH);
+	//	}
 
-	inline glm::vec2 getClosestChunkStartingPosition(glm::vec2 position)
+	//	return positionOnGrid;
+	//}
+
+	inline glm::ivec3 getClosestChunkStartingPosition(glm::ivec3 position)
 	{
-		glm::vec2 positionOnGrid(glm::vec2((position.x / CHUNK_WIDTH) * CHUNK_WIDTH, (position.y / CHUNK_DEPTH) * CHUNK_DEPTH));
-		if (position.x < 0 && static_cast<int>(position.x) % CHUNK_WIDTH < 0)
+		if (position.x < 0 && position.x % CHUNK_WIDTH < 0)
 		{
-			positionOnGrid.x += std::abs(static_cast<int>(position.x) % CHUNK_WIDTH);
-			positionOnGrid.x -= CHUNK_WIDTH;
+			position.x += std::abs(position.x % CHUNK_WIDTH);
+			position.x -= CHUNK_WIDTH;
 		}
-		else if (position.x > 0 && static_cast<int>(position.x) % CHUNK_WIDTH > 0)
+		else if (position.x > 0 && position.x % CHUNK_WIDTH > 0)
 		{
-			positionOnGrid.x -= std::abs(static_cast<int>(position.x) % CHUNK_WIDTH);
+			position.x -= std::abs(position.x % CHUNK_WIDTH);
 		}
-		if (position.y < 0 && static_cast<int>(position.y) % CHUNK_DEPTH < 0)
+		if (position.z < 0 && position.z % CHUNK_DEPTH < 0)
 		{
-			positionOnGrid.y += std::abs(static_cast<int>(position.y) % CHUNK_DEPTH);
-			positionOnGrid.y -= CHUNK_DEPTH;
+			position.z += std::abs(position.z % CHUNK_DEPTH);
+			position.z -= CHUNK_DEPTH;
 		}
-		else if (position.y > 0 && static_cast<int>(position.y) % CHUNK_DEPTH > 0)
+		else if (position.z > 0 && position.z % CHUNK_DEPTH > 0)
 		{
-			positionOnGrid.y -= std::abs(static_cast<int>(position.y) % CHUNK_DEPTH);
+			position.z -= std::abs(position.z % CHUNK_DEPTH);
 		}
 
-		return positionOnGrid;
+		return glm::ivec3(position.x, 0, position.z);
 	}
 
 	inline float clampTo(float value, float min, float max)
