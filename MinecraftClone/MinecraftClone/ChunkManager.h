@@ -42,8 +42,8 @@ class ChunkManager : private NonCopyable
 public:
 	ChunkManager();
 
-	void generateInitialChunks(glm::vec3 playerPosition, std::unordered_map<glm::ivec2, VertexArray>& VAOs, const Texture& texture);
-	void update(Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs, Camera& camera, 
+	void generateInitialChunks(glm::vec3 playerPosition, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const Texture& texture);
+	void update(Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, Camera& camera, 
 		const Texture& texture, const sf::Window& window);
 
 private:
@@ -59,7 +59,7 @@ private:
 
 	void generateChunkMesh(VertexArray& vertexArray, const Texture& texture, const Chunk& chunk);
 
-	void deleteChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs);
-	void addChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture);
-	void regenChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture);
+	void deleteChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs);
+	void addChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture);
+	void regenChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture);
 };
