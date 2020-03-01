@@ -15,11 +15,11 @@ ChunkManager::ChunkManager()
 
 void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const Texture& texture)
 {
-	for (int y = playerPosition.z - Utilities::VISIBILITY_DISTANCE; y < playerPosition.z + Utilities::VISIBILITY_DISTANCE; y += Utilities::CHUNK_DEPTH)
+	for (int z = playerPosition.z - Utilities::VISIBILITY_DISTANCE; z < playerPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
 	{
 		for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x < playerPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
-			glm::ivec3 chunkStartingPosition = Utilities::getClosestChunkStartingPosition(glm::ivec3(x, 0, y));
+			glm::ivec3 chunkStartingPosition = Utilities::getClosestChunkStartingPosition(glm::ivec3(x, 0, z));
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend())
 			{
 				m_chunks.emplace(std::piecewise_construct,
@@ -81,7 +81,6 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 		}
 
 		transparentElementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
-		//transparentElementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
 	}
 	else
 	{

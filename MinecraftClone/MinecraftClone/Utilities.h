@@ -30,7 +30,7 @@ namespace Utilities
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
-	constexpr int VISIBILITY_DISTANCE = 64;
+	constexpr int VISIBILITY_DISTANCE = 128;
 	//constexpr int VISIBILITY_DISTANCE = 480;
 
 	static constexpr std::array<glm::vec2, 4> GRASS_TEXT_COORDS =
