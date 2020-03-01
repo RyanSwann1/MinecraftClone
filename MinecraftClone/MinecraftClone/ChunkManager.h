@@ -48,7 +48,7 @@ public:
 
 private:
 	std::unordered_map<glm::ivec3, Chunk> m_chunks;
-	std::vector<glm::ivec2> m_chunkMeshRegenerateQueue;
+	std::vector<glm::ivec3> m_chunkMeshRegenerateQueue;
 	std::mutex m_mutex;
 
 	void addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,

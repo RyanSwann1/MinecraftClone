@@ -324,7 +324,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 
 	if (regenChunk)
 	{
-		m_chunkMeshRegenerateQueue.push_back(glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.z));
+		m_chunkMeshRegenerateQueue.push_back(chunkStartingPosition);
 	}
 	else
 	{
@@ -341,7 +341,7 @@ void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::unordered_
 			glm::ivec2(Utilities::CHUNK_WIDTH / 2.0f, Utilities::CHUNK_DEPTH / 2.0f), 16);
 		if (!visibilityRect.contains(chunkAABB))
 		{
-			glm::vec3 chunkStartingPosition = chunk->second.getStartingPosition();
+			glm::ivec3 chunkStartingPosition = chunk->second.getStartingPosition();
 
 			auto VAO = VAOs.find(glm::ivec2(chunkStartingPosition.x, chunkStartingPosition.z));
 			assert(VAO != VAOs.end());
@@ -350,10 +350,9 @@ void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::unordered_
 				VAO->second.m_destroy = true;
 			}
 
-			glm::ivec2 startPosition(chunkStartingPosition.x, chunkStartingPosition.z);
-			auto chunkToRegen = std::find_if(m_chunkMeshRegenerateQueue.begin(), m_chunkMeshRegenerateQueue.end(), [startPosition](const auto& position)
+			auto chunkToRegen = std::find_if(m_chunkMeshRegenerateQueue.begin(), m_chunkMeshRegenerateQueue.end(), [chunkStartingPosition](const auto& position)
 			{
-				return position == startPosition;
+				return position == chunkStartingPosition;
 			});
 			if (chunkToRegen != m_chunkMeshRegenerateQueue.end())
 			{
@@ -408,16 +407,14 @@ void ChunkManager::regenChunks(const Rectangle& visibilityRect, std::unordered_m
 	std::lock_guard<std::mutex> lock(m_mutex);
 	for (auto chunkStartingPosition = m_chunkMeshRegenerateQueue.begin(); chunkStartingPosition != m_chunkMeshRegenerateQueue.end();)
 	{
-		auto chunk = m_chunks.find(glm::ivec3(chunkStartingPosition->x, 0, chunkStartingPosition->y));
+		auto chunk = m_chunks.find(*chunkStartingPosition);
 		if (chunk != m_chunks.cend())
 		{
-			if (m_chunks.find(glm::ivec3(chunkStartingPosition->x - Utilities::CHUNK_WIDTH, 0, chunkStartingPosition->y)) != m_chunks.cend() &&
-				m_chunks.find(glm::ivec3(chunkStartingPosition->x + Utilities::CHUNK_WIDTH, 0, chunkStartingPosition->y)) != m_chunks.cend() &&
-				m_chunks.find(glm::ivec3(chunkStartingPosition->x, 0, chunkStartingPosition->y - Utilities::CHUNK_DEPTH)) != m_chunks.cend() &&
-				m_chunks.find(glm::ivec3(chunkStartingPosition->x, 0, chunkStartingPosition->y + Utilities::CHUNK_DEPTH)) != m_chunks.cend())
+			if (m_chunks.find(glm::ivec3(chunkStartingPosition->x - Utilities::CHUNK_WIDTH, 0, chunkStartingPosition->z)) != m_chunks.cend() &&
+				m_chunks.find(glm::ivec3(chunkStartingPosition->x + Utilities::CHUNK_WIDTH, 0, chunkStartingPosition->z)) != m_chunks.cend() &&
+				m_chunks.find(glm::ivec3(chunkStartingPosition->x, 0, chunkStartingPosition->z - Utilities::CHUNK_DEPTH)) != m_chunks.cend() &&
+				m_chunks.find(glm::ivec3(chunkStartingPosition->x, 0, chunkStartingPosition->z + Utilities::CHUNK_DEPTH)) != m_chunks.cend())
 			{
-				glm::vec3 startPosition(chunk->second.getStartingPosition().x, 0, chunk->second.getStartingPosition().z);
-
 				auto VAO = VAOs.find(glm::ivec2(chunk->second.getStartingPosition().x, chunk->second.getStartingPosition().z));
 				assert(VAO != VAOs.end());
 				if (VAO != VAOs.end())
