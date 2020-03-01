@@ -219,23 +219,9 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, const Texture& textur
 	}
 }
 
-bool ChunkManager::isCubeAtPosition(glm::vec3 position) const
-{
-	glm::vec2 closestChunkStartingPosition = Utilities::getClosestChunkStartingPosition(glm::vec2(position.x, position.z));
-	auto cIter = m_chunks.find(closestChunkStartingPosition);
-	if (cIter != m_chunks.cend() && cIter->second.isPositionInBounds(position) && 
-		static_cast<eCubeType>(cIter->second.getCubeDetails(position).type) != eCubeType::Invalid &&
-		static_cast<eCubeType>(cIter->second.getCubeDetails(position).type) != eCubeType::Water)
-	{
-		return true;
-	}
-
-	return false;
-}
-
 bool ChunkManager::isCubeAtPosition(glm::ivec3 position) const
 {
-	glm::vec2 closestChunkStartingPosition = Utilities::getClosestChunkStartingPosition(glm::vec2(position.x, position.z));
+	glm::ivec3 closestChunkStartingPosition = Utilities::getClosestChunkStartingPosition(position);
 	auto cIter = m_chunks.find(closestChunkStartingPosition);
 	if (cIter != m_chunks.cend() && cIter->second.isPositionInBounds(position) && 
 		static_cast<eCubeType>(cIter->second.getCubeDetails(position).type) != eCubeType::Invalid && 
@@ -247,9 +233,9 @@ bool ChunkManager::isCubeAtPosition(glm::ivec3 position) const
 	return false;
 }
 
-bool ChunkManager::isChunkAtPosition(glm::ivec2 position) const
+bool ChunkManager::isChunkAtPosition(glm::ivec3 position) const
 {
-	glm::vec2 closestChunkStartingPosition = Utilities::getClosestChunkStartingPosition(position);
+	glm::ivec3 closestChunkStartingPosition = Utilities::getClosestChunkStartingPosition(position);
 	auto cIter = m_chunks.find(closestChunkStartingPosition);
 	return cIter != m_chunks.cend();
 }
