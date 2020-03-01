@@ -15,6 +15,15 @@ enum class eCubeSide
 	Total
 };
 
+enum class eDirection
+{
+	Left = 0,
+	Right,
+	Forward,
+	Back,
+	Total
+};
+
 namespace Utilities
 {
 	constexpr int CHUNK_WIDTH = 32;

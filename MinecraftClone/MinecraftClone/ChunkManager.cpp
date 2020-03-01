@@ -232,6 +232,12 @@ bool ChunkManager::isCubeAtPosition(glm::ivec3 position) const
 	return false;
 }
 
+bool ChunkManager::isCubeAtPosition(glm::ivec3 position, const Chunk& chunk) const
+{
+	assert(chunk.isPositionInBounds(position));
+	return chunk.getCubeDetailsAtPosition(position).type != static_cast<char>(eCubeType::Invalid);
+}
+
 bool ChunkManager::isChunkAtPosition(glm::ivec3 position) const
 {
 	glm::ivec3 closestChunkStartingPosition = Utilities::getClosestChunkStartingPosition(position);
@@ -245,6 +251,13 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 	int transparentElementBufferIndex = 0;
 	glm::ivec3 chunkStartingPosition = chunk.getStartingPosition();
 	bool regenChunk = false;
+	std::array<const Chunk*, static_cast<size_t>(eDirection::Total)> neighbouringChunks =
+	{
+		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x - Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z)),
+		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x + Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z)),
+		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z + Utilities::CHUNK_DEPTH)),
+		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z - Utilities::CHUNK_DEPTH))
+	};
 
 	for (int z = chunkStartingPosition.z; z < chunkStartingPosition.z + Utilities::CHUNK_DEPTH; ++z)
 	{
@@ -270,7 +283,84 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 				}
 				else
 				{
-					if (isChunkAtPosition(glm::ivec3(x - 1, y, z)) && !isCubeAtPosition(glm::ivec3(x - 1, y, z)))
+					//Left
+					glm::ivec3 leftPosition(x - 1, y, z);
+					if (chunk.isPositionInBounds(leftPosition))
+					{
+						if (!isCubeAtPosition(leftPosition))
+						{
+							addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Left,
+								opaqueElementBufferIndex, transparentElementBufferIndex, position);
+						}
+					}
+					else if (neighbouringChunks[static_cast<int>(eDirection::Left)] &&
+						!isCubeAtPosition(leftPosition, *neighbouringChunks[static_cast<int>(eDirection::Left)]))
+					{
+						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Left,
+							opaqueElementBufferIndex, transparentElementBufferIndex, position);
+
+						regenChunk = true;
+					}
+
+					
+					//Right
+					glm::ivec3 rightPosition(x + 1, y, z);
+					if (chunk.isPositionInBounds(rightPosition))
+					{
+						if (!isCubeAtPosition(rightPosition))
+						{
+							addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Right,
+								opaqueElementBufferIndex, transparentElementBufferIndex, position);
+						}
+					}
+					else if (neighbouringChunks[static_cast<int>(eDirection::Right)] &&
+						!isCubeAtPosition(rightPosition, *neighbouringChunks[static_cast<int>(eDirection::Right)]))
+					{
+						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Right,
+							opaqueElementBufferIndex, transparentElementBufferIndex, position);
+
+						regenChunk = true;
+					}
+
+					//Forward
+					glm::ivec3 forwardPosition(x, y, z + 1);
+					if (chunk.isPositionInBounds(forwardPosition))
+					{
+						if (!isCubeAtPosition(forwardPosition))
+						{
+							addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Front,
+								opaqueElementBufferIndex, transparentElementBufferIndex, position);
+						}
+					}
+					else if (neighbouringChunks[static_cast<int>(eDirection::Forward)] &&
+						!isCubeAtPosition(forwardPosition, *neighbouringChunks[static_cast<int>(eDirection::Forward)]))
+					{
+						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Front,
+							opaqueElementBufferIndex, transparentElementBufferIndex, position);
+
+						regenChunk = true;
+					}
+
+					//Back
+					glm::ivec3 backPosition(x, y, z - 1);
+					if (chunk.isPositionInBounds(backPosition))
+					{
+						if (!isCubeAtPosition(backPosition))
+						{
+							addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Back,
+								opaqueElementBufferIndex, transparentElementBufferIndex, position);
+						}
+					}
+					else if (neighbouringChunks[static_cast<int>(eDirection::Back)] &&
+						!isCubeAtPosition(backPosition, *neighbouringChunks[static_cast<int>(eDirection::Back)]))
+					{
+						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Back,
+							opaqueElementBufferIndex, transparentElementBufferIndex, position);
+
+						regenChunk = true;
+					}
+
+				/*	if (isChunkAtPosition(glm::ivec3(x - 1, y, z)) && !isCubeAtPosition(glm::ivec3(x - 1, y, z)))
 					{
 						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Left, 
 							opaqueElementBufferIndex, transparentElementBufferIndex, position);
@@ -314,7 +404,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 					else if (!regenChunk && !isChunkAtPosition(glm::ivec3(x, y, z + 1)))
 					{
 						regenChunk = true;
-					}
+					}*/
 				}
 			}
 		}
@@ -433,4 +523,37 @@ void ChunkManager::regenChunks(const Rectangle& visibilityRect, std::unordered_m
 			chunkStartingPosition = m_chunkMeshRegenerateQueue.erase(chunkStartingPosition);
 		}
 	}
+}
+
+std::array<const Chunk*, static_cast<size_t>(eDirection::Total)> ChunkManager::getNeighbouringChunks(glm::ivec3 chunkStartingPosition) const
+{
+	std::array<const Chunk*, static_cast<size_t>(eDirection::Total)> neighbouringChunks;
+
+	glm::ivec3 leftChunkStartingPosition(chunkStartingPosition.x - Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z);
+	auto leftChunk = m_chunks.find(leftChunkStartingPosition);
+	if (leftChunk != m_chunks.cend())
+	{
+		neighbouringChunks[static_cast<int>(eDirection::Left)] = &leftChunk->second;
+	}
+
+	glm::ivec3 rightChunkStartingPosition(chunkStartingPosition.x + Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z);
+	auto rightChunk = m_chunks.find(leftChunkStartingPosition);
+	if (rightChunk != m_chunks.cend())
+	{
+		neighbouringChunks[static_cast<int>(eDirection::Left)] = &rightChunk->second;
+	}
+
+	glm::ivec3 forwardChunkStartingPosition(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z + Utilities::CHUNK_DEPTH);
+	auto forwardChunk = m_chunks.find(leftChunkStartingPosition);
+	if (forwardChunk != m_chunks.cend())
+	{
+		neighbouringChunks[static_cast<int>(eDirection::Left)] = &forwardChunk->second;
+	}
+	
+}
+
+const Chunk* ChunkManager::getNeighbouringChunkAtPosition(glm::ivec3 chunkStartingPosition) const
+{
+	auto chunk = m_chunks.find(chunkStartingPosition);
+	return (chunk != m_chunks.cend() ? &chunk->second : nullptr);
 }
