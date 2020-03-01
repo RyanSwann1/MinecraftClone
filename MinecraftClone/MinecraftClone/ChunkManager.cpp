@@ -272,22 +272,22 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 				}
 				else
 				{
-					if (isChunkAtPosition(glm::ivec2(x - 1, z)) && !isCubeAtPosition(glm::ivec3(x - 1, y, z)))
+					if (isChunkAtPosition(glm::ivec3(x - 1, y, z)) && !isCubeAtPosition(glm::ivec3(x - 1, y, z)))
 					{
 						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Left, 
 							opaqueElementBufferIndex, transparentElementBufferIndex, position);
 					}
-					else if (!regenChunk && !isChunkAtPosition(glm::ivec2(x - 1, z)))
+					else if (!regenChunk && !isChunkAtPosition(glm::ivec3(x - 1, y, z)))
 					{
 						regenChunk = true;
 					}
 
-					if (isChunkAtPosition(glm::ivec2(x + 1, z)) && !isCubeAtPosition(glm::ivec3(x + 1, y, z)))
+					if (isChunkAtPosition(glm::ivec3(x + 1, y, z)) && !isCubeAtPosition(glm::ivec3(x + 1, y, z)))
 					{
 						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Right, 
 							opaqueElementBufferIndex, transparentElementBufferIndex, position);
 					}
-					else if (!regenChunk && !isChunkAtPosition(glm::ivec2(x + 1, z)))
+					else if (!regenChunk && !isChunkAtPosition(glm::ivec3(x + 1, y, z)))
 					{
 						regenChunk = true;
 					}
@@ -298,22 +298,22 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 							opaqueElementBufferIndex, transparentElementBufferIndex, position);
 					}
 
-					if (isChunkAtPosition(glm::ivec2(x, z - 1)) && !isCubeAtPosition(glm::ivec3(x, y, z - 1)))
+					if (isChunkAtPosition(glm::ivec3(x, y, z - 1)) && !isCubeAtPosition(glm::ivec3(x, y, z - 1)))
 					{
 						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Back, 
 							opaqueElementBufferIndex, transparentElementBufferIndex, position);
 					}
-					else if (!regenChunk && !isChunkAtPosition(glm::ivec2(x, z - 1)))
+					else if (!regenChunk && !isChunkAtPosition(glm::ivec3(x, y, z - 1)))
 					{
 						regenChunk = true;
 					}
 
-					if (isChunkAtPosition(glm::ivec2(x, z + 1)) && !isCubeAtPosition(glm::ivec3(x, y, z + 1)))
+					if (isChunkAtPosition(glm::ivec3(x, y, z + 1)) && !isCubeAtPosition(glm::ivec3(x, y, z + 1)))
 					{
 						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Front, 
 							opaqueElementBufferIndex, transparentElementBufferIndex, position);
 					}
-					else if (!regenChunk && !isChunkAtPosition(glm::ivec2(x, z + 1)))
+					else if (!regenChunk && !isChunkAtPosition(glm::ivec3(x, y, z + 1)))
 					{
 						regenChunk = true;
 					}
@@ -372,16 +372,17 @@ void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::unordered_
 void ChunkManager::addChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec2, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture)
 {
 	std::queue<const Chunk*> newlyAddedChunks;
-	glm::ivec2 startPosition = Utilities::getClosestChunkStartingPosition(glm::vec2(playerPosition.x, playerPosition.z));	
-	for (int y = startPosition.y - Utilities::VISIBILITY_DISTANCE; y < startPosition.y + Utilities::VISIBILITY_DISTANCE; y += Utilities::CHUNK_DEPTH)
+	glm::ivec3 startPosition = Utilities::getClosestChunkStartingPosition(playerPosition);	
+	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z < startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
 	{
 		for (int x = startPosition.x - Utilities::VISIBILITY_DISTANCE; x < startPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
-			if (m_chunks.find(glm::ivec2(x, y)) == m_chunks.cend())
+			glm::ivec3 position(x, 0, z);
+			if (m_chunks.find(position) == m_chunks.cend())
 			{
 				auto newChunk = m_chunks.emplace(std::piecewise_construct,
-					std::forward_as_tuple(glm::ivec2(x, y)),
-					std::forward_as_tuple(glm::ivec3(x, 0, y))).first;
+					std::forward_as_tuple(position),
+					std::forward_as_tuple(position)).first;
 
 				newlyAddedChunks.push(&newChunk->second);
 			}
@@ -407,13 +408,13 @@ void ChunkManager::regenChunks(const Rectangle& visibilityRect, std::unordered_m
 	std::lock_guard<std::mutex> lock(m_mutex);
 	for (auto chunkStartingPosition = m_chunkMeshRegenerateQueue.begin(); chunkStartingPosition != m_chunkMeshRegenerateQueue.end();)
 	{
-		auto chunk = m_chunks.find(glm::ivec2(chunkStartingPosition->x, chunkStartingPosition->y));
+		auto chunk = m_chunks.find(glm::ivec3(chunkStartingPosition->x, 0, chunkStartingPosition->y));
 		if (chunk != m_chunks.cend())
 		{
-			if (m_chunks.find(glm::ivec2(chunkStartingPosition->x - Utilities::CHUNK_WIDTH, chunkStartingPosition->y)) != m_chunks.cend() &&
-				m_chunks.find(glm::ivec2(chunkStartingPosition->x + Utilities::CHUNK_WIDTH, chunkStartingPosition->y)) != m_chunks.cend() &&
-				m_chunks.find(glm::ivec2(chunkStartingPosition->x, chunkStartingPosition->y - Utilities::CHUNK_DEPTH)) != m_chunks.cend() &&
-				m_chunks.find(glm::ivec2(chunkStartingPosition->x, chunkStartingPosition->y + Utilities::CHUNK_DEPTH)) != m_chunks.cend())
+			if (m_chunks.find(glm::ivec3(chunkStartingPosition->x - Utilities::CHUNK_WIDTH, 0, chunkStartingPosition->y)) != m_chunks.cend() &&
+				m_chunks.find(glm::ivec3(chunkStartingPosition->x + Utilities::CHUNK_WIDTH, 0, chunkStartingPosition->y)) != m_chunks.cend() &&
+				m_chunks.find(glm::ivec3(chunkStartingPosition->x, 0, chunkStartingPosition->y - Utilities::CHUNK_DEPTH)) != m_chunks.cend() &&
+				m_chunks.find(glm::ivec3(chunkStartingPosition->x, 0, chunkStartingPosition->y + Utilities::CHUNK_DEPTH)) != m_chunks.cend())
 			{
 				glm::vec3 startPosition(chunk->second.getStartingPosition().x, 0, chunk->second.getStartingPosition().z);
 

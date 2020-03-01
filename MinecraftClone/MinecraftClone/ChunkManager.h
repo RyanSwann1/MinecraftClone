@@ -47,7 +47,7 @@ public:
 		const Texture& texture, const sf::Window& window);
 
 private:
-	std::unordered_map<glm::ivec2, Chunk> m_chunks;
+	std::unordered_map<glm::ivec3, Chunk> m_chunks;
 	std::vector<glm::ivec2> m_chunkMeshRegenerateQueue;
 	std::mutex m_mutex;
 
