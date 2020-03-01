@@ -259,12 +259,11 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 				}
 				else if (static_cast<eCubeType>(chunk.getCubeDetails(position).type) == eCubeType::Water)
 				{
-					vertexArray.m_attachTransparentVBO = true;
-					//if (!regenChunk && !isChunkAtPosition(glm::ivec2(x - 1, z)) || !isChunkAtPosition(glm::ivec2(x + 1, z)) ||
-					//	!isChunkAtPosition(glm::ivec2(x, z - 1)) || !isChunkAtPosition(glm::ivec2(x, z + 1)))
-					//{
-					//	regenChunk = true;
-					//}
+					if (!regenChunk && !isChunkAtPosition(glm::ivec3(x - 1, y, z)) || !isChunkAtPosition(glm::ivec3(x + 1, y, z)) ||
+						!isChunkAtPosition(glm::ivec3(x, y, z - 1)) || !isChunkAtPosition(glm::ivec3(x, y, z + 1)))
+					{
+						regenChunk = true;
+					}
 
 					addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Top, 
 						opaqueElementBufferIndex, transparentElementBufferIndex, position);
@@ -328,6 +327,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 	else
 	{
 		vertexArray.m_attachOpaqueVBO = true;
+		vertexArray.m_attachTransparentVBO = true;
 	}
 }
 
