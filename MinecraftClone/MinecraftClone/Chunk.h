@@ -25,6 +25,7 @@ public:
 	Chunk();
 	Chunk(glm::ivec3 startingPosition);
 	
+	bool isInUse() const;
 	bool isPositionInBounds(glm::vec3 position) const;
 	bool isPositionInBounds(glm::ivec3 position) const;
 	glm::ivec3 getEndingPosition() const;
@@ -33,10 +34,11 @@ public:
 	CubeDetails getCubeDetailsAtPosition(glm::ivec3 position) const;
 
 	void reset(glm::ivec3 startingPosition);
-
+	void release();
 	void removeCubeAtPosition(glm::ivec3 position);
 
 private:
+	bool m_inUse;
 	glm::ivec3 m_startingPosition;
 	glm::ivec3 m_endingPosition;
 	std::array<std::array<std::array<CubeDetails, Utilities::CHUNK_DEPTH>, Utilities::CHUNK_HEIGHT>, Utilities::CHUNK_WIDTH> m_chunk;

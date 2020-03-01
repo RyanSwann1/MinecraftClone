@@ -3,6 +3,7 @@
 #include "NonCopyable.h"
 #include "Chunk.h"
 #include "glm/gtx/hash.hpp"
+#include "ChunkPool.h"
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -47,7 +48,8 @@ public:
 		const Texture& texture, const sf::Window& window);
 
 private:
-	std::unordered_map<glm::ivec3, Chunk> m_chunks;
+	ChunkPool m_chunkPool;
+	std::unordered_map<glm::ivec3, Chunk*> m_chunks;
 	std::vector<glm::ivec3> m_chunkMeshRegenerateQueue;
 	std::mutex m_mutex;
 
