@@ -32,7 +32,7 @@
 
 struct ChunkFromPool : private NonCopyable
 {
-	ChunkFromPool(ChunkPool& chunkPool, glm::ivec3 startingPosition)
+	ChunkFromPool(ChunkPool& chunkPool, const glm::ivec3& startingPosition)
 		: chunk(chunkPool.getChunk(startingPosition))
 	{}
 
@@ -65,7 +65,7 @@ private:
 	std::unordered_set<glm::ivec3> m_chunksToRegenerate;
 	std::mutex m_mutex;
 
-	void addCubeFace(VertexArray& vertexArray, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide, const glm::ivec3& cubePosition);
+	void addCubeFace(VertexArray& vertexArray, const Texture& texture, const CubeDetails& cubeDetails, eCubeSide cubeSide, const glm::ivec3& cubePosition);
 
 	bool isCubeAtPosition(const glm::ivec3& position) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
