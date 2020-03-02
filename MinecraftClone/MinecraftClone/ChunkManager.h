@@ -36,7 +36,6 @@ enum class eCubeSide;
 class Texture;
 class VertexArray;
 struct CubeDetails;
-struct VertexBuffer;
 class ChunkManager : private NonCopyable
 {
 public:
@@ -51,8 +50,7 @@ private:
 	std::vector<glm::ivec3> m_chunkMeshRegenerateQueue;
 	std::mutex m_mutex;
 
-	void addCubeFace(VertexBuffer& vertexBuffer, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide,
-		int& opaqueElementBufferIndex, int& transparentElementBufferIndex, glm::ivec3 cubePosition);
+	void addCubeFace(VertexArray& vertexArray, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide, glm::ivec3 cubePosition);
 
 	bool isCubeAtPosition(glm::ivec3 position) const;
 	bool isCubeAtPosition(glm::ivec3 position, const Chunk& chunk) const;

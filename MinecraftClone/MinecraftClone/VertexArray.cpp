@@ -12,7 +12,9 @@ VertexArray::VertexArray()
 	m_destroy(false),
 	m_vertexBuffer(),
 	m_ID(Utilities::INVALID_OPENGL_ID),
-	m_transparentID(Utilities::INVALID_OPENGL_ID)
+	m_transparentID(Utilities::INVALID_OPENGL_ID),
+	m_opaqueElementBufferIndex(0),
+	m_transparentElementBufferIndex(0)
 {}
 
 void VertexArray::reset()
@@ -24,6 +26,8 @@ void VertexArray::reset()
 	m_vertexBuffer.transparentPositions.clear();
 	m_vertexBuffer.transparentTextCoords.clear();
 	m_vertexBuffer.transparentIndicies.clear();
+	m_transparentElementBufferIndex = 0;
+	m_opaqueElementBufferIndex = 0;
 }
 
 void VertexArray::destroy()
