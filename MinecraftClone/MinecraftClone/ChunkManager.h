@@ -6,6 +6,7 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
+#include <unordered_set>
 #include <queue>
 #include <mutex>
 #include <SFML/Graphics.hpp>
@@ -47,7 +48,7 @@ public:
 
 private:
 	std::unordered_map<glm::ivec3, Chunk> m_chunks;
-	std::vector<glm::ivec3> m_chunkMeshRegenerateQueue;
+	std::unordered_set<glm::ivec3> m_chunksToRegenerate;
 	std::mutex m_mutex;
 
 	void addCubeFace(VertexArray& vertexArray, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide, glm::ivec3 cubePosition);

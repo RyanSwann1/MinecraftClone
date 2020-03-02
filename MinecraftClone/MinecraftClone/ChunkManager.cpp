@@ -10,7 +10,7 @@
 
 ChunkManager::ChunkManager()
 	: m_chunks(),
-	m_chunkMeshRegenerateQueue()
+	m_chunksToRegenerate()
 {}
 
 void ChunkManager::generateInitialChunks(glm::vec3 playerPosition, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const Texture& texture)
@@ -361,7 +361,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 
 	if (!vertexArray.m_awaitingRegeneration && regenChunk)
 	{
-		m_chunkMeshRegenerateQueue.push_back(chunkStartingPosition);
+		m_chunksToRegenerate.insert(chunkStartingPosition);
 		vertexArray.m_awaitingRegeneration = true;
 	}
 	else if (vertexArray.m_awaitingRegeneration && !regenChunk)
@@ -390,13 +390,13 @@ void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::unordered_
 				VAO->second.m_destroy = true;
 			}
 
-			auto chunkToRegen = std::find_if(m_chunkMeshRegenerateQueue.begin(), m_chunkMeshRegenerateQueue.end(), [chunkStartingPosition](const auto& position)
+			auto chunkToRegen = std::find_if(m_chunksToRegenerate.begin(), m_chunksToRegenerate.end(), [chunkStartingPosition](const auto& position)
 			{
 				return position == chunkStartingPosition;
 			});
-			if (chunkToRegen != m_chunkMeshRegenerateQueue.end())
+			if (chunkToRegen != m_chunksToRegenerate.end())
 			{
-				m_chunkMeshRegenerateQueue.erase(chunkToRegen);
+				m_chunksToRegenerate.erase(chunkToRegen);
 			}
 
 			chunk = m_chunks.erase(chunk);
@@ -445,7 +445,7 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, std::unordered_map
 void ChunkManager::regenChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
-	for (auto chunkStartingPosition = m_chunkMeshRegenerateQueue.begin(); chunkStartingPosition != m_chunkMeshRegenerateQueue.end();)
+	for (auto chunkStartingPosition = m_chunksToRegenerate.begin(); chunkStartingPosition != m_chunksToRegenerate.end();)
 	{
 		auto chunk = m_chunks.find(*chunkStartingPosition);
 		if (chunk != m_chunks.cend())
@@ -462,7 +462,7 @@ void ChunkManager::regenChunks(const Rectangle& visibilityRect, std::unordered_m
 					generateChunkMesh(VAO->second, texture, chunk->second);
 				}
 
-				chunkStartingPosition = m_chunkMeshRegenerateQueue.erase(chunkStartingPosition);
+				chunkStartingPosition = m_chunksToRegenerate.erase(chunkStartingPosition);
 			}
 			else
 			{
@@ -471,7 +471,7 @@ void ChunkManager::regenChunks(const Rectangle& visibilityRect, std::unordered_m
 		}
 		else
 		{
-			chunkStartingPosition = m_chunkMeshRegenerateQueue.erase(chunkStartingPosition);
+			chunkStartingPosition = m_chunksToRegenerate.erase(chunkStartingPosition);
 		}
 	}
 }
