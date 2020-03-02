@@ -62,6 +62,5 @@ private:
 	void addChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture);
 	void regenChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture);
 
-	std::array<const Chunk*, static_cast<size_t>(eDirection::Total)> getNeighbouringChunks(glm::ivec3 chunkStartingPosition) const;
 	const Chunk* getNeighbouringChunkAtPosition(glm::ivec3 chunkStartingPosition) const;
 };

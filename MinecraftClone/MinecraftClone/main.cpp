@@ -173,7 +173,7 @@ int main()
 	settings.majorVersion = 3;
 	settings.minorVersion = 3;
 	settings.attributeFlags = sf::ContextSettings::Core;
-	sf::Vector2i windowSize(1280, 1080);
+	sf::Vector2i windowSize(1980, 1080);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft", sf::Style::Default, settings);
 	window.setFramerateLimit(120);
 	gladLoadGL();
