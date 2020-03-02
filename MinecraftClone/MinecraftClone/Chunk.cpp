@@ -19,16 +19,6 @@ Chunk::Chunk(glm::ivec3 startingPosition)
 	regen(m_startingPosition);
 }
 
-bool Chunk::isPositionInBounds(glm::vec3 position) const
-{
-	return (position.x >= m_startingPosition.x &&
-		position.y >= m_startingPosition.y &&
-		position.z >= m_startingPosition.z &&
-		position.x <= m_endingPosition.x &&
-		position.y <= m_endingPosition.y &&
-		position.z <= m_endingPosition.z);
-}
-
 bool Chunk::isPositionInBounds(glm::ivec3 position) const
 {
 	return (position.x >= m_startingPosition.x &&
@@ -37,11 +27,6 @@ bool Chunk::isPositionInBounds(glm::ivec3 position) const
 		position.x <= m_endingPosition.x - 1 &&
 		position.y <= m_endingPosition.y - 1 &&
 		position.z <= m_endingPosition.z - 1);
-}
-
-glm::ivec3 Chunk::getEndingPosition() const
-{
-	return m_endingPosition;
 }
 
 glm::ivec3 Chunk::getStartingPosition() const
@@ -87,12 +72,6 @@ void Chunk::reset(glm::ivec3 startingPosition)
 
 	m_startingPosition = startingPosition;
 	regen(m_startingPosition);	
-}
-
-void Chunk::removeCubeAtPosition(glm::ivec3 position)
-{
-	glm::ivec3 positionOnGrid = position - glm::ivec3(m_startingPosition.x, m_startingPosition.y, m_startingPosition.z);
-	m_chunk[positionOnGrid.x][positionOnGrid.y][positionOnGrid.z].type = static_cast<char>(eCubeType::Invalid);
 }
 
 void Chunk::regen(glm::ivec3 startingPosition)

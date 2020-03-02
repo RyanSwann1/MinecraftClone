@@ -25,16 +25,12 @@ public:
 	Chunk();
 	Chunk(glm::ivec3 startingPosition);
 	
-	bool isPositionInBounds(glm::vec3 position) const;
 	bool isPositionInBounds(glm::ivec3 position) const;
-	glm::ivec3 getEndingPosition() const;
 	glm::ivec3 getStartingPosition() const;
 	CubeDetails getCubeDetails(glm::ivec3 position) const;
 	CubeDetails getCubeDetailsAtPosition(glm::ivec3 position) const;
 
 	void reset(glm::ivec3 startingPosition);
-
-	void removeCubeAtPosition(glm::ivec3 position);
 
 private:
 	glm::ivec3 m_startingPosition;
