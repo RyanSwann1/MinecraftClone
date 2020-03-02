@@ -9,7 +9,7 @@ class ChunkPool : private NonCopyable
 public:
 	ChunkPool();
 
-	Chunk& getChunk(glm::ivec3 startingPosition);
+	Chunk& getChunk(const glm::ivec3& startingPosition);
 
 private:
 	std::vector<Chunk> m_chunks;

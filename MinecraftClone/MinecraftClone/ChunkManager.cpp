@@ -57,7 +57,7 @@ void ChunkManager::update(Rectangle& visibilityRect, std::unordered_map<glm::ive
 	}
 }
 
-void ChunkManager::addCubeFace(VertexArray& vertexArray, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide, const glm::ivec3& cubePosition)
+void ChunkManager::addCubeFace(VertexArray& vertexArray, const Texture& texture, const CubeDetails& cubeDetails, eCubeSide cubeSide, const glm::ivec3& cubePosition)
 {
 	if (static_cast<eCubeType>(cubeDetails.type) == eCubeType::Water)
 	{

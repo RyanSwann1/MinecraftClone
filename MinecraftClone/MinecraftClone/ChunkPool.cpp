@@ -5,7 +5,7 @@ ChunkPool::ChunkPool()
 	m_chunks.resize(size_t(2500));
 }
 
-Chunk& ChunkPool::getChunk(glm::ivec3 startingPosition)
+Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
 {
 	for (auto& chunk : m_chunks)
 	{
