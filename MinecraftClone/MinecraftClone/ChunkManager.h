@@ -56,7 +56,7 @@ public:
 	ChunkManager();
 
 	void generateInitialChunks(const glm::vec3& playerPosition, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const Texture& texture);
-	void update(Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, Camera& camera, 
+	void update(Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const Camera& camera, 
 		const Texture& texture, const sf::Window& window);
 
 private:
@@ -65,7 +65,7 @@ private:
 	std::unordered_set<glm::ivec3> m_chunksToRegenerate;
 	std::mutex m_mutex;
 
-	void addCubeFace(VertexArray& vertexArray, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide, glm::ivec3 cubePosition);
+	void addCubeFace(VertexArray& vertexArray, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide, const glm::ivec3& cubePosition);
 
 	bool isCubeAtPosition(const glm::ivec3& position) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
