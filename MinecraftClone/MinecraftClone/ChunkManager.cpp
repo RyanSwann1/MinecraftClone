@@ -234,8 +234,14 @@ bool ChunkManager::isCubeAtPosition(glm::ivec3 position) const
 
 bool ChunkManager::isCubeAtPosition(glm::ivec3 position, const Chunk& chunk) const
 {
-	assert(chunk.isPositionInBounds(position));
-	return chunk.getCubeDetailsAtPosition(position).type != static_cast<char>(eCubeType::Invalid);
+	if (chunk.getCubeDetailsAtPosition(position).type != static_cast<char>(eCubeType::Invalid) &&
+		chunk.getCubeDetailsAtPosition(position).type != static_cast<char>(eCubeType::Water))
+	{
+		return true;
+	}
+
+	return false;
+	//return chunk.getCubeDetailsAtPosition(position).type != (static_cast<char>(eCubeType::Invalid));
 }
 
 bool ChunkManager::isChunkAtPosition(glm::ivec3 position) const
@@ -287,7 +293,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 					glm::ivec3 leftPosition(x - 1, y, z);
 					if (chunk.isPositionInBounds(leftPosition))
 					{
-						if (!isCubeAtPosition(leftPosition))
+						if (!isCubeAtPosition(leftPosition, chunk))
 						{
 							addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Left,
 								opaqueElementBufferIndex, transparentElementBufferIndex, position);
@@ -301,14 +307,14 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 					}
 					else if (!neighbouringChunks[static_cast<int>(eDirection::Left)])
 					{
-						regenChunk = true;
+
 					}
 					
 					//Right
 					glm::ivec3 rightPosition(x + 1, y, z);
 					if (chunk.isPositionInBounds(rightPosition))
 					{
-						if (!isCubeAtPosition(rightPosition))
+						if (!isCubeAtPosition(rightPosition, chunk))
 						{
 							addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Right,
 								opaqueElementBufferIndex, transparentElementBufferIndex, position);
@@ -322,14 +328,14 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 					}
 					else if (!neighbouringChunks[static_cast<int>(eDirection::Right)])
 					{
-						regenChunk = true;
+
 					}
 
 					//Forward
 					glm::ivec3 forwardPosition(x, y, z + 1);
 					if (chunk.isPositionInBounds(forwardPosition))
 					{
-						if (!isCubeAtPosition(forwardPosition))
+						if (!isCubeAtPosition(forwardPosition, chunk))
 						{
 							addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Front,
 								opaqueElementBufferIndex, transparentElementBufferIndex, position);
@@ -343,14 +349,14 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 					}
 					else if (!neighbouringChunks[static_cast<int>(eDirection::Forward)])
 					{
-						regenChunk = true;
+
 					}
 
 					//Back
 					glm::ivec3 backPosition(x, y, z - 1);
 					if (chunk.isPositionInBounds(backPosition))
 					{
-						if (!isCubeAtPosition(backPosition))
+						if (!isCubeAtPosition(backPosition, chunk))
 						{
 							addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Back,
 								opaqueElementBufferIndex, transparentElementBufferIndex, position);
@@ -364,7 +370,14 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 					}
 					else if (neighbouringChunks[static_cast<int>(eDirection::Back)])
 					{
-						regenChunk = true;
+
+					}
+
+					//Top
+					if (y < Utilities::CHUNK_HEIGHT && !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
+					{
+						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Top,
+							opaqueElementBufferIndex, transparentElementBufferIndex, position);
 					}
 
 				/*	if (isChunkAtPosition(glm::ivec3(x - 1, y, z)) && !isCubeAtPosition(glm::ivec3(x - 1, y, z)))
@@ -417,15 +430,17 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 		}
 	}
 
-	if (regenChunk)
-	{
-		m_chunkMeshRegenerateQueue.push_back(chunkStartingPosition);
-	}
-	else
-	{
-		vertexArray.m_attachOpaqueVBO = true;
-		vertexArray.m_attachTransparentVBO = true;
-	}
+	vertexArray.m_attachOpaqueVBO = true;
+	vertexArray.m_attachTransparentVBO = true;
+
+	//if (regenChunk)
+	//{
+	//	m_chunkMeshRegenerateQueue.push_back(chunkStartingPosition);
+	//}
+	//else
+	//{
+
+	//}
 }
 
 void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs)
