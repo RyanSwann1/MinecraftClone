@@ -7,8 +7,10 @@
 #include <algorithm>
 
 Chunk::Chunk()
-	: m_chunk(),
-	m_startingPosition()
+	: m_inUse(false),
+	m_startingPosition(),
+	m_endingPosition(),
+	m_chunk()
 {
 }
 
@@ -17,6 +19,11 @@ Chunk::Chunk(glm::ivec3 startingPosition)
 	m_startingPosition(startingPosition)
 {
 	regen(m_startingPosition);
+}
+
+bool Chunk::isInUse() const
+{
+	return m_inUse;
 }
 
 bool Chunk::isPositionInBounds(glm::ivec3 position) const
@@ -70,8 +77,14 @@ void Chunk::reset(glm::ivec3 startingPosition)
 		}
 	}
 
+	m_inUse = true;
 	m_startingPosition = startingPosition;
 	regen(m_startingPosition);	
+}
+
+void Chunk::release()
+{
+	m_inUse = false;
 }
 
 void Chunk::regen(glm::ivec3 startingPosition)

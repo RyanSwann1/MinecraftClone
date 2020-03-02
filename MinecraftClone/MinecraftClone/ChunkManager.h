@@ -1,7 +1,6 @@
 #pragma once
 
-#include "NonCopyable.h"
-#include "Chunk.h"
+#include "ChunkPool.h"
 #include "glm/gtx/hash.hpp"
 #include <vector>
 #include <memory>
@@ -31,6 +30,20 @@
 //https://algs4.cs.princeton.edu/34hash/
 //https://www.hackerearth.com/practice/data-structures/hash-tables/basics-of-hash-tables/tutorial/
 
+struct ChunkFromPool : private NonCopyable
+{
+	ChunkFromPool(ChunkPool& chunkPool, glm::ivec3 startingPosition)
+		: chunk(chunkPool.getChunk(startingPosition))
+	{}
+
+	~ChunkFromPool()
+	{
+		chunk.release();
+	}
+
+	Chunk& chunk;
+};
+
 struct Camera;
 struct Rectangle;
 enum class eCubeSide;
@@ -47,7 +60,8 @@ public:
 		const Texture& texture, const sf::Window& window);
 
 private:
-	std::unordered_map<glm::ivec3, Chunk> m_chunks;
+	ChunkPool m_chunkPool;
+	std::unordered_map<glm::ivec3, ChunkFromPool> m_chunks;
 	std::unordered_set<glm::ivec3> m_chunksToRegenerate;
 	std::mutex m_mutex;
 
