@@ -55,7 +55,7 @@ class ChunkManager : private NonCopyable
 public:
 	ChunkManager();
 
-	void generateInitialChunks(glm::vec3 playerPosition, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const Texture& texture);
+	void generateInitialChunks(const glm::vec3& playerPosition, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const Texture& texture);
 	void update(Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, Camera& camera, 
 		const Texture& texture, const sf::Window& window);
 
@@ -67,15 +67,15 @@ private:
 
 	void addCubeFace(VertexArray& vertexArray, const Texture& texture, CubeDetails cubeDetails, eCubeSide cubeSide, glm::ivec3 cubePosition);
 
-	bool isCubeAtPosition(glm::ivec3 position) const;
-	bool isCubeAtPosition(glm::ivec3 position, const Chunk& chunk) const;
-	bool isChunkAtPosition(glm::ivec3 position) const;
+	bool isCubeAtPosition(const glm::ivec3& position) const;
+	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
+	bool isChunkAtPosition(const glm::ivec3& position) const;
 
 	void generateChunkMesh(VertexArray& vertexArray, const Texture& texture, const Chunk& chunk);
 
 	void deleteChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs);
-	void addChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture);
-	void regenChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, glm::vec3 playerPosition, const Texture& texture);
+	void addChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const glm::vec3& playerPosition, const Texture& texture);
+	void regenChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const glm::vec3& playerPosition, const Texture& texture);
 
-	const Chunk* getNeighbouringChunkAtPosition(glm::ivec3 chunkStartingPosition) const;
+	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition) const;
 };

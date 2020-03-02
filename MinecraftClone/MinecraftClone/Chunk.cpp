@@ -14,7 +14,7 @@ Chunk::Chunk()
 {
 }
 
-Chunk::Chunk(glm::ivec3 startingPosition)
+Chunk::Chunk(const glm::ivec3& startingPosition)
 	: m_chunk(),
 	m_startingPosition(startingPosition)
 {
@@ -26,7 +26,7 @@ bool Chunk::isInUse() const
 	return m_inUse;
 }
 
-bool Chunk::isPositionInBounds(glm::ivec3 position) const
+bool Chunk::isPositionInBounds(const glm::ivec3& position) const
 {
 	return (position.x >= m_startingPosition.x &&
 		position.y >= m_startingPosition.y &&
@@ -36,35 +36,19 @@ bool Chunk::isPositionInBounds(glm::ivec3 position) const
 		position.z <= m_endingPosition.z - 1);
 }
 
-glm::ivec3 Chunk::getStartingPosition() const
+const glm::ivec3& Chunk::getStartingPosition() const
 {
 	return m_startingPosition;
 }
 
-CubeDetails Chunk::getCubeDetails(glm::ivec3 position) const
+const CubeDetails& Chunk::getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const
 {
 	return m_chunk [position.x - m_startingPosition.x]
 		[position.y - m_startingPosition.y]
 		[position.z - m_startingPosition.z];
 }
 
-CubeDetails Chunk::getCubeDetailsAtPosition(glm::ivec3 position) const
-{
-	CubeDetails cubeDetails;
-	if (position.x >= m_startingPosition.x &&
-		position.y >= m_startingPosition.y &&
-		position.z >= m_startingPosition.z &&
-		position.x <= m_endingPosition.x - 1 &&
-		position.y <= m_endingPosition.y - 1 &&
-		position.z <= m_endingPosition.z - 1)
-	{
-		cubeDetails = m_chunk[position.x - m_startingPosition.x][position.y - m_startingPosition.y][position.z - m_startingPosition.z];
-	}
-
-	return cubeDetails;
-}
-
-void Chunk::reset(glm::ivec3 startingPosition)
+void Chunk::reset(const glm::ivec3& startingPosition)
 {
 	for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
 	{
@@ -87,7 +71,7 @@ void Chunk::release()
 	m_inUse = false;
 }
 
-void Chunk::regen(glm::ivec3 startingPosition)
+void Chunk::regen(const glm::ivec3& startingPosition)
 {
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
 	{
