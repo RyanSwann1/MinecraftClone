@@ -36,8 +36,9 @@ glm::ivec3 Chunk::getStartingPosition() const
 
 CubeDetails Chunk::getCubeDetails(glm::ivec3 position) const
 {
-	glm::ivec3 positionOnGrid = position - glm::ivec3(m_startingPosition.x, m_startingPosition.y, m_startingPosition.z);
-	return m_chunk[positionOnGrid.x][positionOnGrid.y][positionOnGrid.z];
+	return m_chunk [position.x - m_startingPosition.x]
+		[position.y - m_startingPosition.y]
+		[position.z - m_startingPosition.z];
 }
 
 CubeDetails Chunk::getCubeDetailsAtPosition(glm::ivec3 position) const
@@ -50,8 +51,7 @@ CubeDetails Chunk::getCubeDetailsAtPosition(glm::ivec3 position) const
 		position.y <= m_endingPosition.y - 1 &&
 		position.z <= m_endingPosition.z - 1)
 	{
-		glm::ivec3 positionOnGrid = position - glm::ivec3(m_startingPosition.x, m_startingPosition.y, m_startingPosition.z);
-		cubeDetails = m_chunk[positionOnGrid.x][positionOnGrid.y][positionOnGrid.z];
+		cubeDetails = m_chunk[position.x - m_startingPosition.x][position.y - m_startingPosition.y][position.z - m_startingPosition.z];
 	}
 
 	return cubeDetails;
