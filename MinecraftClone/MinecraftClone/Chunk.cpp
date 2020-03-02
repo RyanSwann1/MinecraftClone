@@ -51,7 +51,6 @@ glm::ivec3 Chunk::getStartingPosition() const
 
 CubeDetails Chunk::getCubeDetails(glm::ivec3 position) const
 {
-	assert(isPositionInBounds(position));
 	glm::ivec3 positionOnGrid = position - glm::ivec3(m_startingPosition.x, m_startingPosition.y, m_startingPosition.z);
 	return m_chunk[positionOnGrid.x][positionOnGrid.y][positionOnGrid.z];
 }

@@ -233,7 +233,7 @@ bool ChunkManager::isCubeAtPosition(glm::ivec3 position) const
 
 bool ChunkManager::isCubeAtPosition(glm::ivec3 position, const Chunk& chunk) const
 {
-	CubeDetails cubeDetails = chunk.getCubeDetailsAtPosition(position);
+	CubeDetails cubeDetails = chunk.getCubeDetails(position);
 	return (cubeDetails.type != static_cast<char>(eCubeType::Invalid) && cubeDetails.type != static_cast<char>(eCubeType::Water) ? true : false);
 }
 
@@ -350,7 +350,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 					}
 
 					//Top
-					if (y < Utilities::CHUNK_HEIGHT && !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
+					if (y <= Utilities::CHUNK_HEIGHT && !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
 					{
 						addCubeFace(vertexArray, texture, chunk.getCubeDetails(position), eCubeSide::Top, position);
 					}
