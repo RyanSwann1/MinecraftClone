@@ -298,10 +298,11 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 					{
 						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Left,
 							opaqueElementBufferIndex, transparentElementBufferIndex, position);
-
+					}
+					else if (!neighbouringChunks[static_cast<int>(eDirection::Left)])
+					{
 						regenChunk = true;
 					}
-
 					
 					//Right
 					glm::ivec3 rightPosition(x + 1, y, z);
@@ -318,7 +319,9 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 					{
 						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Right,
 							opaqueElementBufferIndex, transparentElementBufferIndex, position);
-
+					}
+					else if (!neighbouringChunks[static_cast<int>(eDirection::Right)])
+					{
 						regenChunk = true;
 					}
 
@@ -337,7 +340,9 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 					{
 						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Front,
 							opaqueElementBufferIndex, transparentElementBufferIndex, position);
-
+					}
+					else if (!neighbouringChunks[static_cast<int>(eDirection::Forward)])
+					{
 						regenChunk = true;
 					}
 
@@ -356,7 +361,9 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 					{
 						addCubeFace(vertexArray.m_vertexBuffer, texture, chunk.getCubeDetails(position), eCubeSide::Back,
 							opaqueElementBufferIndex, transparentElementBufferIndex, position);
-
+					}
+					else if (neighbouringChunks[static_cast<int>(eDirection::Back)])
+					{
 						regenChunk = true;
 					}
 
