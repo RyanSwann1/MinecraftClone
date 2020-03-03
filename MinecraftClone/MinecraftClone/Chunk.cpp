@@ -10,13 +10,16 @@ Chunk::Chunk()
 	: m_inUse(false),
 	m_startingPosition(),
 	m_endingPosition(),
-	m_chunk()
-{
-}
+	m_chunk(),
+	m_next(nullptr)
+{}
 
 Chunk::Chunk(const glm::ivec3& startingPosition)
-	: m_chunk(),
-	m_startingPosition(startingPosition)
+	: m_inUse(false),
+	m_startingPosition(startingPosition),
+	m_endingPosition(),
+	m_chunk(),
+	m_next(nullptr)
 {
 	regen(m_startingPosition);
 }
@@ -43,12 +46,22 @@ const glm::ivec3& Chunk::getStartingPosition() const
 
 const CubeDetails& Chunk::getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const
 {
-	return m_chunk [position.x - m_startingPosition.x]
+	return m_chunk[position.x - m_startingPosition.x]
 		[position.y - m_startingPosition.y]
 		[position.z - m_startingPosition.z];
 }
 
-void Chunk::reset(const glm::ivec3& startingPosition)
+Chunk* Chunk::getNext()
+{
+	return m_next;
+}
+
+void Chunk::setNext(Chunk* chunk)
+{
+	m_next = chunk;
+}
+
+void Chunk::reuse(const glm::ivec3& startingPosition)
 {
 	for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
 	{
@@ -69,6 +82,8 @@ void Chunk::reset(const glm::ivec3& startingPosition)
 void Chunk::release()
 {
 	m_inUse = false;
+	m_startingPosition = glm::ivec3();
+	m_endingPosition = glm::ivec3();
 }
 
 void Chunk::regen(const glm::ivec3& startingPosition)
