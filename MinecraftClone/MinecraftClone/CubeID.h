@@ -6,7 +6,8 @@ enum class eCubeType
 	Grass,
 	Sand,
 	Stone,
-	Water
+	Water,
+	TreeStump
 };
 
 enum class eCubeFaceID
@@ -15,5 +16,6 @@ enum class eCubeFaceID
 	GrassSide,
 	Sand,
 	Stone,
-	Water
+	Water,
+	TreeStump
 };

@@ -96,7 +96,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			double ny = (z) / (Utilities::VISIBILITY_DISTANCE * 1.0f) - 0.5f;
 
 			//float elevation = std::abs(glm::perlin(glm::vec2(nx, ny)));
-
+			
 			float elevation = std::abs(1 * glm::perlin(glm::vec2(1 * nx, 1 * ny)));
 			elevation += std::abs(0.5 * glm::perlin(glm::vec2(nx * 2, ny * 2)));
 			elevation += std::abs(0.25 * glm::perlin(glm::vec2(nx * 4, ny * 4)));
@@ -160,6 +160,26 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			if (m_chunk[x][Utilities::WATER_MAX_HEIGHT][z].type == static_cast<char>(eCubeType::Invalid))
 			{
 				m_chunk[x][Utilities::WATER_MAX_HEIGHT][z].type = static_cast<char>(eCubeType::Water);
+			}
+		}
+	}
+
+	//Fill with trees
+	for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
+	{
+		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
+		{
+			for (int y = Utilities::CHUNK_HEIGHT - 1; y >= Utilities::SAND_MAX_HEIGHT; --y)
+			{
+				if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Grass))
+				{
+					int randNumb = Utilities::getRandomNumber(0, 1000);
+					if (randNumb >= Utilities::TREE_SPAWN_CHANCE)
+					{
+						m_chunk[x][y + 1][z].type = static_cast<char>(eCubeType::TreeStump);
+					}
+					break;
+				}
 			}
 		}
 	}

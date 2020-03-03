@@ -5,6 +5,9 @@
 #include "Utilities.h"
 #include <array>
 
+//Trees
+//https://www.reddit.com/r/proceduralgeneration/comments/72waky/how_does_layered_generation_work_when_generating/
+
 struct CubeDetails
 {
 	CubeDetails()

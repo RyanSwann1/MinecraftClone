@@ -74,6 +74,10 @@ void Texture::getTextCoords(eCubeFaceID tileID, std::vector<glm::vec2>& textCoor
 	case eCubeFaceID::Water:
 		textCoords.insert(textCoords.end(), Utilities::WATER_TEXT_COORDS.begin(), Utilities::WATER_TEXT_COORDS.end());
 		break;
+
+	case eCubeFaceID::TreeStump :
+		textCoords.insert(textCoords.end(), Utilities::TREESTUMP_TEXT_COORDS.begin(), Utilities::TREESTUMP_TEXT_COORDS.end());
+		break;
 	}
 }
 

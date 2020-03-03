@@ -3,6 +3,7 @@
 #include "glm/glm.hpp"
 #include <array>
 #include <vector>
+#include <random>
 
 enum class eCubeSide
 {
@@ -35,6 +36,7 @@ namespace Utilities
 	constexpr int SAND_MAX_HEIGHT = 17;
 	constexpr int WATER_MAX_HEIGHT = 13;
 	constexpr int STONE_MAX_HEIGHT = 12; 
+	constexpr int TREE_SPAWN_CHANCE = 1000;
 	
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
@@ -82,6 +84,14 @@ namespace Utilities
 		glm::vec2(64.0f / 128.0f, 1.0f)
 	};
 
+	static constexpr std::array<glm::vec2, 4> TREESTUMP_TEXT_COORDS =
+	{
+		glm::vec2(80.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
+		glm::vec2(96.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
+		glm::vec2(96.0f / 128.0f, 1.0f),
+		glm::vec2(80.0f / 128.0f, 1.0f)
+	};
+
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_FRONT = { glm::vec3(0, 0, 1.0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(0, 1.0, 1.0) };
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_BACK = { glm::vec3(0, 0, 0), glm::vec3(1.0, 0, 0), glm::vec3(1.0, 1.0, 0), glm::vec3(0, 1.0, 0) };
 
@@ -115,6 +125,15 @@ namespace Utilities
 		}
 
 		return glm::ivec3(closestStartingPosition.x, 0, closestStartingPosition.z);
+	}
+
+	inline int getRandomNumber(int min, int max)
+	{
+		static std::random_device rd;  //Will be used to obtain a seed for the random number engine
+		static std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+		std::uniform_int_distribution<> dis(min, max);
+
+		return dis(gen);
 	}
 
 	inline float clampTo(float value, float min, float max)
