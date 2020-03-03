@@ -18,6 +18,7 @@ Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
 {
 	int iterationCount = 0;
 	bool validChunkFound = false;
+
 	while (!validChunkFound)
 	{
 		if (m_nextAvailable->isInUse())
@@ -29,8 +30,7 @@ Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
 			validChunkFound = true;
 		}
 
-		++iterationCount;
-		assert(iterationCount < m_chunks.size());
+		assert(++iterationCount && iterationCount < m_chunks.size());
 	}
 	
 	m_nextAvailable->reuse(startingPosition);
@@ -39,5 +39,5 @@ Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
 
 void ChunkPool::releaseChunk(Chunk& chunk)
 {
-	chunk.release();
+	chunk.release(); 
 }
