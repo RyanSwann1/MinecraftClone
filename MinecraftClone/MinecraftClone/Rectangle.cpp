@@ -33,10 +33,6 @@ bool Rectangle::contains(const Rectangle& other) const
 		m_bottom <= other.m_top;
 }
 
-
-//Rectangle chunkAABB(glm::ivec2(chunk->second.chunk.getStartingPosition().x, chunk->second.chunk.getStartingPosition().z) +
-//	glm::ivec2(Utilities::CHUNK_WIDTH / 2.0f, Utilities::CHUNK_DEPTH / 2.0f), 16);
-
 void Rectangle::reset(const glm::vec2& position, float distance)
 {
 	m_left = position.x - distance;
