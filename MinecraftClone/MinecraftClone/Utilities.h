@@ -91,28 +91,30 @@ namespace Utilities
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_TOP = { glm::vec3(0, 1.0, 0), glm::vec3(0, 1.0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(1.0, 1.0, 0) };
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_BOTTOM = { glm::vec3(0, 0, 0), glm::vec3(0, 0, 1.0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 0, 0) };
 	
-	inline glm::ivec3 getClosestChunkStartingPosition(glm::ivec3 position)
+	inline glm::ivec3 getClosestChunkStartingPosition(const glm::ivec3& position)
 	{
+		glm::ivec3 closestStartingPosition(position);
+		
 		if (position.x < 0 && position.x % CHUNK_WIDTH < 0)
 		{
-			position.x += std::abs(position.x % CHUNK_WIDTH);
-			position.x -= CHUNK_WIDTH;
+			closestStartingPosition.x += std::abs(position.x % CHUNK_WIDTH);
+			closestStartingPosition.x -= CHUNK_WIDTH;
 		}
 		else if (position.x > 0 && position.x % CHUNK_WIDTH > 0)
 		{
-			position.x -= std::abs(position.x % CHUNK_WIDTH);
+			closestStartingPosition.x -= std::abs(position.x % CHUNK_WIDTH);
 		}
 		if (position.z < 0 && position.z % CHUNK_DEPTH < 0)
 		{
-			position.z += std::abs(position.z % CHUNK_DEPTH);
-			position.z -= CHUNK_DEPTH;
+			closestStartingPosition.z += std::abs(position.z % CHUNK_DEPTH);
+			closestStartingPosition.z -= CHUNK_DEPTH;
 		}
 		else if (position.z > 0 && position.z % CHUNK_DEPTH > 0)
 		{
-			position.z -= std::abs(position.z % CHUNK_DEPTH);
+			closestStartingPosition.z -= std::abs(position.z % CHUNK_DEPTH);
 		}
 
-		return glm::ivec3(position.x, 0, position.z);
+		return glm::ivec3(closestStartingPosition.x, 0, closestStartingPosition.z);
 	}
 
 	inline float clampTo(float value, float min, float max)
