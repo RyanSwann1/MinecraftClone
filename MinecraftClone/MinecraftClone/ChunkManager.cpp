@@ -375,8 +375,6 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 
 void ChunkManager::deleteChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs)
 {
-//	Rectangle chunkAABB;
-	
 	std::lock_guard<std::mutex> lock(m_mutex);
 	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
 	{
