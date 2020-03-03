@@ -36,13 +36,15 @@ namespace Utilities
 	constexpr int SAND_MAX_HEIGHT = 17;
 	constexpr int WATER_MAX_HEIGHT = 13;
 	constexpr int STONE_MAX_HEIGHT = 12; 
-	constexpr int TREE_SPAWN_CHANCE = 1000;
+	constexpr int TREE_SPAWN_CHANCE = 1200;
+	constexpr int TREE_MIN_HEIGHT = 3;
+	constexpr int TREE_MAX_HEIGHT = 8;
 	
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
 	//constexpr int VISIBILITY_DISTANCE = 128;
-	constexpr int VISIBILITY_DISTANCE = 736;
+	constexpr int VISIBILITY_DISTANCE = 480;
 
 	static constexpr std::array<glm::vec2, 4> GRASS_TEXT_COORDS =
 	{	

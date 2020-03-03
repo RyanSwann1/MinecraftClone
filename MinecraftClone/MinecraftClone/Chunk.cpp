@@ -173,11 +173,22 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			{
 				if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Grass))
 				{
-					int randNumb = Utilities::getRandomNumber(0, 1000);
-					if (randNumb >= Utilities::TREE_SPAWN_CHANCE)
+					if (Utilities::getRandomNumber(0, 1200) >= Utilities::TREE_SPAWN_CHANCE)
 					{
-						m_chunk[x][y + 1][z].type = static_cast<char>(eCubeType::TreeStump);
+						int treeHeight = Utilities::getRandomNumber(Utilities::TREE_MIN_HEIGHT, Utilities::TREE_MAX_HEIGHT);
+						for (int i = 1; i <= treeHeight; ++i)
+						{
+							if (y + i < Utilities::CHUNK_HEIGHT - 1)
+							{
+								m_chunk[x][y + i][z].type = static_cast<char>(eCubeType::TreeStump);
+							}
+							else
+							{
+								break;
+							}
+						}
 					}
+
 					break;
 				}
 			}
