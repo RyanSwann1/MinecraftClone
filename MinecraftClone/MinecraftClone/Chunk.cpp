@@ -8,16 +8,20 @@
 
 Chunk::Chunk()
 	: m_inUse(false),
-	m_state()
-{
-}
+	m_startingPosition(),
+	m_endingPosition(),
+	m_chunk(),
+	m_next(nullptr)
+{}
 
 Chunk::Chunk(const glm::ivec3& startingPosition)
 	: m_inUse(false),
-	m_state()
+	m_startingPosition(startingPosition),
+	m_endingPosition(),
+	m_chunk(),
+	m_next(nullptr)
 {
-	m_state.m_startingPosition = startingPosition;
-	regen(m_state.m_startingPosition);
+	regen(m_startingPosition);
 }
 
 bool Chunk::isInUse() const
@@ -27,37 +31,37 @@ bool Chunk::isInUse() const
 
 bool Chunk::isPositionInBounds(const glm::ivec3& position) const
 {
-	return (position.x >= m_state.m_startingPosition.x &&
-		position.y >= m_state.m_startingPosition.y &&
-		position.z >= m_state.m_startingPosition.z &&
-		position.x <= m_state.m_endingPosition.x - 1 &&
-		position.y <= m_state.m_endingPosition.y - 1 &&
-		position.z <= m_state.m_endingPosition.z - 1);
+	return (position.x >= m_startingPosition.x &&
+		position.y >= m_startingPosition.y &&
+		position.z >= m_startingPosition.z &&
+		position.x <= m_endingPosition.x - 1 &&
+		position.y <= m_endingPosition.y - 1 &&
+		position.z <= m_endingPosition.z - 1);
 }
 
 const glm::ivec3& Chunk::getStartingPosition() const
 {
-	return m_state.m_startingPosition;
+	return m_startingPosition;
 }
 
 const CubeDetails& Chunk::getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const
 {
-	return m_state.m_chunk[position.x - m_state.m_startingPosition.x]
-		[position.y - m_state.m_startingPosition.y]
-		[position.z - m_state.m_startingPosition.z];
+	return m_chunk[position.x - m_startingPosition.x]
+		[position.y - m_startingPosition.y]
+		[position.z - m_startingPosition.z];
 }
 
 Chunk* Chunk::getNext()
 {
-	return m_state.m_next;
+	return m_next;
 }
 
 void Chunk::setNext(Chunk* chunk)
 {
-	m_state.m_next = chunk;
+	m_next = chunk;
 }
 
-void Chunk::reset(const glm::ivec3& startingPosition)
+void Chunk::reuse(const glm::ivec3& startingPosition)
 {
 	for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
 	{
@@ -65,14 +69,14 @@ void Chunk::reset(const glm::ivec3& startingPosition)
 		{
 			for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
 			{
-				m_state.m_chunk[x][y][z] = CubeDetails();
+				m_chunk[x][y][z] = CubeDetails();
 			}
 		}
 	}
 
 	m_inUse = true;
-	m_state.m_startingPosition = startingPosition;
-	regen(m_state.m_startingPosition);	
+	m_startingPosition = startingPosition;
+	regen(m_startingPosition);	
 }
 
 void Chunk::release()
@@ -121,7 +125,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 
 			glm::ivec3 positionOnGrid(x - startingPosition.x, (int)elevation, z - startingPosition.z);
 			//std::cout << elevation << "\n";
-			m_state.m_chunk[positionOnGrid.x][(int)elevation][positionOnGrid.z] = CubeDetails(cubeType);
+			m_chunk[positionOnGrid.x][(int)elevation][positionOnGrid.z] = CubeDetails(cubeType);
 
 			for (int y = (int)elevation - 1; y >= 0; --y)
 			{
@@ -138,12 +142,12 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 					cubeType = eCubeType::Grass;
 				}
 
-				m_state.m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = CubeDetails(cubeType);
+				m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = CubeDetails(cubeType);
 			}
 		}
 	}
 
-	m_state.m_endingPosition = glm::ivec3(startingPosition.x + Utilities::CHUNK_WIDTH, startingPosition.y + Utilities::CHUNK_HEIGHT,
+	m_endingPosition = glm::ivec3(startingPosition.x + Utilities::CHUNK_WIDTH, startingPosition.y + Utilities::CHUNK_HEIGHT,
 		startingPosition.z + Utilities::CHUNK_DEPTH);
 
 	//Fill with Water
@@ -151,9 +155,9 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 	{
 		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
 		{
-			if (m_state.m_chunk[x][Utilities::WATER_MAX_HEIGHT][z].type == static_cast<char>(eCubeType::Invalid))
+			if (m_chunk[x][Utilities::WATER_MAX_HEIGHT][z].type == static_cast<char>(eCubeType::Invalid))
 			{
-				m_state.m_chunk[x][Utilities::WATER_MAX_HEIGHT][z].type = static_cast<char>(eCubeType::Water);
+				m_chunk[x][Utilities::WATER_MAX_HEIGHT][z].type = static_cast<char>(eCubeType::Water);
 			}
 		}
 	}

@@ -32,28 +32,34 @@ public:
 
 	Chunk* getNext();
 	void setNext(Chunk* chunk);
-	void reset(const glm::ivec3& startingPosition);
+	void reuse(const glm::ivec3& startingPosition);
 	void release();
 
 private:
 	bool m_inUse;
-	union State
-	{
-		State()
-			: m_startingPosition(),
-			m_endingPosition(),
-			m_chunk()
-		{}
 
-		struct
-		{
-			glm::ivec3 m_startingPosition;
-			glm::ivec3 m_endingPosition;
-			std::array<std::array<std::array<CubeDetails, Utilities::CHUNK_DEPTH>, Utilities::CHUNK_HEIGHT>, Utilities::CHUNK_WIDTH> m_chunk;
-		};
+	glm::ivec3 m_startingPosition;
+	glm::ivec3 m_endingPosition;
+	std::array<std::array<std::array<CubeDetails, Utilities::CHUNK_DEPTH>, Utilities::CHUNK_HEIGHT>, Utilities::CHUNK_WIDTH> m_chunk;
+	Chunk* m_next;
 
-		Chunk* m_next = nullptr;
-	} m_state;
+	//union State
+	//{
+	//	State()
+	//		: m_startingPosition(),
+	//		m_endingPosition(),
+	//		m_chunk()
+	//	{}
+
+	//	struct
+	//	{
+	//		glm::ivec3 m_startingPosition;
+	//		glm::ivec3 m_endingPosition;
+	//		std::array<std::array<std::array<CubeDetails, Utilities::CHUNK_DEPTH>, Utilities::CHUNK_HEIGHT>, Utilities::CHUNK_WIDTH> m_chunk;
+	//	};
+
+	//	Chunk* m_next = nullptr;
+	//} m_state;
 
 	void regen(const glm::ivec3& startingPosition);
 };

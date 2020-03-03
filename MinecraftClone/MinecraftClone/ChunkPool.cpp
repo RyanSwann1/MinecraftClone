@@ -16,19 +16,19 @@ ChunkPool::ChunkPool()
 
 Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
 {
-	//Chunk* chunk = m_firstAvailable;
-	//m_firstAvailable = chunk->getNext();
+	Chunk* chunk = m_firstAvailable;
+	m_firstAvailable = chunk->getNext();
 
-	//return *chunk;
+	return *chunk;
 
-	for (auto& chunk : m_chunks)
-	{
-		if (!chunk.isInUse())
-		{
-			chunk.reset(startingPosition);
-			return chunk;
-		}
-	}
+	//for (auto& chunk : m_chunks)
+	//{
+	//	if (!chunk.isInUse())
+	//	{
+	//		chunk.reuse(startingPosition);
+	//		return chunk;
+	//	}
+	//}
 }
 
 void ChunkPool::releaseChunk(Chunk& chunk)
