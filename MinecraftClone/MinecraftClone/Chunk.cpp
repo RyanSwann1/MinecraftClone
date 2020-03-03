@@ -82,6 +82,8 @@ void Chunk::reuse(const glm::ivec3& startingPosition)
 void Chunk::release()
 {
 	m_inUse = false;
+	m_startingPosition = glm::ivec3();
+	m_endingPosition = glm::ivec3();
 }
 
 void Chunk::regen(const glm::ivec3& startingPosition)

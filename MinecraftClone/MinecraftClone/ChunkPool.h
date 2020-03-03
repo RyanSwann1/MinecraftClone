@@ -14,5 +14,5 @@ public:
 
 private:
 	std::vector<Chunk> m_chunks;
-	Chunk* m_firstAvailable;
+	Chunk* m_nextAvailable;
 };

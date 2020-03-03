@@ -1,38 +1,40 @@
 #include "ChunkPool.h"
+#include <iostream>
 
 ChunkPool::ChunkPool()
 {
 	m_chunks.resize(size_t(2500));
 	
-	m_firstAvailable = &m_chunks.front();
+	m_nextAvailable = &m_chunks.front();
 
 	for (int i = 0; i < m_chunks.size() - 1; ++i)
 	{
 		m_chunks[i].setNext(&m_chunks[i + 1]);
 	}
 
-	m_chunks.back().setNext(nullptr);
+	m_chunks.back().setNext(m_nextAvailable);
 }
 
 Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
 {
-	Chunk* chunk = m_firstAvailable;
-	m_firstAvailable = chunk->getNext();
-
-	return *chunk;
-
-	//for (auto& chunk : m_chunks)
-	//{
-	//	if (!chunk.isInUse())
-	//	{
-	//		chunk.reuse(startingPosition);
-	//		return chunk;
-	//	}
-	//}
+	bool validChunkFound = false;
+	while (!validChunkFound)
+	{
+		if (m_nextAvailable->isInUse())
+		{
+			m_nextAvailable = m_nextAvailable->getNext();
+		}
+		else
+		{
+			validChunkFound = true;
+		}
+	}
+	
+	m_nextAvailable->reuse(startingPosition);
+	return *m_nextAvailable;
 }
 
 void ChunkPool::releaseChunk(Chunk& chunk)
 {
-	chunk.setNext(m_firstAvailable);
-	m_firstAvailable = &chunk;
+	chunk.release();
 }
