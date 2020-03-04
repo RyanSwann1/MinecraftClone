@@ -70,7 +70,6 @@ private:
 
 	void addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition);
 
-	bool isCubeAtPosition(const glm::ivec3& position) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
 	bool isChunkAtPosition(const glm::ivec3& position) const;
 
