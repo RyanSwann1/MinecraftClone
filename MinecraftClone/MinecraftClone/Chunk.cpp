@@ -174,6 +174,7 @@ void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 		}
 	}
 
+	int totalTreesAdded = 0;
 	//Fill with trees
 	for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
 	{
@@ -181,10 +182,11 @@ void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 		{
 			for (int y = Utilities::CHUNK_HEIGHT - 1; y >= Utilities::SAND_MAX_HEIGHT; --y)
 			{
-				if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Grass))
+				if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Grass) && totalTreesAdded < Utilities::MAX_TREE_PER_CHUNK)
 				{
-					if (Utilities::getRandomNumber(0, 1200) >= Utilities::TREE_SPAWN_CHANCE)
+					if (Utilities::getRandomNumber(0, 1400) >= Utilities::TREE_SPAWN_CHANCE)
 					{
+						++totalTreesAdded;
 						int maxTreeHeight = Utilities::getRandomNumber(Utilities::TREE_MIN_HEIGHT, Utilities::TREE_MAX_HEIGHT);
 						int treeHeight = 1;
 						bool beginSpawnLeaves = false;
@@ -192,7 +194,7 @@ void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 						{
 							if (treeHeight >= (maxTreeHeight / 2))
 							{
-								spawnLeaves(glm::ivec3(x, y + treeHeight + 1, z), chunkManager);
+								spawnLeaves(glm::ivec3(x, y + treeHeight + 1, z), chunkManager, 3);
 							}
 							if (y + treeHeight < Utilities::CHUNK_HEIGHT - 1)
 							{
@@ -212,44 +214,30 @@ void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 	}
 }
 
-void Chunk::spawnLeaves(const glm::ivec3& startingPosition, ChunkManager& chunkManager)
+void Chunk::spawnLeaves(const glm::ivec3& startingPosition, ChunkManager& chunkManager, int distance)
 {
 	if (isPositionInLocalBounds(startingPosition))
 	{
 		m_chunk[startingPosition.x][startingPosition.y][startingPosition.z].type = static_cast<char>(eCubeType::Leaves);
 	}
 
-	for (int x = startingPosition.x - 3; x <= startingPosition.x + 3; ++x)
+	for (int z = startingPosition.z - distance; z <= startingPosition.z + distance; ++z)
 	{
-		glm::ivec3 position(x, startingPosition.y, startingPosition.z);
-		if (isPositionInLocalBounds(position))
+		for (int x = startingPosition.x - distance; x <= startingPosition.x + distance; ++x)
 		{
-			if (m_chunk[position.x][position.y][position.z].type == static_cast<char>(eCubeType::Invalid)) 
+			glm::ivec3 position(x, startingPosition.y, z);
+			if (isPositionInLocalBounds(position))
 			{
-				m_chunk[position.x][position.y][position.z].type = static_cast<char>(eCubeType::Leaves);
+				if (m_chunk[position.x][position.y][position.z].type == static_cast<char>(eCubeType::Invalid))
+				{
+					m_chunk[position.x][position.y][position.z].type = static_cast<char>(eCubeType::Leaves);
+				}
 			}
-		}
-		else
-		{
-			glm::ivec3 worldPosition(m_startingPosition.x + position.x, startingPosition.y, m_startingPosition.z + position.z);
-			chunkManager.changeCubeAtPosition(worldPosition, eCubeType::Leaves);
-		}
-	}
-
-	for (int z = startingPosition.z - 3; z <= startingPosition.z + 3; ++z)
-	{
-		glm::ivec3 position(startingPosition.x, startingPosition.y, z);
-		if (isPositionInLocalBounds(position))
-		{
-			if (m_chunk[position.x][position.y][position.z].type == static_cast<char>(eCubeType::Invalid))
+			else
 			{
-				m_chunk[position.x][position.y][position.z].type = static_cast<char>(eCubeType::Leaves);
+				glm::ivec3 worldPosition(m_startingPosition.x + position.x, startingPosition.y, m_startingPosition.z + position.z);
+				chunkManager.changeCubeAtPosition(worldPosition, eCubeType::Leaves);
 			}
-		}
-		else
-		{
-			glm::ivec3 worldPosition(m_startingPosition.x + position.x, startingPosition.y, m_startingPosition.z + position.z);
-			chunkManager.changeCubeAtPosition(worldPosition, eCubeType::Leaves);
 		}
 	}
 }

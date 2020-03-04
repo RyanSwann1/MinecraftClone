@@ -52,6 +52,6 @@ private:
 	Chunk* m_next;
 
 	void regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager);
-	void spawnLeaves(const glm::ivec3& startingPosition, ChunkManager& chunkManager);
+	void spawnLeaves(const glm::ivec3& startingPosition, ChunkManager& chunkManager, int distance);
 	bool isPositionInLocalBounds(const glm::ivec3& position) const;
 };
