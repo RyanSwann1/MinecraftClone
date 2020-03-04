@@ -46,4 +46,6 @@ private:
 	Chunk* m_next;
 
 	void regen(const glm::ivec3& startingPosition);
+	void spawnLeaves(const glm::ivec3& startingPosition);
+	bool isPositionInLocalBounds(const glm::ivec3& position) const;
 };

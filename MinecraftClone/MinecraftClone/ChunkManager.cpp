@@ -107,6 +107,9 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, const Texture& texture,
 			case eCubeType::TreeStump:
 				texture.getTextCoords(eCubeFaceID::TreeStump, vertexArray.m_vertexBuffer.textCoords);
 				break;
+			case eCubeType::Leaves:
+				texture.getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
+				break;
 			}
 			break;
 		case eCubeSide::Back:
@@ -129,6 +132,9 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, const Texture& texture,
 				break;
 			case eCubeType::TreeStump:
 				texture.getTextCoords(eCubeFaceID::TreeStump, vertexArray.m_vertexBuffer.textCoords);
+				break;
+			case eCubeType::Leaves:
+				texture.getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
 				break;
 			}
 			break;
@@ -153,6 +159,9 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, const Texture& texture,
 			case eCubeType::TreeStump:
 				texture.getTextCoords(eCubeFaceID::TreeStump, vertexArray.m_vertexBuffer.textCoords);
 				break;
+			case eCubeType::Leaves:
+				texture.getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
+				break;
 			}
 			break;
 		case eCubeSide::Right:
@@ -175,6 +184,9 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, const Texture& texture,
 				break;
 			case eCubeType::TreeStump:
 				texture.getTextCoords(eCubeFaceID::TreeStump, vertexArray.m_vertexBuffer.textCoords);
+				break;
+			case eCubeType::Leaves:
+				texture.getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
 				break;
 			}
 			break;
@@ -199,6 +211,9 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, const Texture& texture,
 			case eCubeType::TreeStump:
 				texture.getTextCoords(eCubeFaceID::TreeStump, vertexArray.m_vertexBuffer.textCoords);
 				break;
+			case eCubeType::Leaves:
+				texture.getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
+				break;
 			}
 			break;
 		case eCubeSide::Bottom:
@@ -221,6 +236,9 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, const Texture& texture,
 				break;
 			case eCubeType::TreeStump:
 				texture.getTextCoords(eCubeFaceID::TreeStump, vertexArray.m_vertexBuffer.textCoords);
+				break;
+			case eCubeType::Leaves:
+				texture.getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
 				break;
 			}
 			break;
@@ -376,7 +394,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Texture& te
 					}
 
 					//Top
-					if (y <= Utilities::CHUNK_HEIGHT && !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
+					if (y < Utilities::CHUNK_HEIGHT - 1 && !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
 					{
 						addCubeFace(vertexArray, texture, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Top, position);
 					}

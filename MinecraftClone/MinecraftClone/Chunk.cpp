@@ -175,11 +175,13 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 				{
 					if (Utilities::getRandomNumber(0, 1200) >= Utilities::TREE_SPAWN_CHANCE)
 					{
-						int treeHeight = Utilities::getRandomNumber(Utilities::TREE_MIN_HEIGHT, Utilities::TREE_MAX_HEIGHT);
-						for (int i = 1; i <= treeHeight; ++i)
+						int maxTreeHeight = Utilities::getRandomNumber(Utilities::TREE_MIN_HEIGHT, Utilities::TREE_MAX_HEIGHT);
+						int treeHeight = 0;
+						for (int i = 1; i <= maxTreeHeight; ++i)
 						{
 							if (y + i < Utilities::CHUNK_HEIGHT - 1)
 							{
+								treeHeight = i;
 								m_chunk[x][y + i][z].type = static_cast<char>(eCubeType::TreeStump);
 							}
 							else
@@ -187,6 +189,12 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 								break;
 							}
 						}
+
+						/* worldPosition.x = m_startingPosition.x + worldPosition.x;
+						worldPosition.z = m_startingPosition.z + worldPosition.z;*/
+						//Utilities::convertToWorldPosition(worldPosition, m_startingPosition);
+						//Utilities::convertToWorldPosition(worldPosition)
+						spawnLeaves(glm::ivec3(x, y + treeHeight + 1, z));
 					}
 
 					break;
@@ -194,4 +202,45 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			}
 		}
 	}
+}
+
+void Chunk::spawnLeaves(const glm::ivec3& startingPosition)
+{
+	if (isPositionInLocalBounds(startingPosition)) 
+	{
+		std::cout << "Hit\n";
+		m_chunk[startingPosition.x][startingPosition.y][startingPosition.z].type = static_cast<char>(eCubeType::Leaves);
+	}
+
+	for (int x = startingPosition.x - 3; x <= startingPosition.x + 3; ++x)
+	{
+		glm::ivec3 position(x, startingPosition.y, startingPosition.z);
+		if (isPositionInLocalBounds(position) && 
+			m_chunk[position.x][position.y][position.z].type == static_cast<char>(eCubeType::Invalid))
+		{
+			std::cout << "Hit\n";
+			m_chunk[position.x][position.y][position.z].type = static_cast<char>(eCubeType::Leaves);
+		}
+	}
+
+	for (int z = startingPosition.z - 3; z <= startingPosition.z + 3; ++z)
+	{
+		glm::ivec3 position(startingPosition.x, startingPosition.y, z);
+		if (isPositionInLocalBounds(position) && 
+			m_chunk[position.x][position.y][position.z].type == static_cast<char>(eCubeType::Invalid))
+		{
+			std::cout << "Hit\n";
+			m_chunk[position.x][position.y][position.z].type = static_cast<char>(eCubeType::Leaves);
+		}
+	}
+}
+
+bool Chunk::isPositionInLocalBounds(const glm::ivec3& position) const
+{
+	return (position.x >= 0 &&
+		position.y >= 0 &&
+		position.z >= 0 &&
+		position.x < Utilities::CHUNK_WIDTH &&
+		position.y < Utilities::CHUNK_HEIGHT &&
+		position.z < Utilities::CHUNK_DEPTH);
 }
