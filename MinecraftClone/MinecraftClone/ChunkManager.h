@@ -66,7 +66,6 @@ private:
 	std::shared_ptr<Texture> m_texture;
 	std::unordered_map<glm::ivec3, VertexArray> m_VAOs;
 	std::unordered_map<glm::ivec3, ChunkFromPool> m_chunks;
-	//m_addToMeshQueue;
 	std::unordered_set<glm::ivec3> m_chunksToRegenerate;
 	std::mutex m_mutex;
 
@@ -77,8 +76,6 @@ private:
 	bool isChunkAtPosition(const glm::ivec3& position) const;
 
 	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
-	void addToChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const glm::ivec3& position, eCubeType cubeType);
-	//void addToMesh()
 
 	void deleteChunks(const Rectangle& visibilityRect);
 	void addChunks(const Rectangle& visibilityRect, const glm::vec3& playerPosition);

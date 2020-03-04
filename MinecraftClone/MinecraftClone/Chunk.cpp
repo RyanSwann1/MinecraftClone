@@ -176,9 +176,9 @@ void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 
 	//Fill with trees
 	int totalTreesAdded = 0;
-	for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
+	for (int z = 3; z < Utilities::CHUNK_DEPTH - 3; ++z)
 	{
-		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
+		for (int x = 3; x < Utilities::CHUNK_WIDTH - 3; ++x)
 		{
 			for (int y = Utilities::CHUNK_HEIGHT - 1; y >= Utilities::SAND_MAX_HEIGHT; --y)
 			{
@@ -227,11 +227,6 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition, ChunkManager& chunkM
 				{
 					m_chunk[position.x][position.y][position.z].type = static_cast<char>(eCubeType::Leaves);
 				}
-			}
-			else
-			{
-				glm::ivec3 worldPosition(m_startingPosition.x + position.x, startingPosition.y, m_startingPosition.z + position.z);
-				chunkManager.changeCubeAtPosition(worldPosition, eCubeType::Leaves);
 			}
 		}
 	}
