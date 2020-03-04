@@ -179,9 +179,9 @@ void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 	int totalTrees = Utilities::getRandomNumber(0, Utilities::MAX_TREE_PER_CHUNK);
 	if (totalTrees > 0)
 	{
-		for (int z = 3; z < Utilities::CHUNK_DEPTH - 3; ++z)
+		for (int z = Utilities::MAX_LEAVES_DISTANCE; z < Utilities::CHUNK_DEPTH - Utilities::MAX_LEAVES_DISTANCE; ++z)
 		{
-			for (int x = 3; x < Utilities::CHUNK_WIDTH - 3; ++x)
+			for (int x = Utilities::MAX_LEAVES_DISTANCE; x < Utilities::CHUNK_WIDTH - Utilities::MAX_LEAVES_DISTANCE; ++x)
 			{
 				for (int y = Utilities::CHUNK_HEIGHT - 1; y >= Utilities::SAND_MAX_HEIGHT; --y)
 				{

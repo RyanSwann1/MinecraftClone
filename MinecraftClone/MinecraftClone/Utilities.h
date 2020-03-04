@@ -40,16 +40,22 @@ namespace Utilities
 	constexpr int TREE_MIN_HEIGHT = 9;
 	constexpr int TREE_MAX_HEIGHT = 9;
 	constexpr int MAX_TREE_PER_CHUNK = 3;
+	constexpr int MAX_LEAVES_DISTANCE = 3;
 	
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
 	//constexpr int VISIBILITY_DISTANCE = 64;
-	constexpr int VISIBILITY_DISTANCE = 480;
+	constexpr int VISIBILITY_DISTANCE = 640;
 
 	constexpr std::array<int, 6> LEAVES_DISTANCES =
 	{
-		3, 3, 2, 2, 1, 1
+		MAX_LEAVES_DISTANCE, 
+		MAX_LEAVES_DISTANCE, 
+		MAX_LEAVES_DISTANCE - 1, 
+		MAX_LEAVES_DISTANCE - 1, 
+		MAX_LEAVES_DISTANCE - 2,
+		MAX_LEAVES_DISTANCE - 2
 	};
 
 	static constexpr std::array<glm::vec2, 4> GRASS_TEXT_COORDS =
