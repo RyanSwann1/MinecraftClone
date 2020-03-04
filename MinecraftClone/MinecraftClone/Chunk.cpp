@@ -187,20 +187,18 @@ void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 					if (Utilities::getRandomNumber(0, 1400) >= Utilities::TREE_SPAWN_CHANCE)
 					{
 						++totalTreesAdded;
-						int maxTreeHeight = Utilities::getRandomNumber(Utilities::TREE_MIN_HEIGHT, Utilities::TREE_MAX_HEIGHT);
-						int treeHeight = 1;
-						int leavesDistance = 0;
-						bool beginSpawnLeaves = false;
-						for (treeHeight; treeHeight <= maxTreeHeight; ++treeHeight)
+						int currentTreeHeight = 1;
+						int leavesDistanceIndex = 0;
+						for (currentTreeHeight; currentTreeHeight <= Utilities::TREE_MAX_HEIGHT; ++currentTreeHeight)
 						{
-							if (treeHeight >= (maxTreeHeight / 2))
+							if (currentTreeHeight >= (Utilities::TREE_MAX_HEIGHT / 2))
 							{
-								spawnLeaves(glm::ivec3(x, y + treeHeight + 1, z), chunkManager, Utilities::LEAVES_DISTANCES[leavesDistance]);
-								++leavesDistance;
+								spawnLeaves(glm::ivec3(x, y + currentTreeHeight + 1, z), chunkManager, Utilities::LEAVES_DISTANCES[leavesDistanceIndex]);
+								++leavesDistanceIndex;
 							}
-							if (y + treeHeight < Utilities::CHUNK_HEIGHT - 1)
+							if (y + currentTreeHeight < Utilities::CHUNK_HEIGHT - 1)
 							{
-								m_chunk[x][y + treeHeight][z].type = static_cast<char>(eCubeType::TreeStump);
+								m_chunk[x][y + currentTreeHeight][z].type = static_cast<char>(eCubeType::TreeStump);
 							}
 							else
 							{
