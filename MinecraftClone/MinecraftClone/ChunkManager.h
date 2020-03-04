@@ -57,13 +57,15 @@ class ChunkManager : private NonCopyable
 public:
 	ChunkManager();
 
+	std::unordered_map<glm::ivec3, VertexArray>& getVAOs();
+
 	void addCube(const glm::ivec3& position, eCubeType cubeType);
-	void generateInitialChunks(const glm::vec3& playerPosition, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const Texture& texture);
-	void update(Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const Camera& camera, 
-		const Texture& texture, const sf::Window& window);
+	void generateInitialChunks(const glm::vec3& playerPosition, const Texture& texture);
+	void update(Rectangle& visibilityRect, const Camera& camera, const Texture& texture, const sf::Window& window);
 
 private:
 	ChunkPool m_chunkPool;
+	std::unordered_map<glm::ivec3, VertexArray> m_VAOs;
 	std::unordered_map<glm::ivec3, ChunkFromPool> m_chunks;
 	//m_addToMeshQueue;
 	std::unordered_set<glm::ivec3> m_chunksToRegenerate;
@@ -78,9 +80,9 @@ private:
 	void generateChunkMesh(VertexArray& vertexArray, const Texture& texture, const Chunk& chunk);
 	//void addToMesh()
 
-	void deleteChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs);
-	void addChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const glm::vec3& playerPosition, const Texture& texture);
-	void regenChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const glm::vec3& playerPosition, const Texture& texture);
+	void deleteChunks(const Rectangle& visibilityRect);
+	void addChunks(const Rectangle& visibilityRect, const glm::vec3& playerPosition, const Texture& texture);
+	void regenChunks(const Rectangle& visibilityRect, const glm::vec3& playerPosition, const Texture& texture);
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition) const;
 };

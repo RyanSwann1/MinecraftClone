@@ -207,15 +207,14 @@ int main()
 
 	texture->bind();
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot(), uniformLocations);
-
-	std::unordered_map<glm::ivec3, VertexArray> VAOs;
 	Rectangle visibilityRect(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
 
 	ChunkManager chunkManager;
-	chunkManager.generateInitialChunks(camera.m_position, VAOs, *texture);
-	std::thread chunkGenerationThread([&](ChunkManager* chunkManager) {chunkManager->update(std::ref(visibilityRect), std::ref(VAOs), std::ref(camera),
+	chunkManager.generateInitialChunks(camera.m_position, *texture);
+	std::thread chunkGenerationThread([&](ChunkManager* chunkManager) {chunkManager->update(std::ref(visibilityRect), std::ref(camera),
 		*texture, std::ref(window)); }, &chunkManager);
 	std::mutex mutex;
+	std::unordered_map<glm::ivec3, VertexArray>& VAOs = chunkManager.getVAOs();
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
