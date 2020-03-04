@@ -264,8 +264,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 
 bool ChunkManager::isCubeAtPosition(const glm::ivec3& position) const
 {
-	glm::ivec3 closestChunkStartingPosition = Utilities::getClosestChunkStartingPosition(position);
-	auto cIter = m_chunks.find(closestChunkStartingPosition);
+	auto cIter = m_chunks.find(Utilities::getClosestChunkStartingPosition(position));
 	if (cIter != m_chunks.cend() && cIter->second.chunk.isPositionInBounds(position) && 
 		static_cast<eCubeType>(cIter->second.chunk.getCubeDetailsWithoutBoundsCheck(position).type) != eCubeType::Invalid && 
 		static_cast<eCubeType>(cIter->second.chunk.getCubeDetailsWithoutBoundsCheck(position).type) != eCubeType::Water)
@@ -284,8 +283,7 @@ bool ChunkManager::isCubeAtPosition(const glm::ivec3& position, const Chunk& chu
 
 bool ChunkManager::isChunkAtPosition(const glm::ivec3& position) const
 {
-	glm::ivec3 closestChunkStartingPosition = Utilities::getClosestChunkStartingPosition(position);
-	auto cIter = m_chunks.find(closestChunkStartingPosition);
+	auto cIter = m_chunks.find(Utilities::getClosestChunkStartingPosition(position));
 	return cIter != m_chunks.cend();
 }
 
