@@ -216,11 +216,6 @@ void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 
 void Chunk::spawnLeaves(const glm::ivec3& startingPosition, ChunkManager& chunkManager, int distance)
 {
-	if (isPositionInLocalBounds(startingPosition))
-	{
-		m_chunk[startingPosition.x][startingPosition.y][startingPosition.z].type = static_cast<char>(eCubeType::Leaves);
-	}
-
 	for (int z = startingPosition.z - distance; z <= startingPosition.z + distance; ++z)
 	{
 		for (int x = startingPosition.x - distance; x <= startingPosition.x + distance; ++x)
