@@ -208,7 +208,6 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition)
 {
 	if (isPositionInLocalBounds(startingPosition)) 
 	{
-		std::cout << "Hit\n";
 		m_chunk[startingPosition.x][startingPosition.y][startingPosition.z].type = static_cast<char>(eCubeType::Leaves);
 	}
 
@@ -218,7 +217,6 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition)
 		if (isPositionInLocalBounds(position) && 
 			m_chunk[position.x][position.y][position.z].type == static_cast<char>(eCubeType::Invalid))
 		{
-			std::cout << "Hit\n";
 			m_chunk[position.x][position.y][position.z].type = static_cast<char>(eCubeType::Leaves);
 		}
 	}
@@ -229,7 +227,6 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition)
 		if (isPositionInLocalBounds(position) && 
 			m_chunk[position.x][position.y][position.z].type == static_cast<char>(eCubeType::Invalid))
 		{
-			std::cout << "Hit\n";
 			m_chunk[position.x][position.y][position.z].type = static_cast<char>(eCubeType::Leaves);
 		}
 	}
