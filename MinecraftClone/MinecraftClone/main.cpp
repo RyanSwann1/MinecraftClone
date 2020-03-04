@@ -175,6 +175,8 @@ unsigned int createShaderProgram()
 //
 //}
 
+//http://ogldev.atspace.co.uk/index.html
+
 
 //x + (y * width)
 int main()
