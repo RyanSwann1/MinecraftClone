@@ -233,8 +233,8 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition, ChunkManager& chunkM
 		}
 		else
 		{
-			chunkManager.changeCubeAtPosition(glm::ivec3(m_startingPosition.x + position.x, startingPosition.y, m_startingPosition.z + position.z), 
-				eCubeType::Leaves);
+			glm::ivec3 worldPosition(m_startingPosition.x + position.x, startingPosition.y, m_startingPosition.z + position.z);
+			chunkManager.changeCubeAtPosition(worldPosition, eCubeType::Leaves);
 		}
 	}
 
@@ -250,8 +250,8 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition, ChunkManager& chunkM
 		}
 		else
 		{
-			chunkManager.changeCubeAtPosition(glm::ivec3(m_startingPosition.x + position.x, startingPosition.y, m_startingPosition.z + position.z),
-				eCubeType::Leaves);
+			glm::ivec3 worldPosition(m_startingPosition.x + position.x, startingPosition.y, m_startingPosition.z + position.z);
+			chunkManager.changeCubeAtPosition(worldPosition, eCubeType::Leaves);
 		}
 	}
 }

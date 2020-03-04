@@ -77,6 +77,7 @@ private:
 	bool isChunkAtPosition(const glm::ivec3& position) const;
 
 	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
+	void addToChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const glm::ivec3& position, eCubeType cubeType);
 	//void addToMesh()
 
 	void deleteChunks(const Rectangle& visibilityRect);
