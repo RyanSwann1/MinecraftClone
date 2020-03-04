@@ -334,14 +334,6 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 				{
 					addCubeFace(vertexArray, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Top, position);
 				}
-				else if (static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(position).type) == eCubeType::TreeStump)
-				{
-					addCubeFace(vertexArray, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Top, position);
-					addCubeFace(vertexArray, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Left, position);
-					addCubeFace(vertexArray, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Right, position);
-					addCubeFace(vertexArray, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Front, position);
-					addCubeFace(vertexArray, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Back, position);
-				}
 				else
 				{
 					//Left

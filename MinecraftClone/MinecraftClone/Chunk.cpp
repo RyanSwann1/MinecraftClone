@@ -174,8 +174,8 @@ void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 		}
 	}
 
-	int totalTreesAdded = 0;
 	//Fill with trees
+	int totalTreesAdded = 0;
 	for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
 	{
 		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
