@@ -177,38 +177,47 @@ void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 	//Fill with trees
 	int totalTreesAdded = 0;
 	int totalTrees = Utilities::getRandomNumber(0, Utilities::MAX_TREE_PER_CHUNK);
-	for (int z = 3; z < Utilities::CHUNK_DEPTH - 3; ++z)
+	if (totalTrees > 0)
 	{
-		for (int x = 3; x < Utilities::CHUNK_WIDTH - 3; ++x)
+		for (int z = 3; z < Utilities::CHUNK_DEPTH - 3; ++z)
 		{
-			for (int y = Utilities::CHUNK_HEIGHT - 1; y >= Utilities::SAND_MAX_HEIGHT; --y)
+			for (int x = 3; x < Utilities::CHUNK_WIDTH - 3; ++x)
 			{
-				if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Grass) && totalTreesAdded < totalTrees)
+				for (int y = Utilities::CHUNK_HEIGHT - 1; y >= Utilities::SAND_MAX_HEIGHT; --y)
 				{
-					if (Utilities::getRandomNumber(0, 1400) >= Utilities::TREE_SPAWN_CHANCE)
+					if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Grass) && totalTreesAdded < totalTrees)
 					{
-						++totalTreesAdded;
-						int currentTreeHeight = 1;
-						int leavesDistanceIndex = 0;
-						for (currentTreeHeight; currentTreeHeight <= Utilities::TREE_MAX_HEIGHT; ++currentTreeHeight)
+						if (Utilities::getRandomNumber(0, 1400) >= Utilities::TREE_SPAWN_CHANCE)
 						{
-							if (currentTreeHeight >= (Utilities::TREE_MAX_HEIGHT / 2))
+							++totalTreesAdded;
+							int currentTreeHeight = 1;
+							int leavesDistanceIndex = 0;
+							for (currentTreeHeight; currentTreeHeight <= Utilities::TREE_MAX_HEIGHT; ++currentTreeHeight)
 							{
-								spawnLeaves(glm::ivec3(x, y + currentTreeHeight + 1, z), chunkManager, Utilities::LEAVES_DISTANCES[leavesDistanceIndex]);
-								++leavesDistanceIndex;
-							}
-							if (y + currentTreeHeight < Utilities::CHUNK_HEIGHT - 1)
-							{
-								m_chunk[x][y + currentTreeHeight][z].type = static_cast<char>(eCubeType::TreeStump);
-							}
-							else
-							{
-								break;
+								if (currentTreeHeight >= (Utilities::TREE_MAX_HEIGHT / 2))
+								{
+									spawnLeaves(glm::ivec3(x, y + currentTreeHeight + 1, z), chunkManager, Utilities::LEAVES_DISTANCES[leavesDistanceIndex]);
+									++leavesDistanceIndex;
+								}
+								if (y + currentTreeHeight < Utilities::CHUNK_HEIGHT - 1)
+								{
+									m_chunk[x][y + currentTreeHeight][z].type = static_cast<char>(eCubeType::TreeStump);
+								}
+								else
+								{
+									break;
+								}
 							}
 						}
-					}
 
-					break;
+						break;
+					}
+				}
+
+				//Tree cap reached
+				if (totalTreesAdded >= totalTrees)
+				{
+					return;
 				}
 			}
 		}
