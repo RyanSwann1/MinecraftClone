@@ -24,20 +24,20 @@ std::unordered_map<glm::ivec3, VertexArray>& ChunkManager::getVAOs()
 
 void ChunkManager::changeCubeAtPosition(const glm::ivec3& position, eCubeType cubeType)
 {
-	glm::ivec3 chunkStartingPosition = Utilities::getClosestChunkStartingPosition(position);
-	auto chunk = m_chunks.find(chunkStartingPosition);
-	if (chunk != m_chunks.end())
-	{
-		chunk->second.chunk.changeCubeAtPosition(position, cubeType);
-		
-		auto VAO = m_VAOs.find(chunkStartingPosition);
-		assert(VAO != m_VAOs.end());
-		if (VAO != m_VAOs.end())
-		{
-			std::cout << "Add Leaf at Position\n";
-			//generateChunkMesh(VAO->second, chunk->second.chunk);
-		}
-	}
+	//glm::ivec3 chunkStartingPosition = Utilities::getClosestChunkStartingPosition(position);
+	//auto chunk = m_chunks.find(chunkStartingPosition);
+	//if (chunk != m_chunks.end())
+	//{
+	//	chunk->second.chunk.changeCubeAtPosition(position, cubeType);
+	//	
+	//	auto VAO = m_VAOs.find(chunkStartingPosition);
+	//	assert(VAO != m_VAOs.end());
+	//	if (VAO != m_VAOs.end())
+	//	{
+	//		addToChunkMesh(VAO->second, chunk->second.chunk, position, cubeType);
+	//		//generateChunkMesh(VAO->second, chunk->second.chunk);
+	//	}
+	//}
 }
 
 void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition)
