@@ -15,14 +15,14 @@ Chunk::Chunk()
 	m_next(nullptr)
 {}
 
-Chunk::Chunk(const glm::ivec3& startingPosition, ChunkManager& chunkManager)
+Chunk::Chunk(const glm::ivec3& startingPosition)
 	: m_inUse(false),
 	m_startingPosition(startingPosition),
 	m_endingPosition(),
 	m_chunk(),
 	m_next(nullptr)
 {
-	regen(m_startingPosition, chunkManager);
+	regen(m_startingPosition);
 }
 
 bool Chunk::isInUse() const
@@ -71,7 +71,7 @@ void Chunk::setNext(Chunk* chunk)
 	m_next = chunk;
 }
 
-void Chunk::reuse(const glm::ivec3& startingPosition, ChunkManager& chunkManager)
+void Chunk::reuse(const glm::ivec3& startingPosition)
 {
 	for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
 	{
@@ -86,7 +86,7 @@ void Chunk::reuse(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 
 	m_inUse = true;
 	m_startingPosition = startingPosition;
-	regen(m_startingPosition, chunkManager);	
+	regen(m_startingPosition);	
 }
 
 void Chunk::release()
@@ -96,7 +96,7 @@ void Chunk::release()
 	m_endingPosition = glm::ivec3();
 }
 
-void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager)
+void Chunk::regen(const glm::ivec3& startingPosition)
 {
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
 	{
@@ -196,7 +196,7 @@ void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 							{
 								if (currentTreeHeight >= (Utilities::TREE_MAX_HEIGHT / 2))
 								{
-									spawnLeaves(glm::ivec3(x, y + currentTreeHeight + 1, z), chunkManager, Utilities::LEAVES_DISTANCES[leavesDistanceIndex]);
+									spawnLeaves(glm::ivec3(x, y + currentTreeHeight + 1, z), Utilities::LEAVES_DISTANCES[leavesDistanceIndex]);
 									++leavesDistanceIndex;
 								}
 								if (y + currentTreeHeight < Utilities::CHUNK_HEIGHT - 1)
@@ -224,7 +224,7 @@ void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 	}
 }
 
-void Chunk::spawnLeaves(const glm::ivec3& startingPosition, ChunkManager& chunkManager, int distance)
+void Chunk::spawnLeaves(const glm::ivec3& startingPosition, int distance)
 {
 	for (int z = startingPosition.z - distance; z <= startingPosition.z + distance; ++z)
 	{

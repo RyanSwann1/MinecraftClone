@@ -32,8 +32,8 @@
 
 struct ChunkFromPool : private NonCopyable
 {
-	ChunkFromPool(ChunkPool& chunkPool, const glm::ivec3& startingPosition, ChunkManager& chunkManager)
-		: chunk(chunkPool.getChunk(startingPosition, chunkManager))
+	ChunkFromPool(ChunkPool& chunkPool, const glm::ivec3& startingPosition)
+		: chunk(chunkPool.getChunk(startingPosition))
 	{}
 
 	~ChunkFromPool()

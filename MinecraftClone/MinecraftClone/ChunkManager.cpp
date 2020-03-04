@@ -37,7 +37,7 @@ void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition)
 
 				m_chunks.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunkStartingPosition),
-					std::forward_as_tuple(m_chunkPool, chunkStartingPosition, *this));
+					std::forward_as_tuple(m_chunkPool, chunkStartingPosition));
 
 			}
 		}
@@ -481,7 +481,7 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, const glm::vec3& p
 
 				auto newChunk = m_chunks.emplace(std::piecewise_construct,
 					std::forward_as_tuple(position),
-					std::forward_as_tuple(m_chunkPool, position, *this)).first;
+					std::forward_as_tuple(m_chunkPool, position)).first;
 
 				newlyAddedChunks.push(&newChunk->second.chunk);
 			}

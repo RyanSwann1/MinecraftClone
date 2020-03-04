@@ -26,12 +26,11 @@ struct CubeDetails
 };
 
 //position.y * (CHUNK_AREA) + position.z * CHUNK_SIZE + position.x;
-class ChunkManager;
 class Chunk
 {
 public:
 	Chunk();
-	Chunk(const glm::ivec3& startingPosition, ChunkManager& chunkManager);
+	Chunk(const glm::ivec3& startingPosition);
 	
 	bool isInUse() const;
 	bool isPositionInBounds(const glm::ivec3& position) const;
@@ -41,7 +40,7 @@ public:
 	Chunk* getNext();
 	void changeCubeAtPosition(const glm::vec3& position, eCubeType cubeType);
 	void setNext(Chunk* chunk);
-	void reuse(const glm::ivec3& startingPosition, ChunkManager& chunkManager);
+	void reuse(const glm::ivec3& startingPosition);
 	void release();
 
 private:
@@ -51,7 +50,7 @@ private:
 	std::array<std::array<std::array<CubeDetails, Utilities::CHUNK_DEPTH>, Utilities::CHUNK_HEIGHT>, Utilities::CHUNK_WIDTH> m_chunk;
 	Chunk* m_next;
 
-	void regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager);
-	void spawnLeaves(const glm::ivec3& startingPosition, ChunkManager& chunkManager, int distance);
+	void regen(const glm::ivec3& startingPosition);
+	void spawnLeaves(const glm::ivec3& startingPosition, int distance);
 	bool isPositionInLocalBounds(const glm::ivec3& position) const;
 };
