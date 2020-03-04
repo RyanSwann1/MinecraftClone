@@ -186,25 +186,23 @@ void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 					if (Utilities::getRandomNumber(0, 1200) >= Utilities::TREE_SPAWN_CHANCE)
 					{
 						int maxTreeHeight = Utilities::getRandomNumber(Utilities::TREE_MIN_HEIGHT, Utilities::TREE_MAX_HEIGHT);
-						int treeHeight = 0;
-						for (int i = 1; i <= maxTreeHeight; ++i)
+						int treeHeight = 1;
+						bool beginSpawnLeaves = false;
+						for (treeHeight; treeHeight <= maxTreeHeight; ++treeHeight)
 						{
-							if (y + i < Utilities::CHUNK_HEIGHT - 1)
+							if (treeHeight >= (maxTreeHeight / 2))
 							{
-								treeHeight = i;
-								m_chunk[x][y + i][z].type = static_cast<char>(eCubeType::TreeStump);
+								spawnLeaves(glm::ivec3(x, y + treeHeight + 1, z), chunkManager);
+							}
+							if (y + treeHeight < Utilities::CHUNK_HEIGHT - 1)
+							{
+								m_chunk[x][y + treeHeight][z].type = static_cast<char>(eCubeType::TreeStump);
 							}
 							else
 							{
 								break;
 							}
 						}
-
-						/* worldPosition.x = m_startingPosition.x + worldPosition.x;
-						worldPosition.z = m_startingPosition.z + worldPosition.z;*/
-						//Utilities::convertToWorldPosition(worldPosition, m_startingPosition);
-						//Utilities::convertToWorldPosition(worldPosition)
-						spawnLeaves(glm::ivec3(x, y + treeHeight + 1, z), chunkManager);
 					}
 
 					break;
@@ -216,7 +214,7 @@ void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 
 void Chunk::spawnLeaves(const glm::ivec3& startingPosition, ChunkManager& chunkManager)
 {
-	if (isPositionInLocalBounds(startingPosition)) 
+	if (isPositionInLocalBounds(startingPosition))
 	{
 		m_chunk[startingPosition.x][startingPosition.y][startingPosition.z].type = static_cast<char>(eCubeType::Leaves);
 	}

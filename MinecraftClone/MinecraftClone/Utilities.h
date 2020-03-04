@@ -37,8 +37,8 @@ namespace Utilities
 	constexpr int WATER_MAX_HEIGHT = 13;
 	constexpr int STONE_MAX_HEIGHT = 12; 
 	constexpr int TREE_SPAWN_CHANCE = 1200;
-	constexpr int TREE_MIN_HEIGHT = 3;
-	constexpr int TREE_MAX_HEIGHT = 8;
+	constexpr int TREE_MIN_HEIGHT = 5;
+	constexpr int TREE_MAX_HEIGHT = 9;
 	
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
