@@ -39,6 +39,7 @@ public:
 	const CubeDetails& getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const;
 
 	Chunk* getNext();
+	void changeCubeAtPosition(const glm::vec3& position, eCubeType cubeType);
 	void setNext(Chunk* chunk);
 	void reuse(const glm::ivec3& startingPosition, ChunkManager& chunkManager);
 	void release();

@@ -57,6 +57,15 @@ Chunk* Chunk::getNext()
 	return m_next;
 }
 
+void Chunk::changeCubeAtPosition(const glm::vec3& position, eCubeType cubeType)
+{
+	assert(isPositionInBounds(position));
+	if (isPositionInBounds(position))
+	{
+		m_chunk[position.x - m_startingPosition.x][position.y][position.z - m_startingPosition.z].type = static_cast<char>(cubeType);
+	}
+}
+
 void Chunk::setNext(Chunk* chunk)
 {
 	m_next = chunk;
@@ -224,7 +233,7 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition, ChunkManager& chunkM
 		}
 		else
 		{
-			chunkManager.addCube(glm::ivec3(m_startingPosition.x + position.x, startingPosition.y, m_startingPosition.z + position.z), 
+			chunkManager.changeCubeAtPosition(glm::ivec3(m_startingPosition.x + position.x, startingPosition.y, m_startingPosition.z + position.z), 
 				eCubeType::Leaves);
 		}
 	}
@@ -241,7 +250,7 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition, ChunkManager& chunkM
 		}
 		else
 		{
-			chunkManager.addCube(glm::ivec3(m_startingPosition.x + position.x, startingPosition.y, m_startingPosition.z + position.z),
+			chunkManager.changeCubeAtPosition(glm::ivec3(m_startingPosition.x + position.x, startingPosition.y, m_startingPosition.z + position.z),
 				eCubeType::Leaves);
 		}
 	}

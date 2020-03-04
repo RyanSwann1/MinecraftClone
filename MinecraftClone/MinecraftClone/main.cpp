@@ -198,7 +198,7 @@ int main()
 
 	unsigned int shaderID = createShaderProgram();
 	Camera camera(glm::vec3(0.0f, 150.f, 0.0f));
-	std::unique_ptr<Texture> texture = Texture::loadTexture("Atlas3.png");
+	std::shared_ptr<Texture> texture = Texture::loadTexture("Atlas3.png");
 	if (!texture)
 	{
 		std::cout << "couldn't load texture: " << "America.jpg" << "\n";
@@ -209,10 +209,9 @@ int main()
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot(), uniformLocations);
 	Rectangle visibilityRect(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
 
-	ChunkManager chunkManager;
-	chunkManager.generateInitialChunks(camera.m_position, *texture);
-	std::thread chunkGenerationThread([&](ChunkManager* chunkManager) {chunkManager->update(std::ref(visibilityRect), std::ref(camera),
-		*texture, std::ref(window)); }, &chunkManager);
+	ChunkManager chunkManager(texture);
+	chunkManager.generateInitialChunks(camera.m_position);
+	std::thread chunkGenerationThread([&](ChunkManager* chunkManager) {chunkManager->update(std::ref(visibilityRect), std::ref(camera), std::ref(window)); }, &chunkManager);
 	std::mutex mutex;
 	std::unordered_map<glm::ivec3, VertexArray>& VAOs = chunkManager.getVAOs();
 

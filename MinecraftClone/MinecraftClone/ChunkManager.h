@@ -28,9 +28,7 @@
 //https://www.reddit.com/r/VoxelGameDev/comments/95hqrb/how_to_get_started_with_terrain_generation/
 
 //https://algs4.cs.princeton.edu/34hash/
-//https://www.hackerearth.com/practice/data-structures/hash-tables/basics-of-hash-tables/tutorial/
-
-
+//https://www.hackerearth.com/practice/data-structures/hash-tables/basics-of-hash-tables/tutorial
 
 struct ChunkFromPool : private NonCopyable
 {
@@ -55,34 +53,35 @@ struct CubeDetails;
 class ChunkManager : private NonCopyable
 {
 public:
-	ChunkManager();
+	ChunkManager(std::shared_ptr<Texture>& texture);
 
 	std::unordered_map<glm::ivec3, VertexArray>& getVAOs();
 
-	void addCube(const glm::ivec3& position, eCubeType cubeType);
-	void generateInitialChunks(const glm::vec3& playerPosition, const Texture& texture);
-	void update(Rectangle& visibilityRect, const Camera& camera, const Texture& texture, const sf::Window& window);
+	void changeCubeAtPosition(const glm::ivec3& position, eCubeType cubeType);
+	void generateInitialChunks(const glm::vec3& playerPosition);
+	void update(Rectangle& visibilityRect, const Camera& camera, const sf::Window& window);
 
 private:
 	ChunkPool m_chunkPool;
+	std::shared_ptr<Texture> m_texture;
 	std::unordered_map<glm::ivec3, VertexArray> m_VAOs;
 	std::unordered_map<glm::ivec3, ChunkFromPool> m_chunks;
 	//m_addToMeshQueue;
 	std::unordered_set<glm::ivec3> m_chunksToRegenerate;
 	std::mutex m_mutex;
 
-	void addCubeFace(VertexArray& vertexArray, const Texture& texture, const CubeDetails& cubeDetails, eCubeSide cubeSide, const glm::ivec3& cubePosition);
+	void addCubeFace(VertexArray& vertexArray, const CubeDetails& cubeDetails, eCubeSide cubeSide, const glm::ivec3& cubePosition);
 
 	bool isCubeAtPosition(const glm::ivec3& position) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
 	bool isChunkAtPosition(const glm::ivec3& position) const;
 
-	void generateChunkMesh(VertexArray& vertexArray, const Texture& texture, const Chunk& chunk);
+	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
 	//void addToMesh()
 
 	void deleteChunks(const Rectangle& visibilityRect);
-	void addChunks(const Rectangle& visibilityRect, const glm::vec3& playerPosition, const Texture& texture);
-	void regenChunks(const Rectangle& visibilityRect, const glm::vec3& playerPosition, const Texture& texture);
+	void addChunks(const Rectangle& visibilityRect, const glm::vec3& playerPosition);
+	void regenChunks(const Rectangle& visibilityRect, const glm::vec3& playerPosition);
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition) const;
 };
