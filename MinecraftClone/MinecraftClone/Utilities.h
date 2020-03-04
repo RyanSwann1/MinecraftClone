@@ -37,7 +37,7 @@ namespace Utilities
 	constexpr int WATER_MAX_HEIGHT = 13;
 	constexpr int STONE_MAX_HEIGHT = 12; 
 	constexpr int TREE_SPAWN_CHANCE = 1400;
-	constexpr int TREE_MIN_HEIGHT = 5;
+	constexpr int TREE_MIN_HEIGHT = 9;
 	constexpr int TREE_MAX_HEIGHT = 9;
 	constexpr int MAX_TREE_PER_CHUNK = 1;
 	
@@ -46,6 +46,11 @@ namespace Utilities
 
 	//constexpr int VISIBILITY_DISTANCE = 64;
 	constexpr int VISIBILITY_DISTANCE = 480;
+
+	constexpr std::array<int, 6> LEAVES_DISTANCES =
+	{
+		3, 3, 2, 2, 1, 1
+	};
 
 	static constexpr std::array<glm::vec2, 4> GRASS_TEXT_COORDS =
 	{	

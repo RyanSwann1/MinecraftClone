@@ -189,12 +189,14 @@ void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 						++totalTreesAdded;
 						int maxTreeHeight = Utilities::getRandomNumber(Utilities::TREE_MIN_HEIGHT, Utilities::TREE_MAX_HEIGHT);
 						int treeHeight = 1;
+						int leavesDistance = 0;
 						bool beginSpawnLeaves = false;
 						for (treeHeight; treeHeight <= maxTreeHeight; ++treeHeight)
 						{
 							if (treeHeight >= (maxTreeHeight / 2))
 							{
-								spawnLeaves(glm::ivec3(x, y + treeHeight + 1, z), chunkManager, 3);
+								spawnLeaves(glm::ivec3(x, y + treeHeight + 1, z), chunkManager, Utilities::LEAVES_DISTANCES[leavesDistance]);
+								++leavesDistance;
 							}
 							if (y + treeHeight < Utilities::CHUNK_HEIGHT - 1)
 							{
