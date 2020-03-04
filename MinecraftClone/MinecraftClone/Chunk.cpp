@@ -161,7 +161,13 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 
 	m_endingPosition = glm::ivec3(startingPosition.x + Utilities::CHUNK_WIDTH, startingPosition.y + Utilities::CHUNK_HEIGHT,
 		startingPosition.z + Utilities::CHUNK_DEPTH);
+	
+	spawnWater();
+	spawnTrees();
+}
 
+void Chunk::spawnWater()
+{
 	//Fill with Water
 	for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
 	{
@@ -173,7 +179,10 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			}
 		}
 	}
+}
 
+void Chunk::spawnTrees()
+{
 	//Fill with trees
 	int totalTreesAdded = 0;
 	int totalTrees = Utilities::getRandomNumber(0, Utilities::MAX_TREE_PER_CHUNK);
