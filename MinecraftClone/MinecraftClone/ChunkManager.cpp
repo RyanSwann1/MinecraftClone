@@ -19,7 +19,7 @@ void ChunkManager::addCube(const glm::ivec3& position, eCubeType cubeType)
 	auto chunk = m_chunks.find(chunkStartingPosition);
 	if (chunk != m_chunks.end())
 	{
-		chunk->second.chunk.
+		//chunk->second.chunk.
 	}
 }
 
@@ -34,7 +34,7 @@ void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition, std::u
 			{
 				m_chunks.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunkStartingPosition),
-					std::forward_as_tuple(m_chunkPool, chunkStartingPosition));
+					std::forward_as_tuple(m_chunkPool, chunkStartingPosition, *this));
 
 				VAOs.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunkStartingPosition),
@@ -475,7 +475,7 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, std::unordered_map
 			{
 				auto newChunk = m_chunks.emplace(std::piecewise_construct,
 					std::forward_as_tuple(position),
-					std::forward_as_tuple(m_chunkPool, position)).first;
+					std::forward_as_tuple(m_chunkPool, position, *this)).first;
 
 				newlyAddedChunks.push(&newChunk->second.chunk);
 			}

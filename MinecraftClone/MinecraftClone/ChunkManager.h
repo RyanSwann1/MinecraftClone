@@ -34,8 +34,8 @@
 
 struct ChunkFromPool : private NonCopyable
 {
-	ChunkFromPool(ChunkPool& chunkPool, const glm::ivec3& startingPosition)
-		: chunk(chunkPool.getChunk(startingPosition))
+	ChunkFromPool(ChunkPool& chunkPool, const glm::ivec3& startingPosition, ChunkManager& chunkManager)
+		: chunk(chunkPool.getChunk(startingPosition, chunkManager))
 	{}
 
 	~ChunkFromPool()
@@ -76,7 +76,7 @@ private:
 	bool isChunkAtPosition(const glm::ivec3& position) const;
 
 	void generateChunkMesh(VertexArray& vertexArray, const Texture& texture, const Chunk& chunk);
-	void addToMesh()
+	//void addToMesh()
 
 	void deleteChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs);
 	void addChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const glm::vec3& playerPosition, const Texture& texture);
