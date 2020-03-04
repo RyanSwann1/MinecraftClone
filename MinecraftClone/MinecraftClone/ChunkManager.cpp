@@ -66,9 +66,9 @@ void ChunkManager::update(Rectangle& visibilityRect, const Camera& camera, const
 	}
 }
 
-void ChunkManager::addCubeFace(VertexArray& vertexArray, const CubeDetails& cubeDetails, eCubeSide cubeSide, const glm::ivec3& cubePosition)
+void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition)
 {
-	if (static_cast<eCubeType>(cubeDetails.type) == eCubeType::Water)
+	if (cubeType == eCubeType::Water)
 	{
 		assert(cubeSide == eCubeSide::Top);
 		if (cubeSide == eCubeSide::Top)
@@ -102,7 +102,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, const CubeDetails& cube
 				vertexArray.m_vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 			}
 
-			switch (static_cast<eCubeType>(cubeDetails.type))
+			switch (cubeType)
 			{
 			case eCubeType::Stone:
 				m_texture->getTextCoords(eCubeFaceID::Stone, vertexArray.m_vertexBuffer.textCoords);
@@ -128,7 +128,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, const CubeDetails& cube
 				vertexArray.m_vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 			}
 
-			switch (static_cast<eCubeType>(cubeDetails.type))
+			switch (cubeType)
 			{
 			case eCubeType::Stone:
 				m_texture->getTextCoords(eCubeFaceID::Stone, vertexArray.m_vertexBuffer.textCoords);
@@ -154,7 +154,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, const CubeDetails& cube
 				vertexArray.m_vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 			}
 
-			switch (static_cast<eCubeType>(cubeDetails.type))
+			switch (cubeType)
 			{
 			case eCubeType::Stone:
 				m_texture->getTextCoords(eCubeFaceID::Stone, vertexArray.m_vertexBuffer.textCoords);
@@ -180,7 +180,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, const CubeDetails& cube
 				vertexArray.m_vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 			}
 
-			switch (static_cast<eCubeType>(cubeDetails.type))
+			switch (cubeType)
 			{
 			case eCubeType::Stone:
 				m_texture->getTextCoords(eCubeFaceID::Stone, vertexArray.m_vertexBuffer.textCoords);
@@ -206,7 +206,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, const CubeDetails& cube
 				vertexArray.m_vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 			}
 
-			switch (static_cast<eCubeType>(cubeDetails.type))
+			switch (cubeType)
 			{
 			case eCubeType::Stone:
 				m_texture->getTextCoords(eCubeFaceID::Stone, vertexArray.m_vertexBuffer.textCoords);
@@ -232,7 +232,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, const CubeDetails& cube
 				vertexArray.m_vertexBuffer.positions.push_back({ i.x, i.y, i.z });
 			}	
 
-			switch (static_cast<eCubeType>(cubeDetails.type))
+			switch (cubeType)
 			{
 			case eCubeType::Stone:
 				m_texture->getTextCoords(eCubeFaceID::Stone, vertexArray.m_vertexBuffer.textCoords);
@@ -293,13 +293,18 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 {
 	const glm::ivec3& chunkStartingPosition = chunk.getStartingPosition();
 	bool regenChunk = false;
-	std::array<const Chunk*, static_cast<size_t>(eDirection::Total)> neighbouringChunks =
-	{
-		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x - Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z)),
-		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x + Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z)),
-		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z + Utilities::CHUNK_DEPTH)),
-		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z - Utilities::CHUNK_DEPTH))
-	};
+
+	const Chunk* leftNeighbouringChunk =
+		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x - Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z));
+
+	const Chunk* rightNeighbouringChunk =
+		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x + Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z));
+
+	const Chunk* forwardNeighbouringChunk = 
+		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z + Utilities::CHUNK_DEPTH));
+
+	const Chunk* backNeighbouringChunk =
+		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z - Utilities::CHUNK_DEPTH));
 
 	for (int z = chunkStartingPosition.z; z < chunkStartingPosition.z + Utilities::CHUNK_DEPTH; ++z)
 	{
@@ -308,13 +313,14 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 			for (int x = chunkStartingPosition.x; x < chunkStartingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 			{
 				glm::ivec3 position(x, y, z);
-				if (static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(position).type) == eCubeType::Invalid)
+				eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(position).type);
+				if (cubeType == eCubeType::Invalid)
 				{
 					continue;
 				}
-				else if (static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(position).type) == eCubeType::Water)
+				else if (cubeType == eCubeType::Water)
 				{
-					addCubeFace(vertexArray, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Top, position);
+					addCubeFace(vertexArray, cubeType, eCubeSide::Top, position);
 				}
 				else
 				{
@@ -324,15 +330,15 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 					{
 						if (!isCubeAtPosition(leftPosition, chunk))
 						{
-							addCubeFace(vertexArray, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Left, position);
+							addCubeFace(vertexArray, cubeType, eCubeSide::Left, position);
 						}
 					}
-					else if (neighbouringChunks[static_cast<int>(eDirection::Left)] &&
-						!isCubeAtPosition(leftPosition, *neighbouringChunks[static_cast<int>(eDirection::Left)]))
+					else if (leftNeighbouringChunk &&
+						!isCubeAtPosition(leftPosition, *leftNeighbouringChunk))
 					{
-						addCubeFace(vertexArray, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Left, position);
+						addCubeFace(vertexArray, cubeType, eCubeSide::Left, position);
 					}
-					else if (!neighbouringChunks[static_cast<int>(eDirection::Left)])
+					else if (!leftNeighbouringChunk)
 					{
 						regenChunk = true;
 					}
@@ -343,15 +349,15 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 					{
 						if (!isCubeAtPosition(rightPosition, chunk))
 						{
-							addCubeFace(vertexArray, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Right, position);
+							addCubeFace(vertexArray, cubeType, eCubeSide::Right, position);
 						}
 					}
-					else if (neighbouringChunks[static_cast<int>(eDirection::Right)] &&
-						!isCubeAtPosition(rightPosition, *neighbouringChunks[static_cast<int>(eDirection::Right)]))
+					else if (rightNeighbouringChunk &&
+						!isCubeAtPosition(rightPosition, *rightNeighbouringChunk))
 					{
-						addCubeFace(vertexArray, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Right, position);
+						addCubeFace(vertexArray, cubeType, eCubeSide::Right, position);
 					}
-					else if (!neighbouringChunks[static_cast<int>(eDirection::Right)])
+					else if (!rightNeighbouringChunk)
 					{
 						regenChunk = true;
 					}
@@ -362,15 +368,15 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 					{
 						if (!isCubeAtPosition(forwardPosition, chunk))
 						{
-							addCubeFace(vertexArray, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Front, position);
+							addCubeFace(vertexArray, cubeType, eCubeSide::Front, position);
 						}
 					}
-					else if (neighbouringChunks[static_cast<int>(eDirection::Forward)] &&
-						!isCubeAtPosition(forwardPosition, *neighbouringChunks[static_cast<int>(eDirection::Forward)]))
+					else if ( forwardNeighbouringChunk &&
+						!isCubeAtPosition(forwardPosition, *forwardNeighbouringChunk))
 					{
-						addCubeFace(vertexArray, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Front, position);
+						addCubeFace(vertexArray, cubeType, eCubeSide::Front, position);
 					}
-					else if (!neighbouringChunks[static_cast<int>(eDirection::Forward)])
+					else if (!forwardNeighbouringChunk)
 					{
 						regenChunk = true;
 					}
@@ -381,23 +387,26 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 					{
 						if (!isCubeAtPosition(backPosition, chunk))
 						{
-							addCubeFace(vertexArray, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Back, position);
+							addCubeFace(vertexArray, cubeType, eCubeSide::Back, position);
 						}
 					}
-					else if (neighbouringChunks[static_cast<int>(eDirection::Back)] &&
-						!isCubeAtPosition(backPosition, *neighbouringChunks[static_cast<int>(eDirection::Back)]))
+					else if (backNeighbouringChunk &&
+						!isCubeAtPosition(backPosition, *backNeighbouringChunk))
 					{
-						addCubeFace(vertexArray, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Back, position);
+						addCubeFace(vertexArray, cubeType, eCubeSide::Back, position);
 					}
-					else if (!neighbouringChunks[static_cast<int>(eDirection::Back)])
+					else if (!backNeighbouringChunk)
 					{
 						regenChunk = true;
 					}
 
 					//Top
-					if (y < Utilities::CHUNK_HEIGHT - 1 && !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
+					if (cubeType != eCubeType::TreeStump)
 					{
-						addCubeFace(vertexArray, chunk.getCubeDetailsWithoutBoundsCheck(position), eCubeSide::Top, position);
+						if (y < Utilities::CHUNK_HEIGHT - 1 && !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
+						{
+							addCubeFace(vertexArray, cubeType, eCubeSide::Top, position);
+						}
 					}
 				}
 			}
@@ -483,10 +492,6 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, const glm::vec3& p
 	{
 		const Chunk* newChunk = newlyAddedChunks.front();
 		newlyAddedChunks.pop();
-
-		//auto newVAO = m_VAOs.emplace(std::piecewise_construct,
-		//	std::forward_as_tuple(newChunk->getStartingPosition()),
-		//	std::forward_as_tuple()).first;
 
 		auto VAO = m_VAOs.find(newChunk->getStartingPosition());
 		assert(VAO != m_VAOs.end());
