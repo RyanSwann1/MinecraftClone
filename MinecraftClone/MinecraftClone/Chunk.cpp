@@ -3,6 +3,7 @@
 #include "Texture.h"
 #include "VertexBuffer.h"
 #include "glm/gtc/noise.hpp"
+#include "ChunkManager.h"
 #include <iostream>
 #include <algorithm>
 
@@ -14,14 +15,14 @@ Chunk::Chunk()
 	m_next(nullptr)
 {}
 
-Chunk::Chunk(const glm::ivec3& startingPosition)
+Chunk::Chunk(const glm::ivec3& startingPosition, ChunkManager& chunkManager)
 	: m_inUse(false),
 	m_startingPosition(startingPosition),
 	m_endingPosition(),
 	m_chunk(),
 	m_next(nullptr)
 {
-	regen(m_startingPosition);
+	regen(m_startingPosition, chunkManager);
 }
 
 bool Chunk::isInUse() const
@@ -61,7 +62,7 @@ void Chunk::setNext(Chunk* chunk)
 	m_next = chunk;
 }
 
-void Chunk::reuse(const glm::ivec3& startingPosition)
+void Chunk::reuse(const glm::ivec3& startingPosition, ChunkManager& chunkManager)
 {
 	for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
 	{
@@ -76,7 +77,7 @@ void Chunk::reuse(const glm::ivec3& startingPosition)
 
 	m_inUse = true;
 	m_startingPosition = startingPosition;
-	regen(m_startingPosition);	
+	regen(m_startingPosition, chunkManager);	
 }
 
 void Chunk::release()
@@ -86,7 +87,7 @@ void Chunk::release()
 	m_endingPosition = glm::ivec3();
 }
 
-void Chunk::regen(const glm::ivec3& startingPosition)
+void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager)
 {
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
 	{
@@ -194,7 +195,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 						worldPosition.z = m_startingPosition.z + worldPosition.z;*/
 						//Utilities::convertToWorldPosition(worldPosition, m_startingPosition);
 						//Utilities::convertToWorldPosition(worldPosition)
-						spawnLeaves(glm::ivec3(x, y + treeHeight + 1, z));
+						spawnLeaves(glm::ivec3(x, y + treeHeight + 1, z), chunkManager);
 					}
 
 					break;
@@ -204,7 +205,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 	}
 }
 
-void Chunk::spawnLeaves(const glm::ivec3& startingPosition)
+void Chunk::spawnLeaves(const glm::ivec3& startingPosition, ChunkManager& chunkManager)
 {
 	if (isPositionInLocalBounds(startingPosition)) 
 	{
@@ -214,20 +215,34 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition)
 	for (int x = startingPosition.x - 3; x <= startingPosition.x + 3; ++x)
 	{
 		glm::ivec3 position(x, startingPosition.y, startingPosition.z);
-		if (isPositionInLocalBounds(position) && 
-			m_chunk[position.x][position.y][position.z].type == static_cast<char>(eCubeType::Invalid))
+		if (isPositionInLocalBounds(position))
 		{
-			m_chunk[position.x][position.y][position.z].type = static_cast<char>(eCubeType::Leaves);
+			if (m_chunk[position.x][position.y][position.z].type == static_cast<char>(eCubeType::Invalid)) 
+			{
+				m_chunk[position.x][position.y][position.z].type = static_cast<char>(eCubeType::Leaves);
+			}
+		}
+		else
+		{
+			chunkManager.addCube(glm::ivec3(m_startingPosition.x + position.x, startingPosition.y, m_startingPosition.z + position.z), 
+				eCubeType::Leaves);
 		}
 	}
 
 	for (int z = startingPosition.z - 3; z <= startingPosition.z + 3; ++z)
 	{
 		glm::ivec3 position(startingPosition.x, startingPosition.y, z);
-		if (isPositionInLocalBounds(position) && 
-			m_chunk[position.x][position.y][position.z].type == static_cast<char>(eCubeType::Invalid))
+		if (isPositionInLocalBounds(position))
 		{
-			m_chunk[position.x][position.y][position.z].type = static_cast<char>(eCubeType::Leaves);
+			if (m_chunk[position.x][position.y][position.z].type == static_cast<char>(eCubeType::Invalid))
+			{
+				m_chunk[position.x][position.y][position.z].type = static_cast<char>(eCubeType::Leaves);
+			}
+		}
+		else
+		{
+			chunkManager.addCube(glm::ivec3(m_startingPosition.x + position.x, startingPosition.y, m_startingPosition.z + position.z),
+				eCubeType::Leaves);
 		}
 	}
 }

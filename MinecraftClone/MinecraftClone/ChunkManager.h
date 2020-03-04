@@ -30,6 +30,8 @@
 //https://algs4.cs.princeton.edu/34hash/
 //https://www.hackerearth.com/practice/data-structures/hash-tables/basics-of-hash-tables/tutorial/
 
+
+
 struct ChunkFromPool : private NonCopyable
 {
 	ChunkFromPool(ChunkPool& chunkPool, const glm::ivec3& startingPosition)
@@ -55,6 +57,7 @@ class ChunkManager : private NonCopyable
 public:
 	ChunkManager();
 
+	void addCube(const glm::ivec3& position, eCubeType cubeType);
 	void generateInitialChunks(const glm::vec3& playerPosition, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const Texture& texture);
 	void update(Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const Camera& camera, 
 		const Texture& texture, const sf::Window& window);
@@ -62,6 +65,7 @@ public:
 private:
 	ChunkPool m_chunkPool;
 	std::unordered_map<glm::ivec3, ChunkFromPool> m_chunks;
+	//m_addToMeshQueue;
 	std::unordered_set<glm::ivec3> m_chunksToRegenerate;
 	std::mutex m_mutex;
 
@@ -72,6 +76,7 @@ private:
 	bool isChunkAtPosition(const glm::ivec3& position) const;
 
 	void generateChunkMesh(VertexArray& vertexArray, const Texture& texture, const Chunk& chunk);
+	void addToMesh()
 
 	void deleteChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs);
 	void addChunks(const Rectangle& visibilityRect, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const glm::vec3& playerPosition, const Texture& texture);

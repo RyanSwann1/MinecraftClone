@@ -7,6 +7,10 @@
 
 //Trees
 //https://www.reddit.com/r/proceduralgeneration/comments/72waky/how_does_layered_generation_work_when_generating/
+//https://www.reddit.com/r/proceduralgeneration/comments/2t2dyy/trees_in_minecraft_like_worlds_help/
+
+//Saving/Storing
+//https://www.reddit.com/r/proceduralgeneration/comments/3gwbux/question_how_does_the_world_remember_changes/
 
 struct CubeDetails
 {
@@ -22,11 +26,12 @@ struct CubeDetails
 };
 
 //position.y * (CHUNK_AREA) + position.z * CHUNK_SIZE + position.x;
+class ChunkManager;
 class Chunk
 {
 public:
 	Chunk();
-	Chunk(const glm::ivec3& startingPosition);
+	Chunk(const glm::ivec3& startingPosition, ChunkManager& chunkManager);
 	
 	bool isInUse() const;
 	bool isPositionInBounds(const glm::ivec3& position) const;
@@ -35,7 +40,7 @@ public:
 
 	Chunk* getNext();
 	void setNext(Chunk* chunk);
-	void reuse(const glm::ivec3& startingPosition);
+	void reuse(const glm::ivec3& startingPosition, ChunkManager& chunkManager);
 	void release();
 
 private:
@@ -45,7 +50,7 @@ private:
 	std::array<std::array<std::array<CubeDetails, Utilities::CHUNK_DEPTH>, Utilities::CHUNK_HEIGHT>, Utilities::CHUNK_WIDTH> m_chunk;
 	Chunk* m_next;
 
-	void regen(const glm::ivec3& startingPosition);
-	void spawnLeaves(const glm::ivec3& startingPosition);
+	void regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager);
+	void spawnLeaves(const glm::ivec3& startingPosition, ChunkManager& chunkManager);
 	bool isPositionInLocalBounds(const glm::ivec3& position) const;
 };

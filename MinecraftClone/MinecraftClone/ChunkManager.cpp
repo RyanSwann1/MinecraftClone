@@ -13,6 +13,16 @@ ChunkManager::ChunkManager()
 	m_chunksToRegenerate()
 {}
 
+void ChunkManager::addCube(const glm::ivec3& position, eCubeType cubeType)
+{
+	glm::ivec3 chunkStartingPosition = Utilities::getClosestChunkStartingPosition(position);
+	auto chunk = m_chunks.find(chunkStartingPosition);
+	if (chunk != m_chunks.end())
+	{
+		chunk->second.chunk.
+	}
+}
+
 void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition, std::unordered_map<glm::ivec3, VertexArray>& VAOs, const Texture& texture)
 {
 	for (int z = playerPosition.z - Utilities::VISIBILITY_DISTANCE; z < playerPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
