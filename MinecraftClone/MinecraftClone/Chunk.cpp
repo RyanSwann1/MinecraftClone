@@ -176,13 +176,14 @@ void Chunk::regen(const glm::ivec3& startingPosition, ChunkManager& chunkManager
 
 	//Fill with trees
 	int totalTreesAdded = 0;
+	int totalTrees = Utilities::getRandomNumber(0, Utilities::MAX_TREE_PER_CHUNK);
 	for (int z = 3; z < Utilities::CHUNK_DEPTH - 3; ++z)
 	{
 		for (int x = 3; x < Utilities::CHUNK_WIDTH - 3; ++x)
 		{
 			for (int y = Utilities::CHUNK_HEIGHT - 1; y >= Utilities::SAND_MAX_HEIGHT; --y)
 			{
-				if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Grass) && totalTreesAdded < Utilities::MAX_TREE_PER_CHUNK)
+				if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Grass) && totalTreesAdded < totalTrees)
 				{
 					if (Utilities::getRandomNumber(0, 1400) >= Utilities::TREE_SPAWN_CHANCE)
 					{

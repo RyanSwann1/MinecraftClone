@@ -39,7 +39,7 @@ namespace Utilities
 	constexpr int TREE_SPAWN_CHANCE = 1400;
 	constexpr int TREE_MIN_HEIGHT = 9;
 	constexpr int TREE_MAX_HEIGHT = 9;
-	constexpr int MAX_TREE_PER_CHUNK = 1;
+	constexpr int MAX_TREE_PER_CHUNK = 3;
 	
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
