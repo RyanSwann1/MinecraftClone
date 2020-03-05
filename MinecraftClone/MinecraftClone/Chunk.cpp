@@ -193,7 +193,7 @@ void Chunk::spawnTrees()
 		{
 			for (int x = Utilities::MAX_LEAVES_DISTANCE; x < Utilities::CHUNK_WIDTH - Utilities::MAX_LEAVES_DISTANCE; ++x)
 			{
-				for (int y = Utilities::CHUNK_HEIGHT - 1; y >= Utilities::SAND_MAX_HEIGHT; --y)
+				for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_MAX_HEIGHT - Utilities::MAX_LEAVES_DISTANCE - 1; y >= Utilities::SAND_MAX_HEIGHT; --y)
 				{
 					if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Grass) && totalTreesAdded < totalTrees)
 					{

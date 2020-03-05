@@ -43,7 +43,7 @@ namespace Utilities
 	constexpr int CACTUS_MIN_HEIGHT = 1;
 	constexpr int CACTUS_MAX_HEIGHT = 4;
 	constexpr int MAX_TREE_PER_CHUNK = 3;
-	constexpr int MAX_CACTUS_PER_CHUNK = 3;
+	constexpr int MAX_CACTUS_PER_CHUNK = 4;
 	constexpr int MAX_LEAVES_DISTANCE = 3;
 	
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
