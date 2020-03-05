@@ -119,6 +119,9 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 			case eCubeType::Leaves:
 				m_texture->getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
 				break;
+			case eCubeType::Cactus:
+				m_texture->getTextCoords(eCubeFaceID::Cactus, vertexArray.m_vertexBuffer.textCoords);
+				break;
 			}
 			break;
 		case eCubeSide::Back:
@@ -144,6 +147,9 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				break;
 			case eCubeType::Leaves:
 				m_texture->getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
+				break;
+			case eCubeType::Cactus:
+				m_texture->getTextCoords(eCubeFaceID::Cactus, vertexArray.m_vertexBuffer.textCoords);
 				break;
 			}
 			break;
@@ -171,6 +177,9 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 			case eCubeType::Leaves:
 				m_texture->getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
 				break;
+			case eCubeType::Cactus:
+				m_texture->getTextCoords(eCubeFaceID::Cactus, vertexArray.m_vertexBuffer.textCoords);
+				break;
 			}
 			break;
 		case eCubeSide::Right:
@@ -196,6 +205,9 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				break;
 			case eCubeType::Leaves:
 				m_texture->getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
+				break;
+			case eCubeType::Cactus:
+				m_texture->getTextCoords(eCubeFaceID::Cactus, vertexArray.m_vertexBuffer.textCoords);
 				break;
 			}
 			break;
@@ -223,6 +235,9 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 			case eCubeType::Leaves:
 				m_texture->getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
 				break;
+			case eCubeType::Cactus:
+				m_texture->getTextCoords(eCubeFaceID::Cactus, vertexArray.m_vertexBuffer.textCoords);
+				break;
 			}
 			break;
 		case eCubeSide::Bottom:
@@ -248,6 +263,9 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				break;
 			case eCubeType::Leaves:
 				m_texture->getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
+				break;
+			case eCubeType::Cactus:
+				m_texture->getTextCoords(eCubeFaceID::Cactus, vertexArray.m_vertexBuffer.textCoords);
 				break;
 			}
 			break;
