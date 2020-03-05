@@ -55,5 +55,6 @@ private:
 	void regen(const glm::ivec3& startingPosition);
 	void spawnWater();
 	void spawnTrees();
+	void spawnCactus();
 	void spawnLeaves(const glm::ivec3& startingPosition, int distance);
 };

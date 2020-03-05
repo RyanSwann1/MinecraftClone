@@ -164,6 +164,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 	
 	spawnWater();
 	spawnTrees();
+	spawnCactus();
 }
 
 void Chunk::spawnWater()
@@ -228,6 +229,41 @@ void Chunk::spawnTrees()
 				{
 					return;
 				}
+			}
+		}
+	}
+}
+
+void Chunk::spawnCactus()
+{
+	int totalCactusAdded = 0;
+	for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
+	{
+		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
+		{
+			if (Utilities::getRandomNumber(0, Utilities::CACTUS_SPAWN_CHANCE) >= Utilities::CACTUS_SPAWN_CHANCE &&
+				totalCactusAdded < Utilities::MAX_CACTUS_PER_CHUNK)
+			{
+				for (int y = Utilities::CHUNK_HEIGHT; y >= Utilities::WATER_MAX_HEIGHT; --y)
+				{
+					if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Sand))
+					{
+						int cactusMaxHeight = Utilities::getRandomNumber(Utilities::CACTUS_MIN_HEIGHT, Utilities::CACTUS_MAX_HEIGHT);
+						for (int i = 1; i <= cactusMaxHeight; ++i)
+						{
+							m_chunk[x][y + i][z].type = static_cast<char>(eCubeType::Cactus);
+						}
+
+						break;
+					}
+				}
+
+
+			}
+			//Total Cactuses spawned
+			else if (totalCactusAdded >= Utilities::MAX_CACTUS_PER_CHUNK)
+			{
+				return;
 			}
 		}
 	}
