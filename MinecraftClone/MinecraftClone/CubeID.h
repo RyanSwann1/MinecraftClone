@@ -8,7 +8,8 @@ enum class eCubeType
 	Stone,
 	Water,
 	TreeStump,
-	Leaves
+	Leaves,
+	Cactus
 };
 
 enum class eCubeFaceID
@@ -19,5 +20,6 @@ enum class eCubeFaceID
 	Stone,
 	Water,
 	TreeStump,
-	Leaves
+	Leaves,
+	Cactus
 };

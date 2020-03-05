@@ -37,9 +37,13 @@ namespace Utilities
 	constexpr int WATER_MAX_HEIGHT = 13;
 	constexpr int STONE_MAX_HEIGHT = 12; 
 	constexpr int TREE_SPAWN_CHANCE = 1400;
+	constexpr int CACTUS_SPAWN_CHANCE = 1000;
 	constexpr int TREE_MIN_HEIGHT = 9;
 	constexpr int TREE_MAX_HEIGHT = 9;
+	constexpr int CACTUS_MIN_HEIGHT = 1;
+	constexpr int CACTUS_MAX_HEIGHT = 4;
 	constexpr int MAX_TREE_PER_CHUNK = 3;
+	constexpr int MAX_CACTUS_PER_CHUNK = 3;
 	constexpr int MAX_LEAVES_DISTANCE = 3;
 	
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
@@ -112,6 +116,14 @@ namespace Utilities
 		glm::vec2(112.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
 		glm::vec2(112.0f / 128.0f, 1.0f),
 		glm::vec2(96.0f / 128.0f, 1.0f)
+	};
+
+	static constexpr std::array<glm::vec2, 4> CACTUS_TEXT_COORDS =
+	{
+		glm::vec2(112.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
+		glm::vec2(128.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
+		glm::vec2(128.0f / 128.0f, 1.0f),
+		glm::vec2(112.0f / 128.0f, 1.0f)
 	};
 
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_FRONT = { glm::vec3(0, 0, 1.0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(0, 1.0, 1.0) };

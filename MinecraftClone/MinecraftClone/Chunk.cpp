@@ -246,8 +246,10 @@ void Chunk::spawnCactus()
 			{
 				for (int y = Utilities::CHUNK_HEIGHT; y >= Utilities::WATER_MAX_HEIGHT; --y)
 				{
-					if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Sand))
+					if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Sand) && 
+						m_chunk[x][y + 1][z].type == static_cast<char>(eCubeType::Invalid))
 					{
+						++totalCactusAdded;
 						int cactusMaxHeight = Utilities::getRandomNumber(Utilities::CACTUS_MIN_HEIGHT, Utilities::CACTUS_MAX_HEIGHT);
 						for (int i = 1; i <= cactusMaxHeight; ++i)
 						{
@@ -257,8 +259,6 @@ void Chunk::spawnCactus()
 						break;
 					}
 				}
-
-
 			}
 			//Total Cactuses spawned
 			else if (totalCactusAdded >= Utilities::MAX_CACTUS_PER_CHUNK)
