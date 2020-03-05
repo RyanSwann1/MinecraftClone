@@ -30,6 +30,10 @@
 //https://algs4.cs.princeton.edu/34hash/
 //https://www.hackerearth.com/practice/data-structures/hash-tables/basics-of-hash-tables/tutorial
 
+
+
+//https://www.reddit.com/r/proceduralgeneration/comments/4eixfr/how_are_randomly_placed_structures_generated_in_a/
+
 struct ChunkFromPool : private NonCopyable
 {
 	ChunkFromPool(ChunkPool& chunkPool, const glm::ivec3& startingPosition)
