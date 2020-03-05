@@ -185,21 +185,22 @@ void Chunk::spawnWater()
 void Chunk::spawnTrees()
 {
 	//Fill with trees
-	int totalTreesAdded = 0;
-	int totalTrees = Utilities::getRandomNumber(0, Utilities::MAX_TREE_PER_CHUNK);
-	if (totalTrees > 0)
+	int currentTreesPlanted = 0;
+	int maxAllowedTrees = Utilities::getRandomNumber(0, Utilities::MAX_TREE_PER_CHUNK);
+	if (maxAllowedTrees > 0)
 	{
 		for (int z = Utilities::MAX_LEAVES_DISTANCE; z < Utilities::CHUNK_DEPTH - Utilities::MAX_LEAVES_DISTANCE; ++z)
 		{
 			for (int x = Utilities::MAX_LEAVES_DISTANCE; x < Utilities::CHUNK_WIDTH - Utilities::MAX_LEAVES_DISTANCE; ++x)
 			{
-				for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_MAX_HEIGHT - Utilities::MAX_LEAVES_DISTANCE - 1; y >= Utilities::SAND_MAX_HEIGHT; --y)
+				if (currentTreesPlanted < maxAllowedTrees && Utilities::getRandomNumber(0, 1400) >= Utilities::TREE_SPAWN_CHANCE)
 				{
-					if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Grass) && totalTreesAdded < totalTrees)
+					for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_MAX_HEIGHT - Utilities::MAX_LEAVES_DISTANCE; y >= Utilities::SAND_MAX_HEIGHT; --y)
 					{
-						if (Utilities::getRandomNumber(0, 1400) >= Utilities::TREE_SPAWN_CHANCE)
+						if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Grass) &&
+							m_chunk[x][y + 1][z].type == static_cast<char>(eCubeType::Invalid))
 						{
-							++totalTreesAdded;
+							++currentTreesPlanted;
 							int currentTreeHeight = 1;
 							int leavesDistanceIndex = 0;
 							for (currentTreeHeight; currentTreeHeight <= Utilities::TREE_MAX_HEIGHT; ++currentTreeHeight)
@@ -218,14 +219,13 @@ void Chunk::spawnTrees()
 									break;
 								}
 							}
-						}
 
-						break;
+							break;
+						}
 					}
 				}
-
-				//Tree cap reached
-				if (totalTreesAdded >= totalTrees)
+				//Planted all available Trees
+				else if (currentTreesPlanted >= maxAllowedTrees)
 				{
 					return;
 				}
