@@ -3,7 +3,7 @@
 
 ChunkPool::ChunkPool()
 {
-	m_chunks.resize(size_t(7500));
+	m_chunks.resize(size_t(5000));
 
 	for (int i = 0; i < static_cast<int>(m_chunks.size()) - 1; ++i)
 	{
