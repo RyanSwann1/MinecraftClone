@@ -346,25 +346,29 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 					}
 
 					//Left Face
-					if (!isCubeAtPosition(glm::ivec3(x - 1, y, z), chunk, eCubeType::Leaves))
+					if (!isCubeAtPosition(glm::ivec3(x - 1, y, z), chunk, eCubeType::Leaves) &&
+						!isCubeAtPosition(glm::ivec3(x - 1, y, z), chunk, eCubeType::TreeStump))
 					{
 						addCubeFace(vertexArray, cubeType, eCubeSide::Left, position);
 					}
 				
 					//Right Face
-					if (!isCubeAtPosition(glm::ivec3(x + 1, y, z), chunk, eCubeType::Leaves))
+					if (!isCubeAtPosition(glm::ivec3(x + 1, y, z), chunk, eCubeType::Leaves) &&
+						!isCubeAtPosition(glm::ivec3(x + 1, y, z), chunk, eCubeType::TreeStump))
 					{
 						addCubeFace(vertexArray, cubeType, eCubeSide::Right, position);
 					}
 
 					//Front Face
-					if (!isCubeAtPosition(glm::ivec3(x, y, z + 1), chunk, eCubeType::Leaves))
+					if (!isCubeAtPosition(glm::ivec3(x, y, z + 1), chunk, eCubeType::Leaves) &&
+						!isCubeAtPosition(glm::ivec3(x, y, z + 1), chunk, eCubeType::TreeStump))
 					{
 						addCubeFace(vertexArray, cubeType, eCubeSide::Front, position);
 					}
 
 					//Back Face
-					if (!isCubeAtPosition(glm::ivec3(x, y, z - 1), chunk, eCubeType::Leaves))
+					if (!isCubeAtPosition(glm::ivec3(x, y, z - 1), chunk, eCubeType::Leaves) &&
+						!isCubeAtPosition(glm::ivec3(x, y, z - 1), chunk, eCubeType::TreeStump))
 					{
 						addCubeFace(vertexArray, cubeType, eCubeSide::Back, position);
 					}
