@@ -35,6 +35,7 @@ public:
 	bool isInUse() const;
 	bool isPositionInBounds(const glm::ivec3& position) const;
 	const glm::ivec3& getStartingPosition() const;
+	const CubeDetails& getCubeDetailsAtPosition(const glm::ivec3& position) const;
 	const CubeDetails& getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const;
 
 	Chunk* getNext();

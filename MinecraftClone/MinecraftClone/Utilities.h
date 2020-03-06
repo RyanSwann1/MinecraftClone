@@ -28,7 +28,7 @@ enum class eDirection
 namespace Utilities
 {
 	constexpr int CHUNK_WIDTH = 32;
-	constexpr int CHUNK_HEIGHT = 64;
+	constexpr int CHUNK_HEIGHT = 96;
 	constexpr int CHUNK_DEPTH = 32;
 	constexpr int CHUNK_SIZE = (CHUNK_WIDTH + CHUNK_DEPTH) / 2.0f;
 

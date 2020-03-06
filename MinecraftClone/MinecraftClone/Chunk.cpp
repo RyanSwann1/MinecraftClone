@@ -105,11 +105,11 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			double ex = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
 			double ey = (z) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
 			
-			float elevation = std::abs(1 * glm::perlin(glm::vec2(8.0f * ex, 8.0f * ey)));
-			elevation += std::abs(0.5 * glm::perlin(glm::vec2(ex * 40.0f, ey * 40.0f)));
-			elevation += std::abs(0.25 * glm::perlin(glm::vec2(ex * 80.0f, ey * 80.0f)));
+			float elevation = std::abs(1 * glm::perlin(glm::vec2(5.0f * ex, 5.0f * ey)));
+			elevation += std::abs(0.5 * glm::perlin(glm::vec2(ex * 15.0f, ey * 15.0f)));
+			elevation += std::abs(0.25 * glm::perlin(glm::vec2(ex * 30.0f, ey * 30.0f)));
 
-			elevation = glm::pow(elevation, 2.0f);
+			elevation = glm::pow(elevation, 2.5f);
 			elevation = elevation * (float)Utilities::CHUNK_HEIGHT;
 			elevation = Utilities::clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
 
@@ -189,9 +189,9 @@ void Chunk::spawnTrees()
 	int maxAllowedTrees = Utilities::getRandomNumber(0, Utilities::MAX_TREE_PER_CHUNK);
 	if (maxAllowedTrees > 0)
 	{
-		for (int z = Utilities::MAX_LEAVES_DISTANCE; z < Utilities::CHUNK_DEPTH - Utilities::MAX_LEAVES_DISTANCE; ++z)
+		for (int z = Utilities::MAX_LEAVES_DISTANCE + 1; z < Utilities::CHUNK_DEPTH - Utilities::MAX_LEAVES_DISTANCE - 1; ++z)
 		{
-			for (int x = Utilities::MAX_LEAVES_DISTANCE; x < Utilities::CHUNK_WIDTH - Utilities::MAX_LEAVES_DISTANCE; ++x)
+			for (int x = Utilities::MAX_LEAVES_DISTANCE + 1; x < Utilities::CHUNK_WIDTH - Utilities::MAX_LEAVES_DISTANCE - 1; ++x)
 			{
 				if (currentTreesPlanted < maxAllowedTrees && Utilities::getRandomNumber(0, 1400) >= Utilities::TREE_SPAWN_CHANCE)
 				{
@@ -244,7 +244,7 @@ void Chunk::spawnCactus()
 			if (Utilities::getRandomNumber(0, Utilities::CACTUS_SPAWN_CHANCE) >= Utilities::CACTUS_SPAWN_CHANCE &&
 				totalCactusAdded < Utilities::MAX_CACTUS_PER_CHUNK)
 			{
-				for (int y = Utilities::CHUNK_HEIGHT; y >= Utilities::WATER_MAX_HEIGHT; --y)
+				for (int y = Utilities::CHUNK_HEIGHT - Utilities::CACTUS_MAX_HEIGHT - 1; y >= Utilities::WATER_MAX_HEIGHT; --y)
 				{
 					if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Sand) && 
 						m_chunk[x][y + 1][z].type == static_cast<char>(eCubeType::Invalid))
