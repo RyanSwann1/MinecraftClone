@@ -104,8 +104,6 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 		{
 			double nx = (x) / (Utilities::VISIBILITY_DISTANCE * 1.0f) - 0.5f;
 			double ny = (z) / (Utilities::VISIBILITY_DISTANCE * 1.0f) - 0.5f;
-
-			//float elevation = std::abs(glm::perlin(glm::vec2(nx, ny)));
 			
 			float elevation = std::abs(1 * glm::perlin(glm::vec2(1 * nx, 1 * ny)));
 			elevation += std::abs(0.5 * glm::perlin(glm::vec2(nx * 2, ny * 2)));
@@ -113,19 +111,13 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 
 			//elevation = glm::pow(elevation, 5.f);
 			elevation = (float)Utilities::CHUNK_HEIGHT - 1.0f - (elevation * (float)Utilities::CHUNK_HEIGHT);
-			//elevation = glm::pow(elevation, 1.25f);
 			elevation = Utilities::clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
 
-			//glm::perlin(glm::vec2(nx * 1.25f, ny * 1.25f))) * 16;
 			eCubeType cubeType;
 			if (elevation <= Utilities::STONE_MAX_HEIGHT)
 			{
 				cubeType = eCubeType::Stone;
 			}
-			//else if (elevation <= Utilities::WATER_MAX_HEIGHT)
-			//{
-			//	cubeType = eCubeType::Water;
-			//}
 			else if (elevation <= Utilities::SAND_MAX_HEIGHT)
 			{
 				cubeType = eCubeType::Sand;
@@ -136,7 +128,6 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			}
 
 			glm::ivec3 positionOnGrid(x - startingPosition.x, (int)elevation, z - startingPosition.z);
-			//std::cout << elevation << "\n";
 			m_chunk[positionOnGrid.x][(int)elevation][positionOnGrid.z] = CubeDetails(cubeType);
 
 			for (int y = (int)elevation - 1; y >= 0; --y)
@@ -169,7 +160,6 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 
 void Chunk::spawnWater()
 {
-	//Fill with Water
 	for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
 	{
 		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
@@ -184,7 +174,6 @@ void Chunk::spawnWater()
 
 void Chunk::spawnTrees()
 {
-	//Fill with trees
 	int currentTreesPlanted = 0;
 	int maxAllowedTrees = Utilities::getRandomNumber(0, Utilities::MAX_TREE_PER_CHUNK);
 	if (maxAllowedTrees > 0)
