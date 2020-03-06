@@ -190,7 +190,7 @@ int main()
 	settings.attributeFlags = sf::ContextSettings::Core;
 	sf::Vector2i windowSize(1980, 1080);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft", sf::Style::Default, settings);
-	window.setFramerateLimit(120);
+	window.setFramerateLimit(60);
 	gladLoadGL();
 
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
@@ -230,15 +230,13 @@ int main()
 		float deltaTime = clock.restart().asSeconds();
 		sf::Vector2i mousePosition = sf::Mouse::getPosition();
 		camera.mouse_callback(mousePosition.x, mousePosition.y);
-		if (elaspedTime >= messageExpiredTime)
-		{
-			elaspedTime = 0.0f;
-			glm::ivec2 playerPosition(camera.m_position.x, camera.m_position.z);
-			//std::cout << playerPosition.x << "\n";
-			//std::cout << playerPosition.y << "\n";
-		}
-
-		elaspedTime += deltaTime;
+		//if (elaspedTime >= messageExpiredTime)
+		//{
+		//	elaspedTime = 0.0f;
+		//	glm::ivec2 playerPosition(camera.m_position.x, camera.m_position.z);
+		//	//std::cout << playerPosition.x << "\n";
+		//	//std::cout << playerPosition.y << "\n";
+		//}
 
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))

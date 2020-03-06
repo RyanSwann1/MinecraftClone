@@ -105,20 +105,21 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			double ex = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
 			double ey = (z) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
 			
-			float elevation = std::abs(1 * glm::perlin(glm::vec2(1 * ex, 1 * ey)));
-			elevation += std::abs(0.5 * glm::perlin(glm::vec2(ex * 2, ey * 2)));
-			elevation += std::abs(0.25 * glm::perlin(glm::vec2(ex * 4, ey * 4)));
+			float elevation = std::abs(1 * glm::perlin(glm::vec2(8.0f * ex, 8.0f * ey)));
+			elevation += std::abs(0.5 * glm::perlin(glm::vec2(ex * 40.0f, ey * 40.0f)));
+			elevation += std::abs(0.25 * glm::perlin(glm::vec2(ex * 80.0f, ey * 80.0f)));
 
-			//elevation = glm::pow(elevation, 5.f);
+			elevation = glm::pow(elevation, 2.0f);
 			elevation = elevation * (float)Utilities::CHUNK_HEIGHT;
 			elevation = Utilities::clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
 
-			double mx = (x) / (Utilities::VISIBILITY_DISTANCE * 1.0f) - 0.5f;
-			double my = (z) / (Utilities::VISIBILITY_DISTANCE * 1.0f) - 0.5f;
+			double mx = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
+			double my = (z) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
+			float moisture = std::abs(1 * glm::perlin(glm::vec2(15.0f * mx, 15.0f * my)));
 
 			eCubeType cubeType;
 			glm::ivec3 positionOnGrid(x - startingPosition.x, (int)elevation, z - startingPosition.z);
-			float moisture = std::abs(1 * glm::perlin(glm::vec2(1 * mx, 1 * my)));
+
 			//Desert Biome
 			if (moisture >= 0.5f)
 			{

@@ -28,7 +28,7 @@ enum class eDirection
 namespace Utilities
 {
 	constexpr int CHUNK_WIDTH = 32;
-	constexpr int CHUNK_HEIGHT = 96;
+	constexpr int CHUNK_HEIGHT = 64;
 	constexpr int CHUNK_DEPTH = 32;
 	constexpr int CHUNK_SIZE = (CHUNK_WIDTH + CHUNK_DEPTH) / 2.0f;
 
@@ -50,7 +50,7 @@ namespace Utilities
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
 	//constexpr int VISIBILITY_DISTANCE = 64;
-	constexpr int VISIBILITY_DISTANCE = 800;
+	constexpr int VISIBILITY_DISTANCE = 480;
 	constexpr int MAP_SIZE = 8000;
 
 	constexpr std::array<int, 6> LEAVES_DISTANCES =
