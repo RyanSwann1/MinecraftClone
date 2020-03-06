@@ -82,7 +82,7 @@ private:
 
 	void deleteChunks(const Rectangle& visibilityRect);
 	void addChunks(const Rectangle& visibilityRect, const glm::vec3& playerPosition);
-	void regenChunks(const Rectangle& visibilityRect, const glm::vec3& playerPosition);
+	void regenChunks(const Rectangle& visibilityRect);
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition) const;
 };

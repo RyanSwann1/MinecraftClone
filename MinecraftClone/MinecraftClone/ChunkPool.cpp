@@ -3,7 +3,7 @@
 
 ChunkPool::ChunkPool()
 {
-	m_chunks.resize(size_t(5000));
+	m_chunks.resize(size_t((5000)));
 
 	for (int i = 0; i < static_cast<int>(m_chunks.size()) - 1; ++i)
 	{
@@ -30,14 +30,9 @@ Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
 			validChunkFound = true;
 		}
 
-		assert(++iterationCount && iterationCount < m_chunks.size());
+		assert(++iterationCount && iterationCount <= m_chunks.size());
 	}
 	
 	m_nextAvailable->reuse(startingPosition);
 	return *m_nextAvailable;
-}
-
-void ChunkPool::releaseChunk(Chunk& chunk)
-{
-	chunk.release(); 
 }

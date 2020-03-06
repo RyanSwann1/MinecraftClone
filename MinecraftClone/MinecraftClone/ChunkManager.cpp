@@ -62,7 +62,7 @@ void ChunkManager::update(Rectangle& visibilityRect, const Camera& camera, const
 
 		deleteChunks(visibilityRect);
 		addChunks(visibilityRect, camera.m_position);
-		regenChunks(visibilityRect, camera.m_position);
+		regenChunks(visibilityRect);
 	}
 }
 
@@ -525,7 +525,6 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, const glm::vec3& p
 			glm::ivec3 position(x, 0, z);
 			if (m_chunks.find(position) == m_chunks.cend() && m_VAOs.find(position) == m_VAOs.cend())
 			{
-				assert(m_VAOs.find(position) == m_VAOs.cend());
 				auto newVAO = m_VAOs.emplace(std::piecewise_construct,
 					std::forward_as_tuple(position),
 					std::forward_as_tuple()).first;
@@ -553,7 +552,7 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, const glm::vec3& p
 	}
 }
 
-void ChunkManager::regenChunks(const Rectangle& visibilityRect, const glm::vec3& playerPosition)
+void ChunkManager::regenChunks(const Rectangle& visibilityRect)
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	for (auto chunkStartingPosition = m_chunksToRegenerate.begin(); chunkStartingPosition != m_chunksToRegenerate.end();)
