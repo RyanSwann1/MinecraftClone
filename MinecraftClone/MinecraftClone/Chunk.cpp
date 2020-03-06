@@ -113,25 +113,49 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			elevation = elevation * (float)Utilities::CHUNK_HEIGHT;
 			elevation = Utilities::clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
 
+			double mx = (x) / (Utilities::VISIBILITY_DISTANCE * 1.0f) - 0.5f;
+			double my = (z) / (Utilities::VISIBILITY_DISTANCE * 1.0f) - 0.5f;
+
 			eCubeType cubeType;
 			glm::ivec3 positionOnGrid(x - startingPosition.x, (int)elevation, z - startingPosition.z);
-			
-			for (int y = (int)elevation; y >= 0; --y)
+			float moisture = std::abs(1 * glm::perlin(glm::vec2(1 * mx, 1 * my)));
+			//Desert Biome
+			if (moisture >= 0.5f)
 			{
-				if (y <= Utilities::STONE_MAX_HEIGHT)
+				for (int y = (int)elevation; y >= 0; --y)
 				{
-					cubeType = eCubeType::Stone;
-				}
-				else if (y <= Utilities::SAND_MAX_HEIGHT)
-				{
-					cubeType = eCubeType::Sand;
-				}
-				else
-				{
-					cubeType = eCubeType::Grass;
-				}
+					if (y <= Utilities::STONE_MAX_HEIGHT)
+					{
+						cubeType = eCubeType::Stone;
+					}
+					else 
+					{
+						cubeType = eCubeType::Sand;
+					}
 
-				m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = CubeDetails(cubeType);
+					m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = CubeDetails(cubeType);
+				}
+			}
+			//Plains Biome
+			else
+			{
+				for (int y = (int)elevation; y >= 0; --y)
+				{
+					if (y <= Utilities::STONE_MAX_HEIGHT)
+					{
+						cubeType = eCubeType::Stone;
+					}
+					else if (y <= Utilities::SAND_MAX_HEIGHT)
+					{
+						cubeType = eCubeType::Sand;
+					}
+					else
+					{
+						cubeType = eCubeType::Grass;
+					}
+
+					m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = CubeDetails(cubeType);
+				}
 			}
 		}
 	}
