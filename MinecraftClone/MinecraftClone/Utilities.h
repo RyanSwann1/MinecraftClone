@@ -49,8 +49,7 @@ namespace Utilities
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
-	//constexpr int VISIBILITY_DISTANCE = 64;
-	constexpr int VISIBILITY_DISTANCE = 480;
+	constexpr int VISIBILITY_DISTANCE = 640;
 	constexpr int MAP_SIZE = 8000;
 
 	constexpr std::array<int, 6> LEAVES_DISTANCES =
