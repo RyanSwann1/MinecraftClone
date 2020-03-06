@@ -450,12 +450,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 						regenChunk = true;
 					}
 
-					assert(y <= Utilities::CHUNK_HEIGHT - 1);
-					if (y == Utilities::CHUNK_HEIGHT - 1)
-					{
-						addCubeFace(vertexArray, cubeType, eCubeSide::Top, position);
-					}
-					else if (!isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
+					if (y == Utilities::CHUNK_HEIGHT - 1 || !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
 					{
 						addCubeFace(vertexArray, cubeType, eCubeSide::Top, position);
 					}
