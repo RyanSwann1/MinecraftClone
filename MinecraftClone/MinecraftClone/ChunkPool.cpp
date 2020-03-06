@@ -21,8 +21,10 @@ Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
 
 	while (!validChunkFound)
 	{
+		assert(m_nextAvailable);
 		if (m_nextAvailable->isInUse())
 		{
+			assert(m_nextAvailable->getNext());
 			m_nextAvailable = m_nextAvailable->getNext();
 		}
 		else

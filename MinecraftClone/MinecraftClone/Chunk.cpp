@@ -113,26 +113,10 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			elevation = elevation * (float)Utilities::CHUNK_HEIGHT;
 			elevation = Utilities::clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
 
-
-
 			eCubeType cubeType;
-			if (elevation <= Utilities::STONE_MAX_HEIGHT)
-			{
-				cubeType = eCubeType::Stone;
-			}
-			else if (elevation <= Utilities::SAND_MAX_HEIGHT)
-			{
-				cubeType = eCubeType::Sand;
-			}
-			else
-			{
-				cubeType = eCubeType::Grass;
-			}
-
 			glm::ivec3 positionOnGrid(x - startingPosition.x, (int)elevation, z - startingPosition.z);
-			m_chunk[positionOnGrid.x][(int)elevation][positionOnGrid.z] = CubeDetails(cubeType);
-
-			for (int y = (int)elevation - 1; y >= 0; --y)
+			
+			for (int y = (int)elevation; y >= 0; --y)
 			{
 				if (y <= Utilities::STONE_MAX_HEIGHT)
 				{
