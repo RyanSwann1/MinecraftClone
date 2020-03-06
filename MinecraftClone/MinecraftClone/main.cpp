@@ -214,7 +214,7 @@ int main()
 	ChunkManager chunkManager(texture);
 	chunkManager.generateInitialChunks(camera.m_position);
 	std::thread chunkGenerationThread([&](ChunkManager* chunkManager) {chunkManager->update(std::ref(visibilityRect), std::ref(camera), std::ref(window)); }, &chunkManager);
-	std::mutex mutex;
+
 	std::unordered_map<glm::ivec3, VertexArray>& VAOs = chunkManager.getVAOs();
 
 	std::cout << glGetError() << "\n";
