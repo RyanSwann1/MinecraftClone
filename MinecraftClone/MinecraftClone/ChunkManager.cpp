@@ -523,7 +523,7 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, const glm::vec3& p
 		for (int x = startPosition.x - Utilities::VISIBILITY_DISTANCE; x < startPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
 			glm::ivec3 position(x, 0, z);
-			if (m_chunks.find(position) == m_chunks.cend())
+			if (m_chunks.find(position) == m_chunks.cend() && m_VAOs.find(position) == m_VAOs.cend())
 			{
 				assert(m_VAOs.find(position) == m_VAOs.cend());
 				auto newVAO = m_VAOs.emplace(std::piecewise_construct,
