@@ -102,16 +102,18 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 	{
 		for (int x = startingPosition.x; x < startingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 		{
-			double nx = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
-			double ny = (z) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
+			double ex = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
+			double ey = (z) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
 			
-			float elevation = std::abs(1 * glm::perlin(glm::vec2(1 * nx, 1 * ny)));
-			elevation += std::abs(0.5 * glm::perlin(glm::vec2(nx * 2, ny * 2)));
-			elevation += std::abs(0.25 * glm::perlin(glm::vec2(nx * 4, ny * 4)));
+			float elevation = std::abs(1 * glm::perlin(glm::vec2(1 * ex, 1 * ey)));
+			elevation += std::abs(0.5 * glm::perlin(glm::vec2(ex * 2, ey * 2)));
+			elevation += std::abs(0.25 * glm::perlin(glm::vec2(ex * 4, ey * 4)));
 
 			//elevation = glm::pow(elevation, 5.f);
-			elevation = (float)Utilities::CHUNK_HEIGHT - 1.0f - (elevation * (float)Utilities::CHUNK_HEIGHT);
+			elevation = elevation * (float)Utilities::CHUNK_HEIGHT;
 			elevation = Utilities::clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
+
+
 
 			eCubeType cubeType;
 			if (elevation <= Utilities::STONE_MAX_HEIGHT)
