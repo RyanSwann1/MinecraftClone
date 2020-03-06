@@ -38,7 +38,6 @@ void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition)
 				m_chunks.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunkStartingPosition),
 					std::forward_as_tuple(m_chunkPool, chunkStartingPosition));
-
 			}
 		}
 	}
@@ -451,13 +450,14 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 						regenChunk = true;
 					}
 
-					//Top Face
-					if (cubeType != eCubeType::TreeStump)
+					assert(y <= Utilities::CHUNK_HEIGHT - 1);
+					if (y == Utilities::CHUNK_HEIGHT - 1)
 					{
-						if (y < Utilities::CHUNK_HEIGHT - 1 && !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
-						{
-							addCubeFace(vertexArray, cubeType, eCubeSide::Top, position);
-						}
+						addCubeFace(vertexArray, cubeType, eCubeSide::Top, position);
+					}
+					else if (!isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
+					{
+						addCubeFace(vertexArray, cubeType, eCubeSide::Top, position);
 					}
 				}
 			}
