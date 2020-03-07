@@ -59,6 +59,8 @@ void ChunkManager::update(const Camera& camera, const sf::Window& window, const 
 		deleteChunks(camera.m_position);
 		addChunks(camera.m_position, texture);
 		regenChunks(texture);
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(150));
 	}
 }
 
