@@ -209,11 +209,10 @@ int main()
 
 	texture->bind();
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot(), uniformLocations);
-	Rectangle visibilityRect(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
 
 	ChunkManager chunkManager(texture);
 	chunkManager.generateInitialChunks(camera.m_position);
-	std::thread chunkGenerationThread([&](ChunkManager* chunkManager) {chunkManager->update(std::ref(visibilityRect), std::ref(camera), std::ref(window)); }, &chunkManager);
+	std::thread chunkGenerationThread([&](ChunkManager* chunkManager) {chunkManager->update(std::ref(camera), std::ref(window)); }, &chunkManager);
 
 	std::unordered_map<glm::ivec3, VertexArray>& VAOs = chunkManager.getVAOs();
 
@@ -255,7 +254,8 @@ int main()
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
 		setUniformMat4f(shaderID, "uView", view, uniformLocations);
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 1000.f);
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 
+			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, (float)Utilities::VISIBILITY_DISTANCE);
 		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
 
 		for (auto VAO = VAOs.begin(); VAO != VAOs.end();)

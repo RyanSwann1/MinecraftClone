@@ -53,15 +53,13 @@ void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition)
 	}
 }
 
-void ChunkManager::update(Rectangle& visibilityRect, const Camera& camera, const sf::Window& window)
+void ChunkManager::update(const Camera& camera, const sf::Window& window)
 {
 	while (window.isOpen())
 	{
-		visibilityRect.update(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
-
-		deleteChunks(visibilityRect);
-		addChunks(visibilityRect, camera.m_position);
-		regenChunks(visibilityRect);
+		deleteChunks(camera.m_position);
+		addChunks(camera.m_position);
+		//regenChunks();
 	}
 }
 
@@ -473,10 +471,9 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 	vertexArray.m_attachTransparentVBO = true;
 }
 
-void ChunkManager::deleteChunks(const Rectangle& visibilityRect)
+void ChunkManager::deleteChunks(const glm::ivec3& playerPosition)
 {
-
-
+	Rectangle visibilityRect(glm::vec2(playerPosition.x, playerPosition.z), Utilities::VISIBILITY_DISTANCE);
 	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
 	{
 		if (!visibilityRect.contains(chunk->second.chunk.getAABB()))
@@ -511,13 +508,13 @@ void ChunkManager::deleteChunks(const Rectangle& visibilityRect)
 	}
 }
 
-void ChunkManager::addChunks(const Rectangle& visibilityRect, const glm::vec3& playerPosition)
+void ChunkManager::addChunks(const glm::vec3& playerPosition)
 {
 	std::queue<const Chunk*> newlyAddedChunks;
 	glm::ivec3 startPosition = Utilities::getClosestChunkStartingPosition(playerPosition);	
-	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z < startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
+	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE + 32; z < startPosition.z + Utilities::VISIBILITY_DISTANCE + 32; z += Utilities::CHUNK_DEPTH)
 	{
-		for (int x = startPosition.x - Utilities::VISIBILITY_DISTANCE; x < startPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
+		for (int x = startPosition.x - Utilities::VISIBILITY_DISTANCE + 32; x < startPosition.x + Utilities::VISIBILITY_DISTANCE + 32; x += Utilities::CHUNK_WIDTH)
 		{
 			if (x > startPosition.x - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH) && 
 				x < startPosition.x + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH) &&
@@ -561,7 +558,7 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, const glm::vec3& p
 	}
 }
 
-void ChunkManager::regenChunks(const Rectangle& visibilityRect)
+void ChunkManager::regenChunks()
 {
 	for (auto chunkStartingPosition = m_chunksToRegenerate.begin(); chunkStartingPosition != m_chunksToRegenerate.end();)
 	{

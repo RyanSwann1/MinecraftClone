@@ -60,7 +60,7 @@ public:
 	std::unordered_map<glm::ivec3, VertexArray>& getVAOs();
 
 	void generateInitialChunks(const glm::vec3& playerPosition);
-	void update(Rectangle& visibilityRect, const Camera& camera, const sf::Window& window);
+	void update(const Camera& camera, const sf::Window& window);
 
 private:
 	ChunkPool m_chunkPool;
@@ -78,9 +78,9 @@ private:
 
 	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
 
-	void deleteChunks(const Rectangle& visibilityRect);
-	void addChunks(const Rectangle& visibilityRect, const glm::vec3& playerPosition);
-	void regenChunks(const Rectangle& visibilityRect);
+	void deleteChunks(const glm::ivec3& playerPosition);
+	void addChunks(const glm::vec3& playerPosition);
+	void regenChunks();
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition) const;
 };
