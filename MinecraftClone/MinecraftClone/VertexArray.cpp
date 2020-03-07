@@ -106,7 +106,10 @@ void VertexArray::attachOpaqueVBO()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 	unbind();
-	m_opaqueVBODisplayable = true;
+	if (!m_awaitingRegeneration)
+	{
+		m_opaqueVBODisplayable = true;
+	}
 }
 
 void VertexArray::attachTransparentVBO()
@@ -149,8 +152,13 @@ void VertexArray::attachTransparentVBO()
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	
 	unbind();
-	m_transparentVBODisplayable = true;
+
+	if (!m_awaitingRegeneration)
+	{
+		m_transparentVBODisplayable = true;
+	}
 }
 
 void VertexArray::bindOpaqueVAO() const

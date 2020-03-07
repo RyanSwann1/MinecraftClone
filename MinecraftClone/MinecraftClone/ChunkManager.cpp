@@ -58,7 +58,7 @@ void ChunkManager::update(const Camera& camera, const sf::Window& window, const 
 	{
 		deleteChunks(camera.m_position);
 		addChunks(camera.m_position, texture);
-		//regenChunks();
+		regenChunks(texture);
 	}
 }
 
@@ -463,11 +463,15 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 	}
 	else if (vertexArray.m_awaitingRegeneration && !regenChunk)
 	{
+		vertexArray.m_attachOpaqueVBO = true;
+		vertexArray.m_attachTransparentVBO = true;
 		vertexArray.m_awaitingRegeneration = false;
 	}
-
-	vertexArray.m_attachOpaqueVBO = true;
-	vertexArray.m_attachTransparentVBO = true;
+	else if (!vertexArray.m_awaitingRegeneration && !regenChunk)
+	{
+		vertexArray.m_attachOpaqueVBO = true;
+		vertexArray.m_attachTransparentVBO = true;
+	}
 }
 
 void ChunkManager::deleteChunks(const glm::ivec3& playerPosition)
