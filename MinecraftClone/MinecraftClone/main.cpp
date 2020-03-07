@@ -210,9 +210,10 @@ int main()
 	texture->bind();
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot(), uniformLocations);
 
-	ChunkManager chunkManager(texture);
-	chunkManager.generateInitialChunks(camera.m_position);
-	std::thread chunkGenerationThread([&](ChunkManager* chunkManager) {chunkManager->update(std::ref(camera), std::ref(window)); }, &chunkManager);
+	ChunkManager chunkManager;
+	chunkManager.generateInitialChunks(camera.m_position, *texture);
+	std::thread chunkGenerationThread([&](ChunkManager* chunkManager) 
+	{chunkManager->update(std::ref(camera), std::ref(window), std::ref(*texture)); }, &chunkManager);
 
 	std::unordered_map<glm::ivec3, VertexArray>& VAOs = chunkManager.getVAOs();
 

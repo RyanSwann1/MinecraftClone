@@ -55,32 +55,32 @@ struct CubeDetails;
 class ChunkManager : private NonCopyable
 {
 public:
-	ChunkManager(std::shared_ptr<Texture>& texture);
+	ChunkManager();
 
 	std::unordered_map<glm::ivec3, VertexArray>& getVAOs();
 
-	void generateInitialChunks(const glm::vec3& playerPosition);
-	void update(const Camera& camera, const sf::Window& window);
+	void generateInitialChunks(const glm::vec3& playerPosition, const Texture& texture);
+	void update(const Camera& camera, const sf::Window& window, const Texture& texture);
 
 private:
 	ChunkPool m_chunkPool;
-	std::shared_ptr<Texture> m_texture;
 	std::unordered_map<glm::ivec3, VertexArray> m_VAOs;
 	std::unordered_map<glm::ivec3, ChunkFromPool> m_chunks;
 	std::unordered_set<glm::ivec3> m_chunksToRegenerate;
 	std::mutex m_mutex;
 
-	void addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition);
+	void addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition,
+		const Texture& texture);
 
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
 	bool isChunkAtPosition(const glm::ivec3& position) const;
 
-	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
+	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const Texture& texture);
 
 	void deleteChunks(const glm::ivec3& playerPosition);
-	void addChunks(const glm::vec3& playerPosition);
-	void regenChunks();
+	void addChunks(const glm::vec3& playerPosition, const Texture& texture);
+	void regenChunks(const Texture& texture);
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition) const;
 };
