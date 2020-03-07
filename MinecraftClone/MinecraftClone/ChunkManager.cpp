@@ -475,6 +475,8 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 
 void ChunkManager::deleteChunks(const Rectangle& visibilityRect)
 {
+
+
 	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
 	{
 		if (!visibilityRect.contains(chunk->second.chunk.getAABB()))
@@ -517,6 +519,14 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, const glm::vec3& p
 	{
 		for (int x = startPosition.x - Utilities::VISIBILITY_DISTANCE; x < startPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
+			if (x > startPosition.x - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH) && 
+				x < startPosition.x + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH) &&
+				z > startPosition.z - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH) && 
+				z < startPosition.z + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH))
+			{
+				continue;
+			}
+
 			glm::ivec3 position(x, 0, z);
 			if (m_chunks.find(position) == m_chunks.cend() && m_VAOs.find(position) == m_VAOs.cend())
 			{
@@ -539,14 +549,14 @@ void ChunkManager::addChunks(const Rectangle& visibilityRect, const glm::vec3& p
 	std::lock_guard<std::mutex> lock(m_mutex);
 	while (!newlyAddedChunks.empty())
 	{
-		const Chunk* newChunk = newlyAddedChunks.front();
+		const Chunk& newChunk = *newlyAddedChunks.front();
 		newlyAddedChunks.pop();
-
-		auto VAO = m_VAOs.find(newChunk->getStartingPosition());
+		
+		auto VAO = m_VAOs.find(newChunk.getStartingPosition());
 		assert(VAO != m_VAOs.end());
 		if (VAO != m_VAOs.end())
 		{
-			generateChunkMesh(VAO->second, *newChunk);
+			generateChunkMesh(VAO->second, newChunk);
 		}
 	}
 }
