@@ -17,5 +17,4 @@ struct Rectangle
 	float m_right;
 	float m_top;
 	float m_bottom;
-	float m_distance;
 };
