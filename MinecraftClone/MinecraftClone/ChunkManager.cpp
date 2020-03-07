@@ -477,9 +477,7 @@ void ChunkManager::deleteChunks(const Rectangle& visibilityRect)
 {
 	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
 	{
-		Rectangle chunkAABB(glm::ivec2(chunk->second.chunk.getStartingPosition().x, chunk->second.chunk.getStartingPosition().z) +
-			glm::ivec2(Utilities::CHUNK_WIDTH / 2.0f, Utilities::CHUNK_DEPTH / 2.0f), 16);
-		if (!visibilityRect.contains(chunkAABB))
+		if (!visibilityRect.contains(chunk->second.chunk.getAABB()))
 		{
 			const glm::ivec3& chunkStartingPosition = chunk->second.chunk.getStartingPosition();
 			{

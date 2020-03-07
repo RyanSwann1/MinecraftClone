@@ -3,6 +3,7 @@
 #include "glm/glm.hpp"
 #include "CubeID.h"
 #include "Utilities.h"
+#include "Rectangle.h"
 #include <array>
 
 //Trees
@@ -32,6 +33,7 @@ public:
 	Chunk();
 	Chunk(const glm::ivec3& startingPosition);
 	
+	const Rectangle& getAABB() const;
 	bool isInUse() const;
 	bool isPositionInBounds(const glm::ivec3& position) const;
 	const glm::ivec3& getStartingPosition() const;
@@ -49,6 +51,7 @@ private:
 	glm::ivec3 m_endingPosition;
 	std::array<std::array<std::array<CubeDetails, Utilities::CHUNK_DEPTH>, Utilities::CHUNK_HEIGHT>, Utilities::CHUNK_WIDTH> m_chunk;
 	Chunk* m_next;
+	Rectangle m_AABB;
 
 	bool isPositionInLocalBounds(const glm::ivec3& position) const;
 
