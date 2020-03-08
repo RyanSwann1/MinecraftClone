@@ -16,6 +16,27 @@ struct VertexBuffer
 		transparentIndiciesID(Utilities::INVALID_OPENGL_ID)
 	{}
 
+	void clear()
+	{
+		positionsID = Utilities::INVALID_OPENGL_ID;
+		positions.clear();
+
+		transparentPositionsID = Utilities::INVALID_OPENGL_ID;
+		transparentPositions.clear();
+
+		transparentTextCoordsID = Utilities::INVALID_OPENGL_ID;
+		transparentTextCoords.clear();
+		
+		textCoordsID = Utilities::INVALID_OPENGL_ID;
+		textCoords.clear();
+
+		transparentIndiciesID = Utilities::INVALID_OPENGL_ID;
+		transparentIndicies.clear();
+		
+		indiciesID = Utilities::INVALID_OPENGL_ID;
+		indicies.clear();
+	}
+
 	unsigned int positionsID;
 	std::vector<glm::vec3> positions;
 	

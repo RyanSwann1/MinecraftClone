@@ -5,7 +5,8 @@
 #include <iostream>
 
 VertexArray::VertexArray()
-	: m_opaqueVBODisplayable(false),
+	: m_inUse(false),
+	m_opaqueVBODisplayable(false),
 	m_transparentVBODisplayable(false),
 	m_attachOpaqueVBO(false),
 	m_attachTransparentVBO(false),
@@ -15,14 +16,44 @@ VertexArray::VertexArray()
 	m_ID(Utilities::INVALID_OPENGL_ID),
 	m_transparentID(Utilities::INVALID_OPENGL_ID),
 	m_opaqueElementBufferIndex(0),
-	m_transparentElementBufferIndex(0)
+	m_transparentElementBufferIndex(0),
+	m_next(nullptr)
+{}
+
+void VertexArray::reuse()
 {
-	
+	destroy();
+
+	m_inUse = true;
+	m_opaqueVBODisplayable = false;
+	m_transparentVBODisplayable = false;
+	m_attachOpaqueVBO = false;
+	m_attachTransparentVBO = false;
+	m_destroy = false;
+	m_awaitingRegeneration = false;
+	m_vertexBuffer.clear();
+	m_ID = Utilities::INVALID_OPENGL_ID;
+	m_transparentID = Utilities::INVALID_OPENGL_ID;
+	m_opaqueElementBufferIndex = 0;
+	m_transparentElementBufferIndex = 0;
 }
 
 void VertexArray::destroy()
 {
 	m_destroy = false;
+	m_inUse = false;
+	m_opaqueVBODisplayable = false;
+	m_transparentVBODisplayable = false;
+	m_attachOpaqueVBO = false;
+	m_attachTransparentVBO = false;
+	m_destroy = false;
+	m_awaitingRegeneration = false;
+	m_vertexBuffer.clear();
+	m_ID = Utilities::INVALID_OPENGL_ID;
+	m_transparentID = Utilities::INVALID_OPENGL_ID;
+	m_opaqueElementBufferIndex = 0;
+	m_transparentElementBufferIndex = 0;
+
 	
 	if (m_ID != Utilities::INVALID_OPENGL_ID)
 	{
