@@ -8,8 +8,7 @@ struct VertexArray //: private NonCopyable
 {
 	VertexArray();
 	
-	void reuse();
-	void destroy();
+	void reset();
 
 	void attachTransparentVBO();
 	void attachOpaqueVBO();
@@ -22,7 +21,7 @@ struct VertexArray //: private NonCopyable
 	bool m_transparentVBODisplayable;
 	bool m_attachOpaqueVBO;
 	bool m_attachTransparentVBO;
-	bool m_destroy;
+	bool m_reset;
 	bool m_awaitingRegeneration;
 	VertexBuffer m_vertexBuffer;
 	unsigned int m_ID;

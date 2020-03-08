@@ -261,9 +261,9 @@ int main()
 
 		for (auto VAO = VAOs.begin(); VAO != VAOs.end(); ++VAO)
 		{
-			if (VAO->second.vertexArray.m_destroy)
+			if (VAO->second.vertexArray.m_reset)
 			{
-				VAO->second.vertexArray.destroy();
+				VAO->second.vertexArray.reset();
 				VAOs.erase(VAO);
 				continue;
 			}

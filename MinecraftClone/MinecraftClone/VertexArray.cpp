@@ -10,7 +10,7 @@ VertexArray::VertexArray()
 	m_transparentVBODisplayable(false),
 	m_attachOpaqueVBO(false),
 	m_attachTransparentVBO(false),
-	m_destroy(false),
+	m_reset(false),
 	m_awaitingRegeneration(false),
 	m_vertexBuffer(),
 	m_ID(Utilities::INVALID_OPENGL_ID),
@@ -20,41 +20,8 @@ VertexArray::VertexArray()
 	m_next(nullptr)
 {}
 
-void VertexArray::reuse()
+void VertexArray::reset()
 {
-	destroy();
-
-	m_inUse = true;
-	m_opaqueVBODisplayable = false;
-	m_transparentVBODisplayable = false;
-	m_attachOpaqueVBO = false;
-	m_attachTransparentVBO = false;
-	m_destroy = false;
-	m_awaitingRegeneration = false;
-	m_vertexBuffer.clear();
-	m_ID = Utilities::INVALID_OPENGL_ID;
-	m_transparentID = Utilities::INVALID_OPENGL_ID;
-	m_opaqueElementBufferIndex = 0;
-	m_transparentElementBufferIndex = 0;
-}
-
-void VertexArray::destroy()
-{
-	m_destroy = false;
-	m_inUse = false;
-	m_opaqueVBODisplayable = false;
-	m_transparentVBODisplayable = false;
-	m_attachOpaqueVBO = false;
-	m_attachTransparentVBO = false;
-	m_destroy = false;
-	m_awaitingRegeneration = false;
-	m_vertexBuffer.clear();
-	m_ID = Utilities::INVALID_OPENGL_ID;
-	m_transparentID = Utilities::INVALID_OPENGL_ID;
-	m_opaqueElementBufferIndex = 0;
-	m_transparentElementBufferIndex = 0;
-
-	
 	if (m_ID != Utilities::INVALID_OPENGL_ID)
 	{
 		glDeleteVertexArrays(1, &m_ID);
@@ -94,6 +61,19 @@ void VertexArray::destroy()
 	{
 		glDeleteBuffers(1, &m_vertexBuffer.transparentIndiciesID);
 	}
+
+	m_reset = false;
+	m_inUse = false;
+	m_opaqueVBODisplayable = false;
+	m_transparentVBODisplayable = false;
+	m_attachOpaqueVBO = false;
+	m_attachTransparentVBO = false;
+	m_awaitingRegeneration = false;
+	m_vertexBuffer.clear();
+	m_ID = Utilities::INVALID_OPENGL_ID;
+	m_transparentID = Utilities::INVALID_OPENGL_ID;
+	m_opaqueElementBufferIndex = 0;
+	m_transparentElementBufferIndex = 0;
 }
 
 void VertexArray::attachOpaqueVBO()
