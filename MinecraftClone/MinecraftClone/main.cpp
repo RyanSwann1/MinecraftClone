@@ -215,7 +215,7 @@ int main()
 	std::thread chunkGenerationThread([&](ChunkManager* chunkManager) 
 	{chunkManager->update(std::ref(camera), std::ref(window), std::ref(*texture)); }, &chunkManager);
 
-	std::unordered_map<glm::ivec3, VertexArray>& VAOs = chunkManager.getVAOs();
+	std::unordered_map<glm::ivec3, VertexArrayFromPool>& VAOs = chunkManager.getVAOs();
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -255,42 +255,42 @@ int main()
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
 		setUniformMat4f(shaderID, "uView", view, uniformLocations);
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 
-			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, (float)Utilities::VISIBILITY_DISTANCE - 32);
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 1000.0f);//(float)Utilities::VISIBILITY_DISTANCE - 32);
 		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
 
 		for (auto VAO = VAOs.begin(); VAO != VAOs.end(); ++VAO)
 		{
-			if (VAO->second.m_destroy)
+			if (VAO->second.vertexArray.m_destroy)
 			{
-				VAO->second.destroy();
+				VAO->second.vertexArray.destroy();
 				VAOs.erase(VAO);
 				continue;
 			}
 
-			if (VAO->second.m_attachOpaqueVBO)
+			if (VAO->second.vertexArray.m_attachOpaqueVBO)
 			{
-				VAO->second.attachOpaqueVBO();
+				VAO->second.vertexArray.attachOpaqueVBO();
 			}
-			if (VAO->second.m_attachTransparentVBO)
+			if (VAO->second.vertexArray.m_attachTransparentVBO)
 			{
-				VAO->second.attachTransparentVBO();
+				VAO->second.vertexArray.attachTransparentVBO();
 			}
 
-			if (VAO->second.m_opaqueVBODisplayable)
+			if (VAO->second.vertexArray.m_opaqueVBODisplayable)
 			{
-				VAO->second.bindOpaqueVAO();
-				glDrawElements(GL_TRIANGLES, VAO->second.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+				VAO->second.vertexArray.bindOpaqueVAO();
+				glDrawElements(GL_TRIANGLES, VAO->second.vertexArray.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 			}
 		}
 
 		setUniformLocation1f(shaderID, "uAlpha", Utilities::WATER_ALPHA_VALUE, uniformLocations);
 		for (const auto& VAO : VAOs)
 		{
-			if (VAO.second.m_transparentVBODisplayable)
+			if (VAO.second.vertexArray.m_transparentVBODisplayable)
 			{
-				VAO.second.bindTransparentVAO();
-				glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
+				VAO.second.vertexArray.bindTransparentVAO();
+				glDrawElements(GL_TRIANGLES, VAO.second.vertexArray.m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
 			}
 		}
 		setUniformLocation1f(shaderID, "uAlpha", 1.0f, uniformLocations);

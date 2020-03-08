@@ -2,6 +2,7 @@
 
 #include "ChunkPool.h"
 #include "glm/gtx/hash.hpp"
+#include "VertexArrayPool.h"
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -57,14 +58,15 @@ class ChunkManager : private NonCopyable
 public:
 	ChunkManager();
 
-	std::unordered_map<glm::ivec3, VertexArray>& getVAOs();
+	std::unordered_map<glm::ivec3, VertexArrayFromPool>& getVAOs();
 
 	void generateInitialChunks(const glm::vec3& playerPosition, const Texture& texture);
 	void update(const Camera& camera, const sf::Window& window, const Texture& texture);
 
 private:
 	ChunkPool m_chunkPool;
-	std::unordered_map<glm::ivec3, VertexArray> m_VAOs;
+	VertexArrayPool m_vertexArrayPool;
+	std::unordered_map<glm::ivec3, VertexArrayFromPool> m_VAOs;
 	std::unordered_map<glm::ivec3, ChunkFromPool> m_chunks;
 	std::unordered_set<glm::ivec3> m_chunksToRegenerate;
 	std::mutex m_mutex;

@@ -10,13 +10,14 @@
 
 ChunkManager::ChunkManager()
 	: m_chunkPool(),
+	m_vertexArrayPool(),
 	m_VAOs(),
 	m_chunks(),
 	m_chunksToRegenerate(),
 	m_mutex()
 {}
 
-std::unordered_map<glm::ivec3, VertexArray>& ChunkManager::getVAOs()
+std::unordered_map<glm::ivec3, VertexArrayFromPool>& ChunkManager::getVAOs()
 {
 	return m_VAOs;
 }
@@ -32,7 +33,7 @@ void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition, const 
 			{
 				m_VAOs.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunkStartingPosition),
-					std::forward_as_tuple());
+					std::forward_as_tuple(m_vertexArrayPool));
 
 				m_chunks.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunkStartingPosition),
@@ -47,7 +48,7 @@ void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition, const 
 		assert(VAO != m_VAOs.cend());
 		if (VAO != m_VAOs.cend())
 		{
-			generateChunkMesh(VAO->second, chunk.second.chunk, texture);
+			generateChunkMesh(VAO->second.vertexArray, chunk.second.chunk, texture);
 		}
 	}
 }
@@ -490,7 +491,7 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition)
 				assert(VAO != m_VAOs.end());
 				if (VAO != m_VAOs.end())
 				{
-					VAO->second.m_destroy = true;
+					VAO->second.vertexArray.m_destroy = true;
 				}
 			}
 
@@ -536,7 +537,7 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition, const Texture& tex
 					std::lock_guard<std::mutex> lock(m_mutex);
 					auto newVAO = m_VAOs.emplace(std::piecewise_construct,
 						std::forward_as_tuple(position),
-						std::forward_as_tuple()).first;
+						std::forward_as_tuple(m_vertexArrayPool)).first;
 				}
 
 				auto newChunk = m_chunks.emplace(std::piecewise_construct,
@@ -558,7 +559,7 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition, const Texture& tex
 		assert(VAO != m_VAOs.end());
 		if (VAO != m_VAOs.end())
 		{
-			generateChunkMesh(VAO->second, newChunk, texture);
+			generateChunkMesh(VAO->second.vertexArray, newChunk, texture);
 		}
 	}
 }
@@ -582,7 +583,7 @@ void ChunkManager::regenChunks(const Texture& texture)
 					assert(VAO != m_VAOs.end());
 					if (VAO != m_VAOs.end())
 					{
-						generateChunkMesh(VAO->second, chunk->second.chunk, texture);
+						generateChunkMesh(VAO->second.vertexArray, chunk->second.chunk, texture);
 					}
 				}
 
