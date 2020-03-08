@@ -281,14 +281,14 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 
 bool ChunkManager::isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType) const
 {
-	const CubeDetails& cubeDetails = chunk.getCubeDetailsWithoutBoundsCheck(position);
-	return cubeDetails.type == static_cast<char>(cubeType);
+	char cube = chunk.getCubeDetailsWithoutBoundsCheck(position);
+	return cube == static_cast<char>(cubeType);
 }
 
 bool ChunkManager::isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const
 {
-	const CubeDetails& cubeDetails = chunk.getCubeDetailsWithoutBoundsCheck(position);
-	return (cubeDetails.type != static_cast<char>(eCubeType::Invalid) && cubeDetails.type != static_cast<char>(eCubeType::Water) ? true : false);
+	char cubeType = chunk.getCubeDetailsWithoutBoundsCheck(position);
+	return (cubeType != static_cast<char>(eCubeType::Invalid) && cubeType != static_cast<char>(eCubeType::Water) ? true : false);
 }
 
 bool ChunkManager::isChunkAtPosition(const glm::ivec3& position) const
@@ -321,7 +321,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 			for (int x = chunkStartingPosition.x; x < chunkStartingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 			{
 				glm::ivec3 position(x, y, z);
-				eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(position).type);
+				eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(position));
 				if (cubeType == eCubeType::Invalid)
 				{
 					continue;
@@ -491,7 +491,7 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition)
 				assert(VAO != m_VAOs.end());
 				if (VAO != m_VAOs.end())
 				{
-					VAO->second.vertexArray.m_destroy = true;
+					VAO->second.vertexArray.m_reset = true;
 				}
 			}
 

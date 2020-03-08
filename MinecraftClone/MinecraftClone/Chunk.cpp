@@ -53,7 +53,7 @@ const glm::ivec3& Chunk::getStartingPosition() const
 	return m_startingPosition;
 }
 
-const CubeDetails& Chunk::getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const
+char Chunk::getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const
 {
 	return m_chunk[position.x - m_startingPosition.x]
 		[position.y - m_startingPosition.y]
@@ -70,7 +70,7 @@ void Chunk::changeCubeAtPosition(const glm::vec3& position, eCubeType cubeType)
 	assert(isPositionInBounds(position));
 	if (isPositionInBounds(position))
 	{
-		m_chunk[position.x - m_startingPosition.x][position.y][position.z - m_startingPosition.z].type = static_cast<char>(cubeType);
+		m_chunk[position.x - m_startingPosition.x][position.y][position.z - m_startingPosition.z] = static_cast<char>(cubeType);
 	}
 }
 
@@ -87,7 +87,7 @@ void Chunk::reuse(const glm::ivec3& startingPosition)
 		{
 			for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
 			{
-				m_chunk[x][y][z] = CubeDetails();
+				m_chunk[x][y][z] = char();
 			}
 		}
 	}
@@ -145,7 +145,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 						cubeType = eCubeType::Sand;
 					}
 
-					m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = CubeDetails(cubeType);
+					m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = static_cast<char>(cubeType);
 				}
 			}
 			//Plains Biome
@@ -166,7 +166,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 						cubeType = eCubeType::Grass;
 					}
 
-					m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = CubeDetails(cubeType);
+					m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = static_cast<char>(cubeType);
 				}
 			}
 		}
@@ -186,9 +186,9 @@ void Chunk::spawnWater()
 	{
 		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
 		{
-			if (m_chunk[x][Utilities::WATER_MAX_HEIGHT][z].type == static_cast<char>(eCubeType::Invalid))
+			if (m_chunk[x][Utilities::WATER_MAX_HEIGHT][z] == static_cast<char>(eCubeType::Invalid))
 			{
-				m_chunk[x][Utilities::WATER_MAX_HEIGHT][z].type = static_cast<char>(eCubeType::Water);
+				m_chunk[x][Utilities::WATER_MAX_HEIGHT][z] = static_cast<char>(eCubeType::Water);
 			}
 		}
 	}
@@ -208,8 +208,8 @@ void Chunk::spawnTrees()
 				{
 					for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_MAX_HEIGHT - Utilities::MAX_LEAVES_DISTANCE; y >= Utilities::SAND_MAX_HEIGHT; --y)
 					{
-						if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Grass) &&
-							m_chunk[x][y + 1][z].type == static_cast<char>(eCubeType::Invalid))
+						if (m_chunk[x][y][z]  == static_cast<char>(eCubeType::Grass) &&
+							m_chunk[x][y + 1][z] == static_cast<char>(eCubeType::Invalid))
 						{
 							++currentTreesPlanted;
 							int currentTreeHeight = 1;
@@ -223,7 +223,7 @@ void Chunk::spawnTrees()
 								}
 								if (y + currentTreeHeight < Utilities::CHUNK_HEIGHT - 1)
 								{
-									m_chunk[x][y + currentTreeHeight][z].type = static_cast<char>(eCubeType::TreeStump);
+									m_chunk[x][y + currentTreeHeight][z] = static_cast<char>(eCubeType::TreeStump);
 								}
 								else
 								{
@@ -257,14 +257,14 @@ void Chunk::spawnCactus()
 			{
 				for (int y = Utilities::CHUNK_HEIGHT - Utilities::CACTUS_MAX_HEIGHT - 1; y >= Utilities::WATER_MAX_HEIGHT; --y)
 				{
-					if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Sand) && 
-						m_chunk[x][y + 1][z].type == static_cast<char>(eCubeType::Invalid))
+					if (m_chunk[x][y][z] == static_cast<char>(eCubeType::Sand) && 
+						m_chunk[x][y + 1][z] == static_cast<char>(eCubeType::Invalid))
 					{
 						++totalCactusAdded;
 						int cactusMaxHeight = Utilities::getRandomNumber(Utilities::CACTUS_MIN_HEIGHT, Utilities::CACTUS_MAX_HEIGHT);
 						for (int i = 1; i <= cactusMaxHeight; ++i)
 						{
-							m_chunk[x][y + i][z].type = static_cast<char>(eCubeType::Cactus);
+							m_chunk[x][y + i][z] = static_cast<char>(eCubeType::Cactus);
 						}
 
 						break;
@@ -290,9 +290,9 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition, int distance)
 
 			if (position != startingPosition &&
 				isPositionInLocalBounds(position) && 
-				m_chunk[position.x][position.y][position.z].type == static_cast<char>(eCubeType::Invalid))
+				m_chunk[position.x][position.y][position.z] == static_cast<char>(eCubeType::Invalid))
 			{
-				m_chunk[position.x][position.y][position.z].type = static_cast<char>(eCubeType::Leaves);
+				m_chunk[position.x][position.y][position.z] = static_cast<char>(eCubeType::Leaves);
 			}
 		}
 	}
