@@ -51,7 +51,7 @@ unsigned int Texture::getID() const
 	return m_ID;
 }
 
-void Texture::getTextCoords(eCubeFaceID tileID, std::vector<glm::vec2>& textCoords) const
+void Texture::getTextCoords(eCubeFaceID tileID, std::vector<float>& textCoords) const
 {
 	switch (tileID)
 	{

@@ -32,29 +32,19 @@ void VertexArray::reset()
 		glDeleteVertexArrays(1, &m_transparentID);
 	}
 
-	if (m_vertexBuffer.positionsID != Utilities::INVALID_OPENGL_ID)
+	if (m_vertexBuffer.opaqueVerticesID != Utilities::INVALID_OPENGL_ID)
 	{
-		glDeleteBuffers(1, &m_vertexBuffer.positionsID);
+		glDeleteBuffers(1, &m_vertexBuffer.opaqueVerticesID);
 	}
 
-	if (m_vertexBuffer.textCoordsID != Utilities::INVALID_OPENGL_ID)
+	if (m_vertexBuffer.transparentVerticesID != Utilities::INVALID_OPENGL_ID)
 	{
-		glDeleteBuffers(1, &m_vertexBuffer.textCoordsID);
+		glDeleteBuffers(1, &m_vertexBuffer.transparentVerticesID);
 	}
 
 	if (m_vertexBuffer.indiciesID != Utilities::INVALID_OPENGL_ID)
 	{
 		glDeleteBuffers(1, &m_vertexBuffer.indiciesID);
-	}
-
-	if (m_vertexBuffer.transparentPositionsID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &m_vertexBuffer.transparentPositionsID);
-	}
-
-	if (m_vertexBuffer.transparentTextCoordsID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &m_vertexBuffer.transparentTextCoordsID);
 	}
 
 	if (m_vertexBuffer.transparentIndiciesID != Utilities::INVALID_OPENGL_ID) 
@@ -87,7 +77,23 @@ void VertexArray::attachOpaqueVBO()
 
 	bindOpaqueVAO();
 
-	if (m_vertexBuffer.positionsID == Utilities::INVALID_OPENGL_ID)
+	if (m_vertexBuffer.opaqueVerticesID == Utilities::INVALID_OPENGL_ID)
+	{
+		glGenBuffers(1, &m_vertexBuffer.opaqueVerticesID);
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.opaqueVerticesID);
+	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.opaqueVertices.size() * sizeof(float), m_vertexBuffer.opaqueVertices.data(), GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (const void*)0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (const void*)(3 * sizeof(float)));
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+	/*if (m_vertexBuffer.positionsID == Utilities::INVALID_OPENGL_ID)
 	{
 		glGenBuffers(1, &m_vertexBuffer.positionsID);
 	}
@@ -105,7 +111,7 @@ void VertexArray::attachOpaqueVBO()
 	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.textCoords.size() * sizeof(glm::vec2), m_vertexBuffer.textCoords.data(), GL_STATIC_DRAW);
 		
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)(0));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)(0));*/
 
 	if (m_vertexBuffer.indiciesID == Utilities::INVALID_OPENGL_ID)
 	{
@@ -114,8 +120,6 @@ void VertexArray::attachOpaqueVBO()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vertexBuffer.indiciesID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_vertexBuffer.indicies.size() * sizeof(unsigned int), m_vertexBuffer.indicies.data(), GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
 	unbind();
 	if (!m_awaitingRegeneration)
 	{

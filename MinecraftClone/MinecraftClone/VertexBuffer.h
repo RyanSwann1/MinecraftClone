@@ -18,17 +18,7 @@ struct VertexBuffer
 
 	void clear()
 	{
-		positionsID = Utilities::INVALID_OPENGL_ID;
-		positions.clear();
 
-		transparentPositionsID = Utilities::INVALID_OPENGL_ID;
-		transparentPositions.clear();
-
-		transparentTextCoordsID = Utilities::INVALID_OPENGL_ID;
-		transparentTextCoords.clear();
-		
-		textCoordsID = Utilities::INVALID_OPENGL_ID;
-		textCoords.clear();
 
 		transparentIndiciesID = Utilities::INVALID_OPENGL_ID;
 		transparentIndicies.clear();
@@ -37,17 +27,23 @@ struct VertexBuffer
 		indicies.clear();
 	}
 
-	unsigned int positionsID;
-	std::vector<glm::vec3> positions;
-	
-	unsigned int transparentPositionsID;
-	std::vector<glm::vec3> transparentPositions;
+	unsigned int opaqueVerticesID;
+	std::vector<float> opaqueVertices;
 
-	unsigned int transparentTextCoordsID;
-	std::vector<glm::vec2> transparentTextCoords;
+	unsigned int transparentVerticesID;
+	std::vector<float> transparentVertices;
 
-	unsigned int textCoordsID;
-	std::vector<glm::vec2> textCoords;
+	//unsigned int positionsID;
+	//std::vector<glm::vec3> positions;
+	//
+	//unsigned int transparentPositionsID;
+	//std::vector<glm::vec3> transparentPositions;
+
+	//unsigned int transparentTextCoordsID;
+	//std::vector<glm::vec2> transparentTextCoords;
+
+	//unsigned int textCoordsID;
+	//std::vector<glm::vec2> textCoords;
 	
 	unsigned int transparentIndiciesID;
 	std::vector<unsigned int> transparentIndicies;
