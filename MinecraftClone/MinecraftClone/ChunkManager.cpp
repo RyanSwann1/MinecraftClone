@@ -522,10 +522,10 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition, const Texture& tex
 	{
 		for (int x = startPosition.x - Utilities::VISIBILITY_DISTANCE + 32; x < startPosition.x + Utilities::VISIBILITY_DISTANCE + 32; x += Utilities::CHUNK_WIDTH)
 		{
-			if (x > startPosition.x - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH) && 
-				x < startPosition.x + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH) &&
-				z > startPosition.z - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH) && 
-				z < startPosition.z + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH))
+			if (x > startPosition.x - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH * 2) && 
+				x < startPosition.x + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH * 2) &&
+				z > startPosition.z - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH * 2) && 
+				z < startPosition.z + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH * 2))
 			{
 				continue;
 			}

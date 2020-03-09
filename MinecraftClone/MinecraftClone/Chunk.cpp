@@ -107,6 +107,7 @@ void Chunk::release()
 	m_endingPosition = glm::ivec3();
 }
 
+//https://www.reddit.com/r/proceduralgeneration/comments/dkdfq0/different_generation_for_biomes/
 void Chunk::regen(const glm::ivec3& startingPosition)
 {
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
