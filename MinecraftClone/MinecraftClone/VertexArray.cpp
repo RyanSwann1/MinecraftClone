@@ -81,6 +81,7 @@ void VertexArray::attachOpaqueVBO()
 	{
 		glGenBuffers(1, &m_vertexBuffer.opaqueVerticesID);
 	}
+
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.opaqueVerticesID);
 	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.opaqueVertices.size() * sizeof(float), m_vertexBuffer.opaqueVertices.data(), GL_STATIC_DRAW);
 

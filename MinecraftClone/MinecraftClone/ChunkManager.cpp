@@ -117,7 +117,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				textureCoordinates = &Utilities::GRASS_SIDE_TEXT_COORDS;
 				break;
 			case eCubeType::TreeStump:
-				textureCoordinates = &Utilities::TREESTUMP_TEXT_COORDS);
+				textureCoordinates = &Utilities::TREESTUMP_TEXT_COORDS;
 				break;
 			case eCubeType::Leaves:
 				textureCoordinates = &Utilities::LEAVES_TEXT_COORDS;
@@ -127,6 +127,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				break;
 			}
 
+			assert(textureCoordinates);
 			for (int i = 0; i < 4; ++i)
 			{
 				glm::ivec3 position = Utilities::CUBE_FACE_FRONT[i] + cubePosition;
@@ -154,7 +155,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				textureCoordinates = &Utilities::GRASS_SIDE_TEXT_COORDS;
 				break;
 			case eCubeType::TreeStump:
-				textureCoordinates = &Utilities::TREESTUMP_TEXT_COORDS);
+				textureCoordinates = &Utilities::TREESTUMP_TEXT_COORDS;
 				break;
 			case eCubeType::Leaves:
 				textureCoordinates = &Utilities::LEAVES_TEXT_COORDS;
@@ -164,6 +165,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				break;
 			}
 
+			assert(textureCoordinates);
 			for (int i = 0; i < 4; ++i)
 			{
 				glm::ivec3 position = Utilities::CUBE_FACE_BACK[i] + cubePosition;
@@ -191,7 +193,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				textureCoordinates = &Utilities::GRASS_SIDE_TEXT_COORDS;
 				break;
 			case eCubeType::TreeStump:
-				textureCoordinates = &Utilities::TREESTUMP_TEXT_COORDS);
+				textureCoordinates = &Utilities::TREESTUMP_TEXT_COORDS;
 				break;
 			case eCubeType::Leaves:
 				textureCoordinates = &Utilities::LEAVES_TEXT_COORDS;
@@ -201,6 +203,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				break;
 			}
 
+			assert(textureCoordinates);
 			for (int i = 0; i < 4; ++i)
 			{
 				glm::ivec3 position = Utilities::CUBE_FACE_LEFT[i] + cubePosition;
@@ -228,7 +231,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				textureCoordinates = &Utilities::GRASS_SIDE_TEXT_COORDS;
 				break;
 			case eCubeType::TreeStump:
-				textureCoordinates = &Utilities::TREESTUMP_TEXT_COORDS);
+				textureCoordinates = &Utilities::TREESTUMP_TEXT_COORDS;
 				break;
 			case eCubeType::Leaves:
 				textureCoordinates = &Utilities::LEAVES_TEXT_COORDS;
@@ -238,6 +241,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				break;
 			}
 
+			assert(textureCoordinates);
 			for (int i = 0; i < 4; ++i)
 			{
 				glm::ivec3 position = Utilities::CUBE_FACE_RIGHT[i] + cubePosition;
@@ -570,7 +574,6 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition)
 					VAO->second.vertexArray.m_reset = true;
 				}
 			}
-
 
 			auto chunkToRegen = std::find_if(m_chunksToRegenerate.begin(), m_chunksToRegenerate.end(), [chunkStartingPosition](const auto& position)
 			{
