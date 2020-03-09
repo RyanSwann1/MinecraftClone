@@ -24,7 +24,7 @@ struct VertexBuffer
 		opaqueVertices.clear();
 
 		transparentVerticesID = Utilities::INVALID_OPENGL_ID;
-		transparentVertices.clear()p;
+		transparentVertices.clear();
 
 		transparentIndiciesID = Utilities::INVALID_OPENGL_ID;
 		transparentIndicies.clear();

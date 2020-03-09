@@ -139,25 +139,38 @@ void VertexArray::attachTransparentVBO()
 	
 	bindTransparentVAO();
 
-	if (m_vertexBuffer.transparentPositionsID == Utilities::INVALID_OPENGL_ID)
+	if (m_vertexBuffer.transparentVerticesID == Utilities::INVALID_OPENGL_ID)
 	{
-		glGenBuffers(1, &m_vertexBuffer.transparentPositionsID);
+		glGenBuffers(1, &m_vertexBuffer.transparentVerticesID);
 	}
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.transparentPositionsID);
-	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.transparentPositions.size() * sizeof(glm::vec3), m_vertexBuffer.transparentPositions.data(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.transparentVerticesID);
+	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.transparentVertices.size() * sizeof(float), m_vertexBuffer.transparentVertices.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
-
-	if (m_vertexBuffer.transparentTextCoordsID == Utilities::INVALID_OPENGL_ID)
-	{
-		glGenBuffers(1, &m_vertexBuffer.transparentTextCoordsID);
-	}
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.transparentTextCoordsID);
-	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.transparentTextCoords.size() * sizeof(glm::vec2), m_vertexBuffer.transparentTextCoords.data(), GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (const void*)0);
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)(0));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (const void*)(3 * sizeof(float)));
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	//if (m_vertexBuffer.transparentVerticesID == Utilities::INVALID_OPENGL_ID)
+	//{
+	//	glGenBuffers(1, &m_vertexBuffer.transparentVerticesID);
+	//}
+	//glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.transparentPositionsID);
+	//glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.transparentPositions.size() * sizeof(glm::vec3), m_vertexBuffer.transparentPositions.data(), GL_STATIC_DRAW);
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0)
+	//if (m_vertexBuffer.transparentTextCoordsID == Utilities::INVALID_OPENGL_ID)
+	//{
+	//	glGenBuffers(1, &m_vertexBuffer.transparentTextCoordsID);
+	//}
+	//glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.transparentTextCoordsID);
+	//glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.transparentTextCoords.size() * sizeof(glm::vec2), m_vertexBuffer.transparentTextCoords.data(), GL_STATIC_DRAW);
+	//glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const void*)(0));
 
 	if (m_vertexBuffer.transparentIndiciesID == Utilities::INVALID_OPENGL_ID)
 	{
