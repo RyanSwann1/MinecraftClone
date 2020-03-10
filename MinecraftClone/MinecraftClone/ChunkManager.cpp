@@ -466,14 +466,22 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 	}
 	else if (vertexArray.m_awaitingRegeneration && !regenChunk)
 	{
+		if (!vertexArray.m_vertexBuffer.transparentIndicies.empty())
+		{
+			vertexArray.m_attachTransparentVBO = true;
+		}
+		
 		vertexArray.m_attachOpaqueVBO = true;
-		vertexArray.m_attachTransparentVBO = true;
 		vertexArray.m_awaitingRegeneration = false;
 	}
 	else if (!vertexArray.m_awaitingRegeneration && !regenChunk)
 	{
+		if (!vertexArray.m_vertexBuffer.transparentIndicies.empty())
+		{
+			vertexArray.m_attachTransparentVBO = true;
+		}
+
 		vertexArray.m_attachOpaqueVBO = true;
-		vertexArray.m_attachTransparentVBO = true;
 	}
 }
 

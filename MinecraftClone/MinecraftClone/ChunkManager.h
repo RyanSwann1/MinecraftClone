@@ -10,6 +10,7 @@
 #include <queue>
 #include <mutex>
 #include <SFML/Graphics.hpp>
+
 //1. Perlin Noise
 //2. Dynamic Generation
 //3. Dynamic Destruction
@@ -73,7 +74,7 @@ private:
 
 	void addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition,
 		const Texture& texture);
-
+	
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
 	bool isChunkAtPosition(const glm::ivec3& position) const;

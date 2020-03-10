@@ -107,6 +107,11 @@ void Chunk::release()
 	m_endingPosition = glm::ivec3();
 }
 
+//Scale
+//Octaves
+///Lacunraity
+//Persistance
+
 //https://www.reddit.com/r/proceduralgeneration/comments/dkdfq0/different_generation_for_biomes/
 void Chunk::regen(const glm::ivec3& startingPosition)
 {
@@ -193,6 +198,7 @@ void Chunk::spawnWater()
 			}
 		}
 	}
+
 }
 
 void Chunk::spawnTrees()
@@ -209,7 +215,7 @@ void Chunk::spawnTrees()
 				{
 					for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_MAX_HEIGHT - Utilities::MAX_LEAVES_DISTANCE; y >= Utilities::SAND_MAX_HEIGHT; --y)
 					{
-						if (m_chunk[x][y][z]  == static_cast<char>(eCubeType::Grass) &&
+						if (m_chunk[x][y][z] == static_cast<char>(eCubeType::Grass) &&
 							m_chunk[x][y + 1][z] == static_cast<char>(eCubeType::Invalid))
 						{
 							++currentTreesPlanted;
