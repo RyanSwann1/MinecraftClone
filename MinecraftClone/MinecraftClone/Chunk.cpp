@@ -107,12 +107,20 @@ void Chunk::release()
 	m_endingPosition = glm::ivec3();
 }
 
+//elevation[y][x] = 1 * noise(1 * nx, 1 * ny);
+//+0.5 * noise(2 * nx, 2 * ny);
+//+0.25 * noise(4 * nx, 2 * ny);
+
 //Scale
 //Octaves
 ///Lacunraity
 //Persistance
-
+//https://www.reddit.com/r/proceduralgeneration/comments/byju4s/minecraft_style_terrain_gen_question_how_to/
 //https://www.reddit.com/r/proceduralgeneration/comments/dkdfq0/different_generation_for_biomes/
+
+//Amplitude - 'y' Axis
+//Frequency - 'x' Axis
+
 void Chunk::regen(const glm::ivec3& startingPosition)
 {
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
@@ -122,17 +130,18 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			double ex = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
 			double ey = (z) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
 			
-			float elevation = std::abs(1 * glm::perlin(glm::vec2(5.0f * ex, 5.0f * ey)));
-			elevation += std::abs(0.5 * glm::perlin(glm::vec2(ex * 15.0f, ey * 15.0f)));
-			elevation += std::abs(0.25 * glm::perlin(glm::vec2(ex * 30.0f, ey * 30.0f)));
 
-			elevation = glm::pow(elevation, 2.5f);
+			float elevation = 1 * glm::simplex(glm::vec2(12.0f * ex, 12.0f * ey));
+			//elevation += 0.5 * glm::simplex(glm::vec2(ex * 20.0f, ey * 20.0f));
+			//elevation += 0.25 * glm::simplex(glm::vec2(ex * 40.0f, ey * 40.0f));
+			//std::cout << elevation << "\n";
+			//elevation = glm::pow(elevation, 2.5f);
 			elevation = elevation * (float)Utilities::CHUNK_HEIGHT;
 			elevation = Utilities::clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
 
 			double mx = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
 			double my = (z) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
-			float moisture = std::abs(1 * glm::perlin(glm::vec2(15.0f * mx, 15.0f * my)));
+			float moisture = std::abs(1 * glm::simplex(glm::vec2(15.0f * mx, 15.0f * my)));
 
 			eCubeType cubeType;
 			glm::ivec3 positionOnGrid(x - startingPosition.x, (int)elevation, z - startingPosition.z);
