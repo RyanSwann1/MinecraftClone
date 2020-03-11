@@ -60,7 +60,7 @@ char Chunk::getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const
 		[position.z - m_startingPosition.z];
 }
 
-Chunk* Chunk::getNext()
+Chunk* Chunk::getNext() const
 {
 	return m_next;
 }
@@ -118,6 +118,10 @@ void Chunk::release()
 //https://www.reddit.com/r/proceduralgeneration/comments/byju4s/minecraft_style_terrain_gen_question_how_to/
 //https://www.reddit.com/r/proceduralgeneration/comments/dkdfq0/different_generation_for_biomes/
 
+//https://rtouti.github.io/graphics/perlin-noise-algorithm
+//http://www.6by9.net/simplex-noise-for-c-and-python/
+//https://medium.com/@yvanscher/playing-with-perlin-noise-generating-realistic-archipelagos-b59f004d8401
+
 //Amplitude - 'y' Axis
 //Frequency - 'x' Axis
 
@@ -130,22 +134,29 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			double ex = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
 			double ey = (z) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
 			
+			//glm::pow()
 
-			float elevation = 1 * glm::simplex(glm::vec2(12.0f * ex, 12.0f * ey));
-			//elevation += 0.5 * glm::simplex(glm::vec2(ex * 20.0f, ey * 20.0f));
-			//elevation += 0.25 * glm::simplex(glm::vec2(ex * 40.0f, ey * 40.0f));
+			float elevation = 0.0f;
+			for (int i = 0; i < Utilities::OCTAVES; ++i)
+			{
+				elevation += glm::pow()
+			}
+			float elevation = 1 * glm::perlin(glm::vec2(glm::pow(Utilities::FREQUENCY, 0) * ex, glm::pow(Utilities::FREQUENCY, 0) * ey));
+			
+			elevation += 0.5 * glm::simplex(glm::vec2(glm::pow(Utilities::FREQUENCY, 1) * ex, glm::pow(Utilities::FREQUENCY, 1) * ey));
+			//elevation += 0.25 * glm::simplex(glm::vec2(glm ex * 40.0f, ey * 40.0f));
 			//std::cout << elevation << "\n";
+
+			elevation /= (1.0 + 0.50 + 0.25);
 			//elevation = glm::pow(elevation, 2.5f);
-			elevation = elevation * (float)Utilities::CHUNK_HEIGHT;
-			elevation = Utilities::clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
+			elevation = elevation * (float)Utilities::CHUNK_HEIGHT - 1;
 
 			double mx = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
 			double my = (z) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
-			float moisture = std::abs(1 * glm::simplex(glm::vec2(15.0f * mx, 15.0f * my)));
+			float moisture = std::abs(1 * glm::perlin(glm::vec2(15.0f * mx, 15.0f * my)));
 
 			eCubeType cubeType;
 			glm::ivec3 positionOnGrid(x - startingPosition.x, (int)elevation, z - startingPosition.z);
-
 			//Desert Biome
 			if (moisture >= 0.5f)
 			{

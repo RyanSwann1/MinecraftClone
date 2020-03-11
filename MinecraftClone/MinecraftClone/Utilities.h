@@ -51,9 +51,9 @@ namespace Utilities
 
 	constexpr int VISIBILITY_DISTANCE = 480;
 	constexpr int MAP_SIZE = 8000;
-	constexpr int OCTAVES = 0;
-	constexpr float LACUNARITY = 0;
-	constexpr float FREQUENCY = 0;
+	constexpr int OCTAVES = 3;
+	constexpr float LACUNARITY = 1.0f;
+	constexpr float FREQUENCY = 12.0f;
 
 
 	constexpr std::array<int, 6> LEAVES_DISTANCES =
