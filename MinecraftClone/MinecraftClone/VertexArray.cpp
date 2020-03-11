@@ -20,6 +20,65 @@ VertexArray::VertexArray()
 	m_next(nullptr)
 {}
 
+VertexArray::VertexArray(VertexArray&& orig) noexcept
+	: m_inUse(orig.m_inUse),
+	m_opaqueVBODisplayable(orig.m_opaqueVBODisplayable),
+	m_transparentVBODisplayable(orig.m_transparentVBODisplayable),
+	m_attachOpaqueVBO(orig.m_attachOpaqueVBO),
+	m_attachTransparentVBO(orig.m_attachTransparentVBO),
+	m_reset(orig.m_reset),
+	m_awaitingRegeneration(orig.m_awaitingRegeneration),
+	m_vertexBuffer(std::move(orig.m_vertexBuffer)),
+	m_ID(orig.m_ID),
+	m_transparentID(orig.m_transparentID),
+	m_opaqueElementBufferIndex(orig.m_opaqueElementBufferIndex),
+	m_transparentElementBufferIndex(orig.m_transparentElementBufferIndex),
+	m_next(orig.m_next)
+{
+	orig.m_inUse = false;
+	orig.m_opaqueVBODisplayable = false;
+	orig.m_transparentVBODisplayable = false;
+	orig.m_attachOpaqueVBO = false;
+	orig.m_attachTransparentVBO = false;
+	orig.m_reset = false;
+	orig.m_awaitingRegeneration = false;
+	orig.m_ID = Utilities::INVALID_OPENGL_ID;
+	orig.m_transparentID = Utilities::INVALID_OPENGL_ID;
+	orig.m_opaqueElementBufferIndex = 0;
+	orig.m_transparentElementBufferIndex = 0;
+	orig.m_next = nullptr;
+}
+
+VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
+{
+	m_inUse = orig.m_inUse;
+	m_opaqueVBODisplayable = orig.m_opaqueVBODisplayable;
+	m_transparentVBODisplayable = orig.m_transparentVBODisplayable;
+	m_attachOpaqueVBO = orig.m_attachOpaqueVBO;
+	m_attachTransparentVBO = orig.m_attachTransparentVBO;
+	m_reset = orig.m_reset;
+	m_awaitingRegeneration = orig.m_awaitingRegeneration;
+	m_vertexBuffer = std::move(orig.m_vertexBuffer);
+	m_ID = orig.m_ID;
+	m_transparentID = orig.m_transparentID;
+	m_opaqueElementBufferIndex = orig.m_opaqueElementBufferIndex;
+	m_transparentElementBufferIndex = orig.m_transparentElementBufferIndex;
+	m_next = orig.m_next;
+	
+	orig.m_inUse = false;
+	orig.m_opaqueVBODisplayable = false;
+	orig.m_transparentVBODisplayable = false;
+	orig.m_attachOpaqueVBO = false;
+	orig.m_attachTransparentVBO = false;
+	orig.m_reset = false;
+	orig.m_awaitingRegeneration = false;
+	orig.m_ID = Utilities::INVALID_OPENGL_ID;
+	orig.m_transparentID = Utilities::INVALID_OPENGL_ID;
+	orig.m_opaqueElementBufferIndex = 0;
+	orig.m_transparentElementBufferIndex = 0;
+	orig.m_next = nullptr;
+}
+
 void VertexArray::reset()
 {
 	if (m_ID != Utilities::INVALID_OPENGL_ID)

@@ -28,6 +28,29 @@ Chunk::Chunk(const glm::ivec3& startingPosition)
 	regen(m_startingPosition);
 }
 
+Chunk::Chunk(Chunk&& orig) noexcept
+	: m_inUse(orig.m_inUse),
+	m_startingPosition(orig.m_startingPosition),
+	m_endingPosition(orig.m_endingPosition),
+	m_chunk(orig.m_chunk),
+	m_next(orig.m_next),
+	m_AABB(orig.m_AABB)
+{
+	orig.m_next = nullptr;
+}
+
+Chunk& Chunk::operator=(Chunk&& orig) noexcept
+{
+	m_inUse = orig.m_inUse;
+	m_startingPosition = orig.m_startingPosition;
+	m_endingPosition = orig.m_endingPosition;
+	m_chunk = orig.m_chunk;
+	m_next = orig.m_next;
+	m_AABB = orig.m_AABB;
+
+	orig.m_next = nullptr;
+}
+
 const Rectangle& Chunk::getAABB() const
 {
 	return m_AABB;
@@ -125,6 +148,7 @@ void Chunk::release()
 //Amplitude - 'y' Axis
 //Frequency - 'x' Axis
 
+//http://pcgbook.com/wp-content/uploads/chapter04.pdf
 void Chunk::regen(const glm::ivec3& startingPosition)
 {
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
@@ -136,18 +160,18 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			
 			//glm::pow()
 
-			float elevation = 0.0f;
-			for (int i = 0; i < Utilities::OCTAVES; ++i)
-			{
-				elevation += glm::pow()
-			}
+			//float elevation = 0.0f;
+			//for (int i = 0; i < Utilities::OCTAVES; ++i)
+			//{
+			//	//elevation += glm::pow()
+			//}
 
-			float lacunarity = 0.0f;
-			float elevation = 0.0f;
-			for (int i = 0; i < Utilities::OCTAVES; ++i)
-			{
-				//elevation += glm::pow()
-			}
+			//float lacunarity = 0.0f;
+			//float elevation = 0.0f;
+			//for (int i = 0; i < Utilities::OCTAVES; ++i)
+			//{
+			//	//elevation += glm::pow()
+			//}
 			float elevation = 1 * glm::perlin(glm::vec2(glm::pow(Utilities::FREQUENCY, 0) * ex, glm::pow(Utilities::FREQUENCY, 0) * ey));
 			
 			elevation += 0.5 * glm::simplex(glm::vec2(glm::pow(Utilities::FREQUENCY, 1) * ex, glm::pow(Utilities::FREQUENCY, 1) * ey));
