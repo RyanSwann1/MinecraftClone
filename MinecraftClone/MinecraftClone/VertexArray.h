@@ -4,9 +4,11 @@
 #include "NonCopyable.h"
 #include "glm/glm.hpp"
 
-struct VertexArray //: private NonCopyable
+struct VertexArray : private NonCopyable
 {
 	VertexArray();
+	VertexArray(VertexArray&&) noexcept;
+	VertexArray& operator=(VertexArray&&) noexcept;
 	
 	void reset();
 
