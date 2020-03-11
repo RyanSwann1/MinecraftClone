@@ -49,7 +49,7 @@ namespace Utilities
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
-	constexpr int VISIBILITY_DISTANCE = 96;
+	constexpr int VISIBILITY_DISTANCE = 640;
 	constexpr int MAP_SIZE = 8000;
 
 	constexpr std::array<int, 6> LEAVES_DISTANCES =
@@ -138,6 +138,33 @@ namespace Utilities
 	inline glm::ivec3 convertToWorldPosition(glm::ivec3& position, const glm::ivec3& chunkStartingPosition)
 	{
 		return glm::ivec3(chunkStartingPosition.x + position.x, position.y, chunkStartingPosition.z + position.z);
+	}
+
+	inline glm::ivec3 getClosestMiddlePosition(const glm::ivec3& position)
+	{
+		glm::ivec3 closestMiddlePosition(position);
+		if (position.x % (CHUNK_WIDTH / 2) < 0)
+		{
+			closestMiddlePosition.x += std::abs(position.x % CHUNK_WIDTH / 2);
+			closestMiddlePosition.x -= CHUNK_WIDTH / 2;
+		}
+		else if (position.x % (CHUNK_WIDTH / 2) > 0)
+		{
+			closestMiddlePosition.x -= std::abs(position.x % CHUNK_WIDTH / 2);
+			closestMiddlePosition.x += CHUNK_WIDTH / 2;
+		}
+		if (position.z % (CHUNK_DEPTH / 2) < 0)
+		{
+			closestMiddlePosition.z += std::abs(position.z % CHUNK_DEPTH / 2);
+			closestMiddlePosition.z -= CHUNK_DEPTH / 2;
+		}
+		else if (position.z % (CHUNK_DEPTH / 2) > 0)
+		{
+			closestMiddlePosition.z -= std::abs(position.z % CHUNK_DEPTH / 2);
+			closestMiddlePosition.z += CHUNK_DEPTH / 2;
+		}
+
+		return glm::ivec3(closestMiddlePosition.x, 0, closestMiddlePosition.z);
 	}
 
 	inline glm::ivec3 getClosestChunkStartingPosition(const glm::ivec3& position)
