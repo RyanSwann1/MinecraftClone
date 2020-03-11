@@ -30,7 +30,7 @@ public:
 	char getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const;
 
 	Chunk* getNext();
-	void changeCubeAtPosition(const glm::vec3& position, eCubeType cubeType);
+	
 	void setNext(Chunk* chunk);
 	void reuse(const glm::ivec3& startingPosition);
 	void release();
@@ -44,10 +44,12 @@ private:
 	Rectangle m_AABB;
 
 	bool isPositionInLocalBounds(const glm::ivec3& position) const;
-
+	char getCubeAtPosition(const glm::ivec3 position) const;
+	void changeCubeAtPosition(const glm::ivec3& position, eCubeType cubeType);
 	void regen(const glm::ivec3& startingPosition);
 	void spawnWater();
 	void spawnTrees();
 	void spawnCactus();
 	void spawnLeaves(const glm::ivec3& startingPosition, int distance);
+	void spawnTreeStump(const glm::ivec3& startingPosition);
 };

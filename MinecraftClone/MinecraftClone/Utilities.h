@@ -38,8 +38,7 @@ namespace Utilities
 	constexpr int STONE_MAX_HEIGHT = 12; 
 	constexpr int TREE_SPAWN_CHANCE = 1400;
 	constexpr int CACTUS_SPAWN_CHANCE = 1000;
-	constexpr int TREE_MIN_HEIGHT = 9;
-	constexpr int TREE_MAX_HEIGHT = 9;
+	constexpr int TREE_HEIGHT = 9;
 	constexpr int CACTUS_MIN_HEIGHT = 1;
 	constexpr int CACTUS_MAX_HEIGHT = 4;
 	constexpr int MAX_TREE_PER_CHUNK = 3;
