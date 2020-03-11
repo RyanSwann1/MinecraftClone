@@ -77,6 +77,8 @@ VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
 	orig.m_opaqueElementBufferIndex = 0;
 	orig.m_transparentElementBufferIndex = 0;
 	orig.m_next = nullptr;
+
+	return *this;
 }
 
 void VertexArray::reset()

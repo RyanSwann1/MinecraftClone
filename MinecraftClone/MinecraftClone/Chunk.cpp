@@ -49,6 +49,8 @@ Chunk& Chunk::operator=(Chunk&& orig) noexcept
 	m_AABB = orig.m_AABB;
 
 	orig.m_next = nullptr;
+
+	return *this;
 }
 
 const Rectangle& Chunk::getAABB() const
@@ -130,8 +132,10 @@ void Chunk::release()
 	m_endingPosition = glm::ivec3();
 }
 
-
+//https://www.reddit.com/r/proceduralgeneration/comments/4i9a08/terrain_generation_of_a_game_i_am_working_on/
 //http://pcgbook.com/wp-content/uploads/chapter04.pdf
+//https://www.reddit.com/r/proceduralgeneration/comments/drc96v/getting_started_in_proceduralgeneration/
+//https://notch.tumblr.com/post/3746989361/terrain-generation-part-1
 void Chunk::regen(const glm::ivec3& startingPosition)
 {
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
