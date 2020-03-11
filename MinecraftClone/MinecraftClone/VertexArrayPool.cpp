@@ -42,6 +42,7 @@ VertexArray& VertexArrayPool::getVertexArray()
 		assert(++iterationCount && iterationCount <= m_vertexArrayPool.size());
 	}
 
+	assert(m_nextAvailable);
 	m_nextAvailable->m_inUse = true;
 	return *m_nextAvailable;
 }

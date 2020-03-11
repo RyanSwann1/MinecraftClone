@@ -3,10 +3,27 @@
 #include "VertexBuffer.h"
 #include "NonCopyable.h"
 #include "glm/glm.hpp"
+#include <iostream>
 
 struct VertexArray //: private NonCopyable
 {
 	VertexArray();
+	VertexArray(const VertexArray&)
+	{
+		std::cout << "Copy Constructor\n";
+	}
+	VertexArray& operator=(const VertexArray&)
+	{
+		std::cout << "Copy Assignment Operator\n";
+	}
+	VertexArray(VertexArray&&)
+	{
+		std::cout << "Move Constructor\n";
+	}
+	VertexArray&& operator=(VertexArray&&)
+	{
+		std::cout << "Move assignment Operator\n";
+	}
 	
 	void reset();
 

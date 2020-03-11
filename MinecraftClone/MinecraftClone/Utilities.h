@@ -27,6 +27,7 @@ enum class eDirection
 
 namespace Utilities
 {
+	//Chunk Properties
 	constexpr int CHUNK_WIDTH = 32;
 	constexpr int CHUNK_HEIGHT = 96;
 	constexpr int CHUNK_DEPTH = 32;
@@ -49,13 +50,11 @@ namespace Utilities
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
-	constexpr int VISIBILITY_DISTANCE = 480;
-	constexpr float MAP_SIZE = 8000.0f;
-	constexpr int OCTAVES = 3;
-	constexpr float LACUNARITY = 1.0f;
-	constexpr float PERSISTENCE = 0.5f;
-	constexpr float FREQUENCY = 12.0f;
-
+	constexpr int VISIBILITY_DISTANCE = 128; //Player Viewing Distance.
+	constexpr float MAP_SIZE = 8000.0f; // determines at what distance to view the noisemap.
+	constexpr int OCTAVES = 3; //levels of detail you want you perlin noise to have.
+	constexpr float LACUNARITY = 15.0f; //determines how much detail is added or removed at each octave (adjusts frequency).
+	constexpr float PERSISTENCE = 0.75f; //determines how much each octave contributes to the overall shape (adjusts amplitude).
 
 	constexpr std::array<int, 6> LEAVES_DISTANCES =
 	{

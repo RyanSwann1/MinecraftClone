@@ -118,7 +118,7 @@ void Chunk::release()
 //https://www.reddit.com/r/proceduralgeneration/comments/byju4s/minecraft_style_terrain_gen_question_how_to/
 //https://www.reddit.com/r/proceduralgeneration/comments/dkdfq0/different_generation_for_biomes/
 
-//https://rtouti.github.io/graphics/perlin-noise-algorithm
+//
 //http://www.6by9.net/simplex-noise-for-c-and-python/
 //https://medium.com/@yvanscher/playing-with-perlin-noise-generating-realistic-archipelagos-b59f004d8401
 
@@ -132,30 +132,17 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 		for (int x = startingPosition.x; x < startingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 		{
 			float ex = x / Utilities::MAP_SIZE;
-			float ey = z / Utilities::MAP_SIZE;
+			float ez = z / Utilities::MAP_SIZE;
 			
-			//glm::pow()
-
 			float elevation = 0.0f;
 			for (int i = 0; i < Utilities::OCTAVES; ++i)
 			{
-				elevation += glm::pow()
+				elevation += glm::pow(Utilities::PERSISTENCE, i) *
+					glm::perlin(glm::vec2(ex * glm::pow(Utilities::LACUNARITY, i),
+						ez * glm::pow(Utilities::LACUNARITY, i)));
 			}
 
-			float lacunarity = 0.0f;
-			float elevation = 0.0f;
-			for (int i = 0; i < Utilities::OCTAVES; ++i)
-			{
-				//elevation += glm::pow()
-			}
-			float elevation = 1 * glm::perlin(glm::vec2(glm::pow(Utilities::FREQUENCY, 0) * ex, glm::pow(Utilities::FREQUENCY, 0) * ey));
-			
-			elevation += 0.5 * glm::simplex(glm::vec2(glm::pow(Utilities::FREQUENCY, 1) * ex, glm::pow(Utilities::FREQUENCY, 1) * ey));
-			//elevation += 0.25 * glm::simplex(glm::vec2(glm ex * 40.0f, ey * 40.0f));
-			//std::cout << elevation << "\n";
 
-			elevation /= (1.0 + 0.50 + 0.25);
-			//elevation = glm::pow(elevation, 2.5f);
 			elevation = elevation * (float)Utilities::CHUNK_HEIGHT - 1;
 
 			double mx = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
@@ -209,8 +196,8 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 		startingPosition.z + Utilities::CHUNK_DEPTH);
 	
 	spawnWater();
-	spawnTrees();
-	spawnCactus();
+	//spawnTrees();
+	//spawnCactus();
 }
 
 void Chunk::spawnWater()

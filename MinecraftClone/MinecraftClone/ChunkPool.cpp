@@ -4,9 +4,9 @@
 ChunkPool::ChunkPool()
 {
 	int x = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_WIDTH;
-	x += x += 2;
+	x += x += 3;
 	int y = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_DEPTH;
-	y += y += 2;
+	y += y += 3;
 
 	m_chunks.resize(size_t((x * y)));
 
