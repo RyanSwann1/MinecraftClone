@@ -51,6 +51,7 @@ namespace Utilities
 
 	constexpr int VISIBILITY_DISTANCE = 800;
 	constexpr int MAP_SIZE = 8000;
+	const glm::vec3 PLAYER_STARTING_POSITION(0.0f, 250.f, 0.0f);
 
 	constexpr std::array<int, 6> LEAVES_DISTANCES =
 	{

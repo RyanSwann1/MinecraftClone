@@ -199,7 +199,7 @@ int main()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	unsigned int shaderID = createShaderProgram();
-	Camera camera(glm::vec3(0.0f, 250.f, 0.0f));
+	Camera camera(Utilities::PLAYER_STARTING_POSITION);
 	std::shared_ptr<Texture> texture = Texture::loadTexture("Atlas3.png");
 	if (!texture)
 	{
