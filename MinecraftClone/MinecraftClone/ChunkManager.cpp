@@ -28,7 +28,8 @@ void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition, const 
 	{
 		for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x < playerPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
-			glm::ivec3 chunkStartingPosition = Utilities::getClosestChunkStartingPosition(glm::ivec3(x, 0, z));
+			glm::ivec3 chunkStartingPosition(x, 0, z);
+			Utilities::getClosestChunkStartingPosition(chunkStartingPosition);
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend())
 			{
 				m_VAOs.emplace(std::piecewise_construct,
@@ -291,12 +292,6 @@ bool ChunkManager::isCubeAtPosition(const glm::ivec3& position, const Chunk& chu
 	return (cubeType != static_cast<char>(eCubeType::Invalid) && cubeType != static_cast<char>(eCubeType::Water) ? true : false);
 }
 
-bool ChunkManager::isChunkAtPosition(const glm::ivec3& position) const
-{
-	auto cIter = m_chunks.find(Utilities::getClosestChunkStartingPosition(position));
-	return cIter != m_chunks.cend();
-}
-
 void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const Texture& texture)
 {
 	const glm::ivec3& chunkStartingPosition = chunk.getStartingPosition();
@@ -517,7 +512,8 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition)
 void ChunkManager::addChunks(const glm::vec3& playerPosition, const Texture& texture)
 {
 	std::queue<const Chunk*> newlyAddedChunks;
-	glm::ivec3 startPosition = Utilities::getClosestMiddlePosition(playerPosition);
+	glm::ivec3 startPosition(playerPosition);
+	Utilities::getClosestMiddlePosition(startPosition);
 	//glm::ivec3 startPosition = Utilities::getClosestChunkStartingPosition(playerPosition);	
 	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z <= startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
 	{
@@ -532,7 +528,7 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition, const Texture& tex
 			//}
 
 			glm::ivec3 position(x, 0, z);
-			position = Utilities::getClosestChunkStartingPosition(position);
+			Utilities::getClosestChunkStartingPosition(position);
 			if (m_chunks.find(position) == m_chunks.cend() && m_VAOs.find(position) == m_VAOs.cend())
 			{
 				{

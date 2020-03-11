@@ -76,7 +76,6 @@ private:
 
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
-	bool isChunkAtPosition(const glm::ivec3& position) const;
 
 	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const Texture& texture);
 
