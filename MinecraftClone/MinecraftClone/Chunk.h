@@ -4,6 +4,7 @@
 #include "CubeID.h"
 #include "Utilities.h"
 #include "Rectangle.h"
+#include "NonCopyable.h"
 #include <array>
 
 //Trees
@@ -14,12 +15,14 @@
 //https://www.reddit.com/r/proceduralgeneration/comments/3gwbux/question_how_does_the_world_remember_changes/
 
 //position.y * (CHUNK_AREA) + position.z * CHUNK_SIZE + position.x;
-class Chunk
+class Chunk : private NonCopyable
 {
 public:
 	Chunk();
 	Chunk(const glm::ivec3& startingPosition);
-	
+	Chunk(Chunk&&) noexcept;
+	Chunk& operator=(Chunk&&) noexcept;
+
 	const Rectangle& getAABB() const;
 	bool isInUse() const;
 	bool isPositionInBounds(const glm::ivec3& position) const;

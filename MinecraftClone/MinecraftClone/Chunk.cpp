@@ -28,6 +28,29 @@ Chunk::Chunk(const glm::ivec3& startingPosition)
 	regen(m_startingPosition);
 }
 
+Chunk::Chunk(Chunk&& orig) noexcept
+	: m_inUse(orig.m_inUse),
+	m_startingPosition(orig.m_startingPosition),
+	m_endingPosition(orig.m_endingPosition),
+	m_chunk(orig.m_chunk),
+	m_next(orig.m_next),
+	m_AABB(orig.m_AABB)
+{
+	orig.m_next = nullptr;
+}
+
+Chunk& Chunk::operator=(Chunk&& orig) noexcept
+{
+	m_inUse = orig.m_inUse;
+	m_startingPosition = orig.m_startingPosition;
+	m_endingPosition = orig.m_endingPosition;
+	m_chunk = orig.m_chunk;
+	m_next = orig.m_next;
+	m_AABB = orig.m_AABB;
+
+	orig.m_next = nullptr;
+}
+
 const Rectangle& Chunk::getAABB() const
 {
 	return m_AABB;
