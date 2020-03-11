@@ -50,9 +50,10 @@ namespace Utilities
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
 	constexpr int VISIBILITY_DISTANCE = 480;
-	constexpr int MAP_SIZE = 8000;
+	constexpr float MAP_SIZE = 8000.0f;
 	constexpr int OCTAVES = 3;
 	constexpr float LACUNARITY = 1.0f;
+	constexpr float PERSISTENCE = 0.5f;
 	constexpr float FREQUENCY = 12.0f;
 
 

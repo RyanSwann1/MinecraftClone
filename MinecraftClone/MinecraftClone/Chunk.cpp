@@ -131,8 +131,8 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 	{
 		for (int x = startingPosition.x; x < startingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 		{
-			double ex = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
-			double ey = (z) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
+			float ex = x / Utilities::MAP_SIZE;
+			float ey = z / Utilities::MAP_SIZE;
 			
 			//glm::pow()
 
@@ -140,6 +140,13 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			for (int i = 0; i < Utilities::OCTAVES; ++i)
 			{
 				elevation += glm::pow()
+			}
+
+			float lacunarity = 0.0f;
+			float elevation = 0.0f;
+			for (int i = 0; i < Utilities::OCTAVES; ++i)
+			{
+				//elevation += glm::pow()
 			}
 			float elevation = 1 * glm::perlin(glm::vec2(glm::pow(Utilities::FREQUENCY, 0) * ex, glm::pow(Utilities::FREQUENCY, 0) * ey));
 			
