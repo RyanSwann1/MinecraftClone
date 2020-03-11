@@ -49,7 +49,7 @@ namespace Utilities
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
-	constexpr int VISIBILITY_DISTANCE = 480;
+	constexpr int VISIBILITY_DISTANCE = 96;
 	constexpr int MAP_SIZE = 8000;
 
 	constexpr std::array<int, 6> LEAVES_DISTANCES =
@@ -144,21 +144,21 @@ namespace Utilities
 	{
 		glm::ivec3 closestStartingPosition(position);
 		
-		if (position.x < 0 && position.x % CHUNK_WIDTH < 0)
+		if (position.x % CHUNK_WIDTH < 0)
 		{
 			closestStartingPosition.x += std::abs(position.x % CHUNK_WIDTH);
 			closestStartingPosition.x -= CHUNK_WIDTH;
 		}
-		else if (position.x > 0 && position.x % CHUNK_WIDTH > 0)
+		else if (position.x % CHUNK_WIDTH > 0)
 		{
 			closestStartingPosition.x -= std::abs(position.x % CHUNK_WIDTH);
 		}
-		if (position.z < 0 && position.z % CHUNK_DEPTH < 0)
+		if (position.z % CHUNK_DEPTH < 0)
 		{
 			closestStartingPosition.z += std::abs(position.z % CHUNK_DEPTH);
 			closestStartingPosition.z -= CHUNK_DEPTH;
 		}
-		else if (position.z > 0 && position.z % CHUNK_DEPTH > 0)
+		else if (position.z % CHUNK_DEPTH > 0)
 		{
 			closestStartingPosition.z -= std::abs(position.z % CHUNK_DEPTH);
 		}
