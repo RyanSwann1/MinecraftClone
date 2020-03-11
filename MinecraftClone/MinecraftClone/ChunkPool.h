@@ -1,10 +1,10 @@
 #pragma once
 
-#include "NonCopyable.h"
+#include "NonMovable.h"
 #include "Chunk.h"
 #include <vector>
 
-class ChunkPool : private NonCopyable
+class ChunkPool : private NonCopyable, private NonMovable
 {
 public:
 	ChunkPool();

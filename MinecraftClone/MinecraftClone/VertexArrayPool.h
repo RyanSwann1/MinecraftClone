@@ -1,10 +1,10 @@
 #pragma once
 
 #include "VertexArray.h"
+#include "NonMovable.h"
 #include "NonCopyable.h"
-#include <array>
 
-class VertexArrayPool : private NonCopyable
+class VertexArrayPool : private NonCopyable, private NonMovable
 {
 public:
 	VertexArrayPool();
@@ -16,7 +16,7 @@ private:
 	VertexArray* m_nextAvailable;
 };
 
-struct VertexArrayFromPool : private NonCopyable
+struct VertexArrayFromPool : private NonCopyable, private NonMovable
 {
 	VertexArrayFromPool(VertexArrayPool& vertexArrayPool)
 		: vertexArray(vertexArrayPool.getVertexArray())

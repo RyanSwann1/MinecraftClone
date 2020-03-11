@@ -33,7 +33,7 @@
 
 //https://www.reddit.com/r/proceduralgeneration/comments/4eixfr/how_are_randomly_placed_structures_generated_in_a/
 
-struct ChunkFromPool : private NonCopyable
+struct ChunkFromPool : private NonCopyable, private NonMovable
 {
 	ChunkFromPool(ChunkPool& chunkPool, const glm::ivec3& startingPosition)
 		: chunk(chunkPool.getChunk(startingPosition))
@@ -53,7 +53,7 @@ enum class eCubeSide;
 class Texture;
 class VertexArray;
 struct CubeDetails;
-class ChunkManager : private NonCopyable
+class ChunkManager : private NonCopyable, private NonMovable
 {
 public:
 	ChunkManager();

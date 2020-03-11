@@ -2,12 +2,13 @@
 
 #include <string>
 #include "NonCopyable.h"
+#include "NonMovable.h"
 #include "glm/glm.hpp"
 #include <memory>
 #include <vector>
 
 enum class eCubeFaceID;
-class Texture : private NonCopyable
+class Texture : private NonCopyable, private NonMovable
 {
 public:
 	static std::unique_ptr<Texture> loadTexture(const std::string& name);
