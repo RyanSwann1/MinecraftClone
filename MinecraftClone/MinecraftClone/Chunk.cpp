@@ -224,53 +224,55 @@ void Chunk::spawnTrees()
 {
 	int currentTreesPlanted = 0;
 	int maxAllowedTrees = Utilities::getRandomNumber(0, Utilities::MAX_TREE_PER_CHUNK);
-	if (maxAllowedTrees > 0)
+	if (maxAllowedTrees == 0)
 	{
-		for (int z = Utilities::MAX_LEAVES_DISTANCE; z < Utilities::CHUNK_DEPTH - Utilities::MAX_LEAVES_DISTANCE; ++z)
+		return;
+	}
+	for (int z = Utilities::MAX_LEAVES_DISTANCE; z < Utilities::CHUNK_DEPTH - Utilities::MAX_LEAVES_DISTANCE; ++z)
+	{
+		for (int x = Utilities::MAX_LEAVES_DISTANCE; x < Utilities::CHUNK_WIDTH - Utilities::MAX_LEAVES_DISTANCE; ++x)
 		{
-			for (int x = Utilities::MAX_LEAVES_DISTANCE; x < Utilities::CHUNK_WIDTH - Utilities::MAX_LEAVES_DISTANCE; ++x)
+			if (currentTreesPlanted < maxAllowedTrees && Utilities::getRandomNumber(0, 1400) >= Utilities::TREE_SPAWN_CHANCE)
 			{
-				if (currentTreesPlanted < maxAllowedTrees && Utilities::getRandomNumber(0, 1400) >= Utilities::TREE_SPAWN_CHANCE)
+				for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_HEIGHT - Utilities::MAX_LEAVES_DISTANCE; y >= Utilities::SAND_MAX_HEIGHT; --y)
 				{
-					for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_HEIGHT - Utilities::MAX_LEAVES_DISTANCE; y >= Utilities::SAND_MAX_HEIGHT; --y)
+					glm::ivec3 position(x, y, z);
+					if (getCubeAtPosition(position) == static_cast<char>(eCubeType::Grass) &&
+						getCubeAtPosition({ x, y + 1, z }) == static_cast<char>(eCubeType::Invalid))
 					{
-						if (getCubeAtPosition({ x, y, z }) == static_cast<char>(eCubeType::Grass) &&
-							getCubeAtPosition({ x, y + 1, z }) == static_cast<char>(eCubeType::Invalid))
+						++currentTreesPlanted;
+						spawnLeaves(position);
+						spawnTreeStump();
+
+						int currentTreeHeight = 1;
+						int leavesDistanceIndex = 0;
+						for (currentTreeHeight; currentTreeHeight <= Utilities::TREE_HEIGHT; ++currentTreeHeight)
 						{
-							++currentTreesPlanted;
-							spawnLeaves();
-							spawnTreeStump();
-
-							int currentTreeHeight = 1;
-							int leavesDistanceIndex = 0;
-							for (currentTreeHeight; currentTreeHeight <= Utilities::TREE_HEIGHT; ++currentTreeHeight)
+							if (currentTreeHeight >= (Utilities::TREE_HEIGHT / 2))
 							{
-								if (currentTreeHeight >= (Utilities::TREE_HEIGHT / 2))
-								{
-									//spawnLeavesAtPosition
-									spawnLeaves(glm::ivec3(x, y + currentTreeHeight + 1, z), Utilities::LEAVES_DISTANCES[leavesDistanceIndex]);
-									++leavesDistanceIndex;
-								}
-								if (y + currentTreeHeight < Utilities::CHUNK_HEIGHT - 1)
-								{
-									changeCubeAtPosition({ x, y + currentTreeHeight, z }, eCubeType::TreeStump);
-									//m_chunk[x][y + currentTreeHeight][z] = static_cast<char>(eCubeType::TreeStump);
-								}
-								else
-								{
-									break;
-								}
+								//spawnLeavesAtPosition
+								spawnLeaves(glm::ivec3(x, y + currentTreeHeight + 1, z), Utilities::LEAVES_DISTANCES[leavesDistanceIndex]);
+								++leavesDistanceIndex;
 							}
-
-							break;
+							if (y + currentTreeHeight < Utilities::CHUNK_HEIGHT - 1)
+							{
+								changeCubeAtPosition({ x, y + currentTreeHeight, z }, eCubeType::TreeStump);
+								//m_chunk[x][y + currentTreeHeight][z] = static_cast<char>(eCubeType::TreeStump);
+							}
+							else
+							{
+								break;
+							}
 						}
+
+						break;
 					}
 				}
-				//Planted all available Trees
-				else if (currentTreesPlanted >= maxAllowedTrees)
-				{
-					return;
-				}
+			}
+			//Planted all available Trees
+			else if (currentTreesPlanted >= maxAllowedTrees)
+			{
+				return;
 			}
 		}
 	}
@@ -313,7 +315,23 @@ void Chunk::spawnCactus()
 
 void Chunk::spawnLeaves(const glm::ivec3& startingPosition, int distance)
 {
-	for (int y = startingPosition.y + Utilities::TREE_HEIGHT / 2; y < startingPosition.y + Utilities::TREE_HEIGHT; ++y)
+	//spawnLeaves(glm::ivec3(x, y + currentTreeHeight + 1, z), Utilities::LEAVES_DISTANCES[leavesDistanceIndex]);
+	//constexpr std::array<int, 6> LEAVES_DISTANCES =
+	//{
+	//	MAX_LEAVES_DISTANCE,
+	//	MAX_LEAVES_DISTANCE,
+	//	MAX_LEAVES_DISTANCE - 1,
+	//	MAX_LEAVES_DISTANCE - 1,
+	//	MAX_LEAVES_DISTANCE - 2,
+	//	MAX_LEAVES_DISTANCE - 2
+	//};
+
+	for (int i : Utilities::LEAVES_DISTANCES)
+	{
+
+	}
+	
+	for (int y = startingPosition.y + Utilities::TREE_HEIGHT / 2; y <= startingPosition.y + Utilities::TREE_HEIGHT; ++y)
 	{
 		for (int z = startingPosition.z - distance; z <= startingPosition.z + distance; ++z)
 		{
@@ -322,10 +340,9 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition, int distance)
 				glm::ivec3 position(x, startingPosition.y, z);
 
 				if (position != startingPosition &&
-					isPositionInLocalBounds(position) &&
-					m_chunk[position.x][position.y][position.z] == static_cast<char>(eCubeType::Invalid))
+					getCubeAtPosition(position) == static_cast<char>(eCubeType::Invalid))
 				{
-					m_chunk[position.x][position.y][position.z] = static_cast<char>(eCubeType::Leaves);
+					changeCubeAtPosition(position, eCubeType::Leaves);
 				}
 			}
 		}
