@@ -24,9 +24,9 @@ std::unordered_map<glm::ivec3, VertexArrayFromPool>& ChunkManager::getVAOs()
 
 void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition, const Texture& texture)
 {
-	for (int z = playerPosition.z - Utilities::VISIBILITY_DISTANCE; z < playerPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
+	for (int z = playerPosition.z - Utilities::VISIBILITY_DISTANCE; z <= playerPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
 	{
-		for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x < playerPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
+		for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x <= playerPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
 			glm::ivec3 chunkStartingPosition(x, 0, z);
 			Utilities::getClosestChunkStartingPosition(chunkStartingPosition);
@@ -480,15 +480,16 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition)
 		if (!visibilityRect.contains(chunk->second.chunk.getAABB()))
 		{
 			const glm::ivec3& chunkStartingPosition = chunk->second.chunk.getStartingPosition();
+			
+			std::unique_lock<std::mutex> lock(m_mutex);
+			auto VAO = m_VAOs.find(chunkStartingPosition);
+			assert(VAO != m_VAOs.end());
+			if (VAO != m_VAOs.end())
 			{
-				std::lock_guard<std::mutex> lock(m_mutex);
-				auto VAO = m_VAOs.find(chunkStartingPosition);
-				assert(VAO != m_VAOs.end());
-				if (VAO != m_VAOs.end())
-				{
-					VAO->second.vertexArray.m_reset = true;
-				}
+				VAO->second.vertexArray.m_reset = true;
 			}
+			lock.unlock();
+			
 
 
 			auto chunkToRegen = std::find_if(m_chunksToRegenerate.begin(), m_chunksToRegenerate.end(), [chunkStartingPosition](const auto& position)
@@ -530,12 +531,11 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition, const Texture& tex
 			Utilities::getClosestChunkStartingPosition(position);
 			if (m_chunks.find(position) == m_chunks.cend() && m_VAOs.find(position) == m_VAOs.cend())
 			{
-				{
-					std::lock_guard<std::mutex> lock(m_mutex);
-					auto newVAO = m_VAOs.emplace(std::piecewise_construct,
-						std::forward_as_tuple(position),
-						std::forward_as_tuple(m_vertexArrayPool)).first;
-				}
+				std::unique_lock<std::mutex> lock(m_mutex);
+				auto newVAO = m_VAOs.emplace(std::piecewise_construct,
+					std::forward_as_tuple(position),
+					std::forward_as_tuple(m_vertexArrayPool)).first;
+				lock.unlock();
 
 				auto newChunk = m_chunks.emplace(std::piecewise_construct,
 					std::forward_as_tuple(position),
