@@ -1,16 +1,15 @@
 #pragma once
 
-#include "NonCopyable.h"
+#include "NonMovable.h"
 #include "Chunk.h"
 #include <vector>
 
-class ChunkPool : private NonCopyable
+class ChunkPool : private NonCopyable, private NonMovable
 {
 public:
 	ChunkPool();
 
 	Chunk& getChunk(const glm::ivec3& startingPosition);
-	void releaseChunk(Chunk& chunk);
 
 private:
 	std::vector<Chunk> m_chunks;

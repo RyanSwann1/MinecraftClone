@@ -38,8 +38,7 @@ namespace Utilities
 	constexpr int STONE_MAX_HEIGHT = 12; 
 	constexpr int TREE_SPAWN_CHANCE = 1400;
 	constexpr int CACTUS_SPAWN_CHANCE = 1000;
-	constexpr int TREE_MIN_HEIGHT = 9;
-	constexpr int TREE_MAX_HEIGHT = 9;
+	constexpr int TREE_HEIGHT = 9;
 	constexpr int CACTUS_MIN_HEIGHT = 1;
 	constexpr int CACTUS_MAX_HEIGHT = 4;
 	constexpr int MAX_TREE_PER_CHUNK = 3;
@@ -49,8 +48,9 @@ namespace Utilities
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
-	//constexpr int VISIBILITY_DISTANCE = 64;
-	constexpr int VISIBILITY_DISTANCE = 640;
+	constexpr int VISIBILITY_DISTANCE = 800;
+	constexpr int MAP_SIZE = 8000;
+	const glm::vec3 PLAYER_STARTING_POSITION(0.0f, 250.f, 0.0f);
 
 	constexpr std::array<int, 6> LEAVES_DISTANCES =
 	{
@@ -140,30 +140,50 @@ namespace Utilities
 		return glm::ivec3(chunkStartingPosition.x + position.x, position.y, chunkStartingPosition.z + position.z);
 	}
 
-	inline glm::ivec3 getClosestChunkStartingPosition(const glm::ivec3& position)
+	inline void getClosestMiddlePosition(glm::ivec3& position)
 	{
-		glm::ivec3 closestStartingPosition(position);
-		
-		if (position.x < 0 && position.x % CHUNK_WIDTH < 0)
+		if (position.x % (CHUNK_WIDTH / 2) < 0)
 		{
-			closestStartingPosition.x += std::abs(position.x % CHUNK_WIDTH);
-			closestStartingPosition.x -= CHUNK_WIDTH;
+			position.x += std::abs(position.x % CHUNK_WIDTH / 2);
+			position.x -= CHUNK_WIDTH / 2;
 		}
-		else if (position.x > 0 && position.x % CHUNK_WIDTH > 0)
+		else if (position.x % (CHUNK_WIDTH / 2) > 0)
 		{
-			closestStartingPosition.x -= std::abs(position.x % CHUNK_WIDTH);
+			position.x -= std::abs(position.x % CHUNK_WIDTH / 2);
+			position.x += CHUNK_WIDTH / 2;
 		}
-		if (position.z < 0 && position.z % CHUNK_DEPTH < 0)
+		if (position.z % (CHUNK_DEPTH / 2) < 0)
 		{
-			closestStartingPosition.z += std::abs(position.z % CHUNK_DEPTH);
-			closestStartingPosition.z -= CHUNK_DEPTH;
+			position.z += std::abs(position.z % CHUNK_DEPTH / 2);
+			position.z -= CHUNK_DEPTH / 2;
 		}
-		else if (position.z > 0 && position.z % CHUNK_DEPTH > 0)
+		else if (position.z % (CHUNK_DEPTH / 2) > 0)
 		{
-			closestStartingPosition.z -= std::abs(position.z % CHUNK_DEPTH);
+			position.z -= std::abs(position.z % CHUNK_DEPTH / 2);
+			position.z += CHUNK_DEPTH / 2;
 		}
+	}
 
-		return glm::ivec3(closestStartingPosition.x, 0, closestStartingPosition.z);
+	inline void getClosestChunkStartingPosition(glm::ivec3& position)
+	{
+		if (position.x % CHUNK_WIDTH < 0)
+		{
+			position.x += std::abs(position.x % CHUNK_WIDTH);
+			position.x -= CHUNK_WIDTH;
+		}
+		else if (position.x % CHUNK_WIDTH > 0)
+		{
+			position.x -= std::abs(position.x % CHUNK_WIDTH);
+		}
+		if (position.z % CHUNK_DEPTH < 0)
+		{
+			position.z += std::abs(position.z % CHUNK_DEPTH);
+			position.z -= CHUNK_DEPTH;
+		}
+		else if (position.z % CHUNK_DEPTH > 0)
+		{
+			position.z -= std::abs(position.z % CHUNK_DEPTH);
+		}
 	}
 
 	inline int getRandomNumber(int min, int max)

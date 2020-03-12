@@ -2,6 +2,7 @@
 
 #include "ChunkPool.h"
 #include "glm/gtx/hash.hpp"
+#include "VertexArrayPool.h"
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -30,11 +31,9 @@
 //https://algs4.cs.princeton.edu/34hash/
 //https://www.hackerearth.com/practice/data-structures/hash-tables/basics-of-hash-tables/tutorial
 
-
-
 //https://www.reddit.com/r/proceduralgeneration/comments/4eixfr/how_are_randomly_placed_structures_generated_in_a/
 
-struct ChunkFromPool : private NonCopyable
+struct ChunkFromPool : private NonCopyable, private NonMovable
 {
 	ChunkFromPool(ChunkPool& chunkPool, const glm::ivec3& startingPosition)
 		: chunk(chunkPool.getChunk(startingPosition))
@@ -54,34 +53,35 @@ enum class eCubeSide;
 class Texture;
 class VertexArray;
 struct CubeDetails;
-class ChunkManager : private NonCopyable
+class ChunkManager : private NonCopyable, private NonMovable
 {
 public:
-	ChunkManager(std::shared_ptr<Texture>& texture);
+	ChunkManager();
 
-	std::unordered_map<glm::ivec3, VertexArray>& getVAOs();
+	std::unordered_map<glm::ivec3, VertexArrayFromPool>& getVAOs();
 
-	void generateInitialChunks(const glm::vec3& playerPosition);
-	void update(Rectangle& visibilityRect, const Camera& camera, const sf::Window& window);
+	void generateInitialChunks(const glm::vec3& playerPosition, const Texture& texture);
+	void update(const Camera& camera, const sf::Window& window, const Texture& texture);
 
 private:
 	ChunkPool m_chunkPool;
-	std::shared_ptr<Texture> m_texture;
-	std::unordered_map<glm::ivec3, VertexArray> m_VAOs;
+	VertexArrayPool m_vertexArrayPool;
+	std::unordered_map<glm::ivec3, VertexArrayFromPool> m_VAOs;
 	std::unordered_map<glm::ivec3, ChunkFromPool> m_chunks;
 	std::unordered_set<glm::ivec3> m_chunksToRegenerate;
 	std::mutex m_mutex;
 
-	void addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition);
+	void addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition,
+		const Texture& texture);
 
+	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
-	bool isChunkAtPosition(const glm::ivec3& position) const;
 
-	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
+	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const Texture& texture);
 
-	void deleteChunks(const Rectangle& visibilityRect);
-	void addChunks(const Rectangle& visibilityRect, const glm::vec3& playerPosition);
-	void regenChunks(const Rectangle& visibilityRect, const glm::vec3& playerPosition);
+	void deleteChunks(const glm::ivec3& playerPosition);
+	void addChunks(const glm::vec3& playerPosition, const Texture& texture);
+	void regenChunks(const Texture& texture);
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition) const;
 };

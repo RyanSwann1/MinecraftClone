@@ -12,7 +12,8 @@ Chunk::Chunk()
 	m_startingPosition(),
 	m_endingPosition(),
 	m_chunk(),
-	m_next(nullptr)
+	m_next(nullptr),
+	m_AABB()
 {}
 
 Chunk::Chunk(const glm::ivec3& startingPosition)
@@ -20,9 +21,41 @@ Chunk::Chunk(const glm::ivec3& startingPosition)
 	m_startingPosition(startingPosition),
 	m_endingPosition(),
 	m_chunk(),
-	m_next(nullptr)
+	m_next(nullptr),
+	m_AABB(glm::ivec2(m_startingPosition.x, m_startingPosition.z) +
+		glm::ivec2(Utilities::CHUNK_WIDTH / 2.0f, Utilities::CHUNK_DEPTH / 2.0f), 16)
 {
 	regen(m_startingPosition);
+}
+
+Chunk::Chunk(Chunk&& orig) noexcept
+	: m_inUse(orig.m_inUse),
+	m_startingPosition(orig.m_startingPosition),
+	m_endingPosition(orig.m_endingPosition),
+	m_chunk(orig.m_chunk),
+	m_next(orig.m_next),
+	m_AABB(orig.m_AABB)
+{
+	orig.m_next = nullptr;
+}
+
+Chunk& Chunk::operator=(Chunk&& orig) noexcept
+{
+	m_inUse = orig.m_inUse;
+	m_startingPosition = orig.m_startingPosition;
+	m_endingPosition = orig.m_endingPosition;
+	m_chunk = orig.m_chunk;
+	m_next = orig.m_next;
+	m_AABB = orig.m_AABB;
+
+	orig.m_next = nullptr;
+
+	return *this;
+}
+
+const Rectangle& Chunk::getAABB() const
+{
+	return m_AABB;
 }
 
 bool Chunk::isInUse() const
@@ -45,7 +78,7 @@ const glm::ivec3& Chunk::getStartingPosition() const
 	return m_startingPosition;
 }
 
-const CubeDetails& Chunk::getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const
+char Chunk::getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const
 {
 	return m_chunk[position.x - m_startingPosition.x]
 		[position.y - m_startingPosition.y]
@@ -57,13 +90,10 @@ Chunk* Chunk::getNext()
 	return m_next;
 }
 
-void Chunk::changeCubeAtPosition(const glm::vec3& position, eCubeType cubeType)
+void Chunk::changeCubeAtPosition(const glm::ivec3& position, eCubeType cubeType)
 {
 	assert(isPositionInBounds(position));
-	if (isPositionInBounds(position))
-	{
-		m_chunk[position.x - m_startingPosition.x][position.y][position.z - m_startingPosition.z].type = static_cast<char>(cubeType);
-	}
+	m_chunk[position.x][position.y][position.z] = static_cast<char>(cubeType);
 }
 
 void Chunk::setNext(Chunk* chunk)
@@ -79,13 +109,16 @@ void Chunk::reuse(const glm::ivec3& startingPosition)
 		{
 			for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
 			{
-				m_chunk[x][y][z] = CubeDetails();
+				m_chunk[x][y][z] = char();
 			}
 		}
 	}
 
 	m_inUse = true;
 	m_startingPosition = startingPosition;
+	m_AABB.reset(glm::ivec2(m_startingPosition.x, m_startingPosition.z) +
+		glm::ivec2(Utilities::CHUNK_WIDTH / 2.0f, Utilities::CHUNK_DEPTH / 2.0f), 16);
+
 	regen(m_startingPosition);	
 }
 
@@ -96,65 +129,71 @@ void Chunk::release()
 	m_endingPosition = glm::ivec3();
 }
 
+//https://www.reddit.com/r/proceduralgeneration/comments/4i9a08/terrain_generation_of_a_game_i_am_working_on/
+//http://pcgbook.com/wp-content/uploads/chapter04.pdf
+//https://www.reddit.com/r/proceduralgeneration/comments/drc96v/getting_started_in_proceduralgeneration/
+//https://notch.tumblr.com/post/3746989361/terrain-generation-part-1
 void Chunk::regen(const glm::ivec3& startingPosition)
 {
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
 	{
 		for (int x = startingPosition.x; x < startingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 		{
-			double nx = (x) / (Utilities::VISIBILITY_DISTANCE * 1.0f) - 0.5f;
-			double ny = (z) / (Utilities::VISIBILITY_DISTANCE * 1.0f) - 0.5f;
-
-			//float elevation = std::abs(glm::perlin(glm::vec2(nx, ny)));
+			double ex = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
+			double ey = (z) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
 			
-			float elevation = std::abs(1 * glm::perlin(glm::vec2(1 * nx, 1 * ny)));
-			elevation += std::abs(0.5 * glm::perlin(glm::vec2(nx * 2, ny * 2)));
-			elevation += std::abs(0.25 * glm::perlin(glm::vec2(nx * 4, ny * 4)));
+			float elevation = std::abs(1 * glm::perlin(glm::vec2(5.0f * ex, 5.0f * ey)));
+			elevation += std::abs(0.5 * glm::perlin(glm::vec2(ex * 15.0f, ey * 15.0f)));
+			elevation += std::abs(0.25 * glm::perlin(glm::vec2(ex * 30.0f, ey * 30.0f)));
 
-			//elevation = glm::pow(elevation, 5.f);
-			elevation = (float)Utilities::CHUNK_HEIGHT - 1.0f - (elevation * (float)Utilities::CHUNK_HEIGHT);
-			//elevation = glm::pow(elevation, 1.25f);
+			elevation = glm::pow(elevation, 2.5f);
+			elevation = elevation * (float)Utilities::CHUNK_HEIGHT;
 			elevation = Utilities::clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
 
-			//glm::perlin(glm::vec2(nx * 1.25f, ny * 1.25f))) * 16;
+			double mx = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
+			double my = (z) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
+			float moisture = std::abs(1 * glm::perlin(glm::vec2(15.0f * mx, 15.0f * my)));
+
 			eCubeType cubeType;
-			if (elevation <= Utilities::STONE_MAX_HEIGHT)
+			glm::ivec3 positionOnGrid(x - startingPosition.x, (int)elevation, z - startingPosition.z);
+
+			//Desert Biome
+			if (moisture >= 0.5f)
 			{
-				cubeType = eCubeType::Stone;
+				for (int y = (int)elevation; y >= 0; --y)
+				{
+					if (y <= Utilities::STONE_MAX_HEIGHT)
+					{
+						cubeType = eCubeType::Stone;
+					}
+					else 
+					{
+						cubeType = eCubeType::Sand;
+					}
+
+					m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = static_cast<char>(cubeType);
+				}
 			}
-			//else if (elevation <= Utilities::WATER_MAX_HEIGHT)
-			//{
-			//	cubeType = eCubeType::Water;
-			//}
-			else if (elevation <= Utilities::SAND_MAX_HEIGHT)
-			{
-				cubeType = eCubeType::Sand;
-			}
+			//Plains Biome
 			else
 			{
-				cubeType = eCubeType::Grass;
-			}
-
-			glm::ivec3 positionOnGrid(x - startingPosition.x, (int)elevation, z - startingPosition.z);
-			//std::cout << elevation << "\n";
-			m_chunk[positionOnGrid.x][(int)elevation][positionOnGrid.z] = CubeDetails(cubeType);
-
-			for (int y = (int)elevation - 1; y >= 0; --y)
-			{
-				if (y <= Utilities::STONE_MAX_HEIGHT)
+				for (int y = (int)elevation; y >= 0; --y)
 				{
-					cubeType = eCubeType::Stone;
-				}
-				else if (y <= Utilities::SAND_MAX_HEIGHT)
-				{
-					cubeType = eCubeType::Sand;
-				}
-				else
-				{
-					cubeType = eCubeType::Grass;
-				}
+					if (y <= Utilities::STONE_MAX_HEIGHT)
+					{
+						cubeType = eCubeType::Stone;
+					}
+					else if (y <= Utilities::SAND_MAX_HEIGHT)
+					{
+						cubeType = eCubeType::Sand;
+					}
+					else
+					{
+						cubeType = eCubeType::Grass;
+					}
 
-				m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = CubeDetails(cubeType);
+					m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = static_cast<char>(cubeType);
+				}
 			}
 		}
 	}
@@ -169,14 +208,13 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 
 void Chunk::spawnWater()
 {
-	//Fill with Water
 	for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
 	{
 		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
 		{
-			if (m_chunk[x][Utilities::WATER_MAX_HEIGHT][z].type == static_cast<char>(eCubeType::Invalid))
+			if (m_chunk[x][Utilities::WATER_MAX_HEIGHT][z] == static_cast<char>(eCubeType::Invalid))
 			{
-				m_chunk[x][Utilities::WATER_MAX_HEIGHT][z].type = static_cast<char>(eCubeType::Water);
+				m_chunk[x][Utilities::WATER_MAX_HEIGHT][z] = static_cast<char>(eCubeType::Water);
 			}
 		}
 	}
@@ -184,52 +222,57 @@ void Chunk::spawnWater()
 
 void Chunk::spawnTrees()
 {
-	//Fill with trees
-	int treesAdded = 0;
-	int maxTreesAllowed = Utilities::getRandomNumber(0, Utilities::MAX_TREE_PER_CHUNK);
-	if (maxTreesAllowed > 0)
+	int currentTreesPlanted = 0;
+	int maxAllowedTrees = Utilities::getRandomNumber(0, Utilities::MAX_TREE_PER_CHUNK);
+	if (maxAllowedTrees == 0)
 	{
-		for (int z = Utilities::MAX_LEAVES_DISTANCE; z < Utilities::CHUNK_DEPTH - Utilities::MAX_LEAVES_DISTANCE; ++z)
+		return;
+	}
+	for (int z = Utilities::MAX_LEAVES_DISTANCE; z < Utilities::CHUNK_DEPTH - Utilities::MAX_LEAVES_DISTANCE; ++z)
+	{
+		for (int x = Utilities::MAX_LEAVES_DISTANCE; x < Utilities::CHUNK_WIDTH - Utilities::MAX_LEAVES_DISTANCE; ++x)
 		{
-			for (int x = Utilities::MAX_LEAVES_DISTANCE; x < Utilities::CHUNK_WIDTH - Utilities::MAX_LEAVES_DISTANCE; ++x)
+			if (currentTreesPlanted < maxAllowedTrees && Utilities::getRandomNumber(0, 1400) >= Utilities::TREE_SPAWN_CHANCE)
 			{
-				if (treesAdded < maxTreesAllowed && Utilities::getRandomNumber(0, 1400) >= Utilities::TREE_SPAWN_CHANCE)
+				for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_HEIGHT - Utilities::MAX_LEAVES_DISTANCE; y >= Utilities::SAND_MAX_HEIGHT; --y)
 				{
-					for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_MAX_HEIGHT - Utilities::MAX_LEAVES_DISTANCE - 1; y >= Utilities::SAND_MAX_HEIGHT; --y)
+					glm::ivec3 position(x, y, z);
+					if (getCubeAtPosition(position) == static_cast<char>(eCubeType::Grass) &&
+						getCubeAtPosition({ x, y + 1, z }) == static_cast<char>(eCubeType::Invalid))
 					{
-						if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Grass) &&
-							m_chunk[x][y + 1][z].type == static_cast<char>(eCubeType::Invalid) &&
-							treesAdded < maxTreesAllowed)
+						++currentTreesPlanted;
+						spawnLeaves(position);
+						spawnTreeStump();
+
+						int currentTreeHeight = 1;
+						int leavesDistanceIndex = 0;
+						for (currentTreeHeight; currentTreeHeight <= Utilities::TREE_HEIGHT; ++currentTreeHeight)
 						{
-							++treesAdded;
-							int currentTreeHeight = 1;
-							int leavesDistanceIndex = 0;
-							for (currentTreeHeight; currentTreeHeight <= Utilities::TREE_MAX_HEIGHT; ++currentTreeHeight)
+							if (currentTreeHeight >= (Utilities::TREE_HEIGHT / 2))
 							{
-								if (currentTreeHeight >= (Utilities::TREE_MAX_HEIGHT / 2))
-								{
-									spawnLeaves(glm::ivec3(x, y + currentTreeHeight + 1, z), Utilities::LEAVES_DISTANCES[leavesDistanceIndex]);
-									++leavesDistanceIndex;
-								}
-								if (y + currentTreeHeight < Utilities::CHUNK_HEIGHT - 1)
-								{
-									m_chunk[x][y + currentTreeHeight][z].type = static_cast<char>(eCubeType::TreeStump);
-								}
-								else
-								{
-									break;
-								}
+								//spawnLeavesAtPosition
+								spawnLeaves(glm::ivec3(x, y + currentTreeHeight + 1, z), Utilities::LEAVES_DISTANCES[leavesDistanceIndex]);
+								++leavesDistanceIndex;
+							}
+							if (y + currentTreeHeight < Utilities::CHUNK_HEIGHT - 1)
+							{
+								changeCubeAtPosition({ x, y + currentTreeHeight, z }, eCubeType::TreeStump);
+								//m_chunk[x][y + currentTreeHeight][z] = static_cast<char>(eCubeType::TreeStump);
+							}
+							else
+							{
+								break;
 							}
 						}
 
 						break;
 					}
 				}
-				//Tree cap reached
-				else if (treesAdded >= maxTreesAllowed)
-				{
-					return;
-				}
+			}
+			//Planted all available Trees
+			else if (currentTreesPlanted >= maxAllowedTrees)
+			{
+				return;
 			}
 		}
 	}
@@ -245,16 +288,16 @@ void Chunk::spawnCactus()
 			if (Utilities::getRandomNumber(0, Utilities::CACTUS_SPAWN_CHANCE) >= Utilities::CACTUS_SPAWN_CHANCE &&
 				totalCactusAdded < Utilities::MAX_CACTUS_PER_CHUNK)
 			{
-				for (int y = Utilities::CHUNK_HEIGHT; y >= Utilities::WATER_MAX_HEIGHT; --y)
+				for (int y = Utilities::CHUNK_HEIGHT - Utilities::CACTUS_MAX_HEIGHT - 1; y >= Utilities::WATER_MAX_HEIGHT; --y)
 				{
-					if (m_chunk[x][y][z].type == static_cast<char>(eCubeType::Sand) && 
-						m_chunk[x][y + 1][z].type == static_cast<char>(eCubeType::Invalid))
+					if (m_chunk[x][y][z] == static_cast<char>(eCubeType::Sand) && 
+						m_chunk[x][y + 1][z] == static_cast<char>(eCubeType::Invalid))
 					{
 						++totalCactusAdded;
 						int cactusMaxHeight = Utilities::getRandomNumber(Utilities::CACTUS_MIN_HEIGHT, Utilities::CACTUS_MAX_HEIGHT);
 						for (int i = 1; i <= cactusMaxHeight; ++i)
 						{
-							m_chunk[x][y + i][z].type = static_cast<char>(eCubeType::Cactus);
+							m_chunk[x][y + i][z] = static_cast<char>(eCubeType::Cactus);
 						}
 
 						break;
@@ -272,20 +315,43 @@ void Chunk::spawnCactus()
 
 void Chunk::spawnLeaves(const glm::ivec3& startingPosition, int distance)
 {
-	for (int z = startingPosition.z - distance; z <= startingPosition.z + distance; ++z)
+	//spawnLeaves(glm::ivec3(x, y + currentTreeHeight + 1, z), Utilities::LEAVES_DISTANCES[leavesDistanceIndex]);
+	//constexpr std::array<int, 6> LEAVES_DISTANCES =
+	//{
+	//	MAX_LEAVES_DISTANCE,
+	//	MAX_LEAVES_DISTANCE,
+	//	MAX_LEAVES_DISTANCE - 1,
+	//	MAX_LEAVES_DISTANCE - 1,
+	//	MAX_LEAVES_DISTANCE - 2,
+	//	MAX_LEAVES_DISTANCE - 2
+	//};
+
+	for (int i : Utilities::LEAVES_DISTANCES)
 	{
-		for (int x = startingPosition.x - distance; x <= startingPosition.x + distance; ++x)
+
+	}
+	
+	for (int y = startingPosition.y + Utilities::TREE_HEIGHT / 2; y <= startingPosition.y + Utilities::TREE_HEIGHT; ++y)
+	{
+		for (int z = startingPosition.z - distance; z <= startingPosition.z + distance; ++z)
 		{
-			glm::ivec3 position(x, startingPosition.y, z);
-			if (isPositionInLocalBounds(position))
+			for (int x = startingPosition.x - distance; x <= startingPosition.x + distance; ++x)
 			{
-				if (m_chunk[position.x][position.y][position.z].type == static_cast<char>(eCubeType::Invalid))
+				glm::ivec3 position(x, startingPosition.y, z);
+
+				if (position != startingPosition &&
+					getCubeAtPosition(position) == static_cast<char>(eCubeType::Invalid))
 				{
-					m_chunk[position.x][position.y][position.z].type = static_cast<char>(eCubeType::Leaves);
+					changeCubeAtPosition(position, eCubeType::Leaves);
 				}
 			}
 		}
 	}
+}
+
+void Chunk::spawnTreeStump(const glm::ivec3& startingPosition)
+{
+
 }
 
 bool Chunk::isPositionInLocalBounds(const glm::ivec3& position) const
@@ -296,4 +362,10 @@ bool Chunk::isPositionInLocalBounds(const glm::ivec3& position) const
 		position.x < Utilities::CHUNK_WIDTH &&
 		position.y < Utilities::CHUNK_HEIGHT &&
 		position.z < Utilities::CHUNK_DEPTH);
+}
+
+char Chunk::getCubeAtPosition(const glm::ivec3 position) const
+{
+	assert(isPositionInLocalBounds(position));
+	return m_chunk[position.x][position.y][position.z];
 }

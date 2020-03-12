@@ -3,7 +3,12 @@
 
 ChunkPool::ChunkPool()
 {
-	m_chunks.resize(size_t(7500));
+	int x = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_WIDTH;
+	x += x += 2;
+	int y = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_DEPTH;
+	y += y += 2;
+
+	m_chunks.resize(size_t((x * y)));
 
 	for (int i = 0; i < static_cast<int>(m_chunks.size()) - 1; ++i)
 	{
@@ -21,8 +26,10 @@ Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
 
 	while (!validChunkFound)
 	{
+		assert(m_nextAvailable);
 		if (m_nextAvailable->isInUse())
 		{
+			assert(m_nextAvailable->getNext());
 			m_nextAvailable = m_nextAvailable->getNext();
 		}
 		else
@@ -30,14 +37,9 @@ Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
 			validChunkFound = true;
 		}
 
-		assert(++iterationCount && iterationCount < m_chunks.size());
+		assert(++iterationCount && iterationCount <= m_chunks.size());
 	}
 	
 	m_nextAvailable->reuse(startingPosition);
 	return *m_nextAvailable;
-}
-
-void ChunkPool::releaseChunk(Chunk& chunk)
-{
-	chunk.release(); 
 }

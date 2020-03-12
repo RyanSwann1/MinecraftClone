@@ -190,7 +190,7 @@ int main()
 	settings.attributeFlags = sf::ContextSettings::Core;
 	sf::Vector2i windowSize(1980, 1080);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft", sf::Style::Default, settings);
-	window.setFramerateLimit(120);
+	window.setFramerateLimit(60);
 	gladLoadGL();
 
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
@@ -199,7 +199,7 @@ int main()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	unsigned int shaderID = createShaderProgram();
-	Camera camera(glm::vec3(0.0f, 150.f, 0.0f));
+	Camera camera(Utilities::PLAYER_STARTING_POSITION);
 	std::shared_ptr<Texture> texture = Texture::loadTexture("Atlas3.png");
 	if (!texture)
 	{
@@ -209,13 +209,13 @@ int main()
 
 	texture->bind();
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot(), uniformLocations);
-	Rectangle visibilityRect(glm::vec2(camera.m_position.x, camera.m_position.z), Utilities::VISIBILITY_DISTANCE);
 
-	ChunkManager chunkManager(texture);
-	chunkManager.generateInitialChunks(camera.m_position);
-	std::thread chunkGenerationThread([&](ChunkManager* chunkManager) {chunkManager->update(std::ref(visibilityRect), std::ref(camera), std::ref(window)); }, &chunkManager);
-	std::mutex mutex;
-	std::unordered_map<glm::ivec3, VertexArray>& VAOs = chunkManager.getVAOs();
+	ChunkManager chunkManager;
+	chunkManager.generateInitialChunks(camera.m_position, *texture);
+	std::thread chunkGenerationThread([&](ChunkManager* chunkManager) 
+	{chunkManager->update(std::ref(camera), std::ref(window), std::ref(*texture)); }, &chunkManager);
+
+	std::unordered_map<glm::ivec3, VertexArrayFromPool>& VAOs = chunkManager.getVAOs();
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -230,15 +230,13 @@ int main()
 		float deltaTime = clock.restart().asSeconds();
 		sf::Vector2i mousePosition = sf::Mouse::getPosition();
 		camera.mouse_callback(mousePosition.x, mousePosition.y);
-		if (elaspedTime >= messageExpiredTime)
-		{
-			elaspedTime = 0.0f;
-			glm::ivec2 playerPosition(camera.m_position.x, camera.m_position.z);
-			//std::cout << playerPosition.x << "\n";
-			//std::cout << playerPosition.y << "\n";
-		}
-
-		elaspedTime += deltaTime;
+		//if (elaspedTime >= messageExpiredTime)
+		//{
+		//	elaspedTime = 0.0f;
+		//	glm::ivec2 playerPosition(camera.m_position.x, camera.m_position.z);
+		//	//std::cout << playerPosition.x << "\n";
+		//	//std::cout << playerPosition.y << "\n";
+		//}
 
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))
@@ -247,64 +245,52 @@ int main()
 			{
 				window.close();
 			}
-			if (currentSFMLEvent.type == sf::Event::KeyPressed)
-			{
-				std::lock_guard<std::mutex> lock(mutex);
-				camera.move(currentSFMLEvent, deltaTime);
-			}
 		}
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
+		camera.move(deltaTime);
+
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
 		setUniformMat4f(shaderID, "uView", view, uniformLocations);
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 1000.f);
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 1000.0f);//(float)Utilities::VISIBILITY_DISTANCE - 32);
 		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
-
-		for (auto VAO = VAOs.begin(); VAO != VAOs.end();)
-		{
-			if (VAO->second.m_destroy)
-			{
-				VAO->second.destroy();
-				VAO = VAOs.erase(VAO);
-			}
-			else if (VAO->second.m_attachOpaqueVBO)
-			{
-				VAO->second.attachOpaqueVBO();
-				++VAO;
-			}
-			else
-			{
-				++VAO;
-			}
-		}
-
-		for (const auto& VAO : VAOs)
-		{
-			if (VAO.second.m_opaqueVBODisplayable)
-			{
-				VAO.second.bindOpaqueVAO();
-				glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
-			}
-		}
 
 		for (auto VAO = VAOs.begin(); VAO != VAOs.end(); ++VAO)
 		{
-			if (VAO->second.m_attachTransparentVBO)
+			if (VAO->second.vertexArray.m_reset)
 			{
-				VAO->second.attachTransparentVBO();
+				VAO->second.vertexArray.reset();
+				VAOs.erase(VAO);
+				continue;
+			}
+
+			if (VAO->second.vertexArray.m_attachOpaqueVBO)
+			{
+				VAO->second.vertexArray.attachOpaqueVBO();
+			}
+			if (VAO->second.vertexArray.m_attachTransparentVBO)
+			{
+				VAO->second.vertexArray.attachTransparentVBO();
+			}
+
+			if (VAO->second.vertexArray.m_opaqueVBODisplayable)
+			{
+				VAO->second.vertexArray.bindOpaqueVAO();
+				glDrawElements(GL_TRIANGLES, VAO->second.vertexArray.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 			}
 		}
 
 		setUniformLocation1f(shaderID, "uAlpha", Utilities::WATER_ALPHA_VALUE, uniformLocations);
 		for (const auto& VAO : VAOs)
 		{
-			if (VAO.second.m_transparentVBODisplayable)
+			if (VAO.second.vertexArray.m_transparentVBODisplayable)
 			{
-				VAO.second.bindTransparentVAO();
-				glDrawElements(GL_TRIANGLES, VAO.second.m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
+				VAO.second.vertexArray.bindTransparentVAO();
+				glDrawElements(GL_TRIANGLES, VAO.second.vertexArray.m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
 			}
 		}
 		setUniformLocation1f(shaderID, "uAlpha", 1.0f, uniformLocations);

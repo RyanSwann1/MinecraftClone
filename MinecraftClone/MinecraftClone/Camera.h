@@ -11,7 +11,7 @@ struct Camera
 {
 	Camera(glm::vec3 startPosition);
 
-	void move(const sf::Event& sfmlEvent, float deltaTime);
+	void move(float deltaTime);
 
 	glm::vec2 getPosition2D();
 	glm::vec3 getRaycastPosition() const;

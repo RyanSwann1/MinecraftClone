@@ -7,24 +7,29 @@
 struct VertexArray : private NonCopyable
 {
 	VertexArray();
+	VertexArray(VertexArray&&) noexcept;
+	VertexArray& operator=(VertexArray&&) noexcept;
 	
-	void destroy();
+	void reset();
 
 	void attachTransparentVBO();
 	void attachOpaqueVBO();
 	void bindOpaqueVAO() const;
 	void bindTransparentVAO() const;
 	void unbind() const;
-
+	
+	bool m_inUse;
 	bool m_opaqueVBODisplayable;
 	bool m_transparentVBODisplayable;
 	bool m_attachOpaqueVBO;
 	bool m_attachTransparentVBO;
-	bool m_destroy;
+	bool m_reset;
 	bool m_awaitingRegeneration;
 	VertexBuffer m_vertexBuffer;
 	unsigned int m_ID;
 	unsigned int m_transparentID;
 	int m_opaqueElementBufferIndex;
 	int m_transparentElementBufferIndex;
+
+	VertexArray* m_next;
 };

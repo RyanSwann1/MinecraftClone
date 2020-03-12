@@ -5,16 +5,14 @@ Rectangle::Rectangle()
 	: m_left(0.0f),
 	m_right(0.0f),
 	m_top(0.0f),
-	m_bottom(0.0f),
-	m_distance(0.0f)
+	m_bottom(0.0f)
 {}
 
 Rectangle::Rectangle(const glm::vec2& position, float distance)
 	: m_left(position.x - distance),
 	m_right(position.x + distance),
 	m_top(position.y + distance),
-	m_bottom(position.y - distance),
-	m_distance(distance)
+	m_bottom(position.y - distance)
 {}
 
 void Rectangle::update(const glm::vec2 & position, float distance)
@@ -39,5 +37,4 @@ void Rectangle::reset(const glm::vec2& position, float distance)
 	m_right = position.x + distance;
 	m_top = position.y + distance;
 	m_bottom = position.y - distance;
-	m_distance = distance;
 }

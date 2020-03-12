@@ -1,29 +1,30 @@
 #include "Camera.h"
 
 Camera::Camera(glm::vec3 startPosition)
-	: m_speed(5.0f),
+	: m_speed(1.25f),
 	m_position(startPosition),
 	m_front(0.0f, 0.0f, -1.0f),
 	m_frontInverse(0.0f, 0.0f, 1.0f),
 	m_up(0.0f, 1.0f, 0.0f)
 {}
 
-void Camera::move(const sf::Event & sfmlEvent, float deltaTime)
+void Camera::move(float deltaTime)
 {
-	switch (sfmlEvent.key.code)
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-	case sf::Keyboard::A:
 		m_position -= glm::normalize(glm::cross(m_front, m_up)) * m_speed;
-		break;
-	case sf::Keyboard::D:
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	{
 		m_position += glm::normalize(glm::cross(m_front, m_up)) * m_speed;
-		break;
-	case sf::Keyboard::W:
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+	{
 		m_position += m_speed * m_front;
-		break;
-	case sf::Keyboard::S:
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+	{
 		m_position -= m_speed * m_front;
-		break;
 	}
 }
 
