@@ -171,7 +171,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 						cubeType = eCubeType::Sand;
 					}
 
-					m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = static_cast<char>(cubeType);
+					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
 				}
 			}
 			//Plains Biome
@@ -192,7 +192,8 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 						cubeType = eCubeType::Grass;
 					}
 
-					m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = static_cast<char>(cubeType);
+					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
+					//m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = static_cast<char>(cubeType);
 				}
 			}
 		}
