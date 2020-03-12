@@ -90,9 +90,9 @@ Chunk* Chunk::getNext()
 	return m_next;
 }
 
-void Chunk::changeCubeAtPosition(const glm::ivec3& position, eCubeType cubeType)
+void Chunk::changeCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType)
 {
-	assert(isPositionInBounds(position));
+	assert(isPositionInLocalBounds(position));
 	m_chunk[position.x][position.y][position.z] = static_cast<char>(cubeType);
 }
 
@@ -237,33 +237,12 @@ void Chunk::spawnTrees()
 				for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_HEIGHT - Utilities::MAX_LEAVES_DISTANCE; y >= Utilities::SAND_MAX_HEIGHT; --y)
 				{
 					glm::ivec3 position(x, y, z);
-					if (getCubeAtPosition(position) == static_cast<char>(eCubeType::Grass) &&
-						getCubeAtPosition({ x, y + 1, z }) == static_cast<char>(eCubeType::Invalid))
+					if (getCubeAtLocalPosition(position) == static_cast<char>(eCubeType::Grass) &&
+						getCubeAtLocalPosition({ x, y + 1, z }) == static_cast<char>(eCubeType::Invalid))
 					{
 						++currentTreesPlanted;
 						spawnLeaves(position);
-						spawnTreeStump();
-
-						int currentTreeHeight = 1;
-						int leavesDistanceIndex = 0;
-						for (currentTreeHeight; currentTreeHeight <= Utilities::TREE_HEIGHT; ++currentTreeHeight)
-						{
-							if (currentTreeHeight >= (Utilities::TREE_HEIGHT / 2))
-							{
-								//spawnLeavesAtPosition
-								spawnLeaves(glm::ivec3(x, y + currentTreeHeight + 1, z), Utilities::LEAVES_DISTANCES[leavesDistanceIndex]);
-								++leavesDistanceIndex;
-							}
-							if (y + currentTreeHeight < Utilities::CHUNK_HEIGHT - 1)
-							{
-								changeCubeAtPosition({ x, y + currentTreeHeight, z }, eCubeType::TreeStump);
-								//m_chunk[x][y + currentTreeHeight][z] = static_cast<char>(eCubeType::TreeStump);
-							}
-							else
-							{
-								break;
-							}
-						}
+						spawnTreeStump(position);
 
 						break;
 					}
@@ -313,36 +292,25 @@ void Chunk::spawnCactus()
 	}
 }
 
-void Chunk::spawnLeaves(const glm::ivec3& startingPosition, int distance)
+void Chunk::spawnLeaves(const glm::ivec3& startingPosition)
 {
-	//spawnLeaves(glm::ivec3(x, y + currentTreeHeight + 1, z), Utilities::LEAVES_DISTANCES[leavesDistanceIndex]);
-	//constexpr std::array<int, 6> LEAVES_DISTANCES =
-	//{
-	//	MAX_LEAVES_DISTANCE,
-	//	MAX_LEAVES_DISTANCE,
-	//	MAX_LEAVES_DISTANCE - 1,
-	//	MAX_LEAVES_DISTANCE - 1,
-	//	MAX_LEAVES_DISTANCE - 2,
-	//	MAX_LEAVES_DISTANCE - 2
-	//};
-
-	for (int i : Utilities::LEAVES_DISTANCES)
+	int y = startingPosition.y + Utilities::TREE_HEIGHT / 2; //Starting Height
+	for (int distance : Utilities::LEAVES_DISTANCES)
 	{
-
-	}
-	
-	for (int y = startingPosition.y + Utilities::TREE_HEIGHT / 2; y <= startingPosition.y + Utilities::TREE_HEIGHT; ++y)
-	{
+		++y;
 		for (int z = startingPosition.z - distance; z <= startingPosition.z + distance; ++z)
 		{
 			for (int x = startingPosition.x - distance; x <= startingPosition.x + distance; ++x)
 			{
-				glm::ivec3 position(x, startingPosition.y, z);
-
-				if (position != startingPosition &&
-					getCubeAtPosition(position) == static_cast<char>(eCubeType::Invalid))
+				if (z == y || x == y)
 				{
-					changeCubeAtPosition(position, eCubeType::Leaves);
+					continue;
+				}
+
+				glm::ivec3 position(x, y, z);
+				if (getCubeAtLocalPosition(position) == static_cast<char>(eCubeType::Invalid))
+				{
+					changeCubeAtLocalPosition(position, eCubeType::Leaves);
 				}
 			}
 		}
@@ -351,7 +319,10 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition, int distance)
 
 void Chunk::spawnTreeStump(const glm::ivec3& startingPosition)
 {
-
+	for (int y = startingPosition.y; y <= startingPosition.y + Utilities::TREE_HEIGHT; ++y)
+	{
+		changeCubeAtLocalPosition({ startingPosition.x, y, startingPosition.z }, eCubeType::TreeStump);
+	}
 }
 
 bool Chunk::isPositionInLocalBounds(const glm::ivec3& position) const
@@ -364,7 +335,7 @@ bool Chunk::isPositionInLocalBounds(const glm::ivec3& position) const
 		position.z < Utilities::CHUNK_DEPTH);
 }
 
-char Chunk::getCubeAtPosition(const glm::ivec3 position) const
+char Chunk::getCubeAtLocalPosition(const glm::ivec3 position) const
 {
 	assert(isPositionInLocalBounds(position));
 	return m_chunk[position.x][position.y][position.z];
