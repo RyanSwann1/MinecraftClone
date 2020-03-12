@@ -1,6 +1,39 @@
 #include "ChunkPool.h"
 #include <iostream>
 
+//ChunkFromPool
+ChunkFromPool::ChunkFromPool(ChunkPool& chunkPool, const glm::ivec3& startingPosition)
+	: chunkPool(chunkPool),
+	chunk(chunkPool.getChunk(startingPosition))
+{}
+
+ChunkFromPool::~ChunkFromPool()
+{
+	chunk.release();
+}
+
+//ChunkInPool
+ChunkInPool::ChunkInPool()
+	: chunk(),
+	nextChunkInPool(nullptr)
+{}
+
+ChunkInPool::ChunkInPool(ChunkInPool&& orig) noexcept
+	: chunk(std::move(orig.chunk)),
+	nextChunkInPool(orig.nextChunkInPool)
+{
+	orig.nextChunkInPool = nullptr;
+}
+
+ChunkInPool& ChunkInPool::operator=(ChunkInPool&& orig) noexcept
+{
+	chunk = std::move(orig.chunk);
+	nextChunkInPool = orig.nextChunkInPool;
+
+	orig.nextChunkInPool = nullptr;
+}
+
+//ChunkPool
 ChunkPool::ChunkPool()
 {
 	int x = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_WIDTH;
@@ -12,11 +45,11 @@ ChunkPool::ChunkPool()
 
 	for (int i = 0; i < static_cast<int>(m_chunks.size()) - 1; ++i)
 	{
-		m_chunks[i].setNext(&m_chunks[i + 1]);
+		m_chunks[i].nextChunkInPool = &m_chunks[i + 1];
 	}
 
 	m_nextAvailable = &m_chunks.front();
-	m_chunks.back().setNext(m_nextAvailable);
+	m_chunks.back().nextChunkInPool = m_nextAvailable;
 }
 
 Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
@@ -27,10 +60,10 @@ Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
 	while (!validChunkFound)
 	{
 		assert(m_nextAvailable);
-		if (m_nextAvailable->isInUse())
+		if (m_nextAvailable->chunk.isInUse())
 		{
-			assert(m_nextAvailable->getNext());
-			m_nextAvailable = m_nextAvailable->getNext();
+			assert(m_nextAvailable);
+			m_nextAvailable = m_nextAvailable->nextChunkInPool;
 		}
 		else
 		{
@@ -40,6 +73,6 @@ Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
 		assert(++iterationCount && iterationCount <= m_chunks.size());
 	}
 	
-	m_nextAvailable->reuse(startingPosition);
-	return *m_nextAvailable;
+	m_nextAvailable->chunk.reuse(startingPosition);
+	return m_nextAvailable->chunk;
 }

@@ -28,10 +28,7 @@ public:
 	bool isPositionInBounds(const glm::ivec3& position) const;
 	const glm::ivec3& getStartingPosition() const;
 	char getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const;
-
-	Chunk* getNext() const;
 	
-	void setNext(Chunk* chunk);
 	void reuse(const glm::ivec3& startingPosition);
 	void release();
 
@@ -40,7 +37,6 @@ private:
 	glm::ivec3 m_startingPosition;
 	glm::ivec3 m_endingPosition;
 	std::array<std::array<std::array<char, Utilities::CHUNK_DEPTH>, Utilities::CHUNK_HEIGHT>, Utilities::CHUNK_WIDTH> m_chunk;
-	Chunk* m_next;
 	Rectangle m_AABB;
 
 	bool isPositionInLocalBounds(const glm::ivec3& position) const;

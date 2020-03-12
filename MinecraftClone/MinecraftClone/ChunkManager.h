@@ -33,20 +33,6 @@
 
 //https://www.reddit.com/r/proceduralgeneration/comments/4eixfr/how_are_randomly_placed_structures_generated_in_a/
 
-struct ChunkFromPool : private NonCopyable, private NonMovable
-{
-	ChunkFromPool(ChunkPool& chunkPool, const glm::ivec3& startingPosition)
-		: chunk(chunkPool.getChunk(startingPosition))
-	{}
-
-	~ChunkFromPool()
-	{
-		chunk.release();
-	}
-
-	Chunk& chunk;
-};
-
 struct Camera;
 struct Rectangle;
 enum class eCubeSide;

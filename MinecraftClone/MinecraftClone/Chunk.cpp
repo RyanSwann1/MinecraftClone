@@ -12,7 +12,6 @@ Chunk::Chunk()
 	m_startingPosition(),
 	m_endingPosition(),
 	m_chunk(),
-	m_next(nullptr),
 	m_AABB()
 {}
 
@@ -21,7 +20,6 @@ Chunk::Chunk(const glm::ivec3& startingPosition)
 	m_startingPosition(startingPosition),
 	m_endingPosition(),
 	m_chunk(),
-	m_next(nullptr),
 	m_AABB(glm::ivec2(m_startingPosition.x, m_startingPosition.z) +
 		glm::ivec2(Utilities::CHUNK_WIDTH / 2.0f, Utilities::CHUNK_DEPTH / 2.0f), 16)
 {
@@ -32,23 +30,18 @@ Chunk::Chunk(Chunk&& orig) noexcept
 	: m_inUse(orig.m_inUse),
 	m_startingPosition(orig.m_startingPosition),
 	m_endingPosition(orig.m_endingPosition),
-	m_chunk(orig.m_chunk),
-	m_next(orig.m_next),
+	m_chunk(std::move(orig.m_chunk)),
 	m_AABB(orig.m_AABB)
-{
-	orig.m_next = nullptr;
-}
+{}
 
 Chunk& Chunk::operator=(Chunk&& orig) noexcept
 {
 	m_inUse = orig.m_inUse;
 	m_startingPosition = orig.m_startingPosition;
 	m_endingPosition = orig.m_endingPosition;
-	m_chunk = orig.m_chunk;
-	m_next = orig.m_next;
+	m_chunk = std::move(orig.m_chunk);
 	m_AABB = orig.m_AABB;
 
-	orig.m_next = nullptr;
 
 	return *this;
 }
@@ -85,20 +78,10 @@ char Chunk::getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const
 		[position.z - m_startingPosition.z];
 }
 
-Chunk* Chunk::getNext() const
-{
-	return m_next;
-}
-
 void Chunk::changeCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType)
 {
 	assert(isPositionInLocalBounds(position));
 	m_chunk[position.x][position.y][position.z] = static_cast<char>(cubeType);
-}
-
-void Chunk::setNext(Chunk* chunk)
-{
-	m_next = chunk;
 }
 
 void Chunk::reuse(const glm::ivec3& startingPosition)
@@ -193,7 +176,6 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 					}
 
 					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
-					//m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = static_cast<char>(cubeType);
 				}
 			}
 		}
