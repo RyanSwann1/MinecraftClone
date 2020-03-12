@@ -264,19 +264,20 @@ void Chunk::spawnCactus()
 	{
 		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
 		{
-			if (Utilities::getRandomNumber(0, Utilities::CACTUS_SPAWN_CHANCE) >= Utilities::CACTUS_SPAWN_CHANCE &&
-				totalCactusAdded < Utilities::MAX_CACTUS_PER_CHUNK)
+			if (totalCactusAdded < Utilities::MAX_CACTUS_PER_CHUNK &&
+				Utilities::getRandomNumber(0, Utilities::CACTUS_SPAWN_CHANCE) >= Utilities::CACTUS_SPAWN_CHANCE)
 			{
 				for (int y = Utilities::CHUNK_HEIGHT - Utilities::CACTUS_MAX_HEIGHT - 1; y >= Utilities::WATER_MAX_HEIGHT; --y)
 				{
-					if (m_chunk[x][y][z] == static_cast<char>(eCubeType::Sand) && 
-						m_chunk[x][y + 1][z] == static_cast<char>(eCubeType::Invalid))
+					if (getCubeAtLocalPosition({ x, y, z }) == static_cast<char>(eCubeType::Sand) &&
+						getCubeAtLocalPosition({ x, y + 1, z }) == static_cast<char>(eCubeType::Invalid))
 					{
 						++totalCactusAdded;
+
 						int cactusMaxHeight = Utilities::getRandomNumber(Utilities::CACTUS_MIN_HEIGHT, Utilities::CACTUS_MAX_HEIGHT);
 						for (int i = 1; i <= cactusMaxHeight; ++i)
 						{
-							m_chunk[x][y + i][z] = static_cast<char>(eCubeType::Cactus);
+							changeCubeAtLocalPosition({ x, y + i, z }, eCubeType::Cactus);
 						}
 
 						break;
