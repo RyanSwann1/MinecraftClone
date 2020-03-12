@@ -29,7 +29,7 @@ public:
 	const glm::ivec3& getStartingPosition() const;
 	char getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const;
 
-	Chunk* getNext();
+	Chunk* getNext() const;
 	
 	void setNext(Chunk* chunk);
 	void reuse(const glm::ivec3& startingPosition);

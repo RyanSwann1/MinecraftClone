@@ -85,7 +85,7 @@ char Chunk::getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const
 		[position.z - m_startingPosition.z];
 }
 
-Chunk* Chunk::getNext()
+Chunk* Chunk::getNext() const
 {
 	return m_next;
 }
