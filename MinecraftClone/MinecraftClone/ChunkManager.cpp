@@ -28,7 +28,8 @@ void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition, const 
 	{
 		for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x < playerPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
-			glm::ivec3 chunkStartingPosition = Utilities::getClosestChunkStartingPosition(glm::ivec3(x, 0, z));
+			glm::ivec3 chunkStartingPosition(x, 0, z);
+			Utilities::getClosestChunkStartingPosition(chunkStartingPosition);
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend())
 			{
 				m_VAOs.emplace(std::piecewise_construct,
@@ -291,12 +292,6 @@ bool ChunkManager::isCubeAtPosition(const glm::ivec3& position, const Chunk& chu
 	return (cubeType != static_cast<char>(eCubeType::Invalid) && cubeType != static_cast<char>(eCubeType::Water) ? true : false);
 }
 
-bool ChunkManager::isChunkAtPosition(const glm::ivec3& position) const
-{
-	auto cIter = m_chunks.find(Utilities::getClosestChunkStartingPosition(position));
-	return cIter != m_chunks.cend();
-}
-
 void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const Texture& texture)
 {
 	const glm::ivec3& chunkStartingPosition = chunk.getStartingPosition();
@@ -525,20 +520,22 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition)
 void ChunkManager::addChunks(const glm::vec3& playerPosition, const Texture& texture)
 {
 	std::queue<const Chunk*> newlyAddedChunks;
-	glm::ivec3 startPosition = Utilities::getClosestChunkStartingPosition(playerPosition);	
-	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE + 32; z < startPosition.z + Utilities::VISIBILITY_DISTANCE + 32; z += Utilities::CHUNK_DEPTH)
+	glm::ivec3 startPosition(playerPosition);
+	Utilities::getClosestMiddlePosition(startPosition);
+	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z <= startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
 	{
-		for (int x = startPosition.x - Utilities::VISIBILITY_DISTANCE + 32; x < startPosition.x + Utilities::VISIBILITY_DISTANCE + 32; x += Utilities::CHUNK_WIDTH)
+		for (int x = startPosition.x - Utilities::VISIBILITY_DISTANCE; x <= startPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
-			if (x > startPosition.x - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH * 2) && 
-				x < startPosition.x + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH * 2) &&
-				z > startPosition.z - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH * 2) && 
-				z < startPosition.z + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH * 2))
+			if (x >= startPosition.x - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH) && 
+				x <= startPosition.x + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH) &&
+				z >= startPosition.z - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH) && 
+				z <= startPosition.z + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH))
 			{
 				continue;
 			}
 
 			glm::ivec3 position(x, 0, z);
+			Utilities::getClosestChunkStartingPosition(position);
 			if (m_chunks.find(position) == m_chunks.cend() && m_VAOs.find(position) == m_VAOs.cend())
 			{
 				{

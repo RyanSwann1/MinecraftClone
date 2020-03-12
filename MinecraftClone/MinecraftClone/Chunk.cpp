@@ -49,6 +49,8 @@ Chunk& Chunk::operator=(Chunk&& orig) noexcept
 	m_AABB = orig.m_AABB;
 
 	orig.m_next = nullptr;
+
+	return *this;
 }
 
 const Rectangle& Chunk::getAABB() const
@@ -88,13 +90,10 @@ Chunk* Chunk::getNext() const
 	return m_next;
 }
 
-void Chunk::changeCubeAtPosition(const glm::vec3& position, eCubeType cubeType)
+void Chunk::changeCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType)
 {
-	assert(isPositionInBounds(position));
-	if (isPositionInBounds(position))
-	{
-		m_chunk[position.x - m_startingPosition.x][position.y][position.z - m_startingPosition.z] = static_cast<char>(cubeType);
-	}
+	assert(isPositionInLocalBounds(position));
+	m_chunk[position.x][position.y][position.z] = static_cast<char>(cubeType);
 }
 
 void Chunk::setNext(Chunk* chunk)
@@ -130,6 +129,7 @@ void Chunk::release()
 	m_endingPosition = glm::ivec3();
 }
 
+
 //elevation[y][x] = 1 * noise(1 * nx, 1 * ny);
 //+0.5 * noise(2 * nx, 2 * ny);
 //+0.25 * noise(4 * nx, 2 * ny);
@@ -148,7 +148,11 @@ void Chunk::release()
 //Amplitude - 'y' Axis
 //Frequency - 'x' Axis
 
+
+//https://www.reddit.com/r/proceduralgeneration/comments/4i9a08/terrain_generation_of_a_game_i_am_working_on/
 //http://pcgbook.com/wp-content/uploads/chapter04.pdf
+//https://www.reddit.com/r/proceduralgeneration/comments/drc96v/getting_started_in_proceduralgeneration/
+//https://notch.tumblr.com/post/3746989361/terrain-generation-part-1
 void Chunk::regen(const glm::ivec3& startingPosition)
 {
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
@@ -202,7 +206,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 						cubeType = eCubeType::Sand;
 					}
 
-					m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = static_cast<char>(cubeType);
+					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
 				}
 			}
 			//Plains Biome
@@ -223,7 +227,8 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 						cubeType = eCubeType::Grass;
 					}
 
-					m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = static_cast<char>(cubeType);
+					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
+					//m_chunk[positionOnGrid.x][(int)y][positionOnGrid.z] = static_cast<char>(cubeType);
 				}
 			}
 		}
@@ -256,48 +261,34 @@ void Chunk::spawnTrees()
 {
 	int currentTreesPlanted = 0;
 	int maxAllowedTrees = Utilities::getRandomNumber(0, Utilities::MAX_TREE_PER_CHUNK);
-	if (maxAllowedTrees > 0)
+	if (maxAllowedTrees == 0)
 	{
-		for (int z = Utilities::MAX_LEAVES_DISTANCE + 1; z < Utilities::CHUNK_DEPTH - Utilities::MAX_LEAVES_DISTANCE - 1; ++z)
+		return;
+	}
+	for (int z = Utilities::MAX_LEAVES_DISTANCE; z < Utilities::CHUNK_DEPTH - Utilities::MAX_LEAVES_DISTANCE; ++z)
+	{
+		for (int x = Utilities::MAX_LEAVES_DISTANCE; x < Utilities::CHUNK_WIDTH - Utilities::MAX_LEAVES_DISTANCE; ++x)
 		{
-			for (int x = Utilities::MAX_LEAVES_DISTANCE + 1; x < Utilities::CHUNK_WIDTH - Utilities::MAX_LEAVES_DISTANCE - 1; ++x)
+			if (currentTreesPlanted < maxAllowedTrees && Utilities::getRandomNumber(0, 1400) >= Utilities::TREE_SPAWN_CHANCE)
 			{
-				if (currentTreesPlanted < maxAllowedTrees && Utilities::getRandomNumber(0, 1400) >= Utilities::TREE_SPAWN_CHANCE)
+				for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_HEIGHT - Utilities::MAX_LEAVES_DISTANCE; y >= Utilities::SAND_MAX_HEIGHT; --y)
 				{
-					for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_MAX_HEIGHT - Utilities::MAX_LEAVES_DISTANCE; y >= Utilities::SAND_MAX_HEIGHT; --y)
+					glm::ivec3 position(x, y, z);
+					if (getCubeAtLocalPosition(position) == static_cast<char>(eCubeType::Grass) &&
+						getCubeAtLocalPosition({ x, y + 1, z }) == static_cast<char>(eCubeType::Invalid))
 					{
-						if (m_chunk[x][y][z] == static_cast<char>(eCubeType::Grass) &&
-							m_chunk[x][y + 1][z] == static_cast<char>(eCubeType::Invalid))
-						{
-							++currentTreesPlanted;
-							int currentTreeHeight = 1;
-							int leavesDistanceIndex = 0;
-							for (currentTreeHeight; currentTreeHeight <= Utilities::TREE_MAX_HEIGHT; ++currentTreeHeight)
-							{
-								if (currentTreeHeight >= (Utilities::TREE_MAX_HEIGHT / 2))
-								{
-									spawnLeaves(glm::ivec3(x, y + currentTreeHeight + 1, z), Utilities::LEAVES_DISTANCES[leavesDistanceIndex]);
-									++leavesDistanceIndex;
-								}
-								if (y + currentTreeHeight < Utilities::CHUNK_HEIGHT - 1)
-								{
-									m_chunk[x][y + currentTreeHeight][z] = static_cast<char>(eCubeType::TreeStump);
-								}
-								else
-								{
-									break;
-								}
-							}
+						++currentTreesPlanted;
+						spawnLeaves(position);
+						spawnTreeStump(position);
 
-							break;
-						}
+						break;
 					}
 				}
-				//Planted all available Trees
-				else if (currentTreesPlanted >= maxAllowedTrees)
-				{
-					return;
-				}
+			}
+			//Planted all available Trees
+			else if (currentTreesPlanted >= maxAllowedTrees)
+			{
+				return;
 			}
 		}
 	}
@@ -310,19 +301,20 @@ void Chunk::spawnCactus()
 	{
 		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
 		{
-			if (Utilities::getRandomNumber(0, Utilities::CACTUS_SPAWN_CHANCE) >= Utilities::CACTUS_SPAWN_CHANCE &&
-				totalCactusAdded < Utilities::MAX_CACTUS_PER_CHUNK)
+			if (totalCactusAdded < Utilities::MAX_CACTUS_PER_CHUNK &&
+				Utilities::getRandomNumber(0, Utilities::CACTUS_SPAWN_CHANCE) >= Utilities::CACTUS_SPAWN_CHANCE)
 			{
 				for (int y = Utilities::CHUNK_HEIGHT - Utilities::CACTUS_MAX_HEIGHT - 1; y >= Utilities::WATER_MAX_HEIGHT; --y)
 				{
-					if (m_chunk[x][y][z] == static_cast<char>(eCubeType::Sand) && 
-						m_chunk[x][y + 1][z] == static_cast<char>(eCubeType::Invalid))
+					if (getCubeAtLocalPosition({ x, y, z }) == static_cast<char>(eCubeType::Sand) &&
+						getCubeAtLocalPosition({ x, y + 1, z }) == static_cast<char>(eCubeType::Invalid))
 					{
 						++totalCactusAdded;
+
 						int cactusMaxHeight = Utilities::getRandomNumber(Utilities::CACTUS_MIN_HEIGHT, Utilities::CACTUS_MAX_HEIGHT);
 						for (int i = 1; i <= cactusMaxHeight; ++i)
 						{
-							m_chunk[x][y + i][z] = static_cast<char>(eCubeType::Cactus);
+							changeCubeAtLocalPosition({ x, y + i, z }, eCubeType::Cactus);
 						}
 
 						break;
@@ -338,21 +330,36 @@ void Chunk::spawnCactus()
 	}
 }
 
-void Chunk::spawnLeaves(const glm::ivec3& startingPosition, int distance)
+void Chunk::spawnLeaves(const glm::ivec3& startingPosition)
 {
-	for (int z = startingPosition.z - distance; z <= startingPosition.z + distance; ++z)
+	int y = startingPosition.y + Utilities::TREE_HEIGHT / 2; //Starting Height
+	for (int distance : Utilities::LEAVES_DISTANCES)
 	{
-		for (int x = startingPosition.x - distance; x <= startingPosition.x + distance; ++x)
+		++y;
+		for (int z = startingPosition.z - distance; z <= startingPosition.z + distance; ++z)
 		{
-			glm::ivec3 position(x, startingPosition.y, z);
-
-			if (position != startingPosition &&
-				isPositionInLocalBounds(position) && 
-				m_chunk[position.x][position.y][position.z] == static_cast<char>(eCubeType::Invalid))
+			for (int x = startingPosition.x - distance; x <= startingPosition.x + distance; ++x)
 			{
-				m_chunk[position.x][position.y][position.z] = static_cast<char>(eCubeType::Leaves);
+				if (z == y || x == y)
+				{
+					continue;
+				}
+
+				glm::ivec3 position(x, y, z);
+				if (getCubeAtLocalPosition(position) == static_cast<char>(eCubeType::Invalid))
+				{
+					changeCubeAtLocalPosition(position, eCubeType::Leaves);
+				}
 			}
 		}
+	}
+}
+
+void Chunk::spawnTreeStump(const glm::ivec3& startingPosition)
+{
+	for (int y = startingPosition.y; y <= startingPosition.y + Utilities::TREE_HEIGHT; ++y)
+	{
+		changeCubeAtLocalPosition({ startingPosition.x, y, startingPosition.z }, eCubeType::TreeStump);
 	}
 }
 
@@ -364,4 +371,10 @@ bool Chunk::isPositionInLocalBounds(const glm::ivec3& position) const
 		position.x < Utilities::CHUNK_WIDTH &&
 		position.y < Utilities::CHUNK_HEIGHT &&
 		position.z < Utilities::CHUNK_DEPTH);
+}
+
+char Chunk::getCubeAtLocalPosition(const glm::ivec3 position) const
+{
+	assert(isPositionInLocalBounds(position));
+	return m_chunk[position.x][position.y][position.z];
 }

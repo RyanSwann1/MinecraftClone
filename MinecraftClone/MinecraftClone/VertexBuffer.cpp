@@ -60,6 +60,8 @@ VertexBuffer& VertexBuffer::operator=(VertexBuffer&& orig) noexcept
 	orig.transparentPositionsID = Utilities::INVALID_OPENGL_ID;
 	orig.transparentTextCoordsID = Utilities::INVALID_OPENGL_ID;
 	orig.transparentIndiciesID = Utilities::INVALID_OPENGL_ID;
+
+	return *this;
 }
 
 void VertexBuffer::clear()
