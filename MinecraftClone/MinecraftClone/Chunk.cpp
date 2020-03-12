@@ -214,9 +214,10 @@ void Chunk::spawnWater()
 	{
 		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
 		{
-			if (m_chunk[x][Utilities::WATER_MAX_HEIGHT][z] == static_cast<char>(eCubeType::Invalid))
+			glm::ivec3 position(x, Utilities::WATER_MAX_HEIGHT, z);
+			if (getCubeAtLocalPosition(position) == static_cast<char>(eCubeType::Invalid))
 			{
-				m_chunk[x][Utilities::WATER_MAX_HEIGHT][z] = static_cast<char>(eCubeType::Water);
+				changeCubeAtLocalPosition(position, eCubeType::Water);
 			}
 		}
 	}
