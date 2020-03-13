@@ -70,5 +70,5 @@ private:
 	void addChunks(const glm::vec3& playerPosition, const Texture& texture);
 	void regenChunks(const Texture& texture);
 
-	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition) const;
+	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 };

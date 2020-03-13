@@ -304,17 +304,10 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 	const glm::ivec3& chunkEndingPosition = chunk.getEndingPosition();
 	bool regenChunk = false;
 
-	const Chunk* leftNeighbouringChunk =
-		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x - Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z));
-
-	const Chunk* rightNeighbouringChunk =
-		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x + Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z));
-
-	const Chunk* forwardNeighbouringChunk = 
-		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z + Utilities::CHUNK_DEPTH));
-
-	const Chunk* backNeighbouringChunk =
-		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z - Utilities::CHUNK_DEPTH));
+	const Chunk* leftNeighbouringChunk = getNeighbouringChunkAtPosition(chunkStartingPosition, eDirection::Left);
+	const Chunk* rightNeighbouringChunk = getNeighbouringChunkAtPosition(chunkStartingPosition, eDirection::Right);
+	const Chunk* forwardNeighbouringChunk = getNeighbouringChunkAtPosition(chunkStartingPosition, eDirection::Forward);
+	const Chunk* backNeighbouringChunk = getNeighbouringChunkAtPosition(chunkStartingPosition, eDirection::Back);
 
 	for (int z = chunkStartingPosition.z; z < chunkEndingPosition.z; ++z)
 	{
@@ -637,8 +630,49 @@ void ChunkManager::regenChunks(const Texture& texture)
 	}
 }
 
-const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition) const
+const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const
 {
-	auto chunk = m_chunks.find(chunkStartingPosition);
-	return (chunk != m_chunks.cend() ? &chunk->second.chunk : nullptr);
+	const Chunk* chunk = nullptr;
+
+	switch (direction)
+	{
+	case eDirection::Left :
+	{
+		auto cIter = m_chunks.find(glm::ivec3(chunkStartingPosition.x - Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z));
+		if (cIter != m_chunks.cend())
+		{
+			chunk = &cIter->second.chunk;
+		}
+		break;
+	}
+	case eDirection::Right :
+	{
+		auto cIter = m_chunks.find(glm::ivec3(chunkStartingPosition.x + Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z));
+		if (cIter != m_chunks.cend())
+		{
+			chunk = &cIter->second.chunk;
+		}
+		break;
+	}
+	case eDirection::Forward :
+	{
+		auto cIter = m_chunks.find(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z + Utilities::CHUNK_DEPTH));
+		if (cIter != m_chunks.cend())
+		{
+			chunk = &cIter->second.chunk;
+		}
+		break;
+	}
+	case eDirection::Back :
+	{
+		auto cIter = m_chunks.find(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z - Utilities::CHUNK_DEPTH));
+		if (cIter != m_chunks.cend())
+		{
+			chunk = &cIter->second.chunk;
+		}
+		break;
+	}
+	}
+
+	return chunk;
 }

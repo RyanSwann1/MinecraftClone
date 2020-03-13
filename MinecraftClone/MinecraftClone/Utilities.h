@@ -48,9 +48,17 @@ namespace Utilities
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
-	constexpr int VISIBILITY_DISTANCE = 640;
+	constexpr int VISIBILITY_DISTANCE = 64;
 	constexpr int MAP_SIZE = 8000;
 	const glm::vec3 PLAYER_STARTING_POSITION(0.0f, 250.f, 0.0f);
+
+	enum class eDirection
+	{
+		Left,
+		Right,
+		Front,
+		Back
+	};
 
 	constexpr std::array<int, 6> LEAVES_DISTANCES =
 	{
