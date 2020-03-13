@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 Camera::Camera(glm::vec3 startPosition)
-	: m_speed(1.25f),
+	: m_speed(0.5f),
 	m_position(startPosition),
 	m_front(0.0f, 0.0f, -1.0f),
 	m_frontInverse(0.0f, 0.0f, 1.0f),
@@ -10,6 +10,8 @@ Camera::Camera(glm::vec3 startPosition)
 
 void Camera::move(float deltaTime)
 {
+	m_position += m_speed * m_front;
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
 		m_position -= glm::normalize(glm::cross(m_front, m_up)) * m_speed;
@@ -20,7 +22,7 @@ void Camera::move(float deltaTime)
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		m_position += m_speed * m_front;
+
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{

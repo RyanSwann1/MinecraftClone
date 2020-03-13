@@ -96,7 +96,8 @@ void Chunk::reuse(const glm::ivec3& startingPosition)
 			}
 		}
 	}
-
+	
+	assert(!m_inUse);
 	m_inUse = true;
 	m_startingPosition = startingPosition;
 	m_AABB.reset(glm::ivec2(m_startingPosition.x, m_startingPosition.z) +
