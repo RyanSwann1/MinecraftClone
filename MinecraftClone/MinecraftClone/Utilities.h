@@ -48,6 +48,10 @@ namespace Utilities
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
+	constexpr float LACUNARITY = 20.0f;
+	constexpr float PERSISTENCE = 0.8f;
+	constexpr int OCTAVES = 3;
+
 	constexpr int VISIBILITY_DISTANCE = 800;
 	constexpr int MAP_SIZE = 8000;
 	const glm::vec3 PLAYER_STARTING_POSITION(0.0f, 250.f, 0.0f);
