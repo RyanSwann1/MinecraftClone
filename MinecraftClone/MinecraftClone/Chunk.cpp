@@ -6,6 +6,7 @@
 #include "ChunkManager.h"
 #include <iostream>
 #include <algorithm>
+#include <limits>
 
 Chunk::Chunk()
 	: m_inUse(false),
@@ -137,20 +138,37 @@ void Chunk::release()
 //https://notch.tumblr.com/post/3746989361/terrain-generation-part-1
 void Chunk::regen(const glm::ivec3& startingPosition)
 {
+	std::vector<float> elevations;
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
 	{
 		for (int x = startingPosition.x; x < startingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 		{
-			double ex = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
-			double ey = (z) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
+			double ex = x / Utilities::MAP_SIZE;
+			double ey = z / Utilities::MAP_SIZE;
 			
-			float elevation = std::abs(1 * glm::perlin(glm::vec2(5.0f * ex, 5.0f * ey)));
-			elevation += std::abs(0.5 * glm::perlin(glm::vec2(ex * 15.0f, ey * 15.0f)));
-			elevation += std::abs(0.25 * glm::perlin(glm::vec2(ex * 30.0f, ey * 30.0f)));
+			int minElevationValue = 0;
+			int maxElevationValue = FLT_MAX;
+			float elevation = 0.0f;
+			for (int i = 0; i < Utilities::OCTAVES; ++i)
+			{
+				elevation += glm::pow(Utilities::PERSISTENCE, i) *
+					glm::perlin(glm::vec2(ex * glm::pow(Utilities::LACUNARITY, i), ey * glm::pow(Utilities::LACUNARITY, i)));
+			}
+			float i = (elevation + 1) / 2.0f;
+			
+			for (int i = 0; i < Utilities::OCTAVES; ++i)
+			{
+				i /= Utilities::PERSISTENCE;
+			}
+			
 
-			elevation = glm::pow(elevation, 2.5f);
-			elevation = elevation * (float)Utilities::CHUNK_HEIGHT;
-			elevation = Utilities::clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
+			//float elevation = std::abs(1 * glm::perlin(glm::vec2(5.0f * ex, 5.0f * ey)));
+			//elevation += std::abs(0.5 * glm::perlin(glm::vec2(ex * 15.0f, ey * 15.0f)));
+			//elevation += std::abs(0.25 * glm::perlin(glm::vec2(ex * 30.0f, ey * 30.0f)));
+
+			//elevation = glm::pow(elevation, 2.5f);
+			elevation = i * (float)Utilities::CHUNK_HEIGHT - 1;
+			//elevation = Utilities::clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
 
 			double mx = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
 			double my = (z) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
