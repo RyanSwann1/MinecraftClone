@@ -315,11 +315,6 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition)
 		{
 			for (int x = startingPosition.x - distance; x <= startingPosition.x + distance; ++x)
 			{
-				if (z == y || x == y)
-				{
-					continue;
-				}
-
 				glm::ivec3 position(x, y, z);
 				if (getCubeAtLocalPosition(position) == static_cast<char>(eCubeType::Invalid))
 				{
