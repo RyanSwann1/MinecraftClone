@@ -280,18 +280,6 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 	}
 }
 
-bool ChunkManager::isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType, eCubeType cubeType2) const
-{
-	char cube = chunk.getCubeDetailsWithoutBoundsCheck(position);
-	return cube == static_cast<char>(cubeType) || cube == static_cast<char>(cubeType2);
-}
-
-bool ChunkManager::isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType) const
-{
-	char cube = chunk.getCubeDetailsWithoutBoundsCheck(position);
-	return cube == static_cast<char>(cubeType);
-}
-
 bool ChunkManager::isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const
 {
 	char cubeType = chunk.getCubeDetailsWithoutBoundsCheck(position);
@@ -329,13 +317,13 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 				{
 					//Top Face
 					if (y == Utilities::CHUNK_HEIGHT - 1 || 
-						!isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk, eCubeType::Leaves, eCubeType::TreeStump))
+						!isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
 					{
 						addCubeFace(vertexArray, cubeType, eCubeSide::Top, position, texture);
 					}
 					
 					//Bottom Face
-					if (!isCubeAtPosition(glm::ivec3(x, y - 1, z), chunk, eCubeType::Leaves, eCubeType::TreeStump))
+					if (!isCubeAtPosition(glm::ivec3(x, y - 1, z), chunk))
 					{
 						addCubeFace(vertexArray, cubeType, eCubeSide::Bottom, position, texture);
 					}
@@ -344,13 +332,13 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 					glm::ivec3 leftPosition(x - 1, y, z);
 					if (chunk.isPositionInBounds(leftPosition))
 					{
-						if (!isCubeAtPosition(leftPosition, chunk, eCubeType::Leaves, eCubeType::TreeStump))
+						if (!isCubeAtPosition(leftPosition, chunk))
 						{
 							addCubeFace(vertexArray, cubeType, eCubeSide::Left, position, texture);
 						}
 					}
 					else if (leftNeighbouringChunk &&
-						!isCubeAtPosition(leftPosition, *leftNeighbouringChunk, eCubeType::Leaves, eCubeType::TreeStump))
+						!isCubeAtPosition(leftPosition, *leftNeighbouringChunk))
 					{
 						addCubeFace(vertexArray, cubeType, eCubeSide::Left, position, texture);
 					}
@@ -359,13 +347,13 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 					glm::ivec3 rightPosition(x + 1, y, z);
 					if (chunk.isPositionInBounds(rightPosition))
 					{
-						if (!isCubeAtPosition(rightPosition, chunk, eCubeType::Leaves, eCubeType::TreeStump))
+						if (!isCubeAtPosition(rightPosition, chunk))
 						{
 							addCubeFace(vertexArray, cubeType, eCubeSide::Right, position, texture);
 						}
 					}
 					else if (rightNeighbouringChunk &&
-						!isCubeAtPosition(rightPosition, *rightNeighbouringChunk, eCubeType::Leaves, eCubeType::TreeStump))
+						!isCubeAtPosition(rightPosition, *rightNeighbouringChunk))
 					{
 						addCubeFace(vertexArray, cubeType, eCubeSide::Right, position, texture);
 					}
@@ -374,13 +362,13 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 					glm::ivec3 frontPosition(x, y, z + 1);
 					if (chunk.isPositionInBounds(frontPosition))
 					{
-						if (!isCubeAtPosition(frontPosition, chunk, eCubeType::Leaves, eCubeType::TreeStump))
+						if (!isCubeAtPosition(frontPosition, chunk))
 						{
 							addCubeFace(vertexArray, cubeType, eCubeSide::Front, position, texture);
 						}
 					}
 					else if (forwardNeighbouringChunk &&
-						!isCubeAtPosition(frontPosition, *forwardNeighbouringChunk, eCubeType::Leaves, eCubeType::TreeStump))
+						!isCubeAtPosition(frontPosition, *forwardNeighbouringChunk))
 					{
 						addCubeFace(vertexArray, cubeType, eCubeSide::Front, position, texture);
 					}
@@ -389,13 +377,13 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 					glm::ivec3 backPosition(x, y, z - 1);
 					if (chunk.isPositionInBounds(backPosition))
 					{
-						if (!isCubeAtPosition(backPosition, chunk, eCubeType::Leaves, eCubeType::TreeStump))
+						if (!isCubeAtPosition(backPosition, chunk))
 						{
 							addCubeFace(vertexArray, cubeType, eCubeSide::Back, position, texture);
 						}
 					}
 					else if (backNeighbouringChunk &&
-						!isCubeAtPosition(backPosition, *backNeighbouringChunk, eCubeType::Leaves, eCubeType::TreeStump))
+						!isCubeAtPosition(backPosition, *backNeighbouringChunk))
 					{
 						addCubeFace(vertexArray, cubeType, eCubeSide::Back, position, texture);
 					}
