@@ -71,6 +71,11 @@ const glm::ivec3& Chunk::getStartingPosition() const
 	return m_startingPosition;
 }
 
+const glm::ivec3& Chunk::getEndingPosition() const
+{
+	return m_endingPosition;
+}
+
 char Chunk::getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const
 {
 	return m_chunk[position.x - m_startingPosition.x]

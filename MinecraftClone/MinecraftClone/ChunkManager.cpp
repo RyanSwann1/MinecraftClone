@@ -301,6 +301,7 @@ bool ChunkManager::isCubeAtPosition(const glm::ivec3& position, const Chunk& chu
 void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const Texture& texture)
 {
 	const glm::ivec3& chunkStartingPosition = chunk.getStartingPosition();
+	const glm::ivec3& chunkEndingPosition = chunk.getEndingPosition();
 	bool regenChunk = false;
 
 	const Chunk* leftNeighbouringChunk =
@@ -315,11 +316,11 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 	const Chunk* backNeighbouringChunk =
 		getNeighbouringChunkAtPosition(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z - Utilities::CHUNK_DEPTH));
 
-	for (int z = chunkStartingPosition.z; z < chunkStartingPosition.z + Utilities::CHUNK_DEPTH; ++z)
+	for (int z = chunkStartingPosition.z; z < chunkEndingPosition.z; ++z)
 	{
-		for (int y = chunkStartingPosition.y; y < chunkStartingPosition.y + Utilities::CHUNK_HEIGHT; ++y)
+		for (int y = chunkStartingPosition.y; y < chunkEndingPosition.y; ++y)
 		{
-			for (int x = chunkStartingPosition.x; x < chunkStartingPosition.x + Utilities::CHUNK_WIDTH; ++x)
+			for (int x = chunkStartingPosition.x; x < chunkEndingPosition.x; ++x)
 			{
 				glm::ivec3 position(x, y, z);
 				eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(position));
@@ -341,7 +342,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 					}
 					
 					//Bottom Face
-					if (!isCubeAtPosition(glm::ivec3(x, y - 1, z), chunk, eCubeType::Leaves))
+					if (!isCubeAtPosition(glm::ivec3(x, y - 1, z), chunk, eCubeType::Leaves, eCubeType::TreeStump))
 					{
 						addCubeFace(vertexArray, cubeType, eCubeSide::Bottom, position, texture);
 					}
