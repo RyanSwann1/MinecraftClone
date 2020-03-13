@@ -27,6 +27,7 @@ public:
 	bool isInUse() const;
 	bool isPositionInBounds(const glm::ivec3& position) const;
 	const glm::ivec3& getStartingPosition() const;
+	const glm::ivec3& getEndingPosition() const;
 	char getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const;
 	
 	void reuse(const glm::ivec3& startingPosition);

@@ -256,33 +256,38 @@ int main()
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
 		setUniformMat4f(shaderID, "uView", view, uniformLocations);
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
-			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 1000.0f);//(float)Utilities::VISIBILITY_DISTANCE - 32);
+			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 800.0f); //1000.0f);//(
 		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
 
-		for (auto VAO = VAOs.begin(); VAO != VAOs.end(); ++VAO)
+		for (auto VAO = VAOs.begin(); VAO != VAOs.end();)
 		{
 			if (VAO->second.vertexArray.m_reset)
 			{
 				VAO->second.vertexArray.reset();
-				VAOs.erase(VAO);
-				continue;
+				VAO = VAOs.erase(VAO);
 			}
+			else
+			{
+				if (VAO->second.vertexArray.m_attachOpaqueVBO)
+				{
+					VAO->second.vertexArray.attachOpaqueVBO();
+				}
 
-			if (VAO->second.vertexArray.m_attachOpaqueVBO)
-			{
-				VAO->second.vertexArray.attachOpaqueVBO();
-			}
-			if (VAO->second.vertexArray.m_attachTransparentVBO)
-			{
-				VAO->second.vertexArray.attachTransparentVBO();
-			}
+				if (VAO->second.vertexArray.m_attachTransparentVBO)
+				{
+					VAO->second.vertexArray.attachTransparentVBO();
+				}
 
-			if (VAO->second.vertexArray.m_opaqueVBODisplayable)
-			{
-				VAO->second.vertexArray.bindOpaqueVAO();
-				glDrawElements(GL_TRIANGLES, VAO->second.vertexArray.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+				if (VAO->second.vertexArray.m_opaqueVBODisplayable)
+				{
+					VAO->second.vertexArray.bindOpaqueVAO();
+					glDrawElements(GL_TRIANGLES, VAO->second.vertexArray.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+				}
+
+				++VAO;
 			}
 		}
+
 
 		setUniformLocation1f(shaderID, "uAlpha", Utilities::WATER_ALPHA_VALUE, uniformLocations);
 		for (const auto& VAO : VAOs)

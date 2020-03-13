@@ -18,11 +18,12 @@ enum class eCubeSide
 
 enum class eDirection
 {
-	Left = 0,
+	Left,
 	Right,
+	Up,
+	Down,
 	Forward,
-	Back,
-	Total
+	Back
 };
 
 namespace Utilities
@@ -138,10 +139,26 @@ namespace Utilities
 
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_TOP = { glm::vec3(0, 1.0, 0), glm::vec3(0, 1.0, 1.0), glm::vec3(1.0, 1.0, 1.0), glm::vec3(1.0, 1.0, 0) };
 	static constexpr std::array<glm::vec3, 4> CUBE_FACE_BOTTOM = { glm::vec3(0, 0, 0), glm::vec3(0, 0, 1.0), glm::vec3(1.0, 0, 1.0), glm::vec3(1.0, 0, 0) };
-	
-	inline glm::ivec3 convertToWorldPosition(glm::ivec3& position, const glm::ivec3& chunkStartingPosition)
+
+	inline glm::ivec3 getNeighbouringChunkPosition(const glm::ivec3& chunkStartingPosition, eDirection direction)
 	{
-		return glm::ivec3(chunkStartingPosition.x + position.x, position.y, chunkStartingPosition.z + position.z);
+		switch (direction)
+		{
+		case eDirection::Left :
+			return glm::ivec3(chunkStartingPosition.x - Utilities::CHUNK_WIDTH, 0, chunkStartingPosition.z);
+
+		case eDirection::Right:
+			return glm::ivec3(chunkStartingPosition.x + Utilities::CHUNK_WIDTH, 0, chunkStartingPosition.z);
+
+		case eDirection::Forward :
+			return glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.z + Utilities::CHUNK_DEPTH);
+		
+		case eDirection::Back:
+			return glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.z - Utilities::CHUNK_DEPTH);
+
+		default:
+			assert(false);
+		}
 	}
 
 	inline void getClosestMiddlePosition(glm::ivec3& position)

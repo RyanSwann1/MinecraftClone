@@ -72,6 +72,11 @@ const glm::ivec3& Chunk::getStartingPosition() const
 	return m_startingPosition;
 }
 
+const glm::ivec3& Chunk::getEndingPosition() const
+{
+	return m_endingPosition;
+}
+
 char Chunk::getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const
 {
 	return m_chunk[position.x - m_startingPosition.x]
@@ -136,6 +141,10 @@ void Chunk::release()
 //http://pcgbook.com/wp-content/uploads/chapter04.pdf
 //https://www.reddit.com/r/proceduralgeneration/comments/drc96v/getting_started_in_proceduralgeneration/
 //https://notch.tumblr.com/post/3746989361/terrain-generation-part-1
+
+
+//https://www.reddit.com/r/VoxelGameDev/comments/c0fcsi/giving_terrain_oomph_ive_been_trying_to_go_for/
+
 void Chunk::regen(const glm::ivec3& startingPosition)
 {
 	std::vector<float> elevations;

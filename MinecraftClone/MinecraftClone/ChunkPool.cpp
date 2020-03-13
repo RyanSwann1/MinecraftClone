@@ -31,6 +31,8 @@ ChunkInPool& ChunkInPool::operator=(ChunkInPool&& orig) noexcept
 	nextChunkInPool = orig.nextChunkInPool;
 
 	orig.nextChunkInPool = nullptr;
+
+	return *this;
 }
 
 //ChunkPool

@@ -35,6 +35,7 @@
 
 struct Camera;
 struct Rectangle;
+enum class eDirection;
 enum class eCubeSide;
 class Texture;
 class VertexArray;
@@ -60,6 +61,7 @@ private:
 	void addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition,
 		const Texture& texture);
 
+	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType, eCubeType cubeType2) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
 
@@ -69,5 +71,5 @@ private:
 	void addChunks(const glm::vec3& playerPosition, const Texture& texture);
 	void regenChunks(const Texture& texture);
 
-	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition) const;
+	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 };
