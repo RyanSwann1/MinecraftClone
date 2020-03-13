@@ -35,6 +35,7 @@
 
 struct Camera;
 struct Rectangle;
+enum class eDirection;
 enum class eCubeSide;
 class Texture;
 class VertexArray;

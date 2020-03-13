@@ -599,10 +599,10 @@ void ChunkManager::regenChunks(const Texture& texture)
 		auto chunk = m_chunks.find(*chunkStartingPosition);
 		if (chunk != m_chunks.cend())
 		{
-			if (m_chunks.find(glm::ivec3(chunkStartingPosition->x - Utilities::CHUNK_WIDTH, 0, chunkStartingPosition->z)) != m_chunks.cend() &&
-				m_chunks.find(glm::ivec3(chunkStartingPosition->x + Utilities::CHUNK_WIDTH, 0, chunkStartingPosition->z)) != m_chunks.cend() &&
-				m_chunks.find(glm::ivec3(chunkStartingPosition->x, 0, chunkStartingPosition->z - Utilities::CHUNK_DEPTH)) != m_chunks.cend() &&
-				m_chunks.find(glm::ivec3(chunkStartingPosition->x, 0, chunkStartingPosition->z + Utilities::CHUNK_DEPTH)) != m_chunks.cend())
+			if (m_chunks.find(Utilities::getNeighbouringChunkPosition(*chunkStartingPosition, eDirection::Left)) != m_chunks.cend() &&
+				m_chunks.find(Utilities::getNeighbouringChunkPosition(*chunkStartingPosition, eDirection::Right)) != m_chunks.cend() &&
+				m_chunks.find(Utilities::getNeighbouringChunkPosition(*chunkStartingPosition, eDirection::Back)) != m_chunks.cend() &&
+				m_chunks.find(Utilities::getNeighbouringChunkPosition(*chunkStartingPosition, eDirection::Forward)) != m_chunks.cend())
 			{
 				{
 					std::lock_guard<std::mutex> lock(m_mutex);
@@ -672,6 +672,8 @@ const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chun
 		}
 		break;
 	}
+	default: 
+		assert(false);
 	}
 
 	return chunk;
