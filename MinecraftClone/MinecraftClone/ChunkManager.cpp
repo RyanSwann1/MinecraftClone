@@ -328,7 +328,8 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 				else if (cubeType == eCubeType::Leaves)
 				{
 					//Top Face
-					if (!isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk, eCubeType::Leaves))
+					if (y == Utilities::CHUNK_HEIGHT - 1 || !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk) &&
+						!isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk, eCubeType::Leaves))
 					{
 						addCubeFace(vertexArray, cubeType, eCubeSide::Top, position, texture);
 					}
@@ -338,6 +339,14 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 					{
 						addCubeFace(vertexArray, cubeType, eCubeSide::Bottom, position, texture);
 					}
+
+					glm::vec3 leftPosition(x - 1, y, z);
+					if (chunk.isPositionInBounds(leftPosition))
+					{
+
+					}
+					else if(leftNeighbouringChunk &&
+						isCube)
 
 					//Left Face
 					if (!isCubeAtPosition(glm::ivec3(x - 1, y, z), chunk, eCubeType::Leaves) &&
@@ -489,8 +498,6 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition)
 				VAO->second.vertexArray.m_reset = true;
 			}
 			lock.unlock();
-			
-
 
 			auto chunkToRegen = std::find_if(m_chunksToRegenerate.begin(), m_chunksToRegenerate.end(), [chunkStartingPosition](const auto& position)
 			{
