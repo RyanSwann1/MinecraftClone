@@ -60,17 +60,14 @@ private:
 	std::unordered_set<glm::ivec3> m_chunksToRegenerate;
 	std::mutex m_mutex;
 
-	void addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition,
-		const Texture& texture);
-
+	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
 
+	void addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition,
+		const Texture& texture);
 	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const Texture& texture);
-
 	void deleteChunks(const glm::ivec3& playerPosition);
 	void addChunks(const glm::vec3& playerPosition, const Texture& texture);
 	void regenChunks(const Texture& texture);
-
-	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 	void reset(const glm::vec3& playerPosition, const Texture& texture);
 };
