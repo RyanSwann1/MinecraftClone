@@ -220,6 +220,7 @@ int main()
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 
+	bool resetGame = false;
 	sf::Clock clock;
 	clock.restart();
 	float messageExpiredTime = 1.0f;
@@ -245,6 +246,25 @@ int main()
 			{
 				window.close();
 			}
+			else if (currentSFMLEvent.KeyPressed)
+			{
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+				{
+					resetGame = true;
+				}
+			}
+		}
+
+		if (resetGame)
+		{
+			resetGame = false;
+			for (auto& VAO : VAOs)
+			{
+				VAO.second.vertexArray.reset();
+			}
+
+			camera.m_position = Utilities::PLAYER_STARTING_POSITION;
+			chunkManager.resetTo();
 		}
 
 		glClear(GL_COLOR_BUFFER_BIT);
