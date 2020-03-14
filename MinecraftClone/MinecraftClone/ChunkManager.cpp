@@ -17,6 +17,22 @@ ChunkManager::ChunkManager()
 	m_mutex()
 {}
 
+void ChunkManager::resetTo()
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+	m_reset = true;
+}
+
+void ChunkManager::reset(const glm::vec3& playerPosition, const Texture& texture)
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+	m_chunks.clear();
+	m_VAOs.clear();
+	m_chunksToRegenerate.clear();
+
+	generateInitialChunks(playerPosition, texture);
+}
+
 std::unordered_map<glm::ivec3, VertexArrayFromPool>& ChunkManager::getVAOs()
 {
 	return m_VAOs;
@@ -63,6 +79,11 @@ void ChunkManager::update(const Camera& camera, const sf::Window& window, const 
 		regenChunks(texture);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		if (m_reset)
+		{
+			reset(camera.m_position, texture);
+			m_reset = false;
+		}
 	}
 }
 
