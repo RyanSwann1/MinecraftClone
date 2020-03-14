@@ -36,6 +36,11 @@ void ChunkManager::reset(const glm::vec3& playerPosition, const Texture& texture
 	generateInitialChunks(playerPosition, texture);
 }
 
+bool ChunkManager::isReset() const
+{
+	return m_reset;
+}
+
 std::unordered_map<glm::ivec3, VertexArrayFromPool>& ChunkManager::getVAOs()
 {
 	return m_VAOs;
