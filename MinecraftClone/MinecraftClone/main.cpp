@@ -264,7 +264,7 @@ int main()
 			}
 
 			camera.m_position = Utilities::PLAYER_STARTING_POSITION;
-			chunkManager.resetTo();
+			chunkManager.reset();
 		}
 
 		glClear(GL_COLOR_BUFFER_BIT);

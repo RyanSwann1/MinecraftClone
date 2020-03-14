@@ -45,16 +45,14 @@ class ChunkManager : private NonCopyable, private NonMovable
 public:
 	ChunkManager();
 
-	void resetTo();
-	void reset(const glm::vec3& playerPosition, const Texture& texture);
-
 	std::unordered_map<glm::ivec3, VertexArrayFromPool>& getVAOs();
 
+	void reset();
 	void generateInitialChunks(const glm::vec3& playerPosition, const Texture& texture);
 	void update(const Camera& camera, const sf::Window& window, const Texture& texture);
 
 private:
-	bool m_reset = false;
+	bool m_reset;
 	ChunkPool m_chunkPool;
 	VertexArrayPool m_vertexArrayPool;
 	std::unordered_map<glm::ivec3, VertexArrayFromPool> m_VAOs;
@@ -74,4 +72,5 @@ private:
 	void regenChunks(const Texture& texture);
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
+	void reset(const glm::vec3& playerPosition, const Texture& texture);
 };

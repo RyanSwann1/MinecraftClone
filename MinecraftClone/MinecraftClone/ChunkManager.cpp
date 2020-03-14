@@ -9,7 +9,8 @@
 #include <iostream>
 
 ChunkManager::ChunkManager()
-	: m_chunkPool(),
+	: m_reset(false),
+	m_chunkPool(),
 	m_vertexArrayPool(),
 	m_VAOs(),
 	m_chunks(),
@@ -17,14 +18,16 @@ ChunkManager::ChunkManager()
 	m_mutex()
 {}
 
-void ChunkManager::resetTo()
+void ChunkManager::reset()
 {
+	assert(!m_reset);
 	std::lock_guard<std::mutex> lock(m_mutex);
 	m_reset = true;
 }
 
 void ChunkManager::reset(const glm::vec3& playerPosition, const Texture& texture)
 {
+	assert(m_reset);
 	std::lock_guard<std::mutex> lock(m_mutex);
 	m_chunks.clear();
 	m_VAOs.clear();
@@ -559,13 +562,13 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition, const Texture& tex
 	{
 		for (int x = startPosition.x - Utilities::VISIBILITY_DISTANCE; x <= startPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
-			if (x >= startPosition.x - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH) && 
-				x <= startPosition.x + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH) &&
-				z >= startPosition.z - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH) && 
-				z <= startPosition.z + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH))
-			{
-				continue;
-			}
+			//if (x >= startPosition.x - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH) && 
+			//	x <= startPosition.x + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH) &&
+			//	z >= startPosition.z - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH) && 
+			//	z <= startPosition.z + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH))
+			//{
+			//	continue;
+			//}
 
 			glm::ivec3 position(x, 0, z);
 			Utilities::getClosestChunkStartingPosition(position);
