@@ -25,6 +25,8 @@ struct VertexArrayFromPool : private NonCopyable, private NonMovable
 	~VertexArrayFromPool()
 	{
 		vertexArray.m_inUse = false;
+		vertexArray.m_opaqueVBODisplayable = false;
+		vertexArray.m_transparentVBODisplayable = false;
 	}
 
 	VertexArray& vertexArray;
