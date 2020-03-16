@@ -257,6 +257,11 @@ int main()
 		if (resetGame)
 		{
 			resetGame = false;
+			for (auto& VAO : VAOs)
+			{
+				VAO.second.object.reset();
+			}
+
 			camera.m_position = Utilities::PLAYER_STARTING_POSITION;
 			chunkManager.reset();
 		}
