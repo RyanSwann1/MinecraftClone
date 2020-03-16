@@ -30,8 +30,8 @@ VertexArray& VertexArrayPool::getVertexArray()
 		assert(m_nextAvailableObject);
 		if (m_nextAvailableObject->object.m_inUse)
 		{
-			assert(m_nextAvailableObject->m_next);
-			m_nextAvailable = m_nextAvailable->m_next;
+			assert(m_nextAvailableObject->nextAvailableObject);
+			m_nextAvailableObject = m_nextAvailableObject->nextAvailableObject;
 		}
 		else
 		{
@@ -41,8 +41,8 @@ VertexArray& VertexArrayPool::getVertexArray()
 		assert(++iterationCount && iterationCount <= m_objectPool.size());
 	}
 
-	m_nextAvailable->m_inUse = true;
-	return *m_nextAvailable;
+	m_nextAvailableObject->object.m_inUse = true;
+	return m_nextAvailableObject->object;
 }
 
 VertexArrayFromPool::VertexArrayFromPool(VertexArrayPool& vertexArrayPool)
