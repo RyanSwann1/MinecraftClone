@@ -7,6 +7,7 @@
 struct VertexArray : private NonCopyable
 {
 	VertexArray();
+	~VertexArray();
 	VertexArray(VertexArray&&) noexcept;
 	VertexArray& operator=(VertexArray&&) noexcept;
 	
@@ -30,6 +31,4 @@ struct VertexArray : private NonCopyable
 	unsigned int m_transparentID;
 	int m_opaqueElementBufferIndex;
 	int m_transparentElementBufferIndex;
-
-	VertexArray* m_next;
 };

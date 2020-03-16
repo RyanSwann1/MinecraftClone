@@ -144,6 +144,8 @@ void Chunk::release()
 
 //https://www.reddit.com/r/VoxelGameDev/comments/c0fcsi/giving_terrain_oomph_ive_been_trying_to_go_for/
 
+//http://accidentalnoise.sourceforge.net/minecraftworlds.html
+
 void Chunk::regen(const glm::ivec3& startingPosition)
 {
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)

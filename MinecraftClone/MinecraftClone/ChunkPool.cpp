@@ -3,36 +3,12 @@
 
 //ChunkFromPool
 ChunkFromPool::ChunkFromPool(ChunkPool& chunkPool, const glm::ivec3& startingPosition)
-	: chunkPool(chunkPool),
-	chunk(chunkPool.getChunk(startingPosition))
+	: ObjectFromPool(chunkPool.getChunk(startingPosition), chunkPool)
 {}
 
 ChunkFromPool::~ChunkFromPool()
 {
-	chunk.release();
-}
-
-//ChunkInPool
-ChunkInPool::ChunkInPool()
-	: chunk(),
-	nextChunkInPool(nullptr)
-{}
-
-ChunkInPool::ChunkInPool(ChunkInPool&& orig) noexcept
-	: chunk(std::move(orig.chunk)),
-	nextChunkInPool(orig.nextChunkInPool)
-{
-	orig.nextChunkInPool = nullptr;
-}
-
-ChunkInPool& ChunkInPool::operator=(ChunkInPool&& orig) noexcept
-{
-	chunk = std::move(orig.chunk);
-	nextChunkInPool = orig.nextChunkInPool;
-
-	orig.nextChunkInPool = nullptr;
-
-	return *this;
+	object.release();
 }
 
 //ChunkPool
@@ -43,15 +19,15 @@ ChunkPool::ChunkPool()
 	int y = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_DEPTH;
 	y += y += 2;
 
-	m_chunks.resize(size_t((x * y)));
+	m_objectPool.resize(size_t((x * y)));
 
-	for (int i = 0; i < static_cast<int>(m_chunks.size()) - 1; ++i)
+	for (int i = 0; i < static_cast<int>(m_objectPool.size()) - 1; ++i)
 	{
-		m_chunks[i].nextChunkInPool = &m_chunks[i + 1];
+		m_objectPool[i].nextAvailableObject = &m_objectPool[i + 1];
 	}
 
-	m_nextAvailable = &m_chunks.front();
-	m_chunks.back().nextChunkInPool = m_nextAvailable;
+	m_nextAvailableObject = &m_objectPool.front();
+	m_objectPool.back().nextAvailableObject = m_nextAvailableObject;
 }
 
 Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
@@ -61,20 +37,21 @@ Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
 
 	while (!validChunkFound)
 	{
-		assert(m_nextAvailable);
-		if (m_nextAvailable->chunk.isInUse())
+		assert(m_nextAvailableObject);
+		if (m_nextAvailableObject->object.isInUse())
 		{
-			assert(m_nextAvailable);
-			m_nextAvailable = m_nextAvailable->nextChunkInPool;
+			assert(m_nextAvailableObject);
+			//m_nextAvailableObject = m_nextAvailableObjec->nextChunkInPool;
+			m_nextAvailableObject = m_nextAvailableObject->nextAvailableObject;// nextChunkInPool;
 		}
 		else
 		{
 			validChunkFound = true;
 		}
 
-		assert(++iterationCount && iterationCount <= m_chunks.size());
+		assert(++iterationCount && iterationCount <= m_objectPool.size());
 	}
 	
-	m_nextAvailable->chunk.reuse(startingPosition);
-	return m_nextAvailable->chunk;
+	m_nextAvailableObject->object.reuse(startingPosition);
+	return m_nextAvailableObject->object;
 }

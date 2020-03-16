@@ -257,11 +257,6 @@ int main()
 		if (resetGame)
 		{
 			resetGame = false;
-			for (auto& VAO : VAOs)
-			{
-				VAO.second.vertexArray.reset();
-			}
-
 			camera.m_position = Utilities::PLAYER_STARTING_POSITION;
 			chunkManager.reset();
 		}
@@ -283,27 +278,27 @@ int main()
 
 		for (auto VAO = VAOs.begin(); VAO != VAOs.end();)
 		{
-			if (VAO->second.vertexArray.m_reset)
+			if (VAO->second.object.m_reset)
 			{
-				VAO->second.vertexArray.reset();
+				VAO->second.object.reset();
 				VAO = VAOs.erase(VAO);
 			}
 			else
 			{
-				if (VAO->second.vertexArray.m_attachOpaqueVBO)
+				if (VAO->second.object.m_attachOpaqueVBO)
 				{
-					VAO->second.vertexArray.attachOpaqueVBO();
+					VAO->second.object.attachOpaqueVBO();
 				}
 
-				if (VAO->second.vertexArray.m_attachTransparentVBO)
+				if (VAO->second.object.m_attachTransparentVBO)
 				{
-					VAO->second.vertexArray.attachTransparentVBO();
+					VAO->second.object.attachTransparentVBO();
 				}
 
-				if (VAO->second.vertexArray.m_opaqueVBODisplayable)
+				if (VAO->second.object.m_opaqueVBODisplayable)
 				{
-					VAO->second.vertexArray.bindOpaqueVAO();
-					glDrawElements(GL_TRIANGLES, VAO->second.vertexArray.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+					VAO->second.object.bindOpaqueVAO();
+					glDrawElements(GL_TRIANGLES, VAO->second.object.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 				}
 
 				++VAO;
@@ -314,10 +309,10 @@ int main()
 		setUniformLocation1f(shaderID, "uAlpha", Utilities::WATER_ALPHA_VALUE, uniformLocations);
 		for (const auto& VAO : VAOs)
 		{
-			if (VAO.second.vertexArray.m_transparentVBODisplayable)
+			if (VAO.second.object.m_transparentVBODisplayable)
 			{
-				VAO.second.vertexArray.bindTransparentVAO();
-				glDrawElements(GL_TRIANGLES, VAO.second.vertexArray.m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
+				VAO.second.object.bindTransparentVAO();
+				glDrawElements(GL_TRIANGLES, VAO.second.object.m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
 			}
 		}
 		setUniformLocation1f(shaderID, "uAlpha", 1.0f, uniformLocations);

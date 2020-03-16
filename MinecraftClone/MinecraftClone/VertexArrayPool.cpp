@@ -2,23 +2,22 @@
 #include "Utilities.h"
 
 VertexArrayPool::VertexArrayPool()
-	: m_vertexArrayPool(),
-	m_nextAvailable(nullptr)
+	: ObjectPool()
 {
 	int x = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_WIDTH;
 	x += x += 2;
 	int y = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_DEPTH;
 	y += y += 2;
 
-	m_vertexArrayPool.resize(size_t((x * y)));
+	m_objectPool.resize(size_t((x * y)));
 	
-	for (int i = 0; i < static_cast<int>(m_vertexArrayPool.size()) - 1; ++i)
+	for (int i = 0; i < static_cast<int>(m_objectPool.size()) - 1; ++i)
 	{
-		m_vertexArrayPool[i].m_next = &m_vertexArrayPool[i + 1];
+		m_objectPool[i].nextAvailableObject = &m_objectPool[i + 1];
 	}
 
-	m_nextAvailable = &m_vertexArrayPool.front();
-	m_vertexArrayPool.back().m_next = m_nextAvailable;
+	m_nextAvailableObject = &m_objectPool.front();
+	m_objectPool.back().nextAvailableObject = m_nextAvailableObject;
 }
 
 VertexArray& VertexArrayPool::getVertexArray()
@@ -28,10 +27,10 @@ VertexArray& VertexArrayPool::getVertexArray()
 
 	while (!validVertexArrayFound)
 	{
-		assert(m_nextAvailable);
-		if (m_nextAvailable->m_inUse)
+		assert(m_nextAvailableObject);
+		if (m_nextAvailableObject->object.m_inUse)
 		{
-			assert(m_nextAvailable->m_next);
+			assert(m_nextAvailableObject->m_next);
 			m_nextAvailable = m_nextAvailable->m_next;
 		}
 		else
@@ -39,9 +38,20 @@ VertexArray& VertexArrayPool::getVertexArray()
 			validVertexArrayFound = true;
 		}
 
-		assert(++iterationCount && iterationCount <= m_vertexArrayPool.size());
+		assert(++iterationCount && iterationCount <= m_objectPool.size());
 	}
 
 	m_nextAvailable->m_inUse = true;
 	return *m_nextAvailable;
+}
+
+VertexArrayFromPool::VertexArrayFromPool(VertexArrayPool& vertexArrayPool)
+	: ObjectFromPool(vertexArrayPool.getVertexArray(), vertexArrayPool)
+{}
+
+VertexArrayFromPool::~VertexArrayFromPool()
+{
+	object.m_inUse = false;
+	object.m_opaqueVBODisplayable = false;
+	object.m_transparentVBODisplayable = false;
 }
