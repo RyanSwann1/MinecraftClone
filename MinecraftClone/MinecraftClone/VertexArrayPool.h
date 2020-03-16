@@ -1,33 +1,58 @@
 #pragma once
 
 #include "VertexArray.h"
-#include "NonMovable.h"
-#include "NonCopyable.h"
+#include "ObjectPool.h"
 
-class VertexArrayPool : private NonCopyable, private NonMovable
+
+template <class T>
+class ObjectPool : private NonCopyable, private NonMovable
 {
 public:
-	VertexArrayPool();
 
-	VertexArray& getVertexArray();
 
-private:
-	std::vector<VertexArray> m_vertexArrayPool;
-	VertexArray* m_nextAvailable;
+protected:
+	std::vector<T> m_objectPool;
+	T* m_nextAvailable;
 };
 
-struct VertexArrayFromPool : private NonCopyable, private NonMovable
+class VertexArrayPool : private ObjectPool<VertexArray>
 {
-	VertexArrayFromPool(VertexArrayPool& vertexArrayPool)
-		: vertexArray(vertexArrayPool.getVertexArray())
-	{}
-
-	~VertexArrayFromPool()
-	{
-		vertexArray.m_inUse = false;
-		vertexArray.m_opaqueVBODisplayable = false;
-		vertexArray.m_transparentVBODisplayable = false;
-	}
-
-	VertexArray& vertexArray;
+public:
+	VertexArray& getVertexArray();
 };
+
+class Chunk;
+class ChunkPool : private ObjectPool<Chunk>
+{
+public:
+	Chunk& getChunk(const glm::ivec3& startingPosition);
+};
+
+//
+//class VertexArrayPool : private NonCopyable, private NonMovable
+//{
+//public:
+//	VertexArrayPool();
+//
+//	VertexArray& getVertexArray();
+//
+//private:
+//	std::vector<VertexArray> m_vertexArrayPool;
+//	VertexArray* m_nextAvailable;
+//};
+//
+//struct VertexArrayFromPool : private NonCopyable, private NonMovable
+//{
+//	VertexArrayFromPool(VertexArrayPool& vertexArrayPool)
+//		: vertexArray(vertexArrayPool.getVertexArray())
+//	{}
+//
+//	~VertexArrayFromPool()
+//	{
+//		vertexArray.m_inUse = false;
+//		vertexArray.m_opaqueVBODisplayable = false;
+//		vertexArray.m_transparentVBODisplayable = false;
+//	}
+//
+//	VertexArray& vertexArray;
+//};
