@@ -41,8 +41,7 @@ Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
 		if (m_nextAvailableObject->object.isInUse())
 		{
 			assert(m_nextAvailableObject);
-			//m_nextAvailableObject = m_nextAvailableObjec->nextChunkInPool;
-			m_nextAvailableObject = m_nextAvailableObject->nextAvailableObject;// nextChunkInPool;
+			m_nextAvailableObject = m_nextAvailableObject->nextAvailableObject;
 		}
 		else
 		{
