@@ -129,6 +129,9 @@ void Chunk::release()
 //http://www.6by9.net/simplex-noise-for-c-and-python/
 //https://medium.com/@yvanscher/playing-with-perlin-noise-generating-realistic-archipelagos-b59f004d8401
 
+//Lacunarity = Controls the increase in frequency in octaves
+//Persistence = Controls decrease in amplitude of octaves
+
 //Amplitude - 'y' Axis
 //Frequency - 'x' Axis
 
@@ -156,8 +159,6 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			double ex = x / static_cast<float>(Utilities::MAP_SIZE);
 			double ey = z / static_cast<float>(Utilities::MAP_SIZE);
 			
-			int minElevationValue = 0;
-			int maxElevationValue = FLT_MAX;
 			float elevation = 0.0f;
 
 			float persistence = Utilities::PERSISTENCE;
@@ -177,12 +178,21 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			for (int i = 0; i < Utilities::OCTAVES; ++i)
 			{
 				total += persistence;
-				persistence = persistence /= 2.0f;
+				persistence /= 2.0f;
 			}
 
-			elevation /= total;
+			if (elevation < 0)
+			{
+				elevation = 0.0f;
+			}
+			elevation = glm::pow(elevation, 1.25f);
+			//std::cout << elevation << "\n";
 
-			//elevation = glm::pow(elevation, 2.5f);
+			elevation /= total;
+		
+
+
+
 			elevation = elevation * (float)Utilities::CHUNK_HEIGHT - 1;
 			elevation = Utilities::clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
 

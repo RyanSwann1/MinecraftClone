@@ -29,7 +29,7 @@ enum class eDirection
 namespace Utilities
 {
 	constexpr int CHUNK_WIDTH = 32;
-	constexpr int CHUNK_HEIGHT = 96;
+	constexpr int CHUNK_HEIGHT = 128;
 	constexpr int CHUNK_DEPTH = 32;
 	constexpr int CHUNK_SIZE = (CHUNK_WIDTH + CHUNK_DEPTH) / 2.0f;
 
@@ -49,8 +49,8 @@ namespace Utilities
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
-	constexpr float LACUNARITY = 50.0f;
-	constexpr float PERSISTENCE = 1.0f;
+	constexpr float LACUNARITY = 25.f;
+	constexpr float PERSISTENCE = 0.5f;
 	constexpr int OCTAVES = 8;
 
 	constexpr int VISIBILITY_DISTANCE = 640;
