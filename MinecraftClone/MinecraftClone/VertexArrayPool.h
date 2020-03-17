@@ -1,31 +1,18 @@
 #pragma once
 
 #include "VertexArray.h"
-#include "NonMovable.h"
-#include "NonCopyable.h"
+#include "ObjectPool.h"
 
-class VertexArrayPool : private NonCopyable, private NonMovable
+class VertexArrayPool : private ObjectPool<VertexArray>
 {
 public:
 	VertexArrayPool();
 
 	VertexArray& getVertexArray();
-
-private:
-	std::vector<VertexArray> m_vertexArrayPool;
-	VertexArray* m_nextAvailable;
 };
 
-struct VertexArrayFromPool : private NonCopyable, private NonMovable
+struct VertexArrayFromPool : public ObjectFromPool<VertexArray, VertexArrayPool>
 {
-	VertexArrayFromPool(VertexArrayPool& vertexArrayPool)
-		: vertexArray(vertexArrayPool.getVertexArray())
-	{}
-
-	~VertexArrayFromPool()
-	{
-		vertexArray.m_inUse = false;
-	}
-
-	VertexArray& vertexArray;
+	VertexArrayFromPool(VertexArrayPool& vertexArrayPool);
+	~VertexArrayFromPool();
 };

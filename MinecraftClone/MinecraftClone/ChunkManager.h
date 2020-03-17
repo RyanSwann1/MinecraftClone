@@ -45,12 +45,15 @@ class ChunkManager : private NonCopyable, private NonMovable
 public:
 	ChunkManager();
 
+	bool isReset() const;
 	std::unordered_map<glm::ivec3, VertexArrayFromPool>& getVAOs();
 
+	void reset();
 	void generateInitialChunks(const glm::vec3& playerPosition, const Texture& texture);
 	void update(const Camera& camera, const sf::Window& window, const Texture& texture);
 
 private:
+	bool m_reset;
 	ChunkPool m_chunkPool;
 	VertexArrayPool m_vertexArrayPool;
 	std::unordered_map<glm::ivec3, VertexArrayFromPool> m_VAOs;
@@ -58,16 +61,14 @@ private:
 	std::unordered_set<glm::ivec3> m_chunksToRegenerate;
 	std::mutex m_mutex;
 
-	void addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition,
-		const Texture& texture);
-
+	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
 
+	void addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition,
+		const Texture& texture);
 	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const Texture& texture);
-
 	void deleteChunks(const glm::ivec3& playerPosition);
 	void addChunks(const glm::vec3& playerPosition, const Texture& texture);
 	void regenChunks(const Texture& texture);
-
-	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
+	void reset(const glm::vec3& playerPosition, const Texture& texture);
 };

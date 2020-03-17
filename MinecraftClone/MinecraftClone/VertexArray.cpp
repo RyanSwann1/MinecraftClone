@@ -16,9 +16,51 @@ VertexArray::VertexArray()
 	m_ID(Utilities::INVALID_OPENGL_ID),
 	m_transparentID(Utilities::INVALID_OPENGL_ID),
 	m_opaqueElementBufferIndex(0),
-	m_transparentElementBufferIndex(0),
-	m_next(nullptr)
+	m_transparentElementBufferIndex(0)
 {}
+
+VertexArray::~VertexArray()
+{
+	if (m_ID != Utilities::INVALID_OPENGL_ID)
+	{
+		glDeleteVertexArrays(1, &m_ID);
+	}
+
+	if (m_transparentID != Utilities::INVALID_OPENGL_ID)
+	{
+		glDeleteVertexArrays(1, &m_transparentID);
+	}
+
+	if (m_vertexBuffer.positionsID != Utilities::INVALID_OPENGL_ID)
+	{
+		glDeleteBuffers(1, &m_vertexBuffer.positionsID);
+	}
+
+	if (m_vertexBuffer.textCoordsID != Utilities::INVALID_OPENGL_ID)
+	{
+		glDeleteBuffers(1, &m_vertexBuffer.textCoordsID);
+	}
+
+	if (m_vertexBuffer.indiciesID != Utilities::INVALID_OPENGL_ID)
+	{
+		glDeleteBuffers(1, &m_vertexBuffer.indiciesID);
+	}
+
+	if (m_vertexBuffer.transparentPositionsID != Utilities::INVALID_OPENGL_ID)
+	{
+		glDeleteBuffers(1, &m_vertexBuffer.transparentPositionsID);
+	}
+
+	if (m_vertexBuffer.transparentTextCoordsID != Utilities::INVALID_OPENGL_ID)
+	{
+		glDeleteBuffers(1, &m_vertexBuffer.transparentTextCoordsID);
+	}
+
+	if (m_vertexBuffer.transparentIndiciesID != Utilities::INVALID_OPENGL_ID)
+	{
+		glDeleteBuffers(1, &m_vertexBuffer.transparentIndiciesID);
+	}
+}
 
 VertexArray::VertexArray(VertexArray&& orig) noexcept
 	: m_inUse(orig.m_inUse),
@@ -32,8 +74,7 @@ VertexArray::VertexArray(VertexArray&& orig) noexcept
 	m_ID(orig.m_ID),
 	m_transparentID(orig.m_transparentID),
 	m_opaqueElementBufferIndex(orig.m_opaqueElementBufferIndex),
-	m_transparentElementBufferIndex(orig.m_transparentElementBufferIndex),
-	m_next(orig.m_next)
+	m_transparentElementBufferIndex(orig.m_transparentElementBufferIndex)
 {
 	orig.m_inUse = false;
 	orig.m_opaqueVBODisplayable = false;
@@ -46,7 +87,6 @@ VertexArray::VertexArray(VertexArray&& orig) noexcept
 	orig.m_transparentID = Utilities::INVALID_OPENGL_ID;
 	orig.m_opaqueElementBufferIndex = 0;
 	orig.m_transparentElementBufferIndex = 0;
-	orig.m_next = nullptr;
 }
 
 VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
@@ -63,7 +103,6 @@ VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
 	m_transparentID = orig.m_transparentID;
 	m_opaqueElementBufferIndex = orig.m_opaqueElementBufferIndex;
 	m_transparentElementBufferIndex = orig.m_transparentElementBufferIndex;
-	m_next = orig.m_next;
 	
 	orig.m_inUse = false;
 	orig.m_opaqueVBODisplayable = false;
@@ -76,7 +115,6 @@ VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
 	orig.m_transparentID = Utilities::INVALID_OPENGL_ID;
 	orig.m_opaqueElementBufferIndex = 0;
 	orig.m_transparentElementBufferIndex = 0;
-	orig.m_next = nullptr;
 
 	return *this;
 }
