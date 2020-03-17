@@ -167,7 +167,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 				elevation += persistence * glm::perlin(glm::vec2(ex * lacunarity, ey * lacunarity));
 				
 				persistence /= 2.0f;
-				lacunarity * 2.0f;
+				lacunarity *= 2.0f;
 			}
 
 			//elevation = std::abs(elevation);
