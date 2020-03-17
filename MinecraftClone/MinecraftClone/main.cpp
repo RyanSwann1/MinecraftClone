@@ -257,19 +257,22 @@ int main()
 		if (resetGame)
 		{
 			resetGame = false;
-			for (auto& VAO : VAOs)
+			if (!chunkManager.isResetting())
 			{
-				VAO.second.object.reset();
-			}
+				for (auto& VAO : VAOs)
+				{
+					VAO.second.object.reset();
+				}
 
-			camera.m_position = Utilities::PLAYER_STARTING_POSITION;
-			chunkManager.reset();
+				camera.m_position = Utilities::PLAYER_STARTING_POSITION;
+				chunkManager.reset();
+			}
 		}
 
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		if (!chunkManager.isReset())
+		if (!chunkManager.isResetting())
 		{
 			camera.move(deltaTime);
 		}
@@ -281,48 +284,52 @@ int main()
 			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 800.0f); //1000.0f);//(
 		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
 
-		for (auto VAO = VAOs.begin(); VAO != VAOs.end();)
+		if (!chunkManager.isResetting())
 		{
-			if (VAO->second.object.m_reset)
+			for (auto VAO = VAOs.begin(); VAO != VAOs.end();)
 			{
-				VAO->second.object.reset();
-				VAO = VAOs.erase(VAO);
+				if (VAO->second.object.m_reset)
+				{
+					VAO->second.object.reset();
+					VAO = VAOs.erase(VAO);
+				}
+				else
+				{
+					if (VAO->second.object.m_attachOpaqueVBO)
+					{
+						VAO->second.object.attachOpaqueVBO();
+					}
+
+					if (VAO->second.object.m_attachTransparentVBO)
+					{
+						VAO->second.object.attachTransparentVBO();
+					}
+
+					if (VAO->second.object.m_opaqueVBODisplayable)
+					{
+						VAO->second.object.bindOpaqueVAO();
+						glDrawElements(GL_TRIANGLES, VAO->second.object.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+					}
+
+					++VAO;
+				}
 			}
-			else
+
+
+			setUniformLocation1f(shaderID, "uAlpha", Utilities::WATER_ALPHA_VALUE, uniformLocations);
+			for (const auto& VAO : VAOs)
 			{
-				if (VAO->second.object.m_attachOpaqueVBO)
+				if (VAO.second.object.m_transparentVBODisplayable)
 				{
-					VAO->second.object.attachOpaqueVBO();
+					VAO.second.object.bindTransparentVAO();
+					glDrawElements(GL_TRIANGLES, VAO.second.object.m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
 				}
-
-				if (VAO->second.object.m_attachTransparentVBO)
-				{
-					VAO->second.object.attachTransparentVBO();
-				}
-
-				if (VAO->second.object.m_opaqueVBODisplayable)
-				{
-					VAO->second.object.bindOpaqueVAO();
-					glDrawElements(GL_TRIANGLES, VAO->second.object.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
-				}
-
-				++VAO;
 			}
+			setUniformLocation1f(shaderID, "uAlpha", 1.0f, uniformLocations);
+
+
+			window.display();
 		}
-
-
-		setUniformLocation1f(shaderID, "uAlpha", Utilities::WATER_ALPHA_VALUE, uniformLocations);
-		for (const auto& VAO : VAOs)
-		{
-			if (VAO.second.object.m_transparentVBODisplayable)
-			{
-				VAO.second.object.bindTransparentVAO();
-				glDrawElements(GL_TRIANGLES, VAO.second.object.m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
-			}
-		}
-		setUniformLocation1f(shaderID, "uAlpha", 1.0f, uniformLocations);
-
-		window.display();
 	}
 
 	chunkGenerationThread.join();

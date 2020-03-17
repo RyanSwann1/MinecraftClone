@@ -45,7 +45,7 @@ class ChunkManager : private NonCopyable, private NonMovable
 public:
 	ChunkManager();
 
-	bool isReset() const;
+	bool isResetting() const;
 	std::unordered_map<glm::ivec3, VertexArrayFromPool>& getVAOs();
 
 	void reset();
@@ -53,7 +53,7 @@ public:
 	void update(const Camera& camera, const sf::Window& window, const Texture& texture);
 
 private:
-	bool m_reset;
+	bool m_resetting;
 	ChunkPool m_chunkPool;
 	VertexArrayPool m_vertexArrayPool;
 	std::unordered_map<glm::ivec3, VertexArrayFromPool> m_VAOs;

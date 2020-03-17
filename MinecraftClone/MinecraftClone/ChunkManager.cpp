@@ -9,7 +9,7 @@
 #include <iostream>
 
 ChunkManager::ChunkManager()
-	: m_reset(false),
+	: m_resetting(false),
 	m_chunkPool(),
 	m_vertexArrayPool(),
 	m_VAOs(),
@@ -20,25 +20,26 @@ ChunkManager::ChunkManager()
 
 void ChunkManager::reset()
 {
-	assert(!m_reset);
+	assert(!m_resetting);
 	std::lock_guard<std::mutex> lock(m_mutex);
-	m_reset = true;
+	m_resetting = true;
 }
 
 void ChunkManager::reset(const glm::vec3& playerPosition, const Texture& texture)
 {
-	assert(m_reset);
+	assert(m_resetting);
 	std::lock_guard<std::mutex> lock(m_mutex);
 	m_chunks.clear();
 	m_VAOs.clear();
 	m_chunksToRegenerate.clear();
 
 	generateInitialChunks(playerPosition, texture);
+	m_resetting = false;
 }
 
-bool ChunkManager::isReset() const
+bool ChunkManager::isResetting() const
 {
-	return m_reset;
+	return m_resetting;
 }
 
 std::unordered_map<glm::ivec3, VertexArrayFromPool>& ChunkManager::getVAOs()
@@ -82,16 +83,16 @@ void ChunkManager::update(const Camera& camera, const sf::Window& window, const 
 {
 	while (window.isOpen())
 	{
+		if (m_resetting)
+		{
+			reset(camera.m_position, texture);
+		}
+
 		deleteChunks(camera.m_position);
 		addChunks(camera.m_position, texture);
 		regenChunks(texture);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
-		if (m_reset)
-		{
-			reset(camera.m_position, texture);
-			m_reset = false;
-		}
 	}
 }
 
