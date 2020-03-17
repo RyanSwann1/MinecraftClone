@@ -42,6 +42,8 @@ private:
 
 	bool isPositionInLocalBounds(const glm::ivec3& position) const;
 	char getCubeAtLocalPosition(const glm::ivec3 position) const;
+	int getElevationValue(int x, int y) const;
+	float getMoistureValue(int x, int y) const;
 	
 	void changeCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType);
 	void regen(const glm::ivec3& startingPosition);

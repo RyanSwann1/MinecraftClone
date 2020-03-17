@@ -49,9 +49,13 @@ namespace Utilities
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
-	constexpr float LACUNARITY = 25.f;
-	constexpr float PERSISTENCE = 0.5f;
-	constexpr int OCTAVES = 8;
+	constexpr float MOISTURE_LACUNARITY = 0.5f;
+	constexpr float MOISTURE_PERSISTENCE = 0.5f;
+	constexpr int MOISTURE_OCTAVES = 3;
+
+	constexpr float TERRAIN_LACUNARITY = 25.f;
+	constexpr float TERRAIN_PERSISTENCE = 0.5f;
+	constexpr int TERRAIN_OCTAVES = 8;
 
 	constexpr int VISIBILITY_DISTANCE = 640;
 	constexpr int MAP_SIZE = 8000;

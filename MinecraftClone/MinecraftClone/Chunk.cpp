@@ -8,6 +8,24 @@
 #include <algorithm>
 #include <limits>
 
+//OLD VALUES
+
+//MAP_SIZE == 8000;
+//double ex = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
+//double ey = (z) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
+//
+//float elevation = std::abs(1 * glm::perlin(glm::vec2(5.0f * ex, 5.0f * ey)));
+//elevation += std::abs(0.5 * glm::perlin(glm::vec2(ex * 15.0f, ey * 15.0f)));
+//elevation += std::abs(0.25 * glm::perlin(glm::vec2(ex * 30.0f, ey * 30.0f)));
+//
+//elevation = glm::pow(elevation, 2.5f);
+//elevation = elevation * (float)Utilities::CHUNK_HEIGHT;
+//elevation = Utilities::clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
+//
+//double mx = (x) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
+//double my = (z) / (Utilities::MAP_SIZE * 1.0f) - 0.5f;
+//float moisture = std::abs(1 * glm::perlin(glm::vec2(15.0f * mx, 15.0f * my)));
+
 Chunk::Chunk()
 	: m_inUse(false),
 	m_startingPosition(),
@@ -145,7 +163,6 @@ void Chunk::release()
 //https://www.reddit.com/r/proceduralgeneration/comments/drc96v/getting_started_in_proceduralgeneration/
 //https://notch.tumblr.com/post/3746989361/terrain-generation-part-1
 
-
 //https://www.reddit.com/r/VoxelGameDev/comments/c0fcsi/giving_terrain_oomph_ive_been_trying_to_go_for/
 
 //http://accidentalnoise.sourceforge.net/minecraftworlds.html
@@ -156,57 +173,15 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 	{
 		for (int x = startingPosition.x; x < startingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 		{
-			double ex = x / static_cast<float>(Utilities::MAP_SIZE);
-			double ey = z / static_cast<float>(Utilities::MAP_SIZE);
-			
-			float elevation = 0.0f;
-
-			float persistence = Utilities::PERSISTENCE;
-			float lacunarity = Utilities::LACUNARITY;
-			for (int i = 0; i < Utilities::OCTAVES; ++i)
-			{
-				elevation += persistence * glm::perlin(glm::vec2(ex * lacunarity, ey * lacunarity));
-				
-				persistence /= 2.0f;
-				lacunarity *= 2.0f;
-			}
-
-			//elevation = std::abs(elevation);
-			
-			persistence = Utilities::PERSISTENCE;
-			float total = 0.0f;
-			for (int i = 0; i < Utilities::OCTAVES; ++i)
-			{
-				total += persistence;
-				persistence /= 2.0f;
-			}
-
-			if (elevation < 0)
-			{
-				elevation = 0.0f;
-			}
-			elevation = glm::pow(elevation, 1.25f);
-			//std::cout << elevation << "\n";
-
-			elevation /= total;
-		
-
-
-
-			elevation = elevation * (float)Utilities::CHUNK_HEIGHT - 1;
-			elevation = Utilities::clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
-
-			double mx = (x) / (Utilities::MAP_SIZE * 2.0f) - 0.5f;
-			double my = (z) / (Utilities::MAP_SIZE * 2.0f) - 0.5f;
-			float moisture = std::abs(1 * glm::perlin(glm::vec2(15.0f * mx, 15.0f * my)));
-
+			int elevation = getElevationValue(x, z);
+			float moisture = getMoistureValue(x, z);
 			eCubeType cubeType;
-			glm::ivec3 positionOnGrid(x - startingPosition.x, (int)elevation, z - startingPosition.z);
+			glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 
 			//Desert Biome
 			if (moisture >= 0.5f)
 			{
-				for (int y = (int)elevation; y >= 0; --y)
+				for (int y = elevation; y >= 0; --y)
 				{
 					if (y <= Utilities::STONE_MAX_HEIGHT)
 					{
@@ -223,7 +198,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			//Plains Biome
 			else
 			{
-				for (int y = (int)elevation; y >= 0; --y)
+				for (int y = elevation; y >= 0; --y)
 				{
 					if (y <= Utilities::STONE_MAX_HEIGHT)
 					{
@@ -382,4 +357,64 @@ char Chunk::getCubeAtLocalPosition(const glm::ivec3 position) const
 {
 	assert(isPositionInLocalBounds(position));
 	return m_chunk[position.x][position.y][position.z];
+}
+
+int Chunk::getElevationValue(int x, int z) const
+{
+	double ex = x / static_cast<float>(Utilities::MAP_SIZE);
+	double ey = z / static_cast<float>(Utilities::MAP_SIZE);
+
+	float elevation = 0.0f;
+
+	float persistence = Utilities::TERRAIN_PERSISTENCE;
+	float lacunarity = Utilities::TERRAIN_LACUNARITY;
+	for (int i = 0; i < Utilities::TERRAIN_OCTAVES; ++i)
+	{
+		elevation += persistence * glm::perlin(glm::vec2(ex * lacunarity, ey * lacunarity));
+
+		persistence /= 2.0f;
+		lacunarity *= 2.0f;
+	}
+
+	persistence = Utilities::TERRAIN_PERSISTENCE;
+	float total = 0.0f;
+	for (int i = 0; i < Utilities::TERRAIN_OCTAVES; ++i)
+	{
+		total += persistence;
+		persistence /= 2.0f;
+	}
+
+	if (elevation < 0)
+	{
+		elevation = 0.0f;
+	}
+	elevation = glm::pow(elevation, 1.25f);
+	elevation /= total;
+	elevation = elevation * (float)Utilities::CHUNK_HEIGHT - 1;
+	elevation = Utilities::clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
+
+	return elevation;
+}
+
+float Chunk::getMoistureValue(int x, int z) const
+{
+	double mx = x / 1000.0f * 1.0f;
+	double my = z / 1000.0f * 1.0f;
+
+	float moisture = 0.0f;
+	float moisturePersistence = Utilities::MOISTURE_PERSISTENCE;
+	float moistureLacunarity = Utilities::MOISTURE_LACUNARITY;
+	for (int i = 0; i < Utilities::MOISTURE_OCTAVES; ++i)
+	{
+		moisture += moisturePersistence * glm::perlin(glm::vec2(mx * moistureLacunarity, my * moistureLacunarity));
+
+		moisturePersistence /= 2.0f;
+		moistureLacunarity *= 2.0f;
+	}
+	if (moisture < 0)
+	{
+		moisture = 0.0f;
+	}
+
+	return moisture;
 }
