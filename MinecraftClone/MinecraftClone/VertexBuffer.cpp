@@ -66,21 +66,21 @@ VertexBuffer& VertexBuffer::operator=(VertexBuffer&& orig) noexcept
 
 void VertexBuffer::clear()
 {
-	positionsID = Utilities::INVALID_OPENGL_ID;
+	//positionsID = Utilities::INVALID_OPENGL_ID;
 	positions.clear();
 
-	transparentPositionsID = Utilities::INVALID_OPENGL_ID;
+	//transparentPositionsID = Utilities::INVALID_OPENGL_ID;
 	transparentPositions.clear();
 
-	transparentTextCoordsID = Utilities::INVALID_OPENGL_ID;
+	//transparentTextCoordsID = Utilities::INVALID_OPENGL_ID;
 	transparentTextCoords.clear();
 
-	textCoordsID = Utilities::INVALID_OPENGL_ID;
+	//textCoordsID = Utilities::INVALID_OPENGL_ID;
 	textCoords.clear();
 
-	transparentIndiciesID = Utilities::INVALID_OPENGL_ID;
+	//transparentIndiciesID = Utilities::INVALID_OPENGL_ID;
 	transparentIndicies.clear();
 
-	indiciesID = Utilities::INVALID_OPENGL_ID;
+	//indiciesID = Utilities::INVALID_OPENGL_ID;
 	indicies.clear();
 }

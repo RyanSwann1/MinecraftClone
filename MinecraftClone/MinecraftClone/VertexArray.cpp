@@ -17,7 +17,8 @@ VertexArray::VertexArray()
 	m_transparentID(Utilities::INVALID_OPENGL_ID),
 	m_opaqueElementBufferIndex(0),
 	m_transparentElementBufferIndex(0)
-{}
+{
+}
 
 VertexArray::~VertexArray()
 {
@@ -76,6 +77,7 @@ VertexArray::VertexArray(VertexArray&& orig) noexcept
 	m_opaqueElementBufferIndex(orig.m_opaqueElementBufferIndex),
 	m_transparentElementBufferIndex(orig.m_transparentElementBufferIndex)
 {
+	std::cout << "Hit\n";
 	orig.m_inUse = false;
 	orig.m_opaqueVBODisplayable = false;
 	orig.m_transparentVBODisplayable = false;
@@ -91,6 +93,7 @@ VertexArray::VertexArray(VertexArray&& orig) noexcept
 
 VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
 {
+	std::cout << "Hit\n";
 	m_inUse = orig.m_inUse;
 	m_opaqueVBODisplayable = orig.m_opaqueVBODisplayable;
 	m_transparentVBODisplayable = orig.m_transparentVBODisplayable;
@@ -121,46 +124,6 @@ VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
 
 void VertexArray::reset()
 {
-	if (m_ID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteVertexArrays(1, &m_ID);
-	}
-	
-	if (m_transparentID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteVertexArrays(1, &m_transparentID);
-	}
-
-	if (m_vertexBuffer.positionsID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &m_vertexBuffer.positionsID);
-	}
-
-	if (m_vertexBuffer.textCoordsID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &m_vertexBuffer.textCoordsID);
-	}
-
-	if (m_vertexBuffer.indiciesID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &m_vertexBuffer.indiciesID);
-	}
-
-	if (m_vertexBuffer.transparentPositionsID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &m_vertexBuffer.transparentPositionsID);
-	}
-
-	if (m_vertexBuffer.transparentTextCoordsID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &m_vertexBuffer.transparentTextCoordsID);
-	}
-
-	if (m_vertexBuffer.transparentIndiciesID != Utilities::INVALID_OPENGL_ID) 
-	{
-		glDeleteBuffers(1, &m_vertexBuffer.transparentIndiciesID);
-	}
-
 	m_reset = false;
 	m_inUse = false;
 	m_opaqueVBODisplayable = false;
@@ -169,8 +132,6 @@ void VertexArray::reset()
 	m_attachTransparentVBO = false;
 	m_awaitingRegeneration = false;
 	m_vertexBuffer.clear();
-	m_ID = Utilities::INVALID_OPENGL_ID;
-	m_transparentID = Utilities::INVALID_OPENGL_ID;
 	m_opaqueElementBufferIndex = 0;
 	m_transparentElementBufferIndex = 0;
 }
