@@ -51,7 +51,8 @@ VertexArrayFromPool::VertexArrayFromPool(VertexArrayPool& vertexArrayPool)
 
 VertexArrayFromPool::~VertexArrayFromPool()
 {
-	object.m_inUse = false;
-	object.m_opaqueVBODisplayable = false;
-	object.m_transparentVBODisplayable = false;
+	object.reset();
+	//object.m_inUse = false;
+	//object.m_opaqueVBODisplayable = false;
+	//object.m_transparentVBODisplayable = false;
 }

@@ -290,7 +290,6 @@ int main()
 			{
 				if (VAO->second.object.m_reset)
 				{
-					VAO->second.object.reset();
 					VAO = VAOs.erase(VAO);
 				}
 				else

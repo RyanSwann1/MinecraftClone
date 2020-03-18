@@ -11,6 +11,7 @@ struct VertexBuffer : private NonCopyable
 	VertexBuffer();
 	VertexBuffer(VertexBuffer&&) noexcept;
 	VertexBuffer& operator=(VertexBuffer&&) noexcept;
+	~VertexBuffer();
 
 	void clear();
 
