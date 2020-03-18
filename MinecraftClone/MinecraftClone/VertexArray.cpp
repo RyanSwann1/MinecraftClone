@@ -24,15 +24,11 @@ VertexArray::VertexArray()
 
 VertexArray::~VertexArray()
 {
-	if (m_ID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteVertexArrays(1, &m_ID);
-	}
-
-	if (m_transparentID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteVertexArrays(1, &m_transparentID);
-	}
+	assert(m_ID != Utilities::INVALID_OPENGL_ID);
+	glDeleteVertexArrays(1, &m_ID);
+	
+	assert(m_transparentID != Utilities::INVALID_OPENGL_ID);
+	glDeleteVertexArrays(1, &m_transparentID);
 }
 
 VertexArray::VertexArray(VertexArray&& orig) noexcept
@@ -49,7 +45,6 @@ VertexArray::VertexArray(VertexArray&& orig) noexcept
 	m_opaqueElementBufferIndex(orig.m_opaqueElementBufferIndex),
 	m_transparentElementBufferIndex(orig.m_transparentElementBufferIndex)
 {
-	std::cout << "Hit\n";
 	orig.m_inUse = false;
 	orig.m_opaqueVBODisplayable = false;
 	orig.m_transparentVBODisplayable = false;
@@ -65,7 +60,6 @@ VertexArray::VertexArray(VertexArray&& orig) noexcept
 
 VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
 {
-	std::cout << "Hit\n";
 	m_inUse = orig.m_inUse;
 	m_opaqueVBODisplayable = orig.m_opaqueVBODisplayable;
 	m_transparentVBODisplayable = orig.m_transparentVBODisplayable;
@@ -106,13 +100,11 @@ void VertexArray::reset()
 	m_vertexBuffer.clear();
 	m_opaqueElementBufferIndex = 0;
 	m_transparentElementBufferIndex = 0;
-	//glDisableVertexAttribArray(0);
-	//glDisableVertexAttribArray(1);
-	//glDisableVertexAttribArray(2);
 }
 
 void VertexArray::attachOpaqueVBO()
 {
+	assert(m_attachOpaqueVBO);
 	m_attachOpaqueVBO = false;
 
 	bindOpaqueVAO();
@@ -133,16 +125,16 @@ void VertexArray::attachOpaqueVBO()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_vertexBuffer.indicies.size() * sizeof(unsigned int), m_vertexBuffer.indicies.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
 	unbind();
-	if (!m_awaitingRegeneration)
-	{
-		m_opaqueVBODisplayable = true;
-	}
+
+	assert(!m_opaqueVBODisplayable);
+	m_opaqueVBODisplayable = true;
+
 }
 
 void VertexArray::attachTransparentVBO()
 {
+	assert(m_attachTransparentVBO);
 	m_attachTransparentVBO = false;
 	
 	bindTransparentVAO();
@@ -163,13 +155,10 @@ void VertexArray::attachTransparentVBO()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_vertexBuffer.transparentIndicies.size() * sizeof(unsigned int), m_vertexBuffer.transparentIndicies.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
 	unbind();
 
-	if (!m_awaitingRegeneration)
-	{
-		m_transparentVBODisplayable = true;
-	}
+	assert(!m_transparentVBODisplayable);
+	m_transparentVBODisplayable = true;
 }
 
 void VertexArray::bindOpaqueVAO() const
