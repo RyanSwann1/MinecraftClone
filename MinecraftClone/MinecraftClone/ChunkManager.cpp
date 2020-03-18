@@ -49,6 +49,7 @@ std::unordered_map<glm::ivec3, VertexArrayFromPool>& ChunkManager::getVAOs()
 
 void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition, const Texture& texture)
 {
+	std::queue<std::pair<const Chunk*, VertexArray*>> recentlyAddedQueue;
 	for (int z = playerPosition.z - Utilities::VISIBILITY_DISTANCE; z <= playerPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
 	{
 		for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x <= playerPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
@@ -57,24 +58,23 @@ void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition, const 
 			Utilities::getClosestChunkStartingPosition(chunkStartingPosition);
 			assert(m_chunks.find(chunkStartingPosition) == m_chunks.cend() && m_VAOs.find(chunkStartingPosition) == m_VAOs.cend());
 			
-			m_VAOs.emplace(std::piecewise_construct,
+			VertexArray& VAO = m_VAOs.emplace(std::piecewise_construct,
 				std::forward_as_tuple(chunkStartingPosition),
-				std::forward_as_tuple(m_vertexArrayPool));
+				std::forward_as_tuple(m_vertexArrayPool)).first->second.object;
 
-			m_chunks.emplace(std::piecewise_construct,
+			const Chunk& chunk = m_chunks.emplace(std::piecewise_construct,
 				std::forward_as_tuple(chunkStartingPosition),
-				std::forward_as_tuple(m_chunkPool, chunkStartingPosition));
+				std::forward_as_tuple(m_chunkPool, chunkStartingPosition)).first->second.object;
+		
+			recentlyAddedQueue.push(std::make_pair<const Chunk*, VertexArray*>(&chunk, &VAO));
 		}
 	}
 
-	for (const auto& chunk : m_chunks)
+	while (!recentlyAddedQueue.empty())
 	{
-		auto VAO = m_VAOs.find(chunk.second.object.getStartingPosition());
-		assert(VAO != m_VAOs.cend());
-		if (VAO != m_VAOs.cend())
-		{
-			generateChunkMesh(VAO->second.object, chunk.second.object, texture);
-		}
+		std::pair<const Chunk*, VertexArray*> recentlyAdded = recentlyAddedQueue.front();
+		recentlyAddedQueue.pop();
+		generateChunkMesh(*recentlyAdded.second, *recentlyAdded.first, texture);
 	}
 }
 
