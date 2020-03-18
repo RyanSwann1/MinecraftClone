@@ -17,7 +17,7 @@ struct VertexBuffer : private NonCopyable
 
 	//Opaque
 	unsigned int positionsID;
-	std::vector<glm::vec3> positions;
+	std::vector<glm::ivec3> positions;
 
 	unsigned int textCoordsID;
 	std::vector<glm::vec2> textCoords;
@@ -27,7 +27,7 @@ struct VertexBuffer : private NonCopyable
 	
 	//Transparent
 	unsigned int transparentPositionsID;
-	std::vector<glm::vec3> transparentPositions;
+	std::vector<glm::ivec3> transparentPositions;
 
 	unsigned int transparentTextCoordsID;
 	std::vector<glm::vec2> transparentTextCoords;

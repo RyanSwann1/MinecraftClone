@@ -110,10 +110,10 @@ void VertexArray::attachOpaqueVBO()
 	bindOpaqueVAO();
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.positionsID);
-	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.positions.size() * sizeof(glm::vec3), m_vertexBuffer.positions.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.positions.size() * sizeof(glm::ivec3), m_vertexBuffer.positions.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
+	glVertexAttribPointer(0, 3, GL_INT, GL_FALSE, 3 * sizeof(int), (const void*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.textCoordsID);
 	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.textCoords.size() * sizeof(glm::vec2), m_vertexBuffer.textCoords.data(), GL_STATIC_DRAW);
@@ -140,10 +140,10 @@ void VertexArray::attachTransparentVBO()
 	bindTransparentVAO();
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.transparentPositionsID);
-	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.transparentPositions.size() * sizeof(glm::vec3), m_vertexBuffer.transparentPositions.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.transparentPositions.size() * sizeof(glm::ivec3), m_vertexBuffer.transparentPositions.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
+	glVertexAttribPointer(0, 3, GL_INT, GL_FALSE, 3 * sizeof(int), (const void*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.transparentTextCoordsID);
 	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.transparentTextCoords.size() * sizeof(glm::vec2), m_vertexBuffer.transparentTextCoords.data(), GL_STATIC_DRAW);

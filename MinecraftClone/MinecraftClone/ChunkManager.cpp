@@ -97,16 +97,17 @@ void ChunkManager::update(const Camera& camera, const sf::Window& window, const 
 
 void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition, const Texture& texture)
 {
+	glm::ivec3 position = cubePosition;
 	if (cubeType == eCubeType::Water)
 	{
 		assert(cubeSide == eCubeSide::Top);
 		if (cubeSide == eCubeSide::Top)
 		{
-			for (glm::vec3 i : Utilities::CUBE_FACE_TOP)
+			for (const glm::vec3& i : Utilities::CUBE_FACE_TOP)
 			{
-				i += cubePosition;
-
-				vertexArray.m_vertexBuffer.transparentPositions.push_back({ i.x, i.y, i.z });
+				position += i;
+				vertexArray.m_vertexBuffer.transparentPositions.push_back({ position.x, position.y, position.z });
+				position = cubePosition;
 			}
 
 			texture.getTextCoords(eCubeFaceID::Water, vertexArray.m_vertexBuffer.transparentTextCoords);
@@ -121,14 +122,15 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 	}
 	else
 	{
+
 		switch (cubeSide)
 		{
 		case eCubeSide::Front:
-			for (glm::vec3 i : Utilities::CUBE_FACE_FRONT)
+			for (const glm::ivec3& i : Utilities::CUBE_FACE_FRONT)
 			{
-				i += cubePosition;
-
-				vertexArray.m_vertexBuffer.positions.push_back({ i.x, i.y, i.z });
+				position += i;
+				vertexArray.m_vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
 			}
 
 			switch (cubeType)
@@ -154,10 +156,11 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 			}
 			break;
 		case eCubeSide::Back:
-			for (glm::vec3 i : Utilities::CUBE_FACE_BACK)
+			for (glm::ivec3 i : Utilities::CUBE_FACE_BACK)
 			{
-				i += cubePosition;
-				vertexArray.m_vertexBuffer.positions.push_back({ i.x, i.y, i.z });
+				position += i;
+				vertexArray.m_vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
 			}
 
 			switch (cubeType)
@@ -183,10 +186,11 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 			}
 			break;
 		case eCubeSide::Left:
-			for (glm::vec3 i : Utilities::CUBE_FACE_LEFT)
+			for (const glm::ivec3& i : Utilities::CUBE_FACE_LEFT)
 			{
-				i += cubePosition;
-				vertexArray.m_vertexBuffer.positions.push_back({ i.x, i.y, i.z });
+				position += i;
+				vertexArray.m_vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
 			}
 
 			switch (cubeType)
@@ -212,10 +216,11 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 			}
 			break;
 		case eCubeSide::Right:
-			for (glm::vec3 i : Utilities::CUBE_FACE_RIGHT)
+			for (const glm::ivec3& i : Utilities::CUBE_FACE_RIGHT)
 			{
-				i += cubePosition;
-				vertexArray.m_vertexBuffer.positions.push_back({ i.x, i.y, i.z });
+				position += i;
+				vertexArray.m_vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
 			}
 
 			switch (cubeType)
@@ -241,10 +246,11 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 			}
 			break;
 		case eCubeSide::Top:
-			for (glm::vec3 i : Utilities::CUBE_FACE_TOP)
+			for (const glm::ivec3& i : Utilities::CUBE_FACE_TOP)
 			{
-				i += cubePosition;
-				vertexArray.m_vertexBuffer.positions.push_back({ i.x, i.y, i.z });
+				position += i;
+				vertexArray.m_vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
 			}
 
 			switch (cubeType)
@@ -270,10 +276,11 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 			}
 			break;
 		case eCubeSide::Bottom:
-			for (glm::vec3 i : Utilities::CUBE_FACE_BOTTOM)
+			for (const glm::ivec3& i : Utilities::CUBE_FACE_BOTTOM)
 			{
-				i += cubePosition;
-				vertexArray.m_vertexBuffer.positions.push_back({ i.x, i.y, i.z });
+				position += i;
+				vertexArray.m_vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
 			}	
 
 			switch (cubeType)
