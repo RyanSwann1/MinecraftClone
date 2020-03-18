@@ -51,7 +51,9 @@ Chunk::Chunk(Chunk&& orig) noexcept
 	m_endingPosition(orig.m_endingPosition),
 	m_chunk(std::move(orig.m_chunk)),
 	m_AABB(orig.m_AABB)
-{}
+{
+	orig.m_inUse = false;
+}
 
 Chunk& Chunk::operator=(Chunk&& orig) noexcept
 {
@@ -60,6 +62,8 @@ Chunk& Chunk::operator=(Chunk&& orig) noexcept
 	m_endingPosition = orig.m_endingPosition;
 	m_chunk = std::move(orig.m_chunk);
 	m_AABB = orig.m_AABB;
+
+	orig.m_inUse = false;
 
 
 	return *this;
