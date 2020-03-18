@@ -75,54 +75,32 @@ VertexBuffer& VertexBuffer::operator=(VertexBuffer&& orig) noexcept
 
 VertexBuffer::~VertexBuffer()
 {
-	if (positionsID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &positionsID);
-	}
-
-	if (textCoordsID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &textCoordsID);
-	}
-
-	if (indiciesID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &indiciesID);
-	}
-
-	if (transparentPositionsID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &transparentPositionsID);
-	}
-
-	if (transparentTextCoordsID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &transparentTextCoordsID);
-	}
-
-	if (transparentIndiciesID != Utilities::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &transparentIndiciesID);
-	}
+	assert(positionsID != Utilities::INVALID_OPENGL_ID);
+	glDeleteBuffers(1, &positionsID);
+	
+	assert(textCoordsID != Utilities::INVALID_OPENGL_ID);
+	glDeleteBuffers(1, &textCoordsID);
+	
+	assert(indiciesID != Utilities::INVALID_OPENGL_ID);
+	glDeleteBuffers(1, &indiciesID);
+	
+	assert(transparentPositionsID != Utilities::INVALID_OPENGL_ID);
+	glDeleteBuffers(1, &transparentPositionsID);
+	
+	assert(transparentTextCoordsID != Utilities::INVALID_OPENGL_ID);
+	glDeleteBuffers(1, &transparentTextCoordsID);
+	
+	assert(transparentIndiciesID != Utilities::INVALID_OPENGL_ID);
+	glDeleteBuffers(1, &transparentIndiciesID);
 }
 
 void VertexBuffer::clear()
 {
-	//positionsID = Utilities::INVALID_OPENGL_ID;
 	positions.clear();
-
-	//transparentPositionsID = Utilities::INVALID_OPENGL_ID;
 	transparentPositions.clear();
-
-	//transparentTextCoordsID = Utilities::INVALID_OPENGL_ID;
 	transparentTextCoords.clear();
 
-	//textCoordsID = Utilities::INVALID_OPENGL_ID;
 	textCoords.clear();
-
-	//transparentIndiciesID = Utilities::INVALID_OPENGL_ID;
 	transparentIndicies.clear();
-
-	//indiciesID = Utilities::INVALID_OPENGL_ID;
 	indicies.clear();
 }
