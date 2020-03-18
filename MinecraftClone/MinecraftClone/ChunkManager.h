@@ -59,7 +59,6 @@ private:
 	std::unordered_map<glm::ivec3, VertexArrayFromPool> m_VAOs;
 	std::unordered_map<glm::ivec3, ChunkFromPool> m_chunks;
 	std::unordered_set<glm::ivec3> m_chunksToRegenerate;
-	std::queue<const Chunk*> m_newlyAddedChunks;
 	std::mutex m_mutex;
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;

@@ -89,9 +89,9 @@ void ChunkManager::update(const Camera& camera, const sf::Window& window, const 
 
 		deleteChunks(camera.m_position);
 		addChunks(camera.m_position, texture);
-		//regenChunks(texture);
+		regenChunks(texture);
 
-		//std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}
 }
 
@@ -563,6 +563,7 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition)
 
 void ChunkManager::addChunks(const glm::vec3& playerPosition, const Texture& texture)
 {
+	std::queue<std::pair<const Chunk*, VertexArray*>> recentlyAddedQueue;
 	glm::ivec3 startPosition(playerPosition);
 	Utilities::getClosestMiddlePosition(startPosition);
 	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z <= startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
@@ -582,36 +583,45 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition, const Texture& tex
 			if (m_chunks.find(position) == m_chunks.cend() && m_VAOs.find(position) == m_VAOs.cend())
 			{
 				std::unique_lock<std::mutex> lock(m_mutex);
-				auto newVAO = m_VAOs.emplace(std::piecewise_construct,
+				VertexArray& VAO = m_VAOs.emplace(std::piecewise_construct,
 					std::forward_as_tuple(position),
-					std::forward_as_tuple(m_vertexArrayPool)).first;
+					std::forward_as_tuple(m_vertexArrayPool)).first->second.object;
 				lock.unlock();
 
-				auto newChunk = m_chunks.emplace(std::piecewise_construct,
+				const Chunk& chunk = m_chunks.emplace(std::piecewise_construct,
 					std::forward_as_tuple(position),
-					std::forward_as_tuple(m_chunkPool, position)).first;
+					std::forward_as_tuple(m_chunkPool, position)).first->second.object;
 
-				m_newlyAddedChunks.push(&newChunk->second.object);
+				recentlyAddedQueue.push(std::make_pair<const Chunk*, VertexArray*>(&chunk, &VAO));
+				//m_newlyAddedChunks.push(&newChunk);
 			}
 		}
 	}
 
 	std::lock_guard<std::mutex> lock(m_mutex);
-	while (!m_newlyAddedChunks.empty())
+	while (!recentlyAddedQueue.empty())
 	{
-		const Chunk* newChunk = m_newlyAddedChunks.front();
-		m_newlyAddedChunks.pop();
-		assert(newChunk);
-		if (newChunk)
-		{
-			auto VAO = m_VAOs.find(newChunk->getStartingPosition());
-			assert(VAO != m_VAOs.end());
-			if (VAO != m_VAOs.end())
-			{
-				generateChunkMesh(VAO->second.object, *newChunk, texture);
-			}
-		}
+		std::pair<const Chunk*, VertexArray*> recentlyAdded = recentlyAddedQueue.front();
+		recentlyAddedQueue.pop();
+		generateChunkMesh(*recentlyAdded.second, *recentlyAdded.first, texture);
 	}
+
+
+	//while (!m_newlyAddedChunks.empty())
+	//{
+	//	const Chunk* newChunk = m_newlyAddedChunks.front();
+	//	m_newlyAddedChunks.pop();
+	//	assert(newChunk);
+	//	if (newChunk)
+	//	{
+	//		auto VAO = m_VAOs.find(newChunk->getStartingPosition());
+	//		assert(VAO != m_VAOs.end());
+	//		if (VAO != m_VAOs.end())
+	//		{
+	//			generateChunkMesh(VAO->second.object, *newChunk, texture);
+	//		}
+	//	}
+	//}
 }
 
 void ChunkManager::regenChunks(const Texture& texture)
