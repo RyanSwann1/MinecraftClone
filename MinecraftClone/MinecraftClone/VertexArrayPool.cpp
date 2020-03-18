@@ -5,9 +5,9 @@ VertexArrayPool::VertexArrayPool()
 	: ObjectPool()
 {
 	int x = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_WIDTH;
-	x += x += 2;
+	x += x += 1;
 	int y = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_DEPTH;
-	y += y += 2;
+	y += y += 1;
 
 	m_objectPool.resize(size_t((x * y)));
 	
@@ -52,7 +52,4 @@ VertexArrayFromPool::VertexArrayFromPool(VertexArrayPool& vertexArrayPool)
 VertexArrayFromPool::~VertexArrayFromPool()
 {
 	object.reset();
-	//object.m_inUse = false;
-	//object.m_opaqueVBODisplayable = false;
-	//object.m_transparentVBODisplayable = false;
 }
