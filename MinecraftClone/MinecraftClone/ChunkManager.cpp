@@ -115,9 +115,9 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 			{
 				vertexArray.m_vertexBuffer.transparentIndicies.push_back(i + vertexArray.m_transparentElementBufferIndex);
 			}
-		}
 
-		vertexArray.m_transparentElementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
+			vertexArray.m_transparentElementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
+		}
 	}
 	else
 	{
@@ -340,81 +340,9 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 				}
 				else if (cubeType == eCubeType::Water)
 				{
-					addCubeFace(vertexArray, cubeType, eCubeSide::Top, position, texture);
-				}
-				else if (cubeType == eCubeType::Leaves)
-				{
-					//Top Face
-					if (y == Utilities::CHUNK_HEIGHT - 1 || 
-						!isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
+					if (!vertexArray.m_awaitingRegeneration)
 					{
 						addCubeFace(vertexArray, cubeType, eCubeSide::Top, position, texture);
-					}
-					
-					//Bottom Face
-					if (!isCubeAtPosition(glm::ivec3(x, y - 1, z), chunk))
-					{
-						addCubeFace(vertexArray, cubeType, eCubeSide::Bottom, position, texture);
-					}
-
-					//Left Face
-					glm::ivec3 leftPosition(x - 1, y, z);
-					if (chunk.isPositionInBounds(leftPosition))
-					{
-						if (!isCubeAtPosition(leftPosition, chunk))
-						{
-							addCubeFace(vertexArray, cubeType, eCubeSide::Left, position, texture);
-						}
-					}
-					else if (leftNeighbouringChunk &&
-						!isCubeAtPosition(leftPosition, *leftNeighbouringChunk))
-					{
-						addCubeFace(vertexArray, cubeType, eCubeSide::Left, position, texture);
-					}
-					
-					//Right Face
-					glm::ivec3 rightPosition(x + 1, y, z);
-					if (chunk.isPositionInBounds(rightPosition))
-					{
-						if (!isCubeAtPosition(rightPosition, chunk))
-						{
-							addCubeFace(vertexArray, cubeType, eCubeSide::Right, position, texture);
-						}
-					}
-					else if (rightNeighbouringChunk &&
-						!isCubeAtPosition(rightPosition, *rightNeighbouringChunk))
-					{
-						addCubeFace(vertexArray, cubeType, eCubeSide::Right, position, texture);
-					}
-
-					//Front Face
-					glm::ivec3 frontPosition(x, y, z + 1);
-					if (chunk.isPositionInBounds(frontPosition))
-					{
-						if (!isCubeAtPosition(frontPosition, chunk))
-						{
-							addCubeFace(vertexArray, cubeType, eCubeSide::Front, position, texture);
-						}
-					}
-					else if (forwardNeighbouringChunk &&
-						!isCubeAtPosition(frontPosition, *forwardNeighbouringChunk))
-					{
-						addCubeFace(vertexArray, cubeType, eCubeSide::Front, position, texture);
-					}
-
-					//Back Face
-					glm::ivec3 backPosition(x, y, z - 1);
-					if (chunk.isPositionInBounds(backPosition))
-					{
-						if (!isCubeAtPosition(backPosition, chunk))
-						{
-							addCubeFace(vertexArray, cubeType, eCubeSide::Back, position, texture);
-						}
-					}
-					else if (backNeighbouringChunk &&
-						!isCubeAtPosition(backPosition, *backNeighbouringChunk))
-					{
-						addCubeFace(vertexArray, cubeType, eCubeSide::Back, position, texture);
 					}
 				}
 				else
@@ -466,7 +394,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 							addCubeFace(vertexArray, cubeType, eCubeSide::Front, position, texture);
 						}
 					}
-					else if ( forwardNeighbouringChunk &&
+					else if (forwardNeighbouringChunk &&
 						!isCubeAtPosition(forwardPosition, *forwardNeighbouringChunk))
 					{
 						addCubeFace(vertexArray, cubeType, eCubeSide::Front, position, texture);
@@ -497,7 +425,10 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 
 					if (y == Utilities::CHUNK_HEIGHT - 1 || !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
 					{
-						addCubeFace(vertexArray, cubeType, eCubeSide::Top, position, texture);
+						if (!vertexArray.m_awaitingRegeneration)
+						{
+							addCubeFace(vertexArray, cubeType, eCubeSide::Top, position, texture);
+						}
 					}
 				}
 			}
@@ -506,7 +437,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 
 	if (!vertexArray.m_awaitingRegeneration && regenChunk)
 	{
-		m_chunksToRegenerate.insert(chunkStartingPosition); 
+		m_chunksToRegenerate.insert(chunkStartingPosition);
 		vertexArray.m_awaitingRegeneration = true;
 	}
 	else if (vertexArray.m_awaitingRegeneration && !regenChunk)
@@ -520,9 +451,6 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 		vertexArray.m_attachOpaqueVBO = true;
 		vertexArray.m_attachTransparentVBO = true;
 	}
-
-	//vertexArray.m_attachOpaqueVBO = true;
-	//vertexArray.m_attachTransparentVBO = true;
 }
 
 void ChunkManager::deleteChunks(const glm::ivec3& playerPosition)
@@ -539,6 +467,7 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition)
 			assert(VAO != m_VAOs.end());
 			if (VAO != m_VAOs.end())
 			{
+				assert(!VAO->second.object.m_reset);
 				VAO->second.object.m_reset = true;
 			}
 			lock.unlock();
@@ -593,7 +522,6 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition, const Texture& tex
 					std::forward_as_tuple(m_chunkPool, position)).first->second.object;
 
 				recentlyAddedQueue.push(std::make_pair<const Chunk*, VertexArray*>(&chunk, &VAO));
-				//m_newlyAddedChunks.push(&newChunk);
 			}
 		}
 	}
@@ -605,28 +533,11 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition, const Texture& tex
 		recentlyAddedQueue.pop();
 		generateChunkMesh(*recentlyAdded.second, *recentlyAdded.first, texture);
 	}
-
-
-	//while (!m_newlyAddedChunks.empty())
-	//{
-	//	const Chunk* newChunk = m_newlyAddedChunks.front();
-	//	m_newlyAddedChunks.pop();
-	//	assert(newChunk);
-	//	if (newChunk)
-	//	{
-	//		auto VAO = m_VAOs.find(newChunk->getStartingPosition());
-	//		assert(VAO != m_VAOs.end());
-	//		if (VAO != m_VAOs.end())
-	//		{
-	//			generateChunkMesh(VAO->second.object, *newChunk, texture);
-	//		}
-	//	}
-	//}
 }
 
 void ChunkManager::regenChunks(const Texture& texture)
 {
-	for (auto chunkStartingPosition = m_chunksToRegenerate.begin(); chunkStartingPosition != m_chunksToRegenerate.end();)
+	for (auto chunkStartingPosition = m_chunksToRegenerate.cbegin(); chunkStartingPosition != m_chunksToRegenerate.cend();)
 	{
 		auto chunk = m_chunks.find(*chunkStartingPosition);
 		if (chunk != m_chunks.cend())
