@@ -156,7 +156,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 			}
 			break;
 		case eCubeSide::Back:
-			for (const glm::ivec3& i : Utilities::CUBE_FACE_BACK)
+			for (glm::ivec3 i : Utilities::CUBE_FACE_BACK)
 			{
 				position += i;
 				vertexArray.m_vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
@@ -579,7 +579,7 @@ void ChunkManager::regenChunks(const Texture& texture)
 
 const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const
 {
-	const Chunk* neighbouringChunk = nullptr;
+	const Chunk* chunk = nullptr;
 
 	switch (direction)
 	{
@@ -588,7 +588,7 @@ const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chun
 		auto cIter = m_chunks.find(glm::ivec3(chunkStartingPosition.x - Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z));
 		if (cIter != m_chunks.cend())
 		{
-			neighbouringChunk = &cIter->second.object;
+			chunk = &cIter->second.object;
 		}
 		break;
 	}
@@ -597,7 +597,7 @@ const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chun
 		auto cIter = m_chunks.find(glm::ivec3(chunkStartingPosition.x + Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z));
 		if (cIter != m_chunks.cend())
 		{
-			neighbouringChunk = &cIter->second.object;
+			chunk = &cIter->second.object;
 		}
 		break;
 	}
@@ -606,7 +606,7 @@ const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chun
 		auto cIter = m_chunks.find(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z + Utilities::CHUNK_DEPTH));
 		if (cIter != m_chunks.cend())
 		{
-			neighbouringChunk = &cIter->second.object;
+			chunk = &cIter->second.object;
 		}
 		break;
 	}
@@ -615,7 +615,7 @@ const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chun
 		auto cIter = m_chunks.find(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z - Utilities::CHUNK_DEPTH));
 		if (cIter != m_chunks.cend())
 		{
-			neighbouringChunk = &cIter->second.object;
+			chunk = &cIter->second.object;
 		}
 		break;
 	}
@@ -623,5 +623,5 @@ const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chun
 		assert(false);
 	}
 
-	return neighbouringChunk;
+	return chunk;
 }
