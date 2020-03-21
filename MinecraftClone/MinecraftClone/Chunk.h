@@ -37,11 +37,12 @@ private:
 	bool m_inUse;
 	glm::ivec3 m_startingPosition;
 	glm::ivec3 m_endingPosition;
-	std::array<std::array<std::array<char, Utilities::CHUNK_DEPTH>, Utilities::CHUNK_HEIGHT>, Utilities::CHUNK_WIDTH> m_chunk;
+	std::array<char, Utilities::CHUNK_VOLUME> m_chunk;
+	//std::array<std::array<std::array<char, Utilities::CHUNK_DEPTH>, Utilities::CHUNK_HEIGHT>, Utilities::CHUNK_WIDTH> m_chunk;
 	Rectangle m_AABB;
 
 	bool isPositionInLocalBounds(const glm::ivec3& position) const;
-	char getCubeAtLocalPosition(const glm::ivec3 position) const;
+	char getCubeAtLocalPosition(const glm::ivec3& position) const;
 	int getElevationValue(int x, int y) const;
 	float getMoistureValue(int x, int y) const;
 	

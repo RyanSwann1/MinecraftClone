@@ -31,7 +31,7 @@ namespace Utilities
 	constexpr int CHUNK_WIDTH = 32;
 	constexpr int CHUNK_HEIGHT = 160;
 	constexpr int CHUNK_DEPTH = 32;
-	constexpr int CHUNK_SIZE = (CHUNK_WIDTH + CHUNK_DEPTH) / 2.0f;
+	constexpr int CHUNK_VOLUME = CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH;
 
 	constexpr float WATER_ALPHA_VALUE = 0.5f;
 	constexpr int SAND_MAX_HEIGHT = 17;
@@ -213,6 +213,23 @@ namespace Utilities
 		{
 			position.z -= std::abs(position.z % CHUNK_DEPTH);
 		}
+	}
+
+	inline int converTo1D(const glm::ivec3& position) 
+	{
+		//return (z * xMax * yMax) + (y * xMax) + x;
+		return (position.z * Utilities::CHUNK_WIDTH * Utilities::CHUNK_HEIGHT) + (position.y * Utilities::CHUNK_WIDTH) + position.x;
+	}
+
+	inline glm::ivec3 convertTo3D(int idx) 
+	{
+		glm::ivec3 position;
+		position.z = idx / (Utilities::CHUNK_WIDTH * Utilities::CHUNK_HEIGHT);
+		idx -= (position.z * Utilities::CHUNK_WIDTH * Utilities::CHUNK_HEIGHT);
+		position.y = idx / Utilities::CHUNK_WIDTH;
+		position.x = idx % Utilities::CHUNK_WIDTH;
+		return position;
+		//return new int[] { x, y, z };
 	}
 
 	inline int getRandomNumber(int min, int max)

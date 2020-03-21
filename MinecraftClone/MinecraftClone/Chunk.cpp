@@ -101,29 +101,19 @@ const glm::ivec3& Chunk::getEndingPosition() const
 
 char Chunk::getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const
 {
-	return m_chunk[position.x - m_startingPosition.x]
-		[position.y - m_startingPosition.y]
-		[position.z - m_startingPosition.z];
+	glm::ivec3 positionOnGrid(position.x - m_startingPosition.x, position.y - m_startingPosition.y, position.z - m_startingPosition.z);
+	return m_chunk[Utilities::converTo1D(positionOnGrid)];
 }
 
 void Chunk::changeCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType)
 {
 	assert(isPositionInLocalBounds(position));
-	m_chunk[position.x][position.y][position.z] = static_cast<char>(cubeType);
+	m_chunk[Utilities::converTo1D(position)] = static_cast<char>(cubeType);
 }
 
 void Chunk::reuse(const glm::ivec3& startingPosition)
-{
-	for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
-	{
-		for (int y = 0; y < Utilities::CHUNK_HEIGHT; ++y)
-		{
-			for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
-			{
-				m_chunk[x][y][z] = char();
-			}
-		}
-	}
+{	
+	memset(&m_chunk, char(), m_chunk.size());
 
 	m_inUse = true;
 	m_startingPosition = startingPosition;
@@ -357,10 +347,10 @@ bool Chunk::isPositionInLocalBounds(const glm::ivec3& position) const
 		position.z < Utilities::CHUNK_DEPTH);
 }
 
-char Chunk::getCubeAtLocalPosition(const glm::ivec3 position) const
+char Chunk::getCubeAtLocalPosition(const glm::ivec3& position) const
 {
 	assert(isPositionInLocalBounds(position));
-	return m_chunk[position.x][position.y][position.z];
+	return m_chunk[Utilities::converTo1D(position)];
 }
 
 int Chunk::getElevationValue(int x, int z) const
