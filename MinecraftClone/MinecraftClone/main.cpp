@@ -221,7 +221,6 @@ int main()
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 
-	bool resetGame = false;
 	sf::Clock clock;
 	clock.restart();
 	float messageExpiredTime = 1.0f;
@@ -249,25 +248,16 @@ int main()
 			}
 			else if (currentSFMLEvent.KeyPressed)
 			{
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::R) && !chunkManager.isResetting())
 				{
-					resetGame = true;
-				}
-			}
-		}
+					for (auto& VAO : VAOs)
+					{
+						VAO.second.object.reset();
+					}
 
-		if (resetGame)
-		{
-			resetGame = false;
-			if (!chunkManager.isResetting())
-			{
-				for (auto& VAO : VAOs)
-				{
-					VAO.second.object.reset();
+					camera.m_position = Utilities::PLAYER_STARTING_POSITION;
+					chunkManager.reset();
 				}
-
-				camera.m_position = Utilities::PLAYER_STARTING_POSITION;
-				chunkManager.reset();
 			}
 		}
 
