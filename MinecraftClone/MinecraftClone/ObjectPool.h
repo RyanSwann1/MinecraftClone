@@ -76,4 +76,21 @@ public:
 protected:
 	std::vector<ObjectInPool<Object>> m_objectPool;
 	ObjectInPool<Object>* m_nextAvailableObject;
+
+	ObjectInPool<Object>& getNextAvailableObject()
+	{
+		int iterationCount = 0;
+		bool validChunkFound = false;
+
+		assert(m_nextAvailableObject);
+		while (m_nextAvailableObject->object.isInUse())
+		{
+			assert(m_nextAvailableObject->nextAvailableObject);
+			m_nextAvailableObject = m_nextAvailableObject->nextAvailableObject;
+
+			assert(++iterationCount && iterationCount <= m_objectPool.size());
+		}
+
+		return *m_nextAvailableObject;
+	}
 };
