@@ -56,6 +56,7 @@ public:
 		: m_objectPool(),
 		m_nextAvailableObject(nullptr)
 	{
+		//Added a little bit more than neccessary due to how the inifinite map generates
 		int x = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_WIDTH;
 		x += x += 1;
 		int y = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_DEPTH;
@@ -74,9 +75,6 @@ public:
 	virtual ~ObjectPool() {}
 
 protected:
-	std::vector<ObjectInPool<Object>> m_objectPool;
-	ObjectInPool<Object>* m_nextAvailableObject;
-
 	ObjectInPool<Object>& getNextAvailableObject()
 	{
 		int iterationCount = 0;
@@ -93,4 +91,7 @@ protected:
 
 		return *m_nextAvailableObject;
 	}
+private:
+	std::vector<ObjectInPool<Object>> m_objectPool;
+	ObjectInPool<Object>* m_nextAvailableObject;
 };
