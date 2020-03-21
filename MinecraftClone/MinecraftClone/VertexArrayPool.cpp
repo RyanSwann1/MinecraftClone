@@ -3,22 +3,7 @@
 
 VertexArrayPool::VertexArrayPool()
 	: ObjectPool()
-{
-	int x = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_WIDTH;
-	x += x += 1;
-	int y = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_DEPTH;
-	y += y += 1;
-
-	m_objectPool.resize(size_t((x * y)));
-	
-	for (int i = 0; i < static_cast<int>(m_objectPool.size()) - 1; ++i)
-	{
-		m_objectPool[i].nextAvailableObject = &m_objectPool[i + 1];
-	}
-
-	m_nextAvailableObject = &m_objectPool.front();
-	m_objectPool.back().nextAvailableObject = m_nextAvailableObject;
-}
+{}
 
 VertexArray& VertexArrayPool::getVertexArray()
 {
