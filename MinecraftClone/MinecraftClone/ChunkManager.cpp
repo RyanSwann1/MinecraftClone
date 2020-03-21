@@ -109,7 +109,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				vertexArray.m_vertexBuffer.transparentPositions.push_back({ position.x, position.y, position.z });
 				position = cubePosition;
 			}
-
+			
 			texture.getTextCoords(eCubeFaceID::Water, vertexArray.m_vertexBuffer.transparentTextCoords);
 			
 			for (unsigned int i : Utilities::CUBE_FACE_INDICIES)

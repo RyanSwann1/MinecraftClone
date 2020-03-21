@@ -26,17 +26,17 @@ VertexBuffer::VertexBuffer()
 
 VertexBuffer::VertexBuffer(VertexBuffer&& orig) noexcept
 	: positionsID(orig.positionsID),
-	positions(orig.positions),
+	positions(std::move(orig.positions)),
 	textCoordsID(orig.textCoordsID),
-	textCoords(orig.textCoords),
+	textCoords(std::move(orig.textCoords)),
 	indiciesID(orig.indiciesID),
-	indicies(orig.indicies),
+	indicies(std::move(orig.indicies)),
 	transparentPositionsID(orig.transparentPositionsID),
-	transparentPositions(orig.transparentPositions),
+	transparentPositions(std::move(orig.transparentPositions)),
 	transparentTextCoordsID(orig.transparentTextCoordsID),
-	transparentTextCoords(orig.transparentTextCoords),
+	transparentTextCoords(std::move(orig.transparentTextCoords)),
 	transparentIndiciesID(orig.transparentIndiciesID),
-	transparentIndicies(orig.transparentIndicies)
+	transparentIndicies(std::move(orig.transparentIndicies))
 {
 	orig.positionsID = Utilities::INVALID_OPENGL_ID;
 	orig.textCoordsID = Utilities::INVALID_OPENGL_ID;
@@ -50,17 +50,17 @@ VertexBuffer::VertexBuffer(VertexBuffer&& orig) noexcept
 VertexBuffer& VertexBuffer::operator=(VertexBuffer&& orig) noexcept
 {
 	positionsID = orig.positionsID;
-	positions = orig.positions;
+	positions = std::move(orig.positions);
 	textCoordsID = orig.textCoordsID;
-	textCoords = orig.textCoords;
+	textCoords = std::move(orig.textCoords);
 	indiciesID = orig.indiciesID;
-	indicies = orig.indicies;
+	indicies = std::move(orig.indicies);
 	transparentPositionsID = orig.transparentPositionsID;
-	transparentPositions = orig.transparentPositions;
+	transparentPositions = std::move(orig.transparentPositions);
 	transparentTextCoordsID = orig.transparentTextCoordsID;
-	transparentTextCoords = orig.transparentTextCoords;
+	transparentTextCoords = std::move(orig.transparentTextCoords);
 	transparentIndiciesID = orig.transparentIndiciesID;
-	transparentIndicies = orig.transparentIndicies;
+	transparentIndicies = std::move(orig.transparentIndicies);
 
 	orig.positionsID = Utilities::INVALID_OPENGL_ID;
 	orig.textCoordsID = Utilities::INVALID_OPENGL_ID;
@@ -96,11 +96,21 @@ VertexBuffer::~VertexBuffer()
 
 void VertexBuffer::clear()
 {
-	positions.clear();
-	transparentPositions.clear();
-	transparentTextCoords.clear();
+	std::vector<glm::ivec3> newPositions;
+	positions.swap(newPositions);
 
-	textCoords.clear();
-	transparentIndicies.clear();
-	indicies.clear();
+	std::vector<glm::ivec3> newTransparentPositions;
+	transparentPositions.swap(newTransparentPositions);
+	
+	std::vector<glm::vec2> newTransparentTextCoords;
+	transparentTextCoords.swap(newTransparentTextCoords);
+
+	std::vector<glm::vec2> newTextCoords;
+	textCoords.swap(newTextCoords);
+
+	std::vector<unsigned int> newTransparentIndicies;
+	transparentIndicies.swap(newTransparentIndicies);
+	
+	std::vector<unsigned int> newIndicies;
+	indicies.swap(newIndicies);
 }
