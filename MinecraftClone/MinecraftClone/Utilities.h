@@ -27,6 +27,8 @@ enum class eDirection
 	Back
 };
 
+//https://stackoverflow.com/questions/4422507/superiority-of-unnamed-namespace-over-static
+
 namespace Utilities
 {
 	constexpr int CHUNK_WIDTH = 32;
@@ -72,7 +74,7 @@ namespace Utilities
 		MAX_LEAVES_DISTANCE - 2
 	};
 
-	static constexpr std::array<glm::vec2, 4> GRASS_TEXT_COORDS =
+	constexpr std::array<glm::vec2, 4> GRASS_TEXT_COORDS =
 	{	
 		glm::vec2(0.0f, (128.0f - 16.0f) / 128.0f),
 		glm::vec2(16.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
@@ -80,7 +82,7 @@ namespace Utilities
 		glm::vec2(0.0f, 1.0f)
 	};
 
-	static constexpr std::array<glm::vec2, 4> GRASS_SIDE_TEXT_COORDS =
+	constexpr std::array<glm::vec2, 4> GRASS_SIDE_TEXT_COORDS =
 	{
 		glm::vec2(16.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
 		glm::vec2(32.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
@@ -88,7 +90,7 @@ namespace Utilities
 		glm::vec2(16.0f / 128.0f, 1.0f)
 	};
 
-	static constexpr std::array<glm::vec2, 4> SAND_TEXT_COORDS =
+	constexpr std::array<glm::vec2, 4> SAND_TEXT_COORDS =
 	{
 		glm::vec2(32.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
 		glm::vec2(48.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
@@ -96,7 +98,7 @@ namespace Utilities
 		glm::vec2(32.0f / 128.0f, 1.0f)
 	};
 
-	static constexpr std::array<glm::vec2, 4> STONE_TEXT_COORDS =
+	constexpr std::array<glm::vec2, 4> STONE_TEXT_COORDS =
 	{
 		glm::vec2(48.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
 		glm::vec2(64.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
@@ -104,7 +106,7 @@ namespace Utilities
 		glm::vec2(48.0f / 128.0f, 1.0f)
 	};
 
-	static constexpr std::array<glm::vec2, 4> WATER_TEXT_COORDS =
+	constexpr std::array<glm::vec2, 4> WATER_TEXT_COORDS =
 	{
 		glm::vec2(64.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
 		glm::vec2(80.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
@@ -112,7 +114,7 @@ namespace Utilities
 		glm::vec2(64.0f / 128.0f, 1.0f)
 	};
 
-	static constexpr std::array<glm::vec2, 4> TREESTUMP_TEXT_COORDS =
+	constexpr std::array<glm::vec2, 4> TREESTUMP_TEXT_COORDS =
 	{
 		glm::vec2(80.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
 		glm::vec2(96.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
@@ -120,7 +122,7 @@ namespace Utilities
 		glm::vec2(80.0f / 128.0f, 1.0f)
 	};
 
-	static constexpr std::array<glm::vec2, 4> LEAVES_TEXT_COORDS =
+	constexpr std::array<glm::vec2, 4> LEAVES_TEXT_COORDS =
 	{
 		glm::vec2(96.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
 		glm::vec2(112.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
@@ -128,7 +130,7 @@ namespace Utilities
 		glm::vec2(96.0f / 128.0f, 1.0f)
 	};
 
-	static constexpr std::array<glm::vec2, 4> CACTUS_TEXT_COORDS =
+	constexpr std::array<glm::vec2, 4> CACTUS_TEXT_COORDS =
 	{
 		glm::vec2(112.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
 		glm::vec2(128.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
@@ -178,14 +180,14 @@ namespace Utilities
 	//Extern
 	//
 
-	static constexpr std::array<glm::ivec3, 4> CUBE_FACE_FRONT = { glm::ivec3(0, 0, 1), glm::ivec3(1, 0, 1), glm::ivec3(1, 1, 1), glm::ivec3(0, 1, 1) };
-	static constexpr std::array<glm::ivec3, 4> CUBE_FACE_BACK = { glm::ivec3(0, 0, 0), glm::ivec3(1, 0, 0), glm::ivec3(1, 1, 0), glm::ivec3(0, 1, 0) };
+	constexpr std::array<glm::ivec3, 4> CUBE_FACE_FRONT = { glm::ivec3(0, 0, 1), glm::ivec3(1, 0, 1), glm::ivec3(1, 1, 1), glm::ivec3(0, 1, 1) };
+	constexpr std::array<glm::ivec3, 4> CUBE_FACE_BACK = { glm::ivec3(0, 0, 0), glm::ivec3(1, 0, 0), glm::ivec3(1, 1, 0), glm::ivec3(0, 1, 0) };
 
-	static constexpr std::array<glm::ivec3, 4> CUBE_FACE_LEFT = { glm::ivec3(0, 0, 0), glm::ivec3(0, 0, 1), glm::ivec3(0, 1, 1), glm::ivec3(0, 1, 0) };
-	static constexpr std::array<glm::ivec3, 4> CUBE_FACE_RIGHT = { glm::ivec3(1, 0, 0), glm::ivec3(1, 0, 1), glm::ivec3(1, 1, 1), glm::ivec3(1, 1, 0) };
+	constexpr std::array<glm::ivec3, 4> CUBE_FACE_LEFT = { glm::ivec3(0, 0, 0), glm::ivec3(0, 0, 1), glm::ivec3(0, 1, 1), glm::ivec3(0, 1, 0) };
+	constexpr std::array<glm::ivec3, 4> CUBE_FACE_RIGHT = { glm::ivec3(1, 0, 0), glm::ivec3(1, 0, 1), glm::ivec3(1, 1, 1), glm::ivec3(1, 1, 0) };
 
-	static constexpr std::array<glm::ivec3, 4> CUBE_FACE_TOP = { glm::ivec3(0, 1, 0), glm::ivec3(0, 1, 1), glm::ivec3(1, 1, 1), glm::ivec3(1, 1, 0) };
-	static constexpr std::array<glm::ivec3, 4> CUBE_FACE_BOTTOM = { glm::ivec3(0, 0, 0), glm::ivec3(0, 0, 1), glm::ivec3(1, 0, 1), glm::ivec3(1, 0, 0) };
+	constexpr std::array<glm::ivec3, 4> CUBE_FACE_TOP = { glm::ivec3(0, 1, 0), glm::ivec3(0, 1, 1), glm::ivec3(1, 1, 1), glm::ivec3(1, 1, 0) };
+	constexpr std::array<glm::ivec3, 4> CUBE_FACE_BOTTOM = { glm::ivec3(0, 0, 0), glm::ivec3(0, 0, 1), glm::ivec3(1, 0, 1), glm::ivec3(1, 0, 0) };
 
 	inline glm::ivec3 getNeighbouringChunkPosition(const glm::ivec3& chunkStartingPosition, eDirection direction)
 	{
@@ -292,7 +294,7 @@ namespace Utilities
 		return value;
 	}
 
-	static const std::array<unsigned int, 6> CUBE_FACE_INDICIES =
+	const std::array<unsigned int, 6> CUBE_FACE_INDICIES =
 	{
 		0, 1, 2,
 		2, 3, 0
