@@ -191,14 +191,14 @@ int main()
 	settings.attributeFlags = sf::ContextSettings::Core;
 	sf::Vector2i windowSize(1980, 1080);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft", sf::Style::Default, settings);
-	window.setFramerateLimit(60);
+	window.setFramerateLimit(120);
 	gladLoadGL();
 
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);  
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);  
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	unsigned int shaderID = createShaderProgram();
