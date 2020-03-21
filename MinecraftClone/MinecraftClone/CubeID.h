@@ -11,15 +11,3 @@ enum class eCubeType
 	Leaves,
 	Cactus
 };
-
-enum class eCubeFaceID
-{
-	Grass = 0,
-	GrassSide,
-	Sand,
-	Stone,
-	Water,
-	TreeStump,
-	Leaves,
-	Cactus
-};

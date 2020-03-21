@@ -109,7 +109,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				position = cubePosition;
 			}
 			
-			Utilities::getTextCoords(eCubeFaceID::Water, vertexArray.m_vertexBuffer.transparentTextCoords);
+			Utilities::getTextCoords(vertexArray.m_vertexBuffer.transparentTextCoords, cubeSide, cubeType);
 			
 			for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
 			{
@@ -121,7 +121,6 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 	}
 	else
 	{
-
 		switch (cubeSide)
 		{
 		case eCubeSide::Front:
@@ -131,28 +130,8 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				vertexArray.m_vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
 				position = cubePosition;
 			}
-
-			switch (cubeType)
-			{
-			case eCubeType::Stone:
-				Utilities::getTextCoords(eCubeFaceID::Stone, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Sand:
-				Utilities::getTextCoords(eCubeFaceID::Sand, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Grass:
-				Utilities::getTextCoords(eCubeFaceID::GrassSide, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::TreeStump:
-				Utilities::getTextCoords(eCubeFaceID::TreeStump, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Leaves:
-				Utilities::getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Cactus:
-				Utilities::getTextCoords(eCubeFaceID::Cactus, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			}
+			
+			Utilities::getTextCoords(vertexArray.m_vertexBuffer.textCoords, cubeSide, cubeType);
 			break;
 		case eCubeSide::Back:
 			for (glm::ivec3 i : Utilities::CUBE_FACE_BACK)
@@ -162,27 +141,8 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				position = cubePosition;
 			}
 
-			switch (cubeType)
-			{
-			case eCubeType::Stone:
-				Utilities::getTextCoords(eCubeFaceID::Stone, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Sand:
-				Utilities::getTextCoords(eCubeFaceID::Sand, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Grass:
-				Utilities::getTextCoords(eCubeFaceID::GrassSide, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::TreeStump:
-				Utilities::getTextCoords(eCubeFaceID::TreeStump, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Leaves:
-				Utilities::getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Cactus:
-				Utilities::getTextCoords(eCubeFaceID::Cactus, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			}
+			Utilities::getTextCoords(vertexArray.m_vertexBuffer.textCoords, cubeSide, cubeType);
+
 			break;
 		case eCubeSide::Left:
 			for (const glm::ivec3& i : Utilities::CUBE_FACE_LEFT)
@@ -191,28 +151,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				vertexArray.m_vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
 				position = cubePosition;
 			}
-
-			switch (cubeType)
-			{
-			case eCubeType::Stone:
-				Utilities::getTextCoords(eCubeFaceID::Stone, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Sand:
-				Utilities::getTextCoords(eCubeFaceID::Sand, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Grass:
-				Utilities::getTextCoords(eCubeFaceID::GrassSide, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::TreeStump:
-				Utilities::getTextCoords(eCubeFaceID::TreeStump, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Leaves:
-				Utilities::getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Cactus:
-				Utilities::getTextCoords(eCubeFaceID::Cactus, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			}
+			Utilities::getTextCoords(vertexArray.m_vertexBuffer.textCoords, cubeSide, cubeType);
 			break;
 		case eCubeSide::Right:
 			for (const glm::ivec3& i : Utilities::CUBE_FACE_RIGHT)
@@ -222,27 +161,8 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				position = cubePosition;
 			}
 
-			switch (cubeType)
-			{
-			case eCubeType::Stone:
-				Utilities::getTextCoords(eCubeFaceID::Stone, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Sand:
-				Utilities::getTextCoords(eCubeFaceID::Sand, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Grass:
-				Utilities::getTextCoords(eCubeFaceID::GrassSide, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::TreeStump:
-				Utilities::getTextCoords(eCubeFaceID::TreeStump, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Leaves:
-				Utilities::getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Cactus:
-				Utilities::getTextCoords(eCubeFaceID::Cactus, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			}
+			Utilities::getTextCoords(vertexArray.m_vertexBuffer.textCoords, cubeSide, cubeType);
+
 			break;
 		case eCubeSide::Top:
 			for (const glm::ivec3& i : Utilities::CUBE_FACE_TOP)
@@ -251,28 +171,8 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				vertexArray.m_vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
 				position = cubePosition;
 			}
-
-			switch (cubeType)
-			{
-			case eCubeType::Stone:
-				Utilities::getTextCoords(eCubeFaceID::Stone, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Sand:
-				Utilities::getTextCoords(eCubeFaceID::Sand, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Grass:
-				Utilities::getTextCoords(eCubeFaceID::Grass, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::TreeStump:
-				Utilities::getTextCoords(eCubeFaceID::TreeStump, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Leaves:
-				Utilities::getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Cactus:
-				Utilities::getTextCoords(eCubeFaceID::Cactus, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			}
+			Utilities::getTextCoords(vertexArray.m_vertexBuffer.textCoords, cubeSide, cubeType);
+			
 			break;
 		case eCubeSide::Bottom:
 			for (const glm::ivec3& i : Utilities::CUBE_FACE_BOTTOM)
@@ -282,27 +182,8 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 				position = cubePosition;
 			}	
 
-			switch (cubeType)
-			{
-			case eCubeType::Stone:
-				Utilities::getTextCoords(eCubeFaceID::Stone, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Sand:
-				Utilities::getTextCoords(eCubeFaceID::Sand, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Grass:
-				Utilities::getTextCoords(eCubeFaceID::Sand, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::TreeStump:
-				Utilities::getTextCoords(eCubeFaceID::TreeStump, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Leaves:
-				Utilities::getTextCoords(eCubeFaceID::Leaves, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			case eCubeType::Cactus:
-				Utilities::getTextCoords(eCubeFaceID::Cactus, vertexArray.m_vertexBuffer.textCoords);
-				break;
-			}
+			Utilities::getTextCoords(vertexArray.m_vertexBuffer.textCoords, cubeSide, cubeType);
+
 			break;
 		}
 
@@ -314,6 +195,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 		vertexArray.m_opaqueElementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
 	}
 }
+	
 
 bool ChunkManager::isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const
 {

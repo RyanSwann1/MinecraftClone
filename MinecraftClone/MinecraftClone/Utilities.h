@@ -138,40 +138,40 @@ namespace Utilities
 		glm::vec2(112.0f / 128.0f, 1.0f)
 	};
 
-	inline void getTextCoords(eCubeFaceID tileID, std::vector<glm::vec2>& textCoords)
+	inline void getTextCoords(std::vector<glm::vec2>& textCoords, eCubeSide cubeSide, eCubeType cubeType)
 	{
-		switch (tileID)
+		switch (cubeType)
 		{
-		case eCubeFaceID::Grass:
-			textCoords.insert(textCoords.end(), Utilities::GRASS_TEXT_COORDS.begin(), Utilities::GRASS_TEXT_COORDS.end());
-			break;
-
-		case eCubeFaceID::GrassSide:
-			textCoords.insert(textCoords.end(), Utilities::GRASS_SIDE_TEXT_COORDS.begin(), Utilities::GRASS_SIDE_TEXT_COORDS.end());
-			break;
-
-		case eCubeFaceID::Sand:
-			textCoords.insert(textCoords.end(), Utilities::SAND_TEXT_COORDS.begin(), Utilities::SAND_TEXT_COORDS.end());
-			break;
-
-		case eCubeFaceID::Stone:
+		case eCubeType::Stone:
 			textCoords.insert(textCoords.end(), Utilities::STONE_TEXT_COORDS.begin(), Utilities::STONE_TEXT_COORDS.end());
 			break;
-
-		case eCubeFaceID::Water:
-			textCoords.insert(textCoords.end(), Utilities::WATER_TEXT_COORDS.begin(), Utilities::WATER_TEXT_COORDS.end());
+		case eCubeType::Sand:
+			textCoords.insert(textCoords.end(), Utilities::SAND_TEXT_COORDS.begin(), Utilities::SAND_TEXT_COORDS.end());
 			break;
-
-		case eCubeFaceID::TreeStump:
+		case eCubeType::Grass:
+			switch (cubeSide)
+			{
+			case eCubeSide::Back:
+			case eCubeSide::Front:
+			case eCubeSide::Left:
+			case eCubeSide::Right:
+				textCoords.insert(textCoords.end(), Utilities::GRASS_SIDE_TEXT_COORDS.begin(), Utilities::GRASS_SIDE_TEXT_COORDS.end());
+				break;
+			case eCubeSide::Top:
+				textCoords.insert(textCoords.end(), Utilities::GRASS_TEXT_COORDS.begin(), Utilities::GRASS_TEXT_COORDS.end());
+			}
+			break;
+		case eCubeType::TreeStump:
 			textCoords.insert(textCoords.end(), Utilities::TREESTUMP_TEXT_COORDS.begin(), Utilities::TREESTUMP_TEXT_COORDS.end());
 			break;
-
-		case eCubeFaceID::Leaves:
+		case eCubeType::Leaves:
 			textCoords.insert(textCoords.end(), Utilities::LEAVES_TEXT_COORDS.begin(), Utilities::LEAVES_TEXT_COORDS.end());
 			break;
-
-		case eCubeFaceID::Cactus:
+		case eCubeType::Cactus:
 			textCoords.insert(textCoords.end(), Utilities::CACTUS_TEXT_COORDS.begin(), Utilities::CACTUS_TEXT_COORDS.end());
+			break;
+		case eCubeType::Water :
+			textCoords.insert(textCoords.end(), Utilities::WATER_TEXT_COORDS.begin(), Utilities::WATER_TEXT_COORDS.end());
 			break;
 		}
 	}
