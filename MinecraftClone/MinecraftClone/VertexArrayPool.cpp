@@ -1,35 +1,20 @@
 #include "VertexArrayPool.h"
 #include "Utilities.h"
 
+//Vertex Array Pool
 VertexArrayPool::VertexArrayPool()
 	: ObjectPool()
 {}
 
 VertexArray& VertexArrayPool::getVertexArray()
 {
-	int iterationCount = 0;
-	bool validVertexArrayFound = false;
+	ObjectInPool<VertexArray>& nextAvailableObject = getNextAvailableObject();
+	nextAvailableObject.object.m_inUse = true;
 
-	while (!validVertexArrayFound)
-	{
-		assert(m_nextAvailableObject);
-		if (m_nextAvailableObject->object.m_inUse)
-		{
-			assert(m_nextAvailableObject->nextAvailableObject);
-			m_nextAvailableObject = m_nextAvailableObject->nextAvailableObject;
-		}
-		else
-		{
-			validVertexArrayFound = true;
-		}
-
-		assert(++iterationCount && iterationCount <= m_objectPool.size());
-	}
-
-	m_nextAvailableObject->object.m_inUse = true;
-	return m_nextAvailableObject->object;
+	return nextAvailableObject.object;
 }
 
+//VertexArrayFromPool
 VertexArrayFromPool::VertexArrayFromPool(VertexArrayPool& vertexArrayPool)
 	: ObjectFromPool(vertexArrayPool.getVertexArray(), vertexArrayPool)
 {}

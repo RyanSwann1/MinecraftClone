@@ -57,7 +57,7 @@ namespace Utilities
 	constexpr float TERRAIN_PERSISTENCE = 0.5f;
 	constexpr int TERRAIN_OCTAVES = 8;
 
-	constexpr int VISIBILITY_DISTANCE = 800;
+	constexpr int VISIBILITY_DISTANCE = 640;
 	constexpr int MAP_SIZE = 8000;
 	const glm::vec3 PLAYER_STARTING_POSITION(0.0f, 250.f, 0.0f);
 
@@ -217,7 +217,6 @@ namespace Utilities
 
 	inline int converTo1D(const glm::ivec3& position) 
 	{
-		//return (z * xMax * yMax) + (y * xMax) + x;
 		return (position.z * Utilities::CHUNK_WIDTH * Utilities::CHUNK_HEIGHT) + (position.y * Utilities::CHUNK_WIDTH) + position.x;
 	}
 
@@ -229,7 +228,6 @@ namespace Utilities
 		position.y = idx / Utilities::CHUNK_WIDTH;
 		position.x = idx % Utilities::CHUNK_WIDTH;
 		return position;
-		//return new int[] { x, y, z };
 	}
 
 	inline int getRandomNumber(int min, int max)

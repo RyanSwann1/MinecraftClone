@@ -88,6 +88,11 @@ VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
 	return *this;
 }
 
+bool VertexArray::isInUse() const
+{
+	return m_inUse;
+}
+
 void VertexArray::reset()
 {
 	m_reset = false;
