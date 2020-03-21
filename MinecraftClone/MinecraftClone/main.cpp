@@ -252,11 +252,6 @@ int main()
 			{
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::R) && !chunkManager.isResetting())
 				{
-					for (auto& VAO : VAOs)
-					{
-						VAO.second.object.reset();
-					}
-
 					camera.m_position = Utilities::PLAYER_STARTING_POSITION;
 					chunkManager.reset();
 				}
@@ -309,7 +304,6 @@ int main()
 				}
 			}
 
-
 			setUniformLocation1f(shaderID, "uAlpha", Utilities::WATER_ALPHA_VALUE, uniformLocations);
 			for (const auto& VAO : VAOs)
 			{
@@ -319,11 +313,10 @@ int main()
 					glDrawElements(GL_TRIANGLES, VAO.second.object.m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
 				}
 			}
-			setUniformLocation1f(shaderID, "uAlpha", 1.0f, uniformLocations);
-
-
-			window.display();
+			setUniformLocation1f(shaderID, "uAlpha", 1.0f, uniformLocations);	
 		}
+
+		window.display();
 	}
 
 	chunkGenerationThread.join();
