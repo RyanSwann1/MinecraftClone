@@ -197,6 +197,8 @@ int main()
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);  
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	unsigned int shaderID = createShaderProgram();
@@ -208,13 +210,13 @@ int main()
 	}
 	std::unordered_map<std::string, int> uniformLocations;
 
-	texture->bind();
+	texture->bind(0);
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot(), uniformLocations);
 
 	ChunkManager chunkManager;
-	chunkManager.generateInitialChunks(camera.m_position, *texture);
+	chunkManager.generateInitialChunks(camera.m_position);
 	std::thread chunkGenerationThread([&](ChunkManager* chunkManager) 
-	{chunkManager->update(std::ref(camera), std::ref(window), std::ref(*texture)); }, &chunkManager);
+		{chunkManager->update(std::ref(camera), std::ref(window)); }, &chunkManager);
 
 	std::unordered_map<glm::ivec3, VertexArrayFromPool>& VAOs = chunkManager.getVAOs();
 

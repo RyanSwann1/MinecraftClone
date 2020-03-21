@@ -13,6 +13,7 @@ Texture::Texture()
 
 Texture::~Texture()
 {
+	assert(m_ID != Utilities::INVALID_OPENGL_ID);
 	glDeleteTextures(1, &m_ID);
 }
 
@@ -44,49 +45,6 @@ std::unique_ptr<Texture> Texture::loadTexture(const std::string& name)
 unsigned int Texture::getCurrentSlot() const
 {
 	return m_currentSlot;
-}
-
-unsigned int Texture::getID() const
-{
-	return m_ID;
-}
-
-void Texture::getTextCoords(eCubeFaceID tileID, std::vector<glm::vec2>& textCoords) const
-{
-	switch (tileID)
-	{
-	case eCubeFaceID::Grass :
-		textCoords.insert(textCoords.end(), Utilities::GRASS_TEXT_COORDS.begin(), Utilities::GRASS_TEXT_COORDS.end());
-		break;
-
-	case eCubeFaceID::GrassSide :
-		textCoords.insert(textCoords.end(), Utilities::GRASS_SIDE_TEXT_COORDS.begin(), Utilities::GRASS_SIDE_TEXT_COORDS.end());
-		break;
-
-	case eCubeFaceID::Sand :
-		textCoords.insert(textCoords.end(), Utilities::SAND_TEXT_COORDS.begin(), Utilities::SAND_TEXT_COORDS.end());
-		break;
-
-	case eCubeFaceID::Stone :
-		textCoords.insert(textCoords.end(), Utilities::STONE_TEXT_COORDS.begin(), Utilities::STONE_TEXT_COORDS.end());
-		break;
-
-	case eCubeFaceID::Water:
-		textCoords.insert(textCoords.end(), Utilities::WATER_TEXT_COORDS.begin(), Utilities::WATER_TEXT_COORDS.end());
-		break;
-
-	case eCubeFaceID::TreeStump :
-		textCoords.insert(textCoords.end(), Utilities::TREESTUMP_TEXT_COORDS.begin(), Utilities::TREESTUMP_TEXT_COORDS.end());
-		break;
-
-	case eCubeFaceID::Leaves:
-		textCoords.insert(textCoords.end(), Utilities::LEAVES_TEXT_COORDS.begin(), Utilities::LEAVES_TEXT_COORDS.end());
-		break;
-
-	case eCubeFaceID::Cactus :
-		textCoords.insert(textCoords.end(), Utilities::CACTUS_TEXT_COORDS.begin(), Utilities::CACTUS_TEXT_COORDS.end());
-		break;
-	}
 }
 
 void Texture::bind(unsigned int slot)

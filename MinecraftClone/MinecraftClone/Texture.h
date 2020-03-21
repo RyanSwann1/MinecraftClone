@@ -13,12 +13,10 @@ class Texture : private NonCopyable, private NonMovable
 public:
 	static std::unique_ptr<Texture> loadTexture(const std::string& name);
 	~Texture();
+
 	unsigned int getCurrentSlot() const;
-	unsigned int getID() const;
 
-	void getTextCoords(eCubeFaceID tileID, std::vector<glm::vec2>& textCoords) const;
-
-	void bind(unsigned int slot = 0);
+	void bind(unsigned int slot);
 	void unbind() const;
 
 private:
