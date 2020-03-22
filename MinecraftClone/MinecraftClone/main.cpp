@@ -278,30 +278,32 @@ int main()
 		{
 			for (auto VAO = VAOs.begin(); VAO != VAOs.end();)
 			{
-				if (VAO->second.object.m_reset)
+
+				if (VAO->second.object.m_attachOpaqueVBO)
 				{
-					VAO = VAOs.erase(VAO);
+					VAO->second.object.attachOpaqueVBO();
 				}
-				else
+
+				if (VAO->second.object.m_attachTransparentVBO)
 				{
-					if (VAO->second.object.m_attachOpaqueVBO)
-					{
-						VAO->second.object.attachOpaqueVBO();
-					}
-
-					if (VAO->second.object.m_attachTransparentVBO)
-					{
-						VAO->second.object.attachTransparentVBO();
-					}
-
-					if (VAO->second.object.m_opaqueVBODisplayable)
-					{
-						VAO->second.object.bindOpaqueVAO();
-						glDrawElements(GL_TRIANGLES, VAO->second.object.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
-					}
-
-					++VAO;
+					VAO->second.object.attachTransparentVBO();
 				}
+
+				if (VAO->second.object.m_opaqueVBODisplayable)
+				{
+					VAO->second.object.bindOpaqueVAO();
+					glDrawElements(GL_TRIANGLES, VAO->second.object.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+				}
+
+				++VAO;
+				//if (VAO->second.object.m_reset)
+				//{
+				//	VAO = VAOs.erase(VAO);
+				////}
+				//else
+				//{
+
+				//}
 			}
 
 			setUniformLocation1f(shaderID, "uAlpha", Utilities::WATER_ALPHA_VALUE, uniformLocations);
