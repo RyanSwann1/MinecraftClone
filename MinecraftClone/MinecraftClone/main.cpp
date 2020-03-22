@@ -191,7 +191,7 @@ int main()
 	settings.attributeFlags = sf::ContextSettings::Core;
 	sf::Vector2i windowSize(1980, 1080);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft", sf::Style::Default, settings);
-	window.setFramerateLimit(120);
+	window.setFramerateLimit(45);
 	gladLoadGL();
 
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));

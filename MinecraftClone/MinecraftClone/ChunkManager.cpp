@@ -86,8 +86,8 @@ void ChunkManager::update(const Camera& camera, const sf::Window& window)
 			reset(camera.m_position);
 		}
 
-		deleteChunks(camera.m_position);
 		addChunks(camera.m_position);
+		deleteChunks(camera.m_position);
 		regenChunks();
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -349,7 +349,9 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 
 void ChunkManager::deleteChunks(const glm::ivec3& playerPosition)
 {
-	Rectangle visibilityRect(glm::vec2(playerPosition.x, playerPosition.z), Utilities::VISIBILITY_DISTANCE);
+	glm::ivec3 startingPosition(playerPosition);
+	Utilities::getClosestMiddlePosition(startingPosition);
+	Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Utilities::VISIBILITY_DISTANCE);
 	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
 	{
 		if (!visibilityRect.contains(chunk->second.object.getAABB()))
@@ -393,14 +395,14 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition)
 	{
 		for (int x = startPosition.x - Utilities::VISIBILITY_DISTANCE; x <= startPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
-			//if (x >= startPosition.x - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH) && 
-			//	x <= startPosition.x + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH) &&
-			//	z >= startPosition.z - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH) && 
-			//	z <= startPosition.z + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH))
-			//{
-			//	continue;
-			//}
-
+			if (x >= startPosition.x - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH) && 
+				x <= startPosition.x + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_WIDTH) &&
+				z >= startPosition.z - (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH) && 
+				z <= startPosition.z + (Utilities::VISIBILITY_DISTANCE - Utilities::CHUNK_DEPTH))
+			{
+				continue;
+			}
+			
 			glm::ivec3 position(x, 0, z);
 			Utilities::getClosestChunkStartingPosition(position);
 			if (m_chunks.find(position) == m_chunks.cend() && m_VAOs.find(position) == m_VAOs.cend())
