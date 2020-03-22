@@ -13,6 +13,9 @@ struct VertexBuffer : private NonCopyable
 	VertexBuffer& operator=(VertexBuffer&&) noexcept;
 	~VertexBuffer();
 
+	void clearOpaqueVertices();
+	void clearTransparentVertices();
+
 	void clear();
 
 	//Opaque

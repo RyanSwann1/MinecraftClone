@@ -94,6 +94,28 @@ VertexBuffer::~VertexBuffer()
 	glDeleteBuffers(1, &transparentIndiciesID);
 }
 
+void VertexBuffer::clearOpaqueVertices()
+{
+	std::vector<glm::ivec3> newPositions;
+	positions.swap(newPositions);
+
+	std::vector<glm::vec2> newTextCoords;
+	textCoords.swap(newTextCoords);
+
+	indicies.shrink_to_fit();
+}
+
+void VertexBuffer::clearTransparentVertices()
+{
+	std::vector<glm::ivec3> newTransparentPositions;
+	transparentPositions.swap(newTransparentPositions);
+
+	std::vector<glm::vec2> newTransparentTextCoords;
+	transparentTextCoords.swap(newTransparentTextCoords);
+
+	transparentIndicies.shrink_to_fit();
+}
+
 void VertexBuffer::clear()
 {
 	std::vector<glm::ivec3> newPositions;
