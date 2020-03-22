@@ -135,7 +135,7 @@ void VertexArray::attachOpaqueVBO()
 	assert(!m_opaqueVBODisplayable);
 	m_opaqueVBODisplayable = true;
 
-	m_vertexBuffer.clearOpaque();
+	m_vertexBuffer.clearOpaqueVertices();
 }
 
 void VertexArray::attachTransparentVBO()
@@ -166,7 +166,7 @@ void VertexArray::attachTransparentVBO()
 	assert(!m_transparentVBODisplayable);
 	m_transparentVBODisplayable = true;
 
-	m_vertexBuffer.clearTransparent();
+	m_vertexBuffer.clearTransparentVertices();
 }
 
 void VertexArray::bindOpaqueVAO() const
