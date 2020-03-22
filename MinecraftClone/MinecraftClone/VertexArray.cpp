@@ -10,7 +10,6 @@ VertexArray::VertexArray()
 	m_transparentVBODisplayable(false),
 	m_attachOpaqueVBO(false),
 	m_attachTransparentVBO(false),
-	m_reset(false),
 	m_awaitingRegeneration(false),
 	m_vertexBuffer(),
 	m_ID(Utilities::INVALID_OPENGL_ID),
@@ -37,7 +36,6 @@ VertexArray::VertexArray(VertexArray&& orig) noexcept
 	m_transparentVBODisplayable(orig.m_transparentVBODisplayable),
 	m_attachOpaqueVBO(orig.m_attachOpaqueVBO),
 	m_attachTransparentVBO(orig.m_attachTransparentVBO),
-	m_reset(orig.m_reset),
 	m_awaitingRegeneration(orig.m_awaitingRegeneration),
 	m_vertexBuffer(std::move(orig.m_vertexBuffer)),
 	m_ID(orig.m_ID),
@@ -50,7 +48,6 @@ VertexArray::VertexArray(VertexArray&& orig) noexcept
 	orig.m_transparentVBODisplayable = false;
 	orig.m_attachOpaqueVBO = false;
 	orig.m_attachTransparentVBO = false;
-	orig.m_reset = false;
 	orig.m_awaitingRegeneration = false;
 	orig.m_ID = Utilities::INVALID_OPENGL_ID;
 	orig.m_transparentID = Utilities::INVALID_OPENGL_ID;
@@ -65,7 +62,6 @@ VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
 	m_transparentVBODisplayable = orig.m_transparentVBODisplayable;
 	m_attachOpaqueVBO = orig.m_attachOpaqueVBO;
 	m_attachTransparentVBO = orig.m_attachTransparentVBO;
-	m_reset = orig.m_reset;
 	m_awaitingRegeneration = orig.m_awaitingRegeneration;
 	m_vertexBuffer = std::move(orig.m_vertexBuffer);
 	m_ID = orig.m_ID;
@@ -78,7 +74,6 @@ VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
 	orig.m_transparentVBODisplayable = false;
 	orig.m_attachOpaqueVBO = false;
 	orig.m_attachTransparentVBO = false;
-	orig.m_reset = false;
 	orig.m_awaitingRegeneration = false;
 	orig.m_ID = Utilities::INVALID_OPENGL_ID;
 	orig.m_transparentID = Utilities::INVALID_OPENGL_ID;
@@ -95,7 +90,6 @@ bool VertexArray::isInUse() const
 
 void VertexArray::reset()
 {
-	m_reset = false;
 	m_inUse = false;
 	m_opaqueVBODisplayable = false;
 	m_transparentVBODisplayable = false;
