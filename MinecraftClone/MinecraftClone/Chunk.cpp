@@ -37,10 +37,12 @@ Chunk::Chunk()
 Chunk::Chunk(const glm::ivec3& startingPosition)
 	: m_inUse(false),
 	m_startingPosition(startingPosition),
-	m_endingPosition(),
+	m_endingPosition(startingPosition.x + Utilities::CHUNK_WIDTH, 
+		startingPosition.y + Utilities::CHUNK_HEIGHT, 
+		startingPosition.z + Utilities::CHUNK_DEPTH),
 	m_chunk(),
 	m_AABB(glm::ivec2(m_startingPosition.x, m_startingPosition.z) +
-		glm::ivec2(Utilities::CHUNK_WIDTH / 2.0f, Utilities::CHUNK_DEPTH / 2.0f), 16)
+		glm::ivec2(Utilities::CHUNK_WIDTH / 2, Utilities::CHUNK_DEPTH / 2), 16)
 {
 	regen(m_startingPosition);
 }
@@ -64,7 +66,6 @@ Chunk& Chunk::operator=(Chunk&& orig) noexcept
 	m_AABB = orig.m_AABB;
 
 	orig.m_inUse = false;
-
 
 	return *this;
 }
@@ -117,8 +118,10 @@ void Chunk::reuse(const glm::ivec3& startingPosition)
 
 	m_inUse = true;
 	m_startingPosition = startingPosition;
+	m_endingPosition = glm::ivec3(startingPosition.x + Utilities::CHUNK_WIDTH, startingPosition.y + Utilities::CHUNK_HEIGHT,
+		startingPosition.z + Utilities::CHUNK_DEPTH);
 	m_AABB.reset(glm::ivec2(m_startingPosition.x, m_startingPosition.z) +
-		glm::ivec2(Utilities::CHUNK_WIDTH / 2.0f, Utilities::CHUNK_DEPTH / 2.0f), 16);
+		glm::ivec2(Utilities::CHUNK_WIDTH / 2, Utilities::CHUNK_DEPTH / 2), 16);
 
 	regen(m_startingPosition);	
 }
@@ -213,9 +216,6 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 		}
 	}
 
-	m_endingPosition = glm::ivec3(startingPosition.x + Utilities::CHUNK_WIDTH, startingPosition.y + Utilities::CHUNK_HEIGHT,
-		startingPosition.z + Utilities::CHUNK_DEPTH);
-	
 	spawnWater();
 	spawnTrees();
 	spawnCactus();
