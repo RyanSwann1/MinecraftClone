@@ -36,6 +36,18 @@ void ChunkManager::reset(const glm::vec3& playerPosition)
 	m_resetting = false;
 }
 
+void ChunkManager::removeFromChunksToRegenerate(const glm::ivec3& chunkStartingPosition)
+{
+	auto chunkToRegen = std::find_if(m_chunksToRegenerate.begin(), m_chunksToRegenerate.end(), [chunkStartingPosition](const auto& position)
+	{
+		return position == chunkStartingPosition;
+	});
+	if (chunkToRegen != m_chunksToRegenerate.end())
+	{
+		m_chunksToRegenerate.erase(chunkToRegen);
+	}
+}
+
 bool ChunkManager::isResetting() const
 {
 	return m_resetting;
@@ -349,40 +361,37 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 
 void ChunkManager::deleteChunks(const glm::ivec3& playerPosition)
 {
+	std::queue<glm::ivec3> deletionQueue;
 	glm::ivec3 startingPosition(playerPosition);
 	Utilities::getClosestMiddlePosition(startingPosition);
 	Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Utilities::VISIBILITY_DISTANCE);
-	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
+
+	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end(); ++chunk)
 	{
 		if (!visibilityRect.contains(chunk->second.object.getAABB()))
 		{
 			const glm::ivec3& chunkStartingPosition = chunk->second.object.getStartingPosition();
-			
-			std::unique_lock<std::mutex> lock(m_mutex);
-			auto VAO = m_VAOs.find(chunkStartingPosition);
-			assert(VAO != m_VAOs.end());
-			if (VAO != m_VAOs.end())
-			{
-				assert(!VAO->second.object.m_reset);
-				VAO->second.object.m_reset = true;
-			}
-			lock.unlock();
+			assert(m_VAOs.find(chunkStartingPosition) != m_VAOs.cend());
 
-			auto chunkToRegen = std::find_if(m_chunksToRegenerate.begin(), m_chunksToRegenerate.end(), [chunkStartingPosition](const auto& position)
-			{
-				return position == chunkStartingPosition;
-			});
-			if (chunkToRegen != m_chunksToRegenerate.end())
-			{
-				m_chunksToRegenerate.erase(chunkToRegen);
-			}
+			deletionQueue.push(chunkStartingPosition);
+		}
+	}
 
-			chunk = m_chunks.erase(chunk);
-		}
-		else
-		{
-			++chunk;
-		}
+	std::lock_guard<std::mutex> lock(m_mutex);
+	while (!deletionQueue.empty())
+	{
+		glm::ivec3 chunkStartingPosition = deletionQueue.front();
+		deletionQueue.pop();
+
+		auto chunk = m_chunks.find(chunkStartingPosition);
+		assert(chunk != m_chunks.end());	
+		m_chunks.erase(chunk);
+
+		auto VAO = m_VAOs.find(chunkStartingPosition);
+		assert(VAO != m_VAOs.end());
+		m_VAOs.erase(VAO);
+
+		removeFromChunksToRegenerate(chunkStartingPosition);
 	}
 }
 

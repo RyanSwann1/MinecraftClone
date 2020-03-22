@@ -69,4 +69,5 @@ private:
 	void addChunks(const glm::vec3& playerPosition);
 	void regenChunks();
 	void reset(const glm::vec3& playerPosition);
+	void removeFromChunksToRegenerate(const glm::ivec3& chunkStartingPosition);
 };
