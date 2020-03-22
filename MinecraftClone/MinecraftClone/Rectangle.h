@@ -10,7 +10,6 @@ struct Rectangle
 
 	bool contains(const Rectangle& other) const;
 
-	void update(const glm::vec2& position, float distance);
 	void reset(const glm::vec2& position, float distance);
 
 	float m_left;

@@ -15,14 +15,6 @@ Rectangle::Rectangle(const glm::vec2& position, float distance)
 	m_bottom(position.y - distance)
 {}
 
-void Rectangle::update(const glm::vec2 & position, float distance)
-{
-	m_left = position.x - distance;
-	m_right = position.x + distance;
-	m_top = position.y + distance;
-	m_bottom = position.y - distance;
-}
-
 bool Rectangle::contains(const Rectangle& other) const
 {
 	return m_left <= other.m_right &&
