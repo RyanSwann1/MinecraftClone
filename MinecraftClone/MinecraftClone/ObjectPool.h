@@ -58,9 +58,9 @@ public:
 	{
 		//Added a little bit more than neccessary due to how the inifinite map generates
 		int x = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_WIDTH;
-		x += x += 1;
+		x += x += 3;
 		int y = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_DEPTH;
-		y += y += 1;
+		y += y += 3;
 
 		m_objectPool.resize(size_t((x * y)));
 

@@ -7,17 +7,19 @@
 #include "glm/gtc/type_ptr.hpp"
 #include <mutex>
 
+//
+//LEARNOPENGL.COM CAMERA
+//
+
 struct Camera
 {
 	Camera(glm::vec3 startPosition);
 
-	void move(float deltaTime);
+	void move(float deltaTime, std::mutex& mutex);
 
-	glm::vec2 getPosition2D();
 	glm::vec3 getRaycastPosition() const;
 	void mouse_callback(double xpos, double ypos);
 
-	std::mutex m_mutex;
 	float m_speed;
 	glm::vec3 m_position;
 	glm::vec3 m_front;
