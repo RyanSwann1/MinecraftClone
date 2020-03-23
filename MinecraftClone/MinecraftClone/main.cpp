@@ -191,7 +191,7 @@ int main()
 	settings.attributeFlags = sf::ContextSettings::Core;
 	sf::Vector2i windowSize(1980, 1080);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft", sf::Style::Default, settings);
-	window.setFramerateLimit(45);
+	window.setFramerateLimit(60);
 	gladLoadGL();
 
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
@@ -212,17 +212,22 @@ int main()
 
 	texture->bind(0);
 	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot(), uniformLocations);
+	
+	glm::vec3 cameraPosition;
+	bool movePlayer = false;
+	std::atomic<bool> resetGame = false;
+	std::mutex mutex;
+	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
+	chunkManager->generateInitialChunks(camera.m_position);
+	std::thread chunkGenerationThread([&](std::unique_ptr<ChunkManager>* chunkManager)
+		{chunkManager->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), std::ref(mutex)); }, &chunkManager );
 
-	ChunkManager chunkManager;
-	chunkManager.generateInitialChunks(camera.m_position);
-	std::thread chunkGenerationThread([&](ChunkManager* chunkManager) 
-		{chunkManager->update(std::ref(camera), std::ref(window)); }, &chunkManager);
-
-	std::unordered_map<glm::ivec3, VertexArrayFromPool>& VAOs = chunkManager.getVAOs();
+	std::unordered_map<glm::ivec3, VertexArrayFromPool>& VAOs = chunkManager->getVAOs();
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 
+	float deltaTime = 0.0f;
 	sf::Clock clock;
 	clock.restart();
 	float messageExpiredTime = 1.0f;
@@ -230,7 +235,7 @@ int main()
 	setUniformLocation1f(shaderID, "uAlpha", 1.0f, uniformLocations);
 	while (window.isOpen())
 	{
-		float deltaTime = clock.restart().asSeconds();
+		deltaTime = clock.restart().asSeconds();
 		sf::Vector2i mousePosition = sf::Mouse::getPosition();
 		camera.mouse_callback(mousePosition.x, mousePosition.y);
 		//if (elaspedTime >= messageExpiredTime)
@@ -250,22 +255,40 @@ int main()
 			}
 			else if (currentSFMLEvent.KeyPressed)
 			{
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::R) && !chunkManager.isResetting())
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
 				{
-					camera.m_position = Utilities::PLAYER_STARTING_POSITION;
-					chunkManager.reset();
+					resetGame = true;
 				}
 			}
+		}
+
+		if (resetGame)
+		{
+			chunkGenerationThread.join();
+			resetGame = false;
+			camera.m_position = Utilities::PLAYER_STARTING_POSITION;
+			chunkManager.reset();
+			chunkManager = std::make_unique<ChunkManager>();
+			chunkManager->generateInitialChunks(camera.m_position);
+
+			chunkGenerationThread = std::thread{ [&](std::unique_ptr<ChunkManager>* chunkManager)
+				{chunkManager->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), std::ref(mutex)); }, &chunkManager };
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) ||
+			sf::Keyboard::isKeyPressed(sf::Keyboard::S) ||
+			sf::Keyboard::isKeyPressed(sf::Keyboard::D) ||
+			sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		{
+			camera.move(deltaTime, mutex);
+			std::unique_lock<std::mutex> lock(mutex);
+			cameraPosition = camera.m_position;
+			lock.unlock();	
 		}
 
 		//Bitmasking
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//glClear(GL_DEPTH_BUFFER_BIT);
-
-		if (!chunkManager.isResetting())
-		{
-			camera.move(deltaTime);
-		}
 
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
@@ -274,11 +297,11 @@ int main()
 			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 1000.0f); //1000.0f);//(
 		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
 
-		if (!chunkManager.isResetting())
+		if (chunkManager)
 		{
-			for (auto VAO = VAOs.begin(); VAO != VAOs.end();)
+			std::lock_guard<std::mutex> lock(mutex);
+			for (auto VAO = VAOs.begin(); VAO != VAOs.end(); ++VAO)
 			{
-
 				if (VAO->second.object.m_attachOpaqueVBO)
 				{
 					VAO->second.object.attachOpaqueVBO();
@@ -294,16 +317,6 @@ int main()
 					VAO->second.object.bindOpaqueVAO();
 					glDrawElements(GL_TRIANGLES, VAO->second.object.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 				}
-
-				++VAO;
-				//if (VAO->second.object.m_reset)
-				//{
-				//	VAO = VAOs.erase(VAO);
-				////}
-				//else
-				//{
-
-				//}
 			}
 
 			setUniformLocation1f(shaderID, "uAlpha", Utilities::WATER_ALPHA_VALUE, uniformLocations);
