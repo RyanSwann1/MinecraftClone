@@ -15,7 +15,7 @@ struct Camera
 {
 	Camera(glm::vec3 startPosition);
 
-	void move(float deltaTime, std::mutex& mutex);
+	void move(float deltaTime);
 
 	glm::vec3 getRaycastPosition() const;
 	void mouse_callback(double xpos, double ypos);

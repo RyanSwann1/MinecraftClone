@@ -8,7 +8,7 @@ Camera::Camera(glm::vec3 startPosition)
 	m_up(0.0f, 1.0f, 0.0f)
 {}
 
-void Camera::move(float deltaTime, std::mutex& mutex)
+void Camera::move(float deltaTime)
 {
 	//m_position += m_speed * m_front;
 
