@@ -65,7 +65,7 @@ void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition)
 }
 
 void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
-	std::mutex& cameraMutex, std::mutex& renderingMutex)
+	std::mutex& cameraMutex, std::mutex& renderingMutex)	
 {
 	while (!resetGame)
 	{
@@ -323,14 +323,29 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 	}
 	else if (vertexArray.m_awaitingRegeneration && !regenChunk)
 	{
-		vertexArray.m_attachOpaqueVBO = true;
-		vertexArray.m_attachTransparentVBO = true;
+		if (!vertexArray.m_vertexBuffer.indicies.empty())
+		{
+			vertexArray.m_attachOpaqueVBO = true;
+		}
+
+		if (!vertexArray.m_vertexBuffer.transparentIndicies.empty())
+		{
+			vertexArray.m_attachTransparentVBO = true;
+		}
+
 		vertexArray.m_awaitingRegeneration = false;
 	}
 	else if (!vertexArray.m_awaitingRegeneration && !regenChunk)
 	{
-		vertexArray.m_attachOpaqueVBO = true;
-		vertexArray.m_attachTransparentVBO = true;
+		if (!vertexArray.m_vertexBuffer.indicies.empty())
+		{
+			vertexArray.m_attachOpaqueVBO = true;
+		}
+
+		if (!vertexArray.m_vertexBuffer.transparentIndicies.empty())
+		{
+			vertexArray.m_attachTransparentVBO = true;
+		}
 	}
 }
 
