@@ -216,11 +216,15 @@ int main()
 	glm::vec3 cameraPosition;
 	bool movePlayer = false;
 	std::atomic<bool> resetGame = false;
-	std::mutex mutex;
+	std::mutex renderingMutex;
+	std::mutex cameraMutex;
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
 	chunkManager->generateInitialChunks(camera.m_position);
+
+	//std::mutex& cameraMutex, std::mutex& renderingMutex);
 	std::thread chunkGenerationThread([&](std::unique_ptr<ChunkManager>* chunkManager)
-		{chunkManager->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), std::ref(mutex)); }, &chunkManager );
+		{chunkManager->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), 
+			std::ref(cameraMutex), std::ref(renderingMutex)); }, &chunkManager );
 
 	std::unordered_map<glm::ivec3, VertexArrayFromPool>& VAOs = chunkManager->getVAOs();
 
@@ -270,9 +274,9 @@ int main()
 			chunkManager.reset();
 			chunkManager = std::make_unique<ChunkManager>();
 			chunkManager->generateInitialChunks(camera.m_position);
-
 			chunkGenerationThread = std::thread{ [&](std::unique_ptr<ChunkManager>* chunkManager)
-				{chunkManager->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), std::ref(mutex)); }, &chunkManager };
+				{chunkManager->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), 
+					std::ref(cameraMutex), std::ref(renderingMutex)); }, &chunkManager };
 		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) ||
@@ -280,10 +284,14 @@ int main()
 			sf::Keyboard::isKeyPressed(sf::Keyboard::D) ||
 			sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 		{
-			camera.move(deltaTime, mutex);
-			std::unique_lock<std::mutex> lock(mutex);
-			cameraPosition = camera.m_position;
-			lock.unlock();	
+			camera.move(deltaTime);
+
+			//Try lock
+			if (cameraMutex.try_lock())
+			{
+				cameraPosition = camera.m_position;
+				cameraMutex.unlock();
+			}
 		}
 
 		//Bitmasking
@@ -299,7 +307,7 @@ int main()
 
 		if (chunkManager)
 		{
-			std::lock_guard<std::mutex> lock(mutex);
+			std::lock_guard<std::mutex> lock(renderingMutex);
 			for (auto VAO = VAOs.begin(); VAO != VAOs.end(); ++VAO)
 			{
 				if (VAO->second.object.m_attachOpaqueVBO)
