@@ -38,11 +38,11 @@ template <class Object, class ObjectPool>
 struct ObjectFromPool : private NonCopyable, private NonMovable
 {
 	ObjectFromPool(Object& object) 
-		: object(object)
+		: object(&object)
 	{}
 	virtual ~ObjectFromPool() {}
 
-	Object& object;
+	Object* object;
 };
 
 //Object Pool

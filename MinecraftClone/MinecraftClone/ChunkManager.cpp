@@ -44,11 +44,11 @@ void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition)
 			Utilities::getClosestChunkStartingPosition(chunkStartingPosition);
 			assert(m_chunks.find(chunkStartingPosition) == m_chunks.cend() && m_VAOs.find(chunkStartingPosition) == m_VAOs.cend());
 			
-			VertexArray& VAO = m_VAOs.emplace(std::piecewise_construct,
+			VertexArray& VAO = *m_VAOs.emplace(std::piecewise_construct,
 				std::forward_as_tuple(chunkStartingPosition),
 				std::forward_as_tuple(m_vertexArrayPool)).first->second.object;
 
-			const Chunk& chunk = m_chunks.emplace(std::piecewise_construct,
+			const Chunk& chunk = *m_chunks.emplace(std::piecewise_construct,
 				std::forward_as_tuple(chunkStartingPosition),
 				std::forward_as_tuple(m_chunkPool, chunkStartingPosition)).first->second.object;
 		
@@ -359,9 +359,9 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& re
 	//Locate Chunks to delete
 	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end(); ++chunk)
 	{
-		if (!visibilityRect.contains(chunk->second.object.getAABB()))
+		if (!visibilityRect.contains(chunk->second.object->getAABB()))
 		{
-			const glm::ivec3& chunkStartingPosition = chunk->second.object.getStartingPosition();
+			const glm::ivec3& chunkStartingPosition = chunk->second.object->getStartingPosition();
 			deletionQueue.push(chunkStartingPosition);
 		}
 	}
@@ -435,7 +435,7 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition, std::mutex& render
 		auto VAO = m_VAOs.find(chunkStartingPosition);
 		assert(VAO != m_VAOs.cend());
 
-		generateChunkMesh(VAO->second.object, chunk->second.object);
+		generateChunkMesh(*VAO->second.object, *chunk->second.object);
 	}
 
 	//Lock only once here
@@ -482,7 +482,7 @@ void ChunkManager::regenChunks(std::mutex& renderingMutex)
 		assert(chunk != m_chunks.cend());
 
 		//std::lock_guard<std::mutex> lock(renderingMutex);
-		generateChunkMesh(VAO->second.object, chunk->second.object);
+		generateChunkMesh(*VAO->second.object, *chunk->second.object);
 	}
 }
 
@@ -497,7 +497,7 @@ const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chun
 		auto cIter = m_chunks.find(glm::ivec3(chunkStartingPosition.x - Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z));
 		if (cIter != m_chunks.cend())
 		{
-			chunk = &cIter->second.object;
+			chunk = cIter->second.object;
 		}
 		break;
 	}
@@ -506,7 +506,7 @@ const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chun
 		auto cIter = m_chunks.find(glm::ivec3(chunkStartingPosition.x + Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z));
 		if (cIter != m_chunks.cend())
 		{
-			chunk = &cIter->second.object;
+			chunk = cIter->second.object;
 		}
 		break;
 	}
@@ -515,7 +515,7 @@ const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chun
 		auto cIter = m_chunks.find(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z + Utilities::CHUNK_DEPTH));
 		if (cIter != m_chunks.cend())
 		{
-			chunk = &cIter->second.object;
+			chunk = cIter->second.object;
 		}
 		break;
 	}
@@ -524,7 +524,7 @@ const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chun
 		auto cIter = m_chunks.find(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z - Utilities::CHUNK_DEPTH));
 		if (cIter != m_chunks.cend())
 		{
-			chunk = &cIter->second.object;
+			chunk = cIter->second.object;
 		}
 		break;
 	}

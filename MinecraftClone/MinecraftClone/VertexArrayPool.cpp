@@ -21,5 +21,8 @@ VertexArrayFromPool::VertexArrayFromPool(VertexArrayPool& vertexArrayPool)
 
 VertexArrayFromPool::~VertexArrayFromPool()
 {
-	object.reset();
+	if (object)
+	{
+		object->reset();
+	}
 }

@@ -309,30 +309,30 @@ int main()
 			std::lock_guard<std::mutex> lock(renderingMutex);
 			for (auto VAO = VAOs.begin(); VAO != VAOs.end(); ++VAO)
 			{
-				if (VAO->second.object.m_attachOpaqueVBO)
+				if (VAO->second.object->m_attachOpaqueVBO)
 				{
-					VAO->second.object.attachOpaqueVBO();
+					VAO->second.object->attachOpaqueVBO();
 				}
 
-				if (VAO->second.object.m_attachTransparentVBO)
+				if (VAO->second.object->m_attachTransparentVBO)
 				{
-					VAO->second.object.attachTransparentVBO();
+					VAO->second.object->attachTransparentVBO();
 				}
 
-				if (VAO->second.object.m_opaqueVBODisplayable)
+				if (VAO->second.object->m_opaqueVBODisplayable)
 				{
-					VAO->second.object.bindOpaqueVAO();
-					glDrawElements(GL_TRIANGLES, VAO->second.object.m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+					VAO->second.object->bindOpaqueVAO();
+					glDrawElements(GL_TRIANGLES, VAO->second.object->m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 				}
 			}
 
 			setUniformLocation1f(shaderID, "uAlpha", Utilities::WATER_ALPHA_VALUE, uniformLocations);
 			for (const auto& VAO : VAOs)
 			{
-				if (VAO.second.object.m_transparentVBODisplayable)
+				if (VAO.second.object->m_transparentVBODisplayable)
 				{
-					VAO.second.object.bindTransparentVAO();
-					glDrawElements(GL_TRIANGLES, VAO.second.object.m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
+					VAO.second.object->bindTransparentVAO();
+					glDrawElements(GL_TRIANGLES, VAO.second.object->m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
 				}
 			}
 			setUniformLocation1f(shaderID, "uAlpha", 1.0f, uniformLocations);	

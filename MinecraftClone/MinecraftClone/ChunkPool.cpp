@@ -8,7 +8,10 @@ ChunkFromPool::ChunkFromPool(ChunkPool& chunkPool, const glm::ivec3& startingPos
 
 ChunkFromPool::~ChunkFromPool()
 {
-	object.release();
+	if (object)
+	{
+		object->release();
+	}
 }
 
 //ChunkPool
