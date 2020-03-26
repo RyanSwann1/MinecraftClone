@@ -3,7 +3,7 @@
 
 //ChunkFromPool
 ChunkFromPool::ChunkFromPool(ChunkPool& chunkPool, const glm::ivec3& startingPosition)
-	: ObjectFromPool(chunkPool.getChunk(startingPosition), chunkPool)
+	: ObjectFromPool(chunkPool.getChunk(startingPosition))
 {}
 
 ChunkFromPool::~ChunkFromPool()

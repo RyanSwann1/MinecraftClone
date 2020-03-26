@@ -37,13 +37,11 @@ struct ObjectInPool : private NonCopyable
 template <class Object, class ObjectPool>
 struct ObjectFromPool : private NonCopyable, private NonMovable
 {
-	ObjectFromPool(Object& object, ObjectPool& objectPool) 
-		: objectPool(objectPool),
-		object(object)
+	ObjectFromPool(Object& object) 
+		: object(object)
 	{}
 	virtual ~ObjectFromPool() {}
 
-	ObjectPool& objectPool;
 	Object& object;
 };
 

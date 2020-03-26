@@ -16,7 +16,7 @@ VertexArray& VertexArrayPool::getVertexArray()
 
 //VertexArrayFromPool
 VertexArrayFromPool::VertexArrayFromPool(VertexArrayPool& vertexArrayPool)
-	: ObjectFromPool(vertexArrayPool.getVertexArray(), vertexArrayPool)
+	: ObjectFromPool(vertexArrayPool.getVertexArray())
 {}
 
 VertexArrayFromPool::~VertexArrayFromPool()

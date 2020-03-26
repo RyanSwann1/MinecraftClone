@@ -388,6 +388,7 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& re
 void ChunkManager::addChunks(const glm::vec3& playerPosition, std::mutex& renderingMutex)
 {
 	//Locate new Chunks to add
+
 	std::vector<glm::ivec3> chunksToBeAdded;
 	glm::ivec3 startPosition(playerPosition);
 	Utilities::getClosestMiddlePosition(startPosition);
@@ -411,7 +412,6 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition, std::mutex& render
 			}
 		}
 	}
-	
 
 	std::lock_guard<std::mutex> lock(renderingMutex);
 	//Load all new Chunks 

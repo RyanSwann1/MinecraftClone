@@ -221,7 +221,6 @@ int main()
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
 	chunkManager->generateInitialChunks(camera.m_position);
 
-	//std::mutex& cameraMutex, std::mutex& renderingMutex);
 	std::thread chunkGenerationThread([&](std::unique_ptr<ChunkManager>* chunkManager)
 		{chunkManager->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), 
 			std::ref(cameraMutex), std::ref(renderingMutex)); }, &chunkManager );
