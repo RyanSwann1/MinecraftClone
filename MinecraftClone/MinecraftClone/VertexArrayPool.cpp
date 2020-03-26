@@ -19,6 +19,16 @@ VertexArrayFromPool::VertexArrayFromPool(VertexArrayPool& vertexArrayPool)
 	: ObjectFromPool(vertexArrayPool.getVertexArray())
 {}
 
+VertexArrayFromPool::VertexArrayFromPool(VertexArrayFromPool && orig)
+	: ObjectFromPool(std::move(orig))
+{}
+
+VertexArrayFromPool& VertexArrayFromPool::operator=(VertexArrayFromPool&& orig)
+{
+	ObjectFromPool::operator=(std::move(orig));
+	return *this;
+}
+
 VertexArrayFromPool::~VertexArrayFromPool()
 {
 	if (object)

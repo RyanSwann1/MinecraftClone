@@ -14,5 +14,7 @@ public:
 struct VertexArrayFromPool : public ObjectFromPool<VertexArray, VertexArrayPool>
 {
 	VertexArrayFromPool(VertexArrayPool& vertexArrayPool);
+	VertexArrayFromPool(VertexArrayFromPool&& orig);
+	VertexArrayFromPool& operator=(VertexArrayFromPool&& orig);
 	~VertexArrayFromPool();
 };

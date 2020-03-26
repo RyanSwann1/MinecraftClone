@@ -42,7 +42,7 @@ struct ObjectFromPool : private NonCopyable
 	{}
 	virtual ~ObjectFromPool() {}
 	ObjectFromPool(ObjectFromPool&& orig)
-		: object(object)
+		: object(orig.object)
 	{
 		orig.object = nullptr;
 	}
