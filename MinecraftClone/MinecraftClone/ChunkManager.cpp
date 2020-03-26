@@ -75,7 +75,7 @@ void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& win
 
 		deleteChunks(position, renderingMutex);
 		addChunks(position, renderingMutex);
-		regenChunks(renderingMutex);
+		//regenChunks(renderingMutex);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(450));
 	}
@@ -351,45 +351,36 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 
 void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex)
 {
-	std::queue<glm::ivec3> deletionQueue;
 	glm::ivec3 startingPosition(playerPosition);
 	Utilities::getClosestMiddlePosition(startingPosition);
-	Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Utilities::VISIBILITY_DISTANCE);
+	Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Utilities::VISIBILITY_DISTANCE + 64);
 
+	std::lock_guard<std::mutex> lock(renderingMutex);
 	//Locate Chunks to delete
-	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end(); ++chunk)
+	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
 	{
 		if (!visibilityRect.contains(chunk->second.object->getAABB()))
 		{
-			const glm::ivec3& chunkStartingPosition = chunk->second.object->getStartingPosition();
-			deletionQueue.push(chunkStartingPosition);
+			glm::ivec3 chunkStartingPosition = chunk->second.object->getStartingPosition();
+
+			chunk = m_chunks.erase(chunk);
+
+			auto VAO = m_VAOs.find(chunkStartingPosition);
+			assert(VAO != m_VAOs.end());
+			m_VAOs.erase(VAO);
+
+			removeFromChunksToRegenerate(chunkStartingPosition);
 		}
-	}
-
-	std::lock_guard<std::mutex> lock(renderingMutex);
-	//Deletion
-	while (!deletionQueue.empty())
-	{
-		glm::ivec3 chunkStartingPosition = deletionQueue.front();
-		deletionQueue.pop();
-
-		auto chunk = m_chunks.find(chunkStartingPosition);
-		assert(chunk != m_chunks.end());	
-		m_chunks.erase(chunk);
-
-		auto VAO = m_VAOs.find(chunkStartingPosition);
-		assert(VAO != m_VAOs.end());
-		m_VAOs.erase(VAO);
-
-		removeFromChunksToRegenerate(chunkStartingPosition);
+		else
+		{
+			++chunk;
+		}
 	}
 }
 
 void ChunkManager::addChunks(const glm::vec3& playerPosition, std::mutex& renderingMutex)
 {
-	//Locate new Chunks to add
-
-	std::vector<glm::ivec3> chunksToBeAdded;
+	std::deque<std::pair<glm::ivec3, VertexArrayFromPool>> VAOsToAddQueue;
 	glm::ivec3 startPosition(playerPosition);
 	Utilities::getClosestMiddlePosition(startPosition);
 	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z <= startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
@@ -404,41 +395,60 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition, std::mutex& render
 			//	continue;
 			//}
 
-			glm::ivec3 position(x, 0, z);
-			Utilities::getClosestChunkStartingPosition(position);
-			if (m_chunks.find(position) == m_chunks.cend())
+			glm::ivec3 chunkStartingPosition(x, 0, z);
+			Utilities::getClosestChunkStartingPosition(chunkStartingPosition);
+			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend() && m_VAOs.find(chunkStartingPosition) == m_VAOs.cend())
 			{
-				chunksToBeAdded.push_back(std::move(position));
+				m_chunks.emplace(std::piecewise_construct,
+					std::forward_as_tuple(chunkStartingPosition),
+					std::forward_as_tuple(m_chunkPool, chunkStartingPosition));
+				
+				VAOsToAddQueue.emplace_back(chunkStartingPosition, m_vertexArrayPool);
 			}
 		}
 	}
 
-	std::lock_guard<std::mutex> lock(renderingMutex);
-	//Load all new Chunks 
-	for (const auto& chunkStartingPosition : chunksToBeAdded)
+	for (auto& VAOToAdd : VAOsToAddQueue)
 	{
-		m_VAOs.emplace(std::piecewise_construct,
-			std::forward_as_tuple(chunkStartingPosition),
-			std::forward_as_tuple(m_vertexArrayPool));
-
-		m_chunks.emplace(std::piecewise_construct,
-			std::forward_as_tuple(chunkStartingPosition),
-			std::forward_as_tuple(m_chunkPool, chunkStartingPosition));
-	}
-
-	//Generate Chunk Mesh after all new chunks have been loaded
-	for (const auto& chunkStartingPosition : chunksToBeAdded)
-	{
-		auto chunk = m_chunks.find(chunkStartingPosition);
+		auto chunk = m_chunks.find(VAOToAdd.first);
 		assert(chunk != m_chunks.cend());
 
-		auto VAO = m_VAOs.find(chunkStartingPosition);
-		assert(VAO != m_VAOs.cend());
-
-		generateChunkMesh(*VAO->second.object, *chunk->second.object);
+		generateChunkMesh(*VAOToAdd.second.object, *chunk->second.object);
 	}
 
-	//Lock only once here
+	std::lock_guard<std::mutex> lock(renderingMutex);
+	while (!VAOsToAddQueue.empty())
+	{
+		glm::ivec3 chunkStartingPosition = VAOsToAddQueue.front().first;
+		VertexArrayFromPool VAO = std::move(VAOsToAddQueue.front().second);
+		assert(VAO.object);
+		VAOsToAddQueue.pop_front();
+
+		m_VAOs.emplace(std::piecewise_construct,
+			std::forward_as_tuple(chunkStartingPosition), std::forward_as_tuple(std::move(VAO)));
+	}
+
+	////Load all new Chunks 
+	//for (const auto& chunkStartingPosition : chunksToBeAdded)
+	//{
+	//	m_VAOs.emplace(std::piecewise_construct,
+	//		std::forward_as_tuple(chunkStartingPosition),
+	//		std::forward_as_tuple(m_vertexArrayPool));
+
+
+	//}
+
+	////Generate Chunk Mesh after all new chunks have been loaded
+	//for (const auto& chunkStartingPosition : chunksToBeAdded)
+	//{
+	//	auto chunk = m_chunks.find(chunkStartingPosition);
+	//	assert(chunk != m_chunks.cend());
+
+	//	auto VAO = m_VAOs.find(chunkStartingPosition);
+	//	assert(VAO != m_VAOs.cend());
+
+	//	generateChunkMesh(*VAO->second.object, *chunk->second.object);
+	//}
 }
 
 void ChunkManager::regenChunks(std::mutex& renderingMutex)
