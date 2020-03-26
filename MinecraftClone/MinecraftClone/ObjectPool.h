@@ -35,12 +35,24 @@ struct ObjectInPool : private NonCopyable
 
 //External Use - Object Pool
 template <class Object, class ObjectPool>
-struct ObjectFromPool : private NonCopyable, private NonMovable
+struct ObjectFromPool : private NonCopyable
 {
 	ObjectFromPool(Object& object) 
 		: object(&object)
 	{}
 	virtual ~ObjectFromPool() {}
+	ObjectFromPool(ObjectFromPool&& orig)
+		: object(object)
+	{
+		orig.object = nullptr;
+	}
+	ObjectFromPool& operator=(ObjectFromPool&& orig)
+	{
+		object = orig.object;
+		orig.object = nullptr;
+
+		return *this;
+	}
 
 	Object* object;
 };
