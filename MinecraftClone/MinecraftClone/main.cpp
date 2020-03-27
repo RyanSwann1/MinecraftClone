@@ -220,12 +220,10 @@ int main()
 	std::mutex cameraMutex;
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
 	chunkManager->generateInitialChunks(camera.m_position);
-
+	cameraPosition = camera.m_position;
 	std::thread chunkGenerationThread([&](std::unique_ptr<ChunkManager>* chunkManager)
 		{chunkManager->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), 
 			std::ref(cameraMutex), std::ref(renderingMutex)); }, &chunkManager );
-
-	std::unordered_map<glm::ivec3, VertexArrayFromPool>& VAOs = chunkManager->getVAOs();
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -306,6 +304,7 @@ int main()
 
 		if (chunkManager)
 		{
+			std::unordered_map<glm::ivec3, VertexArrayFromPool>& VAOs = chunkManager->getVAOs();
 			std::lock_guard<std::mutex> lock(renderingMutex);
 			for (auto VAO = VAOs.begin(); VAO != VAOs.end(); ++VAO)
 			{
