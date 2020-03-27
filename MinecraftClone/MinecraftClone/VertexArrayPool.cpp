@@ -21,7 +21,9 @@ VertexArrayFromPool::VertexArrayFromPool(VertexArrayPool& vertexArrayPool)
 
 VertexArrayFromPool::VertexArrayFromPool(VertexArrayFromPool && orig)
 	: ObjectFromPool(std::move(orig))
-{}
+{
+	int i = 0;
+}
 
 VertexArrayFromPool& VertexArrayFromPool::operator=(VertexArrayFromPool&& orig)
 {

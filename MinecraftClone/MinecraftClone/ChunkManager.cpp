@@ -60,6 +60,7 @@ void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition)
 	{
 		std::pair<const Chunk*, VertexArray*> recentlyAdded = recentlyAddedQueue.front();
 		recentlyAddedQueue.pop();
+
 		generateChunkMesh(*recentlyAdded.second, *recentlyAdded.first);
 	}
 
@@ -67,9 +68,11 @@ void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition)
 	{
 		if (VAO->second.object->m_awaitingRegeneration)
 		{
-			glm::ivec3 chunkStartingPosition = VAO->first;
-			VertexArrayFromPool tempVAO = std::move(VAO->second);
-			m_VAOQueue.emplace_back(chunkStartingPosition, std::move(tempVAO));
+			const glm::ivec3& chunkStartingPosition = VAO->first;
+
+			m_VAOsToAdd.emplace(std::piecewise_construct,
+				std::forward_as_tuple(chunkStartingPosition),
+				std::forward_as_tuple(std::move(VAO->second)));
 
 			VAO = m_VAOs.erase(VAO);
 		}
@@ -375,30 +378,23 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& re
 	//Locate Chunks to delete
 	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
 	{
-		glm::ivec3 chunkStartingPosition = chunk->second.object->getStartingPosition();
+		const glm::ivec3& chunkStartingPosition = chunk->second.object->getStartingPosition();
 		if (!visibilityRect.contains(chunk->second.object->getAABB()))
 		{
-			chunk = m_chunks.erase(chunk);
-
 			auto VAO = m_VAOs.find(chunkStartingPosition);
 			if (VAO != m_VAOs.cend())
 			{
 				m_VAOs.erase(VAO);
 			}
 
-			for (auto VAOInQueue = m_VAOQueue.begin(); VAOInQueue != m_VAOQueue.end();)
+			auto VAOToAdd = m_VAOsToAdd.find(chunkStartingPosition);
+			if (VAOToAdd != m_VAOsToAdd.cend())
 			{
-				if (VAOInQueue->first == chunkStartingPosition)
-				{
-					VAOInQueue = m_VAOQueue.erase(VAOInQueue);
-				}
-				else
-				{
-					++VAOInQueue;
-				}
+				m_VAOsToAdd.erase(VAOToAdd);
 			}
 
 			removeFromChunksToRegenerate(chunkStartingPosition);
+			chunk = m_chunks.erase(chunk);
 		}
 		else
 		{
@@ -426,7 +422,7 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition, std::mutex& render
 
 			glm::ivec3 chunkStartingPosition(x, 0, z);
 			Utilities::getClosestChunkStartingPosition(chunkStartingPosition);
-			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend() && m_VAOs.find(chunkStartingPosition) == m_VAOs.cend())
+			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend())
 			{
 				const Chunk* chunk = m_chunks.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunkStartingPosition),
@@ -442,8 +438,11 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition, std::mutex& render
 		const Chunk* recentlyAddedChunk = recentlyAddedChunks.front();
 		recentlyAddedChunks.pop();
 
-		m_VAOQueue.emplace_back(recentlyAddedChunk->getStartingPosition(), m_vertexArrayPool);
-		generateChunkMesh(*m_VAOQueue.back().second.object, *recentlyAddedChunk);
+		VertexArray& VAO = *m_VAOsToAdd.emplace(std::piecewise_construct,
+			std::forward_as_tuple(recentlyAddedChunk->getStartingPosition()),
+			std::forward_as_tuple(m_vertexArrayPool)).first->second.object;
+
+		generateChunkMesh(VAO, *recentlyAddedChunk);
 	}
 }
 
@@ -477,39 +476,30 @@ void ChunkManager::regenChunks(std::mutex& renderingMutex)
 
 	for (const auto& chunkStartingPosition : regenerationQueue)
 	{
-		VertexArrayFromPool* VAO = nullptr;
-		for (auto& VAOInQueue : m_VAOQueue)
-		{
-			if (VAOInQueue.first == chunkStartingPosition)
-			{
-				VAO = &VAOInQueue.second;
-			}
-		}
-
-		assert(VAO);
-		if (VAO)
+		auto VAOToAdd = m_VAOsToAdd.find(chunkStartingPosition);
+		assert(VAOToAdd != m_VAOsToAdd.end());
+		if (VAOToAdd != m_VAOsToAdd.end())
 		{
 			auto chunk = m_chunks.find(chunkStartingPosition);
 			assert(chunk != m_chunks.cend());
 
-			generateChunkMesh(*VAO->object, *chunk->second.object);
+			generateChunkMesh(*VAOToAdd->second.object, *chunk->second.object);
 		}
 	}
 
 	std::lock_guard<std::mutex> lock(renderingMutex);
-	for (auto VAOInQueue = m_VAOQueue.begin(); VAOInQueue != m_VAOQueue.end();)
+	for (auto VAOInQueue = m_VAOsToAdd.begin(); VAOInQueue != m_VAOsToAdd.end();)
 	{
 		if (!VAOInQueue->second.object->m_awaitingRegeneration)
 		{
-			glm::ivec3 chunkStartingPosition = VAOInQueue->first;
-			VertexArrayFromPool VAO = std::move(VAOInQueue->second);
-			VAOInQueue = m_VAOQueue.erase(VAOInQueue);
+			const glm::ivec3& chunkStartingPosition = VAOInQueue->first;
 
-			auto chunk = m_chunks.find(chunkStartingPosition);
-			assert(chunk != m_chunks.cend());
-
+			assert(m_VAOs.find(chunkStartingPosition) == m_VAOs.cend());
+			
 			m_VAOs.emplace(std::piecewise_construct,
-				std::forward_as_tuple(chunkStartingPosition), std::forward_as_tuple(std::move(VAO)));
+				std::forward_as_tuple(chunkStartingPosition), std::forward_as_tuple(std::move(VAOInQueue->second)));
+			
+			VAOInQueue = m_VAOsToAdd.erase(VAOInQueue);
 		}
 		else
 		{
