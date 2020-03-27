@@ -41,12 +41,12 @@ struct ObjectFromPool : private NonCopyable
 		: object(&object)
 	{}
 	virtual ~ObjectFromPool() {}
-	ObjectFromPool(ObjectFromPool&& orig)
+	ObjectFromPool(ObjectFromPool&& orig) noexcept
 		: object(orig.object)
 	{
 		orig.object = nullptr;
 	}
-	ObjectFromPool& operator=(ObjectFromPool&& orig)
+	ObjectFromPool& operator=(ObjectFromPool&& orig) noexcept
 	{
 		object = orig.object;
 		orig.object = nullptr;

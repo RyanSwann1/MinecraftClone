@@ -19,13 +19,11 @@ VertexArrayFromPool::VertexArrayFromPool(VertexArrayPool& vertexArrayPool)
 	: ObjectFromPool(vertexArrayPool.getVertexArray())
 {}
 
-VertexArrayFromPool::VertexArrayFromPool(VertexArrayFromPool && orig)
+VertexArrayFromPool::VertexArrayFromPool(VertexArrayFromPool && orig) noexcept
 	: ObjectFromPool(std::move(orig))
-{
-	int i = 0;
-}
+{}
 
-VertexArrayFromPool& VertexArrayFromPool::operator=(VertexArrayFromPool&& orig)
+VertexArrayFromPool& VertexArrayFromPool::operator=(VertexArrayFromPool&& orig) noexcept
 {
 	ObjectFromPool::operator=(std::move(orig));
 	return *this;
