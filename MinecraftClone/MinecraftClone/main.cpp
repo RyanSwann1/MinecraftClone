@@ -283,7 +283,6 @@ int main()
 		{
 			camera.move(deltaTime);
 
-			//Try lock
 			if (cameraMutex.try_lock())
 			{
 				cameraPosition = camera.m_position;

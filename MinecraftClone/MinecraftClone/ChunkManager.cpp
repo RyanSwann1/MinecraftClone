@@ -454,7 +454,7 @@ void ChunkManager::regenChunks(std::mutex& renderingMutex)
 		auto chunk = m_chunks.find(*chunkStartingPosition);
 		if (chunk != m_chunks.cend())
 		{
-			//If Chunk has no neighbours
+			//If Chunk has no neighbours - then it can be regenerated
 			if (m_chunks.find(Utilities::getNeighbouringChunkPosition(*chunkStartingPosition, eDirection::Left)) != m_chunks.cend() &&
 				m_chunks.find(Utilities::getNeighbouringChunkPosition(*chunkStartingPosition, eDirection::Right)) != m_chunks.cend() &&
 				m_chunks.find(Utilities::getNeighbouringChunkPosition(*chunkStartingPosition, eDirection::Back)) != m_chunks.cend() &&
