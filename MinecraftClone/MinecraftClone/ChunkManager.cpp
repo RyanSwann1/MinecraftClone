@@ -522,9 +522,6 @@ void ChunkManager::regenChunks(std::mutex& renderingMutex)
 		if (!VAOInQueue->second.object->m_awaitingRegeneration)
 		{
 			const glm::ivec3& chunkStartingPosition = VAOInQueue->first;
-
-			assert(m_VAOs.find(chunkStartingPosition) == m_VAOs.cend());
-			
 			m_VAOs.emplace(std::piecewise_construct,
 				std::forward_as_tuple(chunkStartingPosition), std::forward_as_tuple(std::move(VAOInQueue->second)));
 			
