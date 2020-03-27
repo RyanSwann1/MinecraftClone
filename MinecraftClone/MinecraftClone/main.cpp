@@ -303,37 +303,12 @@ int main()
 
 		if (chunkManager)
 		{
-			std::unordered_map<glm::ivec3, VertexArrayFromPool>& VAOs = chunkManager->getVAOs();
-			std::lock_guard<std::mutex> lock(renderingMutex);
-			for (auto VAO = VAOs.begin(); VAO != VAOs.end(); ++VAO)
-			{
-				if (VAO->second.object->m_attachOpaqueVBO)
-				{
-					VAO->second.object->attachOpaqueVBO();
-				}
-
-				if (VAO->second.object->m_attachTransparentVBO)
-				{
-					VAO->second.object->attachTransparentVBO();
-				}
-
-				if (VAO->second.object->m_opaqueVBODisplayable)
-				{
-					VAO->second.object->bindOpaqueVAO();
-					glDrawElements(GL_TRIANGLES, VAO->second.object->m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
-				}
-			}
-
+			std::unique_lock<std::mutex> renderingLock(renderingMutex);
+			chunkManager->renderOpaque();
 			setUniformLocation1f(shaderID, "uAlpha", Utilities::WATER_ALPHA_VALUE, uniformLocations);
-			for (const auto& VAO : VAOs)
-			{
-				if (VAO.second.object->m_transparentVBODisplayable)
-				{
-					VAO.second.object->bindTransparentVAO();
-					glDrawElements(GL_TRIANGLES, VAO.second.object->m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
-				}
-			}
-			setUniformLocation1f(shaderID, "uAlpha", 1.0f, uniformLocations);	
+			chunkManager->renderTransparent();
+			renderingLock.unlock();
+			setUniformLocation1f(shaderID, "uAlpha", 1.0f, uniformLocations);
 		}
 
 		window.display();

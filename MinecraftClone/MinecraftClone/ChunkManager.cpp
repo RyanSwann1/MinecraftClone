@@ -28,11 +28,6 @@ void ChunkManager::removeFromChunksToRegenerate(const glm::ivec3& chunkStartingP
 	}
 }
 
-std::unordered_map<glm::ivec3, VertexArrayFromPool>& ChunkManager::getVAOs()
-{
-	return m_VAOs;
-}
-
 void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition)
 {
 	std::queue<std::pair<const Chunk*, VertexArray*>> recentlyAddedQueue;
@@ -97,6 +92,40 @@ void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& win
 		regenChunks(renderingMutex);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(400));
+	}
+}
+
+void ChunkManager::renderOpaque() const
+{
+	for (auto& VAO : m_VAOs)
+	{
+		if (VAO.second.object->m_attachOpaqueVBO)
+		{
+			VAO.second.object->attachOpaqueVBO();
+		}
+
+		if (VAO.second.object->m_attachTransparentVBO)
+		{
+			VAO.second.object->attachTransparentVBO();
+		}
+
+		if (VAO.second.object->m_opaqueVBODisplayable)
+		{
+			VAO.second.object->bindOpaqueVAO();
+			glDrawElements(GL_TRIANGLES, VAO.second.object->m_vertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+		}
+	}
+}
+
+void ChunkManager::renderTransparent() const
+{
+	for (const auto& VAO : m_VAOs)
+	{
+		if (VAO.second.object->m_transparentVBODisplayable)
+		{
+			VAO.second.object->bindTransparentVAO();
+			glDrawElements(GL_TRIANGLES, VAO.second.object->m_vertexBuffer.transparentIndicies.size(), GL_UNSIGNED_INT, nullptr);
+		}
 	}
 }
 

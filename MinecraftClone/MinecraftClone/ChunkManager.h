@@ -45,11 +45,11 @@ class ChunkManager : private NonCopyable, private NonMovable
 public:
 	ChunkManager();
 
-	std::unordered_map<glm::ivec3, VertexArrayFromPool>& getVAOs();
-
 	void generateInitialChunks(const glm::vec3& playerPosition);
 	void update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
 		std::mutex& cameraMutex, std::mutex& renderingMutex);
+	void renderOpaque() const;
+	void renderTransparent() const;
 
 private:
 	ChunkPool m_chunkPool;
