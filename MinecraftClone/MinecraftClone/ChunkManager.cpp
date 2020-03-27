@@ -11,6 +11,7 @@ ChunkManager::ChunkManager()
 	: m_chunkPool(),
 	m_vertexArrayPool(),
 	m_VAOs(),
+	m_VAOsToRegenerate(),
 	m_chunks(),
 	m_chunksToRegenerate()
 {}
@@ -65,7 +66,7 @@ void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition)
 		{
 			const glm::ivec3& chunkStartingPosition = VAO->first;
 
-			m_VAOsToAdd.emplace(std::piecewise_construct,
+			m_VAOsToRegenerate.emplace(std::piecewise_construct,
 				std::forward_as_tuple(chunkStartingPosition),
 				std::forward_as_tuple(std::move(VAO->second)));
 
@@ -416,10 +417,10 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& re
 				m_VAOs.erase(VAO);
 			}
 
-			auto VAOToAdd = m_VAOsToAdd.find(chunkStartingPosition);
-			if (VAOToAdd != m_VAOsToAdd.cend())
+			auto VAOToAdd = m_VAOsToRegenerate.find(chunkStartingPosition);
+			if (VAOToAdd != m_VAOsToRegenerate.cend())
 			{
-				m_VAOsToAdd.erase(VAOToAdd);
+				m_VAOsToRegenerate.erase(VAOToAdd);
 			}
 
 			removeFromChunksToRegenerate(chunkStartingPosition);
@@ -467,7 +468,7 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition, std::mutex& render
 		const Chunk* recentlyAddedChunk = recentlyAddedChunks.front();
 		recentlyAddedChunks.pop();
 
-		VertexArray& VAO = *m_VAOsToAdd.emplace(std::piecewise_construct,
+		VertexArray& VAO = *m_VAOsToRegenerate.emplace(std::piecewise_construct,
 			std::forward_as_tuple(recentlyAddedChunk->getStartingPosition()),
 			std::forward_as_tuple(m_vertexArrayPool)).first->second.object;
 
@@ -505,9 +506,9 @@ void ChunkManager::regenChunks(std::mutex& renderingMutex)
 
 	for (const auto& chunkStartingPosition : regenerationQueue)
 	{
-		auto VAOToAdd = m_VAOsToAdd.find(chunkStartingPosition);
-		assert(VAOToAdd != m_VAOsToAdd.end());
-		if (VAOToAdd != m_VAOsToAdd.end())
+		auto VAOToAdd = m_VAOsToRegenerate.find(chunkStartingPosition);
+		assert(VAOToAdd != m_VAOsToRegenerate.end());
+		if (VAOToAdd != m_VAOsToRegenerate.end())
 		{
 			auto chunk = m_chunks.find(chunkStartingPosition);
 			assert(chunk != m_chunks.cend());
@@ -517,7 +518,7 @@ void ChunkManager::regenChunks(std::mutex& renderingMutex)
 	}
 
 	std::lock_guard<std::mutex> lock(renderingMutex);
-	for (auto VAOInQueue = m_VAOsToAdd.begin(); VAOInQueue != m_VAOsToAdd.end();)
+	for (auto VAOInQueue = m_VAOsToRegenerate.begin(); VAOInQueue != m_VAOsToRegenerate.end();)
 	{
 		if (!VAOInQueue->second.object->m_awaitingRegeneration)
 		{
@@ -525,7 +526,7 @@ void ChunkManager::regenChunks(std::mutex& renderingMutex)
 			m_VAOs.emplace(std::piecewise_construct,
 				std::forward_as_tuple(chunkStartingPosition), std::forward_as_tuple(std::move(VAOInQueue->second)));
 			
-			VAOInQueue = m_VAOsToAdd.erase(VAOInQueue);
+			VAOInQueue = m_VAOsToRegenerate.erase(VAOInQueue);
 		}
 		else
 		{

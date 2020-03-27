@@ -55,7 +55,7 @@ private:
 	ChunkPool m_chunkPool;
 	VertexArrayPool m_vertexArrayPool;
 	std::unordered_map<glm::ivec3, VertexArrayFromPool> m_VAOs;
-	std::unordered_map<glm::ivec3, VertexArrayFromPool> m_VAOsToAdd;
+	std::unordered_map<glm::ivec3, VertexArrayFromPool> m_VAOsToRegenerate;
 	std::unordered_map<glm::ivec3, ChunkFromPool> m_chunks;
 	std::unordered_set<glm::ivec3> m_chunksToRegenerate;
 
