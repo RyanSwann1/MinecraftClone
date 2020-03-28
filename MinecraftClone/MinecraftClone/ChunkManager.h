@@ -66,10 +66,8 @@ private:
 	ChunkPool m_chunkPool;
 	VertexArrayPool m_vertexArrayPool;
 	std::unordered_map<glm::ivec3, VertexArrayFromPool> m_VAOs;
-	//std::unordered_map<glm::ivec3, VertexArrayFromPool> m_VAOsToRegenerate;
 	std::unordered_map<glm::ivec3, Regenerate> m_regenerate;
 	std::unordered_map<glm::ivec3, ChunkFromPool> m_chunks;
-	//std::vector<const Chunk*> m_chunksToRegenerate;
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
