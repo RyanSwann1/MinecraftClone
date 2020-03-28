@@ -3,9 +3,8 @@
 #include "VertexArray.h"
 #include "ObjectPool.h"
 
-class VertexArrayPool : private ObjectPool<VertexArray>
+struct VertexArrayPool : private ObjectPool<VertexArray>
 {
-public:
 	VertexArrayPool();
 
 	VertexArray& getVertexArray();

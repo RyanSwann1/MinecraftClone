@@ -3,9 +3,8 @@
 #include "ObjectPool.h"
 #include "Chunk.h"
 
-class ChunkPool : private ObjectPool<Chunk>
+struct ChunkPool : private ObjectPool<Chunk>
 {
-public:
 	ChunkPool();
 
 	Chunk& getChunk(const glm::ivec3& startingPosition);
