@@ -71,9 +71,9 @@ void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& win
 {
 	while (!resetGame)
 	{
-		std::unique_lock<std::mutex> lock(cameraMutex);
+		std::unique_lock<std::mutex> cameraLock(cameraMutex);
 		glm::ivec3 position = cameraPosition;
-		lock.unlock();
+		cameraLock.unlock();
 
 		deleteChunks(position, renderingMutex);
 		addChunks(position, renderingMutex);
@@ -386,7 +386,7 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& re
 	Utilities::getClosestMiddlePosition(startingPosition);
 	Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Utilities::VISIBILITY_DISTANCE);
 
-	std::lock_guard<std::mutex> lock(renderingMutex);
+	std::lock_guard<std::mutex> renderingLock(renderingMutex);
 	//Locate Chunks to delete
 	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
 	{
