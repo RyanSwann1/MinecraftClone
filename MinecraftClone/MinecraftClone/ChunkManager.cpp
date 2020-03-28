@@ -16,7 +16,7 @@ ChunkManager::ChunkManager()
 
 void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition)
 {
-	std::queue<std::pair<const Chunk*, VertexArray*>> recentlyAddedQueue;
+	std::vector<std::pair<const Chunk*, VertexArray*>> recentlyAdded;
 	for (int z = playerPosition.z - Utilities::VISIBILITY_DISTANCE; z <= playerPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
 	{
 		for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x <= playerPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
@@ -33,16 +33,13 @@ void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition)
 				std::forward_as_tuple(chunkStartingPosition),
 				std::forward_as_tuple(m_chunkPool, chunkStartingPosition)).first->second.object;
 		
-			recentlyAddedQueue.push(std::make_pair<const Chunk*, VertexArray*>(&chunk, &VAO));
+			recentlyAdded.emplace_back(&chunk, &VAO);
 		}
 	}
 
-	while (!recentlyAddedQueue.empty())
+	for (const auto& added : recentlyAdded)
 	{
-		std::pair<const Chunk*, VertexArray*> recentlyAdded = recentlyAddedQueue.front();
-		recentlyAddedQueue.pop();
-
-		generateChunkMesh(*recentlyAdded.second, *recentlyAdded.first);
+		generateChunkMesh(*added.second, *added.first);
 	}
 
 	for (auto VAO = m_VAOs.begin(); VAO != m_VAOs.end();)
@@ -426,7 +423,7 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& re
 
 void ChunkManager::addChunks(const glm::vec3& playerPosition, std::mutex& renderingMutex)
 {
-	std::queue<const Chunk*> addedChunks;
+	std::vector<const Chunk*> addedChunks;
 	glm::ivec3 startPosition(playerPosition);
 	Utilities::getClosestMiddlePosition(startPosition);
 	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z <= startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
@@ -449,19 +446,16 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition, std::mutex& render
 					std::forward_as_tuple(chunkStartingPosition),
 					std::forward_as_tuple(m_chunkPool, chunkStartingPosition)).first->second.object;
 				
-				addedChunks.push(chunk);
+				addedChunks.push_back(chunk);
 			}
 		}
 	}
 
-	while (!addedChunks.empty())
+	for (const auto& addedChunk : addedChunks)
 	{
-		const Chunk* addedChunk = addedChunks.front();
-		addedChunks.pop();
-
 		VertexArrayFromPool VAO(m_vertexArrayPool);
 		generateChunkMesh(*VAO.object, *addedChunk);
-		
+
 		m_regenerate.emplace(std::piecewise_construct,
 			std::forward_as_tuple(addedChunk->getStartingPosition()),
 			std::forward_as_tuple(*addedChunk, std::move(VAO)));
