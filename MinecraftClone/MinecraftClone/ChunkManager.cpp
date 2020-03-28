@@ -122,25 +122,21 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 	glm::ivec3 position = cubePosition;
 	if (cubeType == eCubeType::Water)
 	{
-		assert(cubeSide == eCubeSide::Top);
-		if (cubeSide == eCubeSide::Top)
+		for (const glm::vec3& i : Utilities::CUBE_FACE_TOP)
 		{
-			for (const glm::vec3& i : Utilities::CUBE_FACE_TOP)
-			{
-				position += i;
-				vertexArray.m_vertexBuffer.transparentPositions.push_back({ position.x, position.y, position.z });
-				position = cubePosition;
-			}
-			
-			Utilities::getTextCoords(vertexArray.m_vertexBuffer.transparentTextCoords, cubeSide, cubeType);
-			
-			for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
-			{
-				vertexArray.m_vertexBuffer.transparentIndicies.push_back(i + vertexArray.m_transparentElementBufferIndex);
-			}
-
-			vertexArray.m_transparentElementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
+			position += i;
+			vertexArray.m_vertexBuffer.transparentPositions.push_back({ position.x, position.y, position.z });
+			position = cubePosition;
 		}
+			
+		Utilities::getTextCoords(vertexArray.m_vertexBuffer.transparentTextCoords, cubeSide, cubeType);
+			
+		for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
+		{
+			vertexArray.m_vertexBuffer.transparentIndicies.push_back(i + vertexArray.m_transparentElementBufferIndex);
+		}
+
+		vertexArray.m_transparentElementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;	
 	}
 	else
 	{
