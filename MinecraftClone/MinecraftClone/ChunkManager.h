@@ -34,14 +34,25 @@
 
 //https://www.reddit.com/r/proceduralgeneration/comments/4eixfr/how_are_randomly_placed_structures_generated_in_a/
 
-struct Camera;
-struct Rectangle;
 enum class eDirection;
 enum class eCubeSide;
 class VertexArray;
 struct CubeDetails;
 class ChunkManager : private NonCopyable, private NonMovable
 {
+	struct Regenerate : private NonCopyable, private NonMovable
+	{
+		Regenerate(const Chunk& chunk, VertexArrayFromPool&& vertexArrayFromPool)
+			: vertexArrayToRegenerate(std::move(vertexArrayFromPool)),
+			chunkToRegenerate(chunk),
+			regenerated(false)
+		{}
+
+		VertexArrayFromPool vertexArrayToRegenerate;
+		const Chunk& chunkToRegenerate;
+		bool regenerated;
+	};
+
 public:
 	ChunkManager();
 
@@ -55,9 +66,10 @@ private:
 	ChunkPool m_chunkPool;
 	VertexArrayPool m_vertexArrayPool;
 	std::unordered_map<glm::ivec3, VertexArrayFromPool> m_VAOs;
-	std::unordered_map<glm::ivec3, VertexArrayFromPool> m_VAOsToRegenerate;
+	//std::unordered_map<glm::ivec3, VertexArrayFromPool> m_VAOsToRegenerate;
+	std::unordered_map<glm::ivec3, Regenerate> m_regenerate;
 	std::unordered_map<glm::ivec3, ChunkFromPool> m_chunks;
-	std::unordered_set<glm::ivec3> m_chunksToRegenerate;
+	//std::vector<const Chunk*> m_chunksToRegenerate;
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
@@ -66,6 +78,5 @@ private:
 	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::vec3& playerPosition, std::mutex& renderingMutex);
-	void regenChunks(std::mutex& renderingMutex);
-	void removeFromChunksToRegenerate(const glm::ivec3& chunkStartingPosition);
+	void handleRegeneration(std::mutex& renderingMutex);
 };
