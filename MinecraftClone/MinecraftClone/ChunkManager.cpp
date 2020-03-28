@@ -515,37 +515,37 @@ const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chun
 	{
 	case eDirection::Left :
 	{
-		auto cIter = m_chunks.find(glm::ivec3(chunkStartingPosition.x - Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z));
-		if (cIter != m_chunks.cend())
+		auto chunk = m_chunks.find(glm::ivec3(chunkStartingPosition.x - Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z));
+		if (chunk != m_chunks.cend())
 		{
-			neighbouringChunk = cIter->second.object;
+			neighbouringChunk = chunk->second.object;
 		}
 		break;
 	}
 	case eDirection::Right :
 	{
-		auto cIter = m_chunks.find(glm::ivec3(chunkStartingPosition.x + Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z));
-		if (cIter != m_chunks.cend())
+		auto chunk = m_chunks.find(glm::ivec3(chunkStartingPosition.x + Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z));
+		if (chunk != m_chunks.cend())
 		{
-			neighbouringChunk = cIter->second.object;
+			neighbouringChunk = chunk->second.object;
 		}
 		break;
 	}
 	case eDirection::Forward :
 	{
-		auto cIter = m_chunks.find(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z + Utilities::CHUNK_DEPTH));
-		if (cIter != m_chunks.cend())
+		auto chunk = m_chunks.find(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z + Utilities::CHUNK_DEPTH));
+		if (chunk != m_chunks.cend())
 		{
-			neighbouringChunk = cIter->second.object;
+			neighbouringChunk = chunk->second.object;
 		}
 		break;
 	}
 	case eDirection::Back :
 	{
-		auto cIter = m_chunks.find(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z - Utilities::CHUNK_DEPTH));
-		if (cIter != m_chunks.cend())
+		auto chunk = m_chunks.find(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z - Utilities::CHUNK_DEPTH));
+		if (chunk != m_chunks.cend())
 		{
-			neighbouringChunk = cIter->second.object;
+			neighbouringChunk = chunk->second.object;
 		}
 		break;
 	}
