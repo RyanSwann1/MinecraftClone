@@ -164,19 +164,6 @@ unsigned int createShaderProgram()
 //https://community.khronos.org/t/how-do-you-implement-texture-arrays/75315
 
 
-//Jamie Test - Interview Question
-//x = [1, 3, 6, 7, 0, 1, 3, 6, 0, 0]
-//s = 9
-//
-//
-//r = [1, 2]
-//r = [-1]
-//
-//for (int i = 0; i < x.size(); ++i)
-//{
-//
-//}
-
 //http://ogldev.atspace.co.uk/index.html
 
 //x + (y * width)
