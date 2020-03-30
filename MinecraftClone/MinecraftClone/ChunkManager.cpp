@@ -449,12 +449,11 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition)
 
 	for (const auto& addedChunk : addedChunks)
 	{
-		VertexArrayFromPool VAO(m_vertexArrayPool);
-		generateChunkMesh(*VAO.object, *addedChunk);
+		VertexArray& VAO = *m_regenerate.emplace(std::piecewise_construct,
+		std::forward_as_tuple(addedChunk->getStartingPosition()),
+		std::forward_as_tuple(*addedChunk, m_vertexArrayPool)).first->second.vertexArrayToRegenerate.object;
 
-		m_regenerate.emplace(std::piecewise_construct,
-			std::forward_as_tuple(addedChunk->getStartingPosition()),
-			std::forward_as_tuple(*addedChunk, std::move(VAO)));
+		generateChunkMesh(VAO, *addedChunk);
 	}
 }
 
