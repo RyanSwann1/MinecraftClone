@@ -5,7 +5,6 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include <mutex>
 
 //
 //LEARNOPENGL.COM CAMERA
@@ -17,13 +16,11 @@ struct Camera
 
 	void move(float deltaTime);
 
-	glm::vec3 getRaycastPosition() const;
 	void mouse_callback(double xpos, double ypos);
 
 	float m_speed;
 	glm::vec3 m_position;
 	glm::vec3 m_front;
-	glm::vec3 m_frontInverse;
 	glm::vec3 m_up;
 
 	float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.

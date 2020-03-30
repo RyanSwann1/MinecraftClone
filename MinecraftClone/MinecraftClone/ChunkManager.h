@@ -42,11 +42,7 @@ class ChunkManager : private NonCopyable, private NonMovable
 {
 	struct Regenerate : private NonCopyable, private NonMovable
 	{
-		Regenerate(const Chunk& chunk, VertexArrayFromPool&& vertexArrayFromPool)
-			: vertexArrayToRegenerate(std::move(vertexArrayFromPool)),
-			chunkToRegenerate(chunk),
-			regenerated(false)
-		{}
+		Regenerate(const Chunk& chunk, VertexArrayFromPool&& vertexArrayFromPool);
 
 		VertexArrayFromPool vertexArrayToRegenerate;
 		const Chunk& chunkToRegenerate;
