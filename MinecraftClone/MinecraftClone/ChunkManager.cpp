@@ -16,52 +16,38 @@ ChunkManager::ChunkManager()
 
 void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition)
 {
-	std::vector<std::pair<const Chunk*, VertexArray*>> recentlyAdded;
+	assert(m_chunks.empty() && m_VAOs.empty() && m_regenerate.empty());
+	//Generate Chunks
 	for (int z = playerPosition.z - Utilities::VISIBILITY_DISTANCE; z <= playerPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
 	{
 		for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x <= playerPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
 			glm::ivec3 chunkStartingPosition(x, 0, z);
 			Utilities::getClosestChunkStartingPosition(chunkStartingPosition);
-			assert(m_chunks.find(chunkStartingPosition) == m_chunks.cend() && m_VAOs.find(chunkStartingPosition) == m_VAOs.cend());
-			
-			VertexArray& VAO = *m_VAOs.emplace(std::piecewise_construct,
-				std::forward_as_tuple(chunkStartingPosition),
-				std::forward_as_tuple(m_vertexArrayPool)).first->second.object;
 
 			const Chunk& chunk = *m_chunks.emplace(std::piecewise_construct,
 				std::forward_as_tuple(chunkStartingPosition),
 				std::forward_as_tuple(m_chunkPool, chunkStartingPosition)).first->second.object;
-		
-			recentlyAdded.emplace_back(&chunk, &VAO);
 		}
 	}
 
-	for (const auto& added : recentlyAdded)
+	//Generate VAOs
+	for (const auto& chunk : m_chunks)
 	{
-		generateChunkMesh(*added.second, *added.first);
-	}
+		VertexArrayFromPool VAO(m_vertexArrayPool);
+		generateChunkMesh(*VAO.object, *chunk.second.object);
 
-	for (auto VAO = m_VAOs.begin(); VAO != m_VAOs.end();)
-	{
-		if (VAO->second.object->m_awaitingRegeneration)
+		if (VAO.object->m_awaitingRegeneration)
 		{
-			const glm::ivec3& chunkStartingPosition = VAO->first;
-
-			auto chunk = m_chunks.find(chunkStartingPosition);
-			assert(chunk != m_chunks.cend());
-			if (chunk != m_chunks.cend())
-			{
-				m_regenerate.emplace(std::piecewise_construct,
-					std::forward_as_tuple(chunkStartingPosition),
-					std::forward_as_tuple(*chunk->second.object, std::move(VAO->second)));
-			}
-
-			VAO = m_VAOs.erase(VAO);
+			m_regenerate.emplace(std::piecewise_construct,
+				std::forward_as_tuple(chunk.first),
+				std::forward_as_tuple(*chunk.second.object, std::move(VAO)));
 		}
 		else
 		{
-			++VAO;
+			m_VAOs.emplace(std::piecewise_construct,
+				std::forward_as_tuple(chunk.first),
+				std::forward_as_tuple(std::move(VAO)));
 		}
 	}
 }
