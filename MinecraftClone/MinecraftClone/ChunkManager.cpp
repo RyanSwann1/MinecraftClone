@@ -76,7 +76,7 @@ void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& win
 		cameraLock.unlock();
 
 		deleteChunks(position, renderingMutex);
-		addChunks(position, renderingMutex);
+		addChunks(position);
 		handleRegeneration(renderingMutex);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(400));
@@ -417,7 +417,7 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& re
 	}
 }
 
-void ChunkManager::addChunks(const glm::vec3& playerPosition, std::mutex& renderingMutex)
+void ChunkManager::addChunks(const glm::vec3& playerPosition)
 {
 	std::vector<const Chunk*> addedChunks;
 	glm::ivec3 startPosition(playerPosition);
