@@ -7,6 +7,12 @@
 #include "Camera.h"
 #include <iostream>
 
+ChunkManager::Regenerate::Regenerate(const Chunk& chunk, VertexArrayFromPool&& vertexArrayFromPool)
+	: vertexArrayToRegenerate(std::move(vertexArrayFromPool)),
+	chunkToRegenerate(chunk),
+	regenerated(false)
+{}
+
 ChunkManager::ChunkManager()
 	: m_chunkPool(),
 	m_vertexArrayPool(),
@@ -536,3 +542,4 @@ const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chun
 
 	return neighbouringChunk;
 }
+
