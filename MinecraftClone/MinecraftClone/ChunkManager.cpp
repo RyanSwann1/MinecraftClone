@@ -70,8 +70,6 @@ void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& win
 		deleteChunks(position, renderingMutex);
 		addChunks(position);
 		handleRegeneration(renderingMutex);
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(400));
 	}
 }
 
@@ -145,7 +143,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 			Utilities::getTextCoords(vertexArray.m_vertexBuffer.textCoords, cubeSide, cubeType);
 			break;
 		case eCubeSide::Back:
-			for (glm::ivec3 i : Utilities::CUBE_FACE_BACK)
+			for (const glm::ivec3& i : Utilities::CUBE_FACE_BACK)
 			{
 				position += i;
 				vertexArray.m_vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
