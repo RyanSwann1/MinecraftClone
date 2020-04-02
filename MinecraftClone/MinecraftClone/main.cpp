@@ -268,9 +268,9 @@ int main()
 			chunkGenerationThread.join();
 			resetGame = false;
 			camera.m_position = Utilities::PLAYER_STARTING_POSITION;
-			//chunkManager.reset();
+			cameraPosition = camera.m_position;
 			chunkManager = std::make_unique<ChunkManager>();
-			chunkManager->generateInitialChunks(camera.m_position);
+			chunkManager->generateInitialChunks(cameraPosition);
 
 			chunkGenerationThread = std::thread{ [&](std::unique_ptr<ChunkManager>* chunkManager)
 				{chunkManager->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), 
