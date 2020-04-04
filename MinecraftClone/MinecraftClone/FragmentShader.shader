@@ -1,10 +1,10 @@
 #version 330 core
 
 out vec4 color;
-uniform sampler2D uTexture;
+uniform sampler2DArray uTexture;
 uniform float uAlpha;
 
-in vec2 vTextCoord;
+in vec3 vTextCoord;
 
 void main()
 {
