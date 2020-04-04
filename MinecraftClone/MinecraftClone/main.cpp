@@ -323,12 +323,9 @@ int main()
 
 		if (chunkManager)
 		{
-			std::unique_lock<std::mutex> renderingLock(renderingMutex);
+			std::lock_guard<std::mutex> renderingLock(renderingMutex);
 			chunkManager->renderOpaque();
-			setUniformLocation1f(shaderID, "uAlpha", Utilities::WATER_ALPHA_VALUE, uniformLocations);
 			chunkManager->renderTransparent();
-			renderingLock.unlock();
-			setUniformLocation1f(shaderID, "uAlpha", 1.0f, uniformLocations);
 		}
 
 		window.display();
