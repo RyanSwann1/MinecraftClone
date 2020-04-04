@@ -99,7 +99,7 @@ void VertexBuffer::clearOpaqueVertices()
 	std::vector<glm::ivec3> newPositions;
 	positions.swap(newPositions);
 
-	std::vector<glm::vec2> newTextCoords;
+	std::vector<glm::vec3> newTextCoords;
 	textCoords.swap(newTextCoords);
 
 	indicies.shrink_to_fit();
@@ -110,7 +110,7 @@ void VertexBuffer::clearTransparentVertices()
 	std::vector<glm::ivec3> newTransparentPositions;
 	transparentPositions.swap(newTransparentPositions);
 
-	std::vector<glm::vec2> newTransparentTextCoords;
+	std::vector<glm::vec3> newTransparentTextCoords;
 	transparentTextCoords.swap(newTransparentTextCoords);
 
 	transparentIndicies.shrink_to_fit();
@@ -124,10 +124,10 @@ void VertexBuffer::clear()
 	std::vector<glm::ivec3> newTransparentPositions;
 	transparentPositions.swap(newTransparentPositions);
 	
-	std::vector<glm::vec2> newTransparentTextCoords;
+	std::vector<glm::vec3> newTransparentTextCoords;
 	transparentTextCoords.swap(newTransparentTextCoords);
 
-	std::vector<glm::vec2> newTextCoords;
+	std::vector<glm::vec3> newTextCoords;
 	textCoords.swap(newTextCoords);
 
 	std::vector<unsigned int> newTransparentIndicies;
