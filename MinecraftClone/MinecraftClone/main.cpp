@@ -221,14 +221,14 @@ int main()
 	unsigned int shaderID = createShaderProgram();
 	Camera camera(Utilities::PLAYER_STARTING_POSITION);
 
-	TextureArray textureArray(0);
+	TextureArray textureArray;
+	textureArray.bind();
 	bool texturesLoaded = loadTextures(textureArray);
 	assert(texturesLoaded);
 	if (!loadTextures)
 	{
 		return -1;
 	}
-
 	std::unordered_map<std::string, int> uniformLocations;
 	setUniform1i(shaderID, "uTexture", textureArray.getCurrentSlot(), uniformLocations);
 	

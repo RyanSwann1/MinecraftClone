@@ -5,14 +5,14 @@
 #include <iostream>
 #include "Utilities.h"
 
-TextureArray::TextureArray(unsigned int slot)
+TextureArray::TextureArray()
 	: m_textureSize(16, 16),
-	m_slot(slot),
+	m_slot(0),
 	m_ID(Utilities::INVALID_OPENGL_ID),
 	m_textureCount(0)
 {
 	glGenTextures(1, &m_ID);
-	glActiveTexture(GL_TEXTURE0 + slot);
+	glActiveTexture(GL_TEXTURE0 + m_slot);
 	bind();
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -21,6 +21,7 @@ TextureArray::TextureArray(unsigned int slot)
 
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, m_textureSize.x, m_textureSize.y, static_cast<int>(eTextureLayer::Max) + 1, 0, 
 		GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+	unbind();
 }
 
 unsigned int TextureArray::getCurrentSlot() const
@@ -53,4 +54,9 @@ bool TextureArray::addTexture(const std::string& textureName)
 void TextureArray::bind() const
 {
 	glBindTexture(GL_TEXTURE_2D_ARRAY, m_ID);
+}
+
+void TextureArray::unbind() const
+{
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 }
