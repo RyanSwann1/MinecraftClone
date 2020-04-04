@@ -1,26 +1,25 @@
 #pragma once
 
-#include <string>
 #include "NonCopyable.h"
 #include "NonMovable.h"
 #include "glm/glm.hpp"
+#include <string>
 #include <memory>
 #include <vector>
 
-enum class eCubeFaceID;
-class Texture : private NonCopyable, private NonMovable
+class TextureArray : private NonCopyable, private NonMovable
 {
 public:
-	static std::unique_ptr<Texture> loadTexture(const std::string& name);
-	~Texture();
-
+	TextureArray(unsigned int slot);
+	
 	unsigned int getCurrentSlot() const;
-
-	void bind(unsigned int slot);
-	void unbind() const;
+	bool addTexture(const std::string& textureName);
 
 private:
-	Texture();
-	unsigned int m_currentSlot;
+	const glm::ivec2 m_textureSize;
+	const unsigned int m_slot;
 	unsigned int m_ID;
+	int m_textureCount;
+
+	void bind() const;
 };
