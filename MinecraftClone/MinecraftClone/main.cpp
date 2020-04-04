@@ -35,7 +35,24 @@
 
 //OpenGL is a state machine
 //Select buffer - state - then draw me a triangle
-//Based off of which buffer has been selected, it determines what/how will be drawns
+//Based off of which buffer has been selected, it determines what/how will be 
+
+bool loadTextures(TextureArray & textureArray)
+{
+	if (!textureArray.addTexture("grass.png") ||
+		!textureArray.addTexture("grass_side.png") ||
+		!textureArray.addTexture("sand.png") ||
+		!textureArray.addTexture("stone.png") ||
+		!textureArray.addTexture("water.png") ||
+		!textureArray.addTexture("log.png") ||
+		!textureArray.addTexture("leaves.png") ||
+		!textureArray.addTexture("common_cactus_side.png"))
+	{
+		return false;
+	}
+
+	return true;
+}
 
 int getUniformLocation(unsigned int shaderID, const std::string& uniformName, std::unordered_map<std::string, int>& uniformLocations)
 {
@@ -203,15 +220,17 @@ int main()
 
 	unsigned int shaderID = createShaderProgram();
 	Camera camera(Utilities::PLAYER_STARTING_POSITION);
-	std::shared_ptr<Texture> texture = Texture::loadTexture("Atlas3.png");
-	if (!texture)
-	{
-		std::cout << "couldn't load texture: " << "America.jpg" << "\n";
-	}
-	std::unordered_map<std::string, int> uniformLocations;
 
-	texture->bind(0);
-	setUniform1i(shaderID, "uTexture", texture->getCurrentSlot(), uniformLocations);
+	TextureArray textureArray(0);
+	bool texturesLoaded = loadTextures(textureArray);
+	assert(texturesLoaded);
+	if (!loadTextures)
+	{
+		return -1;
+	}
+
+	std::unordered_map<std::string, int> uniformLocations;
+	setUniform1i(shaderID, "uTexture", textureArray.getCurrentSlot(), uniformLocations);
 	
 	glm::vec3 cameraPosition;
 	bool movePlayer = false;

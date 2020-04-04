@@ -6,6 +6,19 @@
 #include <vector>
 #include <random>
 
+enum class eTextureLayer
+{
+	Grass = 0,
+	GrassSide,
+	Sand,
+	Stone,
+	Water,
+	TreeStump,
+	Leaves,
+	Cactus,
+	Max = Cactus
+};
+
 enum class eCubeSide
 {
 	Front,
@@ -62,7 +75,8 @@ namespace Utilities
 
 	constexpr int VISIBILITY_DISTANCE = 640;
 	constexpr int MAP_SIZE = 8000;
-	const glm::vec3 PLAYER_STARTING_POSITION(0.0f, 250.f, 0.0f);
+	const glm::vec3 PLAYER_STARTING_POSITION(0.0f, 100.f, 0.0f);
+	const std::string TEXTURE_DIRECTORY = "Textures/";
 
 	constexpr std::array<int, 6> LEAVES_DISTANCES =
 	{
@@ -74,76 +88,77 @@ namespace Utilities
 		MAX_LEAVES_DISTANCE - 2
 	};
 
-	constexpr std::array<glm::vec2, 4> GRASS_TEXT_COORDS =
-	{	
-		glm::vec2(0.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(16.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(16.0f / 128.0f, 1.0f),
-		glm::vec2(0.0f, 1.0f)
-	};
-
-	constexpr std::array<glm::vec2, 4> GRASS_SIDE_TEXT_COORDS =
+	constexpr std::array<glm::vec3, 4> GRASS_TEXT_COORDS =
 	{
-		glm::vec2(16.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(32.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(32.0f / 128.0f, 1.0f),
-		glm::vec2(16.0f / 128.0f, 1.0f)
+		glm::vec3(0.0f, 0.0f, static_cast<int>(eTextureLayer::Grass)),
+		glm::vec3(1.0f, 0.0f, static_cast<int>(eTextureLayer::Grass)),
+		glm::vec3(1.0f, 1.0f, static_cast<int>(eTextureLayer::Grass)),
+		glm::vec3(0.0f, 1.0f, static_cast<int>(eTextureLayer::Grass))
 	};
 
-	constexpr std::array<glm::vec2, 4> SAND_TEXT_COORDS =
+	constexpr std::array<glm::vec3, 4> GRASS_SIDE_TEXT_COORDS =
 	{
-		glm::vec2(32.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(48.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(48.0f / 128.0f, 1.0f),
-		glm::vec2(32.0f / 128.0f, 1.0f)
+		glm::vec3(0.0f, 0.0f, static_cast<int>(eTextureLayer::GrassSide)),
+		glm::vec3(1.0f, 0.0f, static_cast<int>(eTextureLayer::GrassSide)),
+		glm::vec3(1.0f, 1.0f, static_cast<int>(eTextureLayer::GrassSide)),
+		glm::vec3(0.0f, 1.0f, static_cast<int>(eTextureLayer::GrassSide))
 	};
 
-	constexpr std::array<glm::vec2, 4> STONE_TEXT_COORDS =
+	constexpr std::array<glm::vec3, 4> SAND_TEXT_COORDS =
 	{
-		glm::vec2(48.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(64.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(64.0f / 128.0f, 1.0f),
-		glm::vec2(48.0f / 128.0f, 1.0f)
+		glm::vec3(0.0f, 0.0f, static_cast<int>(eTextureLayer::Sand)),
+		glm::vec3(1.0f, 0.0f, static_cast<int>(eTextureLayer::Sand)),
+		glm::vec3(1.0f, 1.0f, static_cast<int>(eTextureLayer::Sand)),
+		glm::vec3(0.0f, 1.0f, static_cast<int>(eTextureLayer::Sand))
 	};
 
-	constexpr std::array<glm::vec2, 4> WATER_TEXT_COORDS =
+	constexpr std::array<glm::vec3, 4> STONE_TEXT_COORDS =
 	{
-		glm::vec2(64.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(80.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(80.0f / 128.0f, 1.0f),
-		glm::vec2(64.0f / 128.0f, 1.0f)
+		glm::vec3(0.0f, 0.0f, static_cast<int>(eTextureLayer::Stone)),
+		glm::vec3(1.0f, 0.0f, static_cast<int>(eTextureLayer::Stone)),
+		glm::vec3(1.0f, 1.0f, static_cast<int>(eTextureLayer::Stone)),
+		glm::vec3(0.0f, 1.0f, static_cast<int>(eTextureLayer::Stone))
 	};
 
-	constexpr std::array<glm::vec2, 4> TREESTUMP_TEXT_COORDS =
+	constexpr std::array<glm::vec3, 4> WATER_TEXT_COORDS =
 	{
-		glm::vec2(80.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(96.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(96.0f / 128.0f, 1.0f),
-		glm::vec2(80.0f / 128.0f, 1.0f)
+		glm::vec3(0.0f, 0.0f, static_cast<int>(eTextureLayer::Water)),
+		glm::vec3(1.0f, 0.0f, static_cast<int>(eTextureLayer::Water)),
+		glm::vec3(1.0f, 1.0f, static_cast<int>(eTextureLayer::Water)),
+		glm::vec3(0.0f, 1.0f, static_cast<int>(eTextureLayer::Water))
 	};
 
-	constexpr std::array<glm::vec2, 4> LEAVES_TEXT_COORDS =
+	constexpr std::array<glm::vec3, 4> TREESTUMP_TEXT_COORDS =
 	{
-		glm::vec2(96.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(112.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(112.0f / 128.0f, 1.0f),
-		glm::vec2(96.0f / 128.0f, 1.0f)
+		glm::vec3(0.0f, 0.0f, static_cast<int>(eTextureLayer::TreeStump)),
+		glm::vec3(1.0f, 0.0f, static_cast<int>(eTextureLayer::TreeStump)),
+		glm::vec3(1.0f, 1.0f, static_cast<int>(eTextureLayer::TreeStump)),
+		glm::vec3(0.0f, 1.0f, static_cast<int>(eTextureLayer::TreeStump))
 	};
 
-	constexpr std::array<glm::vec2, 4> CACTUS_TEXT_COORDS =
+	constexpr std::array<glm::vec3, 4> LEAVES_TEXT_COORDS =
 	{
-		glm::vec2(112.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(128.0f / 128.0f, (128.0f - 16.0f) / 128.0f),
-		glm::vec2(128.0f / 128.0f, 1.0f),
-		glm::vec2(112.0f / 128.0f, 1.0f)
+		glm::vec3(0.0f, 0.0f, static_cast<int>(eTextureLayer::Leaves)),
+		glm::vec3(1.0f, 0.0f, static_cast<int>(eTextureLayer::Leaves)),
+		glm::vec3(1.0f, 1.0f, static_cast<int>(eTextureLayer::Leaves)),
+		glm::vec3(0.0f, 1.0f, static_cast<int>(eTextureLayer::Leaves))
 	};
 
-	inline void getTextCoords(std::vector<glm::vec2>& textCoords, eCubeSide cubeSide, eCubeType cubeType)
+	constexpr std::array<glm::vec3, 4> CACTUS_TEXT_COORDS =
+	{
+		glm::vec3(0.0f, 0.0f, static_cast<int>(eTextureLayer::Cactus)),
+		glm::vec3(1.0f, 0.0f, static_cast<int>(eTextureLayer::Cactus)),
+		glm::vec3(1.0f, 1.0f, static_cast<int>(eTextureLayer::Cactus)),
+		glm::vec3(0.0f, 1.0f, static_cast<int>(eTextureLayer::Cactus))
+	};
+
+	inline void getTextCoords(std::vector<glm::vec3>& textCoords, eCubeSide cubeSide, eCubeType cubeType)
 	{
 		switch (cubeType)
 		{
 		case eCubeType::Stone:
 			textCoords.insert(textCoords.end(), Utilities::STONE_TEXT_COORDS.begin(), Utilities::STONE_TEXT_COORDS.end());
+			
 			break;
 		case eCubeType::Sand:
 			textCoords.insert(textCoords.end(), Utilities::SAND_TEXT_COORDS.begin(), Utilities::SAND_TEXT_COORDS.end());
