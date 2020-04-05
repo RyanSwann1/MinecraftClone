@@ -6,6 +6,7 @@
 #include "NonCopyable.h"
 #include <vector>
 
+struct VertexArray;
 struct VertexBuffer : private NonCopyable
 {
 	VertexBuffer();
@@ -13,28 +14,17 @@ struct VertexBuffer : private NonCopyable
 	VertexBuffer& operator=(VertexBuffer&&) noexcept;
 	~VertexBuffer();
 
-	void clearOpaqueVertices();
-	void clearTransparentVertices();
-
+	void bind();
+	void unbind() const;
 	void clear();
 
-	//Opaque
+	int elementBufferIndex;
+	bool bindToVAO;
+	bool displayable;
 	unsigned int positionsID;
 	std::vector<glm::ivec3> positions;
-
 	unsigned int textCoordsID;
 	std::vector<glm::vec3> textCoords;
-
 	unsigned int indiciesID;
 	std::vector<unsigned int> indicies;
-	
-	//Transparent
-	unsigned int transparentPositionsID;
-	std::vector<glm::ivec3> transparentPositions;
-
-	unsigned int transparentTextCoordsID;
-	std::vector<glm::vec3> transparentTextCoords;
-
-	unsigned int transparentIndiciesID;
-	std::vector<unsigned int> transparentIndicies;
 };

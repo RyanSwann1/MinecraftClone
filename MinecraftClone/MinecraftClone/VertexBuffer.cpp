@@ -1,74 +1,54 @@
 #include "VertexBuffer.h"
+#include "VertexArray.h"
 #include <iostream>
 
 VertexBuffer::VertexBuffer()
-	: positionsID(Utilities::INVALID_OPENGL_ID),
+	: elementBufferIndex(0),
+	bindToVAO(false),
+	displayable(false),
+	positionsID(Utilities::INVALID_OPENGL_ID),
 	positions(),
 	textCoordsID(Utilities::INVALID_OPENGL_ID),
 	textCoords(),
 	indiciesID(Utilities::INVALID_OPENGL_ID),
-	indicies(),
-	transparentPositionsID(Utilities::INVALID_OPENGL_ID),
-	transparentPositions(),
-	transparentTextCoordsID(Utilities::INVALID_OPENGL_ID),
-	transparentTextCoords(),
-	transparentIndiciesID(Utilities::INVALID_OPENGL_ID),
-	transparentIndicies()
+	indicies()
 {
 	glGenBuffers(1, &positionsID);
 	glGenBuffers(1, &textCoordsID);
 	glGenBuffers(1, &indiciesID);
-
-	glGenBuffers(1, &transparentPositionsID);
-	glGenBuffers(1, &transparentTextCoordsID);
-	glGenBuffers(1, &transparentIndiciesID);
 }
 
 VertexBuffer::VertexBuffer(VertexBuffer&& orig) noexcept
-	: positionsID(orig.positionsID),
+	: elementBufferIndex(orig.elementBufferIndex),
+	bindToVAO(orig.bindToVAO),
+	displayable(orig.displayable),
+	positionsID(orig.positionsID),
 	positions(std::move(orig.positions)),
 	textCoordsID(orig.textCoordsID),
 	textCoords(std::move(orig.textCoords)),
 	indiciesID(orig.indiciesID),
-	indicies(std::move(orig.indicies)),
-	transparentPositionsID(orig.transparentPositionsID),
-	transparentPositions(std::move(orig.transparentPositions)),
-	transparentTextCoordsID(orig.transparentTextCoordsID),
-	transparentTextCoords(std::move(orig.transparentTextCoords)),
-	transparentIndiciesID(orig.transparentIndiciesID),
-	transparentIndicies(std::move(orig.transparentIndicies))
+	indicies(std::move(orig.indicies))
 {
 	orig.positionsID = Utilities::INVALID_OPENGL_ID;
 	orig.textCoordsID = Utilities::INVALID_OPENGL_ID;
 	orig.indiciesID = Utilities::INVALID_OPENGL_ID;
-
-	orig.transparentPositionsID = Utilities::INVALID_OPENGL_ID;
-	orig.transparentTextCoordsID = Utilities::INVALID_OPENGL_ID;
-	orig.transparentIndiciesID = Utilities::INVALID_OPENGL_ID;
 }
 
 VertexBuffer& VertexBuffer::operator=(VertexBuffer&& orig) noexcept
 {
+	elementBufferIndex = orig.elementBufferIndex;
+	bindToVAO = orig.bindToVAO;
+	displayable = orig.displayable;
 	positionsID = orig.positionsID;
 	positions = std::move(orig.positions);
 	textCoordsID = orig.textCoordsID;
 	textCoords = std::move(orig.textCoords);
 	indiciesID = orig.indiciesID;
 	indicies = std::move(orig.indicies);
-	transparentPositionsID = orig.transparentPositionsID;
-	transparentPositions = std::move(orig.transparentPositions);
-	transparentTextCoordsID = orig.transparentTextCoordsID;
-	transparentTextCoords = std::move(orig.transparentTextCoords);
-	transparentIndiciesID = orig.transparentIndiciesID;
-	transparentIndicies = std::move(orig.transparentIndicies);
 
 	orig.positionsID = Utilities::INVALID_OPENGL_ID;
 	orig.textCoordsID = Utilities::INVALID_OPENGL_ID;
 	orig.indiciesID = Utilities::INVALID_OPENGL_ID;
-
-	orig.transparentPositionsID = Utilities::INVALID_OPENGL_ID;
-	orig.transparentTextCoordsID = Utilities::INVALID_OPENGL_ID;
-	orig.transparentIndiciesID = Utilities::INVALID_OPENGL_ID;
 
 	return *this;
 }
@@ -83,19 +63,31 @@ VertexBuffer::~VertexBuffer()
 	
 	assert(indiciesID != Utilities::INVALID_OPENGL_ID);
 	glDeleteBuffers(1, &indiciesID);
-	
-	assert(transparentPositionsID != Utilities::INVALID_OPENGL_ID);
-	glDeleteBuffers(1, &transparentPositionsID);
-	
-	assert(transparentTextCoordsID != Utilities::INVALID_OPENGL_ID);
-	glDeleteBuffers(1, &transparentTextCoordsID);
-	
-	assert(transparentIndiciesID != Utilities::INVALID_OPENGL_ID);
-	glDeleteBuffers(1, &transparentIndiciesID);
 }
 
-void VertexBuffer::clearOpaqueVertices()
+void VertexBuffer::bind()
 {
+	assert(bindToVAO);
+	bindToVAO = false;
+	displayable = true;
+
+	glBindBuffer(GL_ARRAY_BUFFER, positionsID);
+	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(glm::ivec3), positions.data(), GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_INT, GL_FALSE, sizeof(glm::ivec3), (const void*)0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, textCoordsID);
+	glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(glm::vec3), textCoords.data(), GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (const void*)(0));
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesID);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies.size() * sizeof(unsigned int), indicies.data(), GL_STATIC_DRAW);
+
+	unbind();
+
 	std::vector<glm::ivec3> newPositions;
 	positions.swap(newPositions);
 
@@ -105,33 +97,21 @@ void VertexBuffer::clearOpaqueVertices()
 	indicies.shrink_to_fit();
 }
 
-void VertexBuffer::clearTransparentVertices()
+void VertexBuffer::unbind() const
 {
-	std::vector<glm::ivec3> newTransparentPositions;
-	transparentPositions.swap(newTransparentPositions);
-
-	std::vector<glm::vec3> newTransparentTextCoords;
-	transparentTextCoords.swap(newTransparentTextCoords);
-
-	transparentIndicies.shrink_to_fit();
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void VertexBuffer::clear()
 {
+	elementBufferIndex = 0;
+	bindToVAO = false;
+	displayable = false;
 	std::vector<glm::ivec3> newPositions;
 	positions.swap(newPositions);
 
-	std::vector<glm::ivec3> newTransparentPositions;
-	transparentPositions.swap(newTransparentPositions);
-	
-	std::vector<glm::vec3> newTransparentTextCoords;
-	transparentTextCoords.swap(newTransparentTextCoords);
-
 	std::vector<glm::vec3> newTextCoords;
 	textCoords.swap(newTextCoords);
-
-	std::vector<unsigned int> newTransparentIndicies;
-	transparentIndicies.swap(newTransparentIndicies);
 	
 	std::vector<unsigned int> newIndicies;
 	indicies.swap(newIndicies);
