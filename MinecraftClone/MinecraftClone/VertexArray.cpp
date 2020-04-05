@@ -6,25 +6,20 @@
 
 VertexArray::VertexArray()
 	: m_inUse(false),
-	m_opaqueVBODisplayable(false),
-	m_transparentVBODisplayable(false),
-	m_attachOpaqueVBO(false),
-	m_attachTransparentVBO(false),
 	m_awaitingRegeneration(false),
-	m_vertexBuffer(),
-	m_ID(Utilities::INVALID_OPENGL_ID),
-	m_transparentID(Utilities::INVALID_OPENGL_ID),
-	m_opaqueElementBufferIndex(0),
-	m_transparentElementBufferIndex(0)
+	m_opaqueVertexBuffer(),
+	m_transparentVertexBuffer(),
+	m_opaqueID(Utilities::INVALID_OPENGL_ID),
+	m_transparentID(Utilities::INVALID_OPENGL_ID)
 {
-	glGenVertexArrays(1, &m_ID);
+	glGenVertexArrays(1, &m_opaqueID);
 	glGenVertexArrays(1, &m_transparentID);
 }
 
 VertexArray::~VertexArray()
 {
-	assert(m_ID != Utilities::INVALID_OPENGL_ID);
-	glDeleteVertexArrays(1, &m_ID);
+	assert(m_opaqueID != Utilities::INVALID_OPENGL_ID);
+	glDeleteVertexArrays(1, &m_opaqueID);
 	
 	assert(m_transparentID != Utilities::INVALID_OPENGL_ID);
 	glDeleteVertexArrays(1, &m_transparentID);
@@ -32,53 +27,31 @@ VertexArray::~VertexArray()
 
 VertexArray::VertexArray(VertexArray&& orig) noexcept
 	: m_inUse(orig.m_inUse),
-	m_opaqueVBODisplayable(orig.m_opaqueVBODisplayable),
-	m_transparentVBODisplayable(orig.m_transparentVBODisplayable),
-	m_attachOpaqueVBO(orig.m_attachOpaqueVBO),
-	m_attachTransparentVBO(orig.m_attachTransparentVBO),
 	m_awaitingRegeneration(orig.m_awaitingRegeneration),
-	m_vertexBuffer(std::move(orig.m_vertexBuffer)),
-	m_ID(orig.m_ID),
-	m_transparentID(orig.m_transparentID),
-	m_opaqueElementBufferIndex(orig.m_opaqueElementBufferIndex),
-	m_transparentElementBufferIndex(orig.m_transparentElementBufferIndex)
+	m_opaqueVertexBuffer(std::move(orig.m_opaqueVertexBuffer)),
+	m_transparentVertexBuffer(std::move(orig.m_transparentVertexBuffer)),
+	m_opaqueID(orig.m_opaqueID),
+	m_transparentID(orig.m_transparentID)
 {
 	orig.m_inUse = false;
-	orig.m_opaqueVBODisplayable = false;
-	orig.m_transparentVBODisplayable = false;
-	orig.m_attachOpaqueVBO = false;
-	orig.m_attachTransparentVBO = false;
 	orig.m_awaitingRegeneration = false;
-	orig.m_ID = Utilities::INVALID_OPENGL_ID;
+	orig.m_opaqueID = Utilities::INVALID_OPENGL_ID; 
 	orig.m_transparentID = Utilities::INVALID_OPENGL_ID;
-	orig.m_opaqueElementBufferIndex = 0;
-	orig.m_transparentElementBufferIndex = 0;
 }
 
 VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
 {
 	m_inUse = orig.m_inUse;
-	m_opaqueVBODisplayable = orig.m_opaqueVBODisplayable;
-	m_transparentVBODisplayable = orig.m_transparentVBODisplayable;
-	m_attachOpaqueVBO = orig.m_attachOpaqueVBO;
-	m_attachTransparentVBO = orig.m_attachTransparentVBO;
 	m_awaitingRegeneration = orig.m_awaitingRegeneration;
-	m_vertexBuffer = std::move(orig.m_vertexBuffer);
-	m_ID = orig.m_ID;
+	m_opaqueVertexBuffer = std::move(orig.m_opaqueVertexBuffer);
+	m_transparentVertexBuffer = std::move(orig.m_transparentVertexBuffer);
+	m_opaqueID = orig.m_opaqueID;
 	m_transparentID = orig.m_transparentID;
-	m_opaqueElementBufferIndex = orig.m_opaqueElementBufferIndex;
-	m_transparentElementBufferIndex = orig.m_transparentElementBufferIndex;
 	
 	orig.m_inUse = false;
-	orig.m_opaqueVBODisplayable = false;
-	orig.m_transparentVBODisplayable = false;
-	orig.m_attachOpaqueVBO = false;
-	orig.m_attachTransparentVBO = false;
 	orig.m_awaitingRegeneration = false;
-	orig.m_ID = Utilities::INVALID_OPENGL_ID;
+	orig.m_opaqueID = Utilities::INVALID_OPENGL_ID;
 	orig.m_transparentID = Utilities::INVALID_OPENGL_ID;
-	orig.m_opaqueElementBufferIndex = 0;
-	orig.m_transparentElementBufferIndex = 0;
 
 	return *this;
 }
@@ -91,81 +64,28 @@ bool VertexArray::isInUse() const
 void VertexArray::reset()
 {
 	m_inUse = false;
-	m_opaqueVBODisplayable = false;
-	m_transparentVBODisplayable = false;
-	m_attachOpaqueVBO = false;
-	m_attachTransparentVBO = false;
 	m_awaitingRegeneration = false;
-	m_vertexBuffer.clear();
-	m_opaqueElementBufferIndex = 0;
-	m_transparentElementBufferIndex = 0;
+	m_opaqueVertexBuffer.clear();
+	m_transparentVertexBuffer.clear();
 }
 
 void VertexArray::attachOpaqueVBO()
 {
-	assert(m_attachOpaqueVBO);
-	m_attachOpaqueVBO = false;
-
 	bindOpaqueVAO();
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.positionsID);
-	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.positions.size() * sizeof(glm::ivec3), m_vertexBuffer.positions.data(), GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_INT, GL_FALSE, 3 * sizeof(int), (const void*)0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.textCoordsID);
-	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.textCoords.size() * sizeof(glm::vec3), m_vertexBuffer.textCoords.data(), GL_STATIC_DRAW);
-		
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)(0));
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vertexBuffer.indiciesID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_vertexBuffer.indicies.size() * sizeof(unsigned int), m_vertexBuffer.indicies.data(), GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	m_opaqueVertexBuffer.bind();
 	unbind();
-
-	assert(!m_opaqueVBODisplayable);
-	m_opaqueVBODisplayable = true;
-
-	m_vertexBuffer.clearOpaqueVertices();
 }
 
 void VertexArray::attachTransparentVBO()
-{
-	assert(m_attachTransparentVBO);
-	m_attachTransparentVBO = false;
-	
+{	
 	bindTransparentVAO();
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.transparentPositionsID);
-	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.transparentPositions.size() * sizeof(glm::ivec3), m_vertexBuffer.transparentPositions.data(), GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_INT, GL_FALSE, sizeof(glm::ivec3), (const void*)0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer.transparentTextCoordsID);
-	glBufferData(GL_ARRAY_BUFFER, m_vertexBuffer.transparentTextCoords.size() * sizeof(glm::vec3), m_vertexBuffer.transparentTextCoords.data(), GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (const void*)(0));
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vertexBuffer.transparentIndiciesID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_vertexBuffer.transparentIndicies.size() * sizeof(unsigned int), m_vertexBuffer.transparentIndicies.data(), GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	m_transparentVertexBuffer.bind();
 	unbind();
-
-	assert(!m_transparentVBODisplayable);
-	m_transparentVBODisplayable = true;
-
-	m_vertexBuffer.clearTransparentVertices();
 }
 
 void VertexArray::bindOpaqueVAO() const
 {
-	glBindVertexArray(m_ID);
+	glBindVertexArray(m_opaqueID);
 }
 
 void VertexArray::bindTransparentVAO() const

@@ -21,14 +21,9 @@ struct VertexArray : private NonCopyable
 	void unbind() const;
 	
 	bool m_inUse;
-	bool m_opaqueVBODisplayable;
-	bool m_transparentVBODisplayable;
-	bool m_attachOpaqueVBO;
-	bool m_attachTransparentVBO;
 	bool m_awaitingRegeneration;
-	VertexBuffer m_vertexBuffer;
-	unsigned int m_ID;
+	VertexBuffer m_opaqueVertexBuffer;
+	VertexBuffer m_transparentVertexBuffer;
+	unsigned int m_opaqueID;
 	unsigned int m_transparentID;
-	int m_opaqueElementBufferIndex;
-	int m_transparentElementBufferIndex;
 };
