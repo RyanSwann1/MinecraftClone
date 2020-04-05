@@ -15,7 +15,7 @@ struct VertexBuffer : private NonCopyable
 	~VertexBuffer();
 
 	void bind();
-	void unbind() const;
+	void unbind() const; //TODO: DELETE FUNCTION
 	void clear();
 
 	int elementBufferIndex;
@@ -23,6 +23,8 @@ struct VertexBuffer : private NonCopyable
 	bool displayable;
 	unsigned int positionsID;
 	std::vector<glm::ivec3> positions;
+	unsigned int lightIntensityID;
+	std::vector<float> lightIntensityVertices;
 	unsigned int textCoordsID;
 	std::vector<glm::vec3> textCoords;
 	unsigned int indiciesID;
