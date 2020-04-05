@@ -115,7 +115,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 		for (const glm::vec3& i : Utilities::CUBE_FACE_TOP)
 		{
 			position += i;
-			vertexArray.m_vertexBuffer.transparentPositions.push_back({ position.x, position.y, position.z });
+			vertexArray.m_vertexBuffer.transparentPositions.emplace_back(position.x, position.y, position.z);
 			position = cubePosition;
 		}
 			
@@ -123,10 +123,85 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 			
 		for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
 		{
-			vertexArray.m_vertexBuffer.transparentIndicies.push_back(i + vertexArray.m_transparentElementBufferIndex);
+			vertexArray.m_vertexBuffer.transparentIndicies.emplace_back(i + vertexArray.m_transparentElementBufferIndex);
 		}
 
-		vertexArray.m_transparentElementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;	
+		vertexArray.m_transparentElementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
+	}
+	else if (cubeType == eCubeType::Leaves)
+	{
+		switch (cubeSide)
+		{
+		case eCubeSide::Front:
+			for (const glm::ivec3& i : Utilities::CUBE_FACE_FRONT)
+			{
+				position += i;
+				vertexArray.m_vertexBuffer.transparentPositions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
+			}
+
+			Utilities::getTextCoords(vertexArray.m_vertexBuffer.transparentTextCoords, cubeSide, cubeType);
+			break;
+		case eCubeSide::Back:
+			for (const glm::ivec3& i : Utilities::CUBE_FACE_BACK)
+			{
+				position += i;
+				vertexArray.m_vertexBuffer.transparentPositions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
+			}
+
+			Utilities::getTextCoords(vertexArray.m_vertexBuffer.transparentTextCoords, cubeSide, cubeType);
+
+			break;
+		case eCubeSide::Left:
+			for (const glm::ivec3& i : Utilities::CUBE_FACE_LEFT)
+			{
+				position += i;
+				vertexArray.m_vertexBuffer.transparentPositions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
+			}
+			Utilities::getTextCoords(vertexArray.m_vertexBuffer.transparentTextCoords, cubeSide, cubeType);
+			break;
+		case eCubeSide::Right:
+			for (const glm::ivec3& i : Utilities::CUBE_FACE_RIGHT)
+			{
+				position += i;
+				vertexArray.m_vertexBuffer.transparentPositions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
+			}
+
+			Utilities::getTextCoords(vertexArray.m_vertexBuffer.transparentTextCoords, cubeSide, cubeType);
+
+			break;
+		case eCubeSide::Top:
+			for (const glm::ivec3& i : Utilities::CUBE_FACE_TOP)
+			{
+				position += i;
+				vertexArray.m_vertexBuffer.transparentPositions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
+			}
+			Utilities::getTextCoords(vertexArray.m_vertexBuffer.transparentTextCoords, cubeSide, cubeType);
+
+			break;
+		case eCubeSide::Bottom:
+			for (const glm::ivec3& i : Utilities::CUBE_FACE_BOTTOM)
+			{
+				position += i;
+				vertexArray.m_vertexBuffer.transparentPositions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
+			}
+
+			Utilities::getTextCoords(vertexArray.m_vertexBuffer.transparentTextCoords, cubeSide, cubeType);
+
+			break;
+		}
+
+		for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
+		{
+			vertexArray.m_vertexBuffer.transparentIndicies.emplace_back(i + vertexArray.m_transparentElementBufferIndex);
+		}
+
+		vertexArray.m_transparentElementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
 	}
 	else
 	{
@@ -198,7 +273,7 @@ void ChunkManager::addCubeFace(VertexArray& vertexArray, eCubeType cubeType, eCu
 
 		for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
 		{
-			vertexArray.m_vertexBuffer.indicies.push_back(i + vertexArray.m_opaqueElementBufferIndex);
+			vertexArray.m_vertexBuffer.indicies.emplace_back(i + vertexArray.m_opaqueElementBufferIndex);
 		}
 
 		vertexArray.m_opaqueElementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
