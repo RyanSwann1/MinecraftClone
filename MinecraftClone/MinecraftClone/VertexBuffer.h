@@ -15,7 +15,6 @@ struct VertexBuffer : private NonCopyable
 	~VertexBuffer();
 
 	void bind();
-	void unbind() const; //TODO: DELETE FUNCTION
 	void clear();
 
 	int elementBufferIndex;

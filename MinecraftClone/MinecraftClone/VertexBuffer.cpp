@@ -110,7 +110,7 @@ void VertexBuffer::bind()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies.size() * sizeof(unsigned int), indicies.data(), GL_STATIC_DRAW);
 
-	unbind();
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	std::vector<glm::ivec3> newPositions;
 	positions.swap(newPositions);
@@ -122,11 +122,6 @@ void VertexBuffer::bind()
 	lightIntensityVertices.swap(newLightIntensityVertices);
 
 	indicies.shrink_to_fit();
-}
-
-void VertexBuffer::unbind() const
-{
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void VertexBuffer::clear()
