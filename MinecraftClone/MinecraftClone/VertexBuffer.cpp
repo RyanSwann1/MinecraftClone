@@ -29,6 +29,9 @@ VertexBuffer::VertexBuffer(VertexBuffer&& orig) noexcept
 	indiciesID(orig.indiciesID),
 	indicies(std::move(orig.indicies))
 {
+	orig.elementBufferIndex = 0;
+	orig.bindToVAO = false;
+	orig.displayable = false;
 	orig.positionsID = Utilities::INVALID_OPENGL_ID;
 	orig.textCoordsID = Utilities::INVALID_OPENGL_ID;
 	orig.indiciesID = Utilities::INVALID_OPENGL_ID;
@@ -46,6 +49,9 @@ VertexBuffer& VertexBuffer::operator=(VertexBuffer&& orig) noexcept
 	indiciesID = orig.indiciesID;
 	indicies = std::move(orig.indicies);
 
+	orig.elementBufferIndex = 0;
+	orig.bindToVAO = false;
+	orig.displayable = false;
 	orig.positionsID = Utilities::INVALID_OPENGL_ID;
 	orig.textCoordsID = Utilities::INVALID_OPENGL_ID;
 	orig.indiciesID = Utilities::INVALID_OPENGL_ID;
@@ -107,6 +113,7 @@ void VertexBuffer::clear()
 	elementBufferIndex = 0;
 	bindToVAO = false;
 	displayable = false;
+
 	std::vector<glm::ivec3> newPositions;
 	positions.swap(newPositions);
 

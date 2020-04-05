@@ -591,37 +591,6 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 
 		vertexArray.m_awaitingRegeneration = false;
 	}
-
-	//if (!vertexArray.m_awaitingRegeneration && regenChunk)
-	//{
-	//	vertexArray.m_awaitingRegeneration = true;
-	//}
-	//else if (vertexArray.m_awaitingRegeneration && !regenChunk)
-	//{
-	//	if (!vertexArray.m_opaqueVertexBuffer.indicies.empty())
-	//	{
-	//		vertexArray.m_opaqueVertexBuffer.bindToVAO = true;
-	//	}
-
-	//	if (!vertexArray.m_vertexBuffer.transparentIndicies.empty())
-	//	{
-	//		vertexArray.m_attachTransparentVBO = true;
-	//	}
-
-	//	vertexArray.m_awaitingRegeneration = false;
-	//}
-	//else if (!vertexArray.m_awaitingRegeneration && !regenChunk)
-	//{
-	//	if (!vertexArray.m_vertexBuffer.indicies.empty())
-	//	{
-	//		vertexArray.m_attachOpaqueVBO = true;
-	//	}
-
-	//	if (!vertexArray.m_vertexBuffer.transparentIndicies.empty())
-	//	{
-	//		vertexArray.m_attachTransparentVBO = true;
-	//	}
-	//}
 }
 
 void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex)
