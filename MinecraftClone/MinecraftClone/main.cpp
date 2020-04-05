@@ -118,9 +118,9 @@ unsigned int createShaderProgram()
 	unsigned int shaderID = glCreateProgram();
 
 	std::string vertexShaderSource;
-	parseShaderFromFile("VertexShader.shader", vertexShaderSource);
+	parseShaderFromFile("VertexShader.glsl", vertexShaderSource);
 	std::string fragmentShaderSource;
-	parseShaderFromFile("FragmentShader.shader", fragmentShaderSource);
+	parseShaderFromFile("FragmentShader.glsl", fragmentShaderSource);
 
 	//Create Vertex Shader
 	unsigned int vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
@@ -213,10 +213,10 @@ int main()
 
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
+
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);  
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 
 	unsigned int shaderID = createShaderProgram();
 	Camera camera(Utilities::PLAYER_STARTING_POSITION);
@@ -325,7 +325,10 @@ int main()
 		{
 			std::lock_guard<std::mutex> renderingLock(renderingMutex);
 			chunkManager->renderOpaque();
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			chunkManager->renderTransparent();
+			glDisable(GL_BLEND);
 		}
 
 		window.display();

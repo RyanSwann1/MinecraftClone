@@ -172,11 +172,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="FragmentShader.shader">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="VertexShader.shader">
-      <Filter>Source Files</Filter>
-    </None>
+    <None Include="VertexShader.glsl" />
+    <None Include="FragmentShader.glsl" />
   </ItemGroup>
 </Project>
