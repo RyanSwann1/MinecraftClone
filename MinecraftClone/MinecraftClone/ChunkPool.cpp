@@ -6,6 +6,16 @@ ChunkFromPool::ChunkFromPool(ChunkPool& chunkPool, const glm::ivec3& startingPos
 	: ObjectFromPool(chunkPool.getChunk(startingPosition))
 {}
 
+ChunkFromPool::ChunkFromPool(ChunkFromPool&& orig) noexcept
+	: ObjectFromPool(std::move(orig))
+{}
+
+ChunkFromPool& ChunkFromPool::operator=(ChunkFromPool&& orig) noexcept
+{
+	ObjectFromPool::operator=(std::move(orig));
+	return *this;
+}
+
 ChunkFromPool::~ChunkFromPool()
 {
 	if (object)
@@ -19,10 +29,14 @@ ChunkPool::ChunkPool()
 	: ObjectPool()
 {}
 
-Chunk& ChunkPool::getChunk(const glm::ivec3& startingPosition)
+Chunk* ChunkPool::getChunk(const glm::ivec3& startingPosition)
 {
-	ObjectInPool<Chunk>& nextAvailableChunk = getNextAvailableObject();
-	nextAvailableChunk.object.reuse(startingPosition);
+	Chunk* chunk = getNextAvailableObject();
+	if (chunk)
+	{
+		assert(!chunk->isInUse());
+		chunk->reuse(startingPosition);
+	}
 
-	return nextAvailableChunk.object;
+	return chunk;
 }
