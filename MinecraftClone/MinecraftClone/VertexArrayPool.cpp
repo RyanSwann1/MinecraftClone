@@ -6,12 +6,16 @@ VertexArrayPool::VertexArrayPool()
 	: ObjectPool()
 {}
 
-VertexArray& VertexArrayPool::getVertexArray()
+VertexArray* VertexArrayPool::getVertexArray()
 {
-	ObjectInPool<VertexArray>& nextAvailableObject = getNextAvailableObject();
-	nextAvailableObject.object.m_inUse = true;
+	VertexArray* vertexArray = getNextAvailableObject();
+	if (vertexArray)
+	{
+		assert(!vertexArray->isInUse());
+		vertexArray->m_inUse = true;
+	}
 
-	return nextAvailableObject.object;
+	return vertexArray;
 }
 
 //VertexArrayFromPool

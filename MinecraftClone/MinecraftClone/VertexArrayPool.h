@@ -7,7 +7,7 @@ struct VertexArrayPool : private ObjectPool<VertexArray>
 {
 	VertexArrayPool();
 
-	VertexArray& getVertexArray();
+	VertexArray* getVertexArray();
 };
 
 struct VertexArrayFromPool : public ObjectFromPool<VertexArray, VertexArrayPool>
