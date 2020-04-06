@@ -28,6 +28,7 @@ ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 			Utilities::getClosestChunkStartingPosition(chunkStartingPosition);
 
 			ChunkFromPool chunkFromPool(m_chunkPool, chunkStartingPosition);
+			assert(chunkFromPool.object);
 			if (chunkFromPool.object)
 			{
 				m_chunks.emplace(std::piecewise_construct,
@@ -45,6 +46,7 @@ ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 	for (const auto& chunk : m_chunks)
 	{
 		VertexArrayFromPool VAOFromPool(m_vertexArrayPool);
+		assert(VAOFromPool.object);
 		if (VAOFromPool.object)
 		{
 			generateChunkMesh(*VAOFromPool.object, *chunk.second.object);
@@ -538,6 +540,7 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend())
 			{
 				ChunkFromPool chunkFromPool(m_chunkPool, chunkStartingPosition);
+				assert(chunkFromPool.object);
 				if (chunkFromPool.object)
 				{
 					const Chunk* chunk = m_chunks.emplace(std::piecewise_construct,
@@ -557,6 +560,7 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 	for (const auto& addedChunk : addedChunks)
 	{
 		VertexArrayFromPool VAOFromPool(m_vertexArrayPool);
+		assert(VAOFromPool.object);
 		if (VAOFromPool.object)
 		{
 			VertexArray& VAO = *m_regenerate.emplace(std::piecewise_construct,
