@@ -252,10 +252,56 @@ void ChunkGenerator::addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType,
 	vertexBuffer.elementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
 }
 
+void ChunkGenerator::addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const glm::ivec3& cubePosition)
+{
+	//constexpr std::array<glm::ivec3, 4> FIRST_DIAGONAL_FACE = { glm::ivec3(0, 0, 0), glm::ivec3(1, 0, 1), glm::ivec3(1, 1, 1), glm::ivec3(0, 1, 0) };
+	//constexpr std::array<glm::ivec3, 4> SECOND_DIAGONAL_FACE = { glm::ivec3(0, 0, 1), glm::ivec3(1, 0, 0), glm::ivec3(1, 1, 0), glm::ivec3(0, 1, 1) };
+
+	//First Face
+	glm::ivec3 position = cubePosition;
+	for (const glm::ivec3& i : Utilities::FIRST_DIAGONAL_FACE)
+	{
+		position += i;
+		vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
+		position = cubePosition;
+
+		vertexBuffer.lightIntensityVertices.push_back(Utilities::DEFAULT_LIGHTING_INTENSITY);
+	}
+
+	Utilities::getTextCoords(vertexBuffer.textCoords, eCubeSide::Front, cubeType);
+	for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
+	{
+		vertexBuffer.indicies.emplace_back(i + vertexBuffer.elementBufferIndex);
+	}
+
+
+	vertexBuffer.elementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
+
+	//Second Face
+	for (const glm::ivec3& i : Utilities::SECOND_DIAGONAL_FACE)
+	{
+		position += i;
+		vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
+		position = cubePosition;
+
+		vertexBuffer.lightIntensityVertices.push_back(Utilities::DEFAULT_LIGHTING_INTENSITY);
+	}
+
+	Utilities::getTextCoords(vertexBuffer.textCoords, eCubeSide::Front, cubeType);
+
+	for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
+	{
+		vertexBuffer.indicies.emplace_back(i + vertexBuffer.elementBufferIndex);
+	}
+
+	vertexBuffer.elementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
+}
+
 bool ChunkGenerator::isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const
 {
 	char cubeType = chunk.getCubeDetailsWithoutBoundsCheck(position);
-	return (cubeType != static_cast<char>(eCubeType::Invalid) && cubeType != static_cast<char>(eCubeType::Water) ? true : false);
+	return (cubeType != static_cast<char>(eCubeType::Invalid) && cubeType != static_cast<char>(eCubeType::Water) && 
+		cubeType != static_cast<char>(eCubeType::Shrub) ? true : false);
 }
 
 void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk)
@@ -377,6 +423,16 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 
 					//Bottom Face
 					addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Bottom, position, true);
+				}
+				else if (cubeType == eCubeType::Shrub)
+				{
+					addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position);
+					//addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
+					//addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Bottom, position, true);
+					//addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
+					//addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
+					//addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
+					//addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
 				}
 				else
 				{
