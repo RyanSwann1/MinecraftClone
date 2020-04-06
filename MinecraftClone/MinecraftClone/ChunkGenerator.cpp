@@ -19,11 +19,6 @@ ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 	m_VAOs(),
 	m_chunks()
 {
-	generateInitialChunks(playerPosition);
-}
-
-void ChunkGenerator::generateInitialChunks(const glm::vec3& playerPosition)
-{
 	//Generate Chunks
 	for (int z = playerPosition.z - Utilities::VISIBILITY_DISTANCE; z <= playerPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
 	{
