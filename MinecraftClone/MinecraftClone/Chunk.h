@@ -51,6 +51,7 @@ private:
 	void spawnTrees();
 	void spawnCactus();
 	void spawnShrubs();
+	void spawnTallGrass();
 	void spawnLeaves(const glm::ivec3& startingPosition);
 	void spawnTreeStump(const glm::ivec3& startingPosition);
 };
