@@ -41,7 +41,7 @@ private:
 	Rectangle m_AABB;
 
 	bool isPositionInLocalBounds(const glm::ivec3& position) const;
-	char getCubeAtLocalPosition(const glm::ivec3& position) const;
+	bool isCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType) const;
 	int getElevationValue(int x, int y) const;
 	float getMoistureValue(int x, int y) const;
 	

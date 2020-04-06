@@ -230,7 +230,7 @@ void Chunk::spawnWater()
 		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
 		{
 			glm::ivec3 position(x, Utilities::WATER_MAX_HEIGHT, z);
-			if (getCubeAtLocalPosition(position) == static_cast<char>(eCubeType::Invalid))
+			if (isCubeAtLocalPosition(position, eCubeType::Invalid))
 			{
 				changeCubeAtLocalPosition(position, eCubeType::Water);
 			}
@@ -255,8 +255,8 @@ void Chunk::spawnTrees()
 				for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_HEIGHT - Utilities::MAX_LEAVES_DISTANCE; y >= Utilities::SAND_MAX_HEIGHT; --y)
 				{
 					glm::ivec3 position(x, y, z);
-					if (getCubeAtLocalPosition(position) == static_cast<char>(eCubeType::Grass) &&
-						getCubeAtLocalPosition({ x, y + 1, z }) == static_cast<char>(eCubeType::Invalid))
+					if (isCubeAtLocalPosition(position, eCubeType::Grass) &&
+						isCubeAtLocalPosition({ x, y + 1, z }, eCubeType::Invalid))
 					{
 						++currentTreesPlanted;
 						spawnLeaves(position);
@@ -277,9 +277,9 @@ void Chunk::spawnTrees()
 
 void Chunk::spawnCactus()
 {
-	int numberOfAttempts = 0;
+	int attemptsCount = 0;
 	int spawnCount = 0;
-	while (numberOfAttempts < Utilities::MAX_CACTUS_SPAWN_ATTEMPTS && spawnCount < Utilities::MAX_CACTUS_PER_CHUNK)
+	while (attemptsCount < Utilities::MAX_CACTUS_SPAWN_ATTEMPTS && spawnCount < Utilities::MAX_CACTUS_PER_CHUNK)
 	{
 		glm::ivec3 spawnPosition;
 		spawnPosition.x = Utilities::getRandomNumber(0, Utilities::CHUNK_WIDTH - 1);
@@ -289,8 +289,8 @@ void Chunk::spawnCactus()
 		for (int y = Utilities::CHUNK_HEIGHT - 1; y >= 0; --y)
 		{
 			spawnPosition.y = y;
-			if (getCubeAtLocalPosition(spawnPosition) == static_cast<char>(eCubeType::Sand) &&
-				getCubeAtLocalPosition({ spawnPosition.x, y + 1, spawnPosition.z }) == static_cast<char>(eCubeType::Invalid))
+			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Sand) &&
+				isCubeAtLocalPosition({ spawnPosition.x, y + 1, spawnPosition.z }, eCubeType::Invalid))
 			{
 				//Spawn Cactus
 				int cactusHeight = Utilities::getRandomNumber(Utilities::CACTUS_MIN_HEIGHT, Utilities::CACTUS_MAX_HEIGHT);
@@ -303,49 +303,15 @@ void Chunk::spawnCactus()
 			}
 		}
 
-		++numberOfAttempts;
+		++attemptsCount;
 	}
-
-
-	//int totalCactusAdded = 0;
-	//for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
-	//{
-	//	for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
-	//	{
-	//		if (totalCactusAdded < Utilities::MAX_CACTUS_PER_CHUNK &&
-	//			Utilities::getRandomNumber(0, Utilities::CACTUS_SPAWN_CHANCE) >= Utilities::CACTUS_SPAWN_CHANCE)
-	//		{
-	//			for (int y = Utilities::CHUNK_HEIGHT - Utilities::CACTUS_MAX_HEIGHT - 1; y >= Utilities::WATER_MAX_HEIGHT; --y)
-	//			{
-	//				if (getCubeAtLocalPosition({ x, y, z }) == static_cast<char>(eCubeType::Sand) &&
-	//					getCubeAtLocalPosition({ x, y + 1, z }) == static_cast<char>(eCubeType::Invalid))
-	//				{
-	//					++totalCactusAdded;
-
-	//					int cactusMaxHeight = Utilities::getRandomNumber(Utilities::CACTUS_MIN_HEIGHT, Utilities::CACTUS_MAX_HEIGHT);
-	//					for (int i = 1; i <= cactusMaxHeight; ++i)
-	//					{
-	//						changeCubeAtLocalPosition({ x, y + i, z }, eCubeType::Cactus);
-	//					}
-
-	//					break;
-	//				}
-	//			}
-	//		}
-	//		//Total Cactuses spawned
-	//		else if (totalCactusAdded >= Utilities::MAX_CACTUS_PER_CHUNK)
-	//		{
-	//			return;
-	//		}
-	//	}
-	//}
 }
 
 void Chunk::spawnPlant(int maxQuantity, eCubeType baseCubeType, eCubeType plantCubeType)
 {
-	int numberOfAttempts = 0;
+	int attemptsCount = 0;
 	int spawnCount = 0;
-	while (numberOfAttempts < Utilities::MAX_PLANT_SPAWN_ATTEMPTS && spawnCount < maxQuantity)
+	while (attemptsCount < Utilities::MAX_PLANT_SPAWN_ATTEMPTS && spawnCount < maxQuantity)
 	{
 		glm::ivec3 spawnPosition;
 		spawnPosition.x = Utilities::getRandomNumber(0, Utilities::CHUNK_WIDTH - 1);
@@ -354,15 +320,15 @@ void Chunk::spawnPlant(int maxQuantity, eCubeType baseCubeType, eCubeType plantC
 		for (int y = Utilities::CHUNK_HEIGHT - 1; y >= 0; --y)
 		{
 			spawnPosition.y = y;
-			if (getCubeAtLocalPosition(spawnPosition) == static_cast<char>(eCubeType::Invalid) &&
-				getCubeAtLocalPosition({ spawnPosition.x, y - 1, spawnPosition.z }) == static_cast<char>(baseCubeType))
+			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Invalid) &&
+				isCubeAtLocalPosition({ spawnPosition.x, y - 1, spawnPosition.z }, baseCubeType))
 			{
 				changeCubeAtLocalPosition(spawnPosition, plantCubeType);
 				++spawnCount;
 			}
 		}
 
-		++numberOfAttempts;
+		++attemptsCount;
 	}
 }
 
@@ -377,7 +343,7 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition)
 			for (int x = startingPosition.x - distance; x <= startingPosition.x + distance; ++x)
 			{
 				glm::ivec3 position(x, y, z);
-				if (getCubeAtLocalPosition(position) == static_cast<char>(eCubeType::Invalid))
+				if (isCubeAtLocalPosition(position, eCubeType::Invalid))
 				{
 					changeCubeAtLocalPosition(position, eCubeType::Leaves);
 				}
@@ -411,10 +377,10 @@ bool Chunk::isPositionInLocalBounds(const glm::ivec3& position) const
 		position.z < Utilities::CHUNK_DEPTH);
 }
 
-char Chunk::getCubeAtLocalPosition(const glm::ivec3& position) const
+bool Chunk::isCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType) const
 {
 	assert(isPositionInLocalBounds(position));
-	return m_chunk[Utilities::converTo1D(position)];
+	return m_chunk[Utilities::converTo1D(position)] == static_cast<char>(cubeType);
 }
 
 int Chunk::getElevationValue(int x, int z) const
