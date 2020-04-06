@@ -16,7 +16,8 @@ enum class eTextureLayer
 	TreeStump,
 	Leaves,
 	Cactus,
-	Max = Cactus
+	Error,
+	Max = Error
 };
 
 enum class eCubeSide
@@ -98,12 +99,11 @@ namespace Utilities
 
 	inline void getTextCoords(std::vector<glm::vec3>& textCoords, eCubeSide cubeSide, eCubeType cubeType)
 	{
-		int textureLayer = -1;
+		int textureLayer = 0;
 		switch (cubeType)
 		{
 		case eCubeType::Stone:
 			textureLayer = static_cast<int>(eTextureLayer::Stone);
-			
 			break;
 		case eCubeType::Sand:
 			textureLayer = static_cast<int>(eTextureLayer::Sand);
@@ -133,9 +133,11 @@ namespace Utilities
 		case eCubeType::Water :
 			textureLayer = static_cast<int>(eTextureLayer::Water);
 			break;
+		default:
+			textureLayer = static_cast<int>(eTextureLayer::Error);
 		}
 
-		assert(textureLayer > -1);
+		assert(textureLayer != static_cast<int>(eTextureLayer::Error));
 		for (const auto& i : TEXT_COORDS)
 		{
 			textCoords.emplace_back(i.x, i.y, textureLayer);
