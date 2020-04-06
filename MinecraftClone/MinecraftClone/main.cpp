@@ -45,6 +45,7 @@ bool loadTextures(TextureArray & textureArray)
 		!textureArray.addTexture("stone.png") ||
 		!textureArray.addTexture("water.png") ||
 		!textureArray.addTexture("log.png") ||
+		!textureArray.addTexture("logtop.png") ||
 		!textureArray.addTexture("leaves.png") ||
 		!textureArray.addTexture("common_cactus_side.png") ||
 		!textureArray.addTexture("error.png"))

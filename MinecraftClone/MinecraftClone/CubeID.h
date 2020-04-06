@@ -7,7 +7,8 @@ enum class eCubeType
 	Sand,
 	Stone,
 	Water,
-	TreeStump,
+	Log,
+	LogTop,
 	Leaves,
 	Cactus
 };

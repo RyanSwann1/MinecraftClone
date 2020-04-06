@@ -1,5 +1,4 @@
 #include "ChunkPool.h"
-#include <iostream>
 
 //ChunkFromPool
 ChunkFromPool::ChunkFromPool(ChunkPool& chunkPool, const glm::ivec3& startingPosition)

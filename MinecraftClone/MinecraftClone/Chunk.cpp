@@ -330,9 +330,16 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition)
 
 void Chunk::spawnTreeStump(const glm::ivec3& startingPosition)
 {
-	for (int y = startingPosition.y; y <= startingPosition.y + Utilities::TREE_HEIGHT; ++y)
+	for (int y = startingPosition.y; y <= startingPosition.y + Utilities::TREE_HEIGHT / 2; ++y)
 	{
-		changeCubeAtLocalPosition({ startingPosition.x, y, startingPosition.z }, eCubeType::TreeStump);
+		if (y == startingPosition.y + Utilities::TREE_HEIGHT / 2)
+		{
+			changeCubeAtLocalPosition({ startingPosition.x, y, startingPosition.z }, eCubeType::LogTop);
+		}
+		else
+		{
+			changeCubeAtLocalPosition({ startingPosition.x, y, startingPosition.z }, eCubeType::Log);
+		}
 	}
 }
 

@@ -13,7 +13,8 @@ enum class eTextureLayer
 	Sand,
 	Stone,
 	Water,
-	TreeStump,
+	Log,
+	LogTop,
 	Leaves,
 	Cactus,
 	Error,
@@ -121,8 +122,30 @@ namespace Utilities
 				textureLayer = static_cast<int>(eTextureLayer::Grass);
 			}
 			break;
-		case eCubeType::TreeStump:
-			textureLayer = static_cast<int>(eTextureLayer::TreeStump);
+		case eCubeType::Log:
+			textureLayer = static_cast<int>(eTextureLayer::Log);
+			break;
+		case eCubeType::LogTop :
+			switch (cubeSide)
+			{
+			case eCubeSide::Back:
+			case eCubeSide::Front:
+			case eCubeSide::Left:
+			case eCubeSide::Right:
+				textureLayer = static_cast<int>(eTextureLayer::Log);
+				break;
+			case eCubeSide::Top:
+				textureLayer = static_cast<int>(eTextureLayer::LogTop);
+				break;
+			}
+			//if (cubeSide == eCubeSide::Top)
+			//{
+			//	textureLayer = static_cast<int>(eTextureLayer::LogTop);
+			//}
+			//else
+			//{
+			//
+			//}
 			break;
 		case eCubeType::Leaves:
 			textureLayer = static_cast<int>(eTextureLayer::Leaves);
@@ -133,6 +156,7 @@ namespace Utilities
 		case eCubeType::Water :
 			textureLayer = static_cast<int>(eTextureLayer::Water);
 			break;
+
 		default:
 			textureLayer = static_cast<int>(eTextureLayer::Error);
 		}

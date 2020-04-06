@@ -456,12 +456,19 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 						regenChunk = true;
 					}
 
-					//Top Face
-					if (y == Utilities::CHUNK_HEIGHT - 1 || !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
+					if (cubeType == eCubeType::LogTop)
 					{
-						if (!vertexArray.m_awaitingRegeneration)
+						addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false);
+					}
+					else
+					{
+						//Top Face
+						if (y == Utilities::CHUNK_HEIGHT - 1 || !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
 						{
-							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false);
+							if (!vertexArray.m_awaitingRegeneration)
+							{
+								addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false);
+							}
 						}
 					}
 				}
