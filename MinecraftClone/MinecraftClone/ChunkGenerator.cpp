@@ -1,4 +1,4 @@
-#include "ChunkManager.h"
+#include "ChunkGenerator.h"
 #include "Utilities.h"
 #include "VertexBuffer.h"
 #include "VertexArray.h"
@@ -7,22 +7,23 @@
 #include "Camera.h"
 #include <iostream>
 
-ChunkManager::Regenerate::Regenerate(const Chunk& chunk, VertexArrayFromPool&& vertexArrayFromPool)
+ChunkGenerator::Regenerate::Regenerate(const Chunk& chunk, VertexArrayFromPool&& vertexArrayFromPool)
 	: vertexArrayToRegenerate(std::move(vertexArrayFromPool)),
 	chunkToRegenerate(chunk),
 	regenerated(false)
 {}
 
-ChunkManager::ChunkManager()
+ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 	: m_chunkPool(),
 	m_vertexArrayPool(),
 	m_VAOs(),
 	m_chunks()
-{}
-
-void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition)
 {
-	assert(m_chunks.empty() && m_VAOs.empty() && m_regenerate.empty());
+	generateInitialChunks(playerPosition);
+}
+
+void ChunkGenerator::generateInitialChunks(const glm::vec3& playerPosition)
+{
 	//Generate Chunks
 	for (int z = playerPosition.z - Utilities::VISIBILITY_DISTANCE; z <= playerPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
 	{
@@ -58,7 +59,7 @@ void ChunkManager::generateInitialChunks(const glm::vec3& playerPosition)
 	}
 }
 
-void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
+void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
 	std::mutex& cameraMutex, std::mutex& renderingMutex)	
 {
 	while (!resetGame)
@@ -73,7 +74,7 @@ void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& win
 	}
 }
 
-void ChunkManager::renderOpaque() const
+void ChunkGenerator::renderOpaque() const
 {
 	for (const auto& VAO : m_VAOs)
 	{
@@ -90,7 +91,7 @@ void ChunkManager::renderOpaque() const
 	}
 }
 
-void ChunkManager::renderTransparent() const
+void ChunkGenerator::renderTransparent() const
 {
 	for (const auto& VAO : m_VAOs)
 	{
@@ -107,7 +108,7 @@ void ChunkManager::renderTransparent() const
 	}
 }
 
-void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition, bool transparent)
+void ChunkGenerator::addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition, bool transparent)
 {
 	glm::ivec3 position = cubePosition;
 	switch (cubeSide)
@@ -239,13 +240,13 @@ void ChunkManager::addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, e
 	vertexBuffer.elementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
 }
 
-bool ChunkManager::isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const
+bool ChunkGenerator::isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const
 {
 	char cubeType = chunk.getCubeDetailsWithoutBoundsCheck(position);
 	return (cubeType != static_cast<char>(eCubeType::Invalid) && cubeType != static_cast<char>(eCubeType::Water) ? true : false);
 }
 
-void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk)
+void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk)
 {
 	const glm::ivec3& chunkStartingPosition = chunk.getStartingPosition();
 	const glm::ivec3& chunkEndingPosition = chunk.getEndingPosition();
@@ -476,7 +477,7 @@ void ChunkManager::generateChunkMesh(VertexArray& vertexArray, const Chunk& chun
 	}
 }
 
-void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex)
+void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex)
 {
 	glm::ivec3 startingPosition(playerPosition);
 	Utilities::getClosestMiddlePosition(startingPosition);
@@ -513,7 +514,7 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& re
 	}
 }
 
-void ChunkManager::addChunks(const glm::vec3& playerPosition)
+void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 {
 	std::vector<const Chunk*> addedChunks;
 	glm::ivec3 startPosition(playerPosition);
@@ -545,7 +546,7 @@ void ChunkManager::addChunks(const glm::vec3& playerPosition)
 	}
 }
 
-void ChunkManager::handleRegeneration(std::mutex& renderingMutex)
+void ChunkGenerator::handleRegeneration(std::mutex& renderingMutex)
 {
 	for (auto regen = m_regenerate.begin(); regen != m_regenerate.end();)
 	{
@@ -590,7 +591,7 @@ void ChunkManager::handleRegeneration(std::mutex& renderingMutex)
 	}
 }
 
-const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const
+const Chunk* ChunkGenerator::getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const
 {
 	const Chunk* neighbouringChunk = nullptr;
 

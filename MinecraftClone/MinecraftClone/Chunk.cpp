@@ -3,7 +3,6 @@
 #include "Texture.h"
 #include "VertexBuffer.h"
 #include "glm/gtc/noise.hpp"
-#include "ChunkManager.h"
 #include <iostream>
 #include <algorithm>
 #include <limits>

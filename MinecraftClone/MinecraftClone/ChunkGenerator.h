@@ -48,7 +48,7 @@ enum class eDirection;
 enum class eCubeSide;
 class VertexArray;
 struct CubeDetails;
-class ChunkManager : private NonCopyable, private NonMovable
+class ChunkGenerator : private NonCopyable, private NonMovable
 {
 	struct Regenerate : private NonCopyable, private NonMovable
 	{
@@ -60,9 +60,8 @@ class ChunkManager : private NonCopyable, private NonMovable
 	};
 
 public:
-	ChunkManager();
+	ChunkGenerator(const glm::ivec3& playerPosition);
 
-	void generateInitialChunks(const glm::vec3& playerPosition);
 	void update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
 		std::mutex& cameraMutex, std::mutex& renderingMutex);
 	void renderOpaque() const;
@@ -78,6 +77,7 @@ private:
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
 
+	void generateInitialChunks(const glm::vec3& playerPosition);
 	void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition, bool transparent);
 	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);

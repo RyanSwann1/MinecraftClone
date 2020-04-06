@@ -1,7 +1,7 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "Chunk.h"
-#include "ChunkManager.h"
+#include "ChunkGenerator.h"
 #include "VertexBuffer.h"
 #include "Utilities.h"
 #include "VertexArray.h"
@@ -217,7 +217,6 @@ int main()
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);  
 
-
 	unsigned int shaderID = createShaderProgram();
 	Camera camera(Utilities::PLAYER_STARTING_POSITION);
 
@@ -237,12 +236,12 @@ int main()
 	std::atomic<bool> resetGame = false;
 	std::mutex renderingMutex;
 	std::mutex cameraMutex;
-	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
-	chunkManager->generateInitialChunks(camera.m_position);
+	std::unique_ptr<ChunkGenerator> chunkGenerator = std::make_unique<ChunkGenerator>(camera.m_position);
+
 	cameraPosition = camera.m_position;
-	std::thread chunkGenerationThread([&](std::unique_ptr<ChunkManager>* chunkManager)
-		{chunkManager->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), 
-			std::ref(cameraMutex), std::ref(renderingMutex)); }, &chunkManager );
+	std::thread chunkGenerationThread([&](std::unique_ptr<ChunkGenerator>* chunkGenerator)
+		{chunkGenerator->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), 
+			std::ref(cameraMutex), std::ref(renderingMutex)); }, &chunkGenerator );
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -288,12 +287,11 @@ int main()
 			resetGame = false;
 			camera.m_position = Utilities::PLAYER_STARTING_POSITION;
 			cameraPosition = camera.m_position;
-			chunkManager = std::make_unique<ChunkManager>();
-			chunkManager->generateInitialChunks(cameraPosition);
+			chunkGenerator = std::make_unique<ChunkGenerator>(cameraPosition);
 
-			chunkGenerationThread = std::thread{ [&](std::unique_ptr<ChunkManager>* chunkManager)
-				{chunkManager->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), 
-					std::ref(cameraMutex), std::ref(renderingMutex)); }, &chunkManager };
+			chunkGenerationThread = std::thread{ [&](std::unique_ptr<ChunkGenerator>* chunkGenerator)
+				{chunkGenerator->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), 
+					std::ref(cameraMutex), std::ref(renderingMutex)); }, &chunkGenerator };
 		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) ||
@@ -321,13 +319,13 @@ int main()
 			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 1000.0f); //1000.0f);//(
 		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
 
-		if (chunkManager)
+		if (chunkGenerator)
 		{
 			std::lock_guard<std::mutex> renderingLock(renderingMutex);
-			chunkManager->renderOpaque();
+			chunkGenerator->renderOpaque();
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			chunkManager->renderTransparent();
+			chunkGenerator->renderTransparent();
 			glDisable(GL_BLEND);
 		}
 
