@@ -17,6 +17,8 @@ enum class eTextureLayer
 	LogTop,
 	Leaves,
 	Cactus,
+	Shrub,
+	TallGrass,
 	Error,
 	Max = Error
 };
@@ -63,6 +65,9 @@ namespace Utilities
 	constexpr int MAX_TREE_PER_CHUNK = 3;
 	constexpr int MAX_CACTUS_PER_CHUNK = 4;
 	constexpr int MAX_LEAVES_DISTANCE = 3;
+	constexpr int MAX_SHRUB_PER_CHUNK = 3;
+	constexpr int MAX_TALL_GRASS_PER_CHUNK = 3;
+	constexpr int MAX_PLANT_SPAWN_ATTEMPTS = 20;
 	
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
@@ -138,14 +143,6 @@ namespace Utilities
 				textureLayer = static_cast<int>(eTextureLayer::LogTop);
 				break;
 			}
-			//if (cubeSide == eCubeSide::Top)
-			//{
-			//	textureLayer = static_cast<int>(eTextureLayer::LogTop);
-			//}
-			//else
-			//{
-			//
-			//}
 			break;
 		case eCubeType::Leaves:
 			textureLayer = static_cast<int>(eTextureLayer::Leaves);
@@ -155,6 +152,12 @@ namespace Utilities
 			break;
 		case eCubeType::Water :
 			textureLayer = static_cast<int>(eTextureLayer::Water);
+			break;
+		case eCubeType::Shrub :
+			textureLayer = static_cast<int>(eTextureLayer::Shrub);
+			break;
+		case eCubeType::TallGrass :
+			textureLayer = static_cast<int>(eTextureLayer::TallGrass);
 			break;
 
 		default:
@@ -171,6 +174,9 @@ namespace Utilities
 	//
 	//Extern
 	//
+
+	constexpr std::array<glm::ivec3, 4> FIRST_DIAGONAL_FACE = { glm::ivec3(0, 0, 0), glm::ivec3(1, 0, 1), glm::ivec3(1, 1, 1), glm::ivec3(0, 1, 0) };
+	constexpr std::array<glm::ivec3, 4> SECOND_DIAGONAL_FACE = { glm::ivec3(0, 0, 1), glm::ivec3(1, 0, 0), glm::ivec3(1, 1, 0), glm::ivec3(0, 1, 1) };
 	
 	constexpr float DEFAULT_LIGHTING_INTENSITY = 1.0f;
 	constexpr float TOP_LIGHTING_INTENSITY = 1.35f;

@@ -48,6 +48,8 @@ bool loadTextures(TextureArray & textureArray)
 		!textureArray.addTexture("logtop.png") ||
 		!textureArray.addTexture("leaves.png") ||
 		!textureArray.addTexture("common_cactus_side.png") ||
+		!textureArray.addTexture("common_dead_shrub.png") ||
+		!textureArray.addTexture("common_tall_grass.png") ||
 		!textureArray.addTexture("error.png"))
 	{
 		return false;
@@ -216,8 +218,7 @@ int main()
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
 	glEnable(GL_DEPTH_TEST);
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);  
+
 
 	unsigned int shaderID = createShaderProgram();
 	Camera camera(Utilities::PLAYER_STARTING_POSITION);
@@ -323,9 +324,13 @@ int main()
 		if (chunkGenerator)
 		{
 			std::lock_guard<std::mutex> renderingLock(renderingMutex);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
 			chunkGenerator->renderOpaque();
+			glDisable(GL_CULL_FACE);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 			chunkGenerator->renderTransparent();
 			glDisable(GL_BLEND);
 		}
