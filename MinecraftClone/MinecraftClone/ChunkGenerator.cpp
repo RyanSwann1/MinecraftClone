@@ -300,8 +300,10 @@ void ChunkGenerator::addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType c
 bool ChunkGenerator::isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const
 {
 	char cubeType = chunk.getCubeDetailsWithoutBoundsCheck(position);
-	return (cubeType != static_cast<char>(eCubeType::Invalid) && cubeType != static_cast<char>(eCubeType::Water) && 
-		cubeType != static_cast<char>(eCubeType::Shrub) ? true : false);
+	return (cubeType != static_cast<char>(eCubeType::Invalid) && 
+		cubeType != static_cast<char>(eCubeType::Water) && 
+		cubeType != static_cast<char>(eCubeType::Shrub) &&
+		cubeType != static_cast<char>(eCubeType::TallGrass) ? true : false);
 }
 
 void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk)
@@ -424,7 +426,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 					//Bottom Face
 					addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Bottom, position, true);
 				}
-				else if (cubeType == eCubeType::Shrub)
+				else if (cubeType == eCubeType::Shrub || cubeType == eCubeType::TallGrass)
 				{
 					addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position);
 					//addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);

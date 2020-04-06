@@ -66,7 +66,7 @@ namespace Utilities
 	constexpr int MAX_CACTUS_PER_CHUNK = 4;
 	constexpr int MAX_LEAVES_DISTANCE = 3;
 	constexpr int MAX_SHRUB_PER_CHUNK = 3;
-	constexpr int MAX_TALL_GRASS_PER_CHUNK = 3;
+	constexpr int MAX_TALL_GRASS_PER_CHUNK = 16;
 	constexpr int MAX_PLANT_SPAWN_ATTEMPTS = 20;
 	
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;

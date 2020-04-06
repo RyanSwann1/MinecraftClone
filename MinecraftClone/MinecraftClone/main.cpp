@@ -185,19 +185,6 @@ unsigned int createShaderProgram()
 //https://community.khronos.org/t/how-do-you-implement-texture-arrays/75315
 
 
-//Jamie Test - Interview Question
-//x = [1, 3, 6, 7, 0, 1, 3, 6, 0, 0]
-//s = 9
-//
-//
-//r = [1, 2]
-//r = [-1]
-//
-//for (int i = 0; i < x.size(); ++i)
-//{
-//
-//}
-
 //http://ogldev.atspace.co.uk/index.html
 
 //x + (y * width)
@@ -330,7 +317,6 @@ int main()
 			glDisable(GL_CULL_FACE);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 			chunkGenerator->renderTransparent();
 			glDisable(GL_BLEND);
 		}
