@@ -402,7 +402,11 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 					}
 
 					//Bottom Face
-					addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Bottom, position, true);
+					if (!isCubeAtPosition({ x, y - 1, z }, chunk))
+					{
+						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Bottom, position, true);
+					}
+				
 				}
 				else if (cubeType == eCubeType::Shrub || cubeType == eCubeType::TallGrass)
 				{
