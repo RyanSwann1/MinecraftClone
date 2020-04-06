@@ -240,38 +240,29 @@ void Chunk::spawnWater()
 
 void Chunk::spawnTrees()
 {
-	int currentTreesPlanted = 0;
-	int maxAllowedTrees = Utilities::getRandomNumber(0, Utilities::MAX_TREE_PER_CHUNK);
-	if (maxAllowedTrees == 0)
+	int attemptsCount = 0;
+	int spawnCount = 0;
+	while (attemptsCount < Utilities::MAX_TREE_SPAWN_ATTEMPTS && spawnCount < Utilities::MAX_TREE_PER_CHUNK)
 	{
-		return;
-	}
-	for (int z = Utilities::MAX_LEAVES_DISTANCE; z < Utilities::CHUNK_DEPTH - Utilities::MAX_LEAVES_DISTANCE; ++z)
-	{
-		for (int x = Utilities::MAX_LEAVES_DISTANCE; x < Utilities::CHUNK_WIDTH - Utilities::MAX_LEAVES_DISTANCE; ++x)
-		{
-			if (currentTreesPlanted < maxAllowedTrees && Utilities::getRandomNumber(0, 1400) >= Utilities::TREE_SPAWN_CHANCE)
-			{
-				for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_HEIGHT - Utilities::MAX_LEAVES_DISTANCE; y >= Utilities::SAND_MAX_HEIGHT; --y)
-				{
-					glm::ivec3 position(x, y, z);
-					if (isCubeAtLocalPosition(position, eCubeType::Grass) &&
-						isCubeAtLocalPosition({ x, y + 1, z }, eCubeType::Invalid))
-					{
-						++currentTreesPlanted;
-						spawnLeaves(position);
-						spawnTreeStump(position);
+		glm::ivec3 spawnPosition;
+		spawnPosition.x = Utilities::getRandomNumber(Utilities::MAX_LEAVES_DISTANCE, Utilities::CHUNK_WIDTH - Utilities::MAX_LEAVES_DISTANCE - 1);
+		spawnPosition.z = Utilities::getRandomNumber(Utilities::MAX_LEAVES_DISTANCE, Utilities::CHUNK_DEPTH - Utilities::MAX_LEAVES_DISTANCE - 1);
 
-						break;
-					}
-				}
-			}
-			//Planted all available Trees
-			else if (currentTreesPlanted >= maxAllowedTrees)
+		//Find Spawn Location
+		for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_HEIGHT - Utilities::MAX_LEAVES_DISTANCE; y >= Utilities::SAND_MAX_HEIGHT; --y)
+		{
+			spawnPosition.y = y;
+			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Grass) &&
+				isCubeAtLocalPosition({ spawnPosition.x, spawnPosition.y + 1, spawnPosition.z }, eCubeType::Invalid))
 			{
-				return;
+				spawnLeaves(spawnPosition);
+				spawnTreeStump(spawnPosition);
+				++spawnCount;
+				break;
 			}
 		}
+
+		++attemptsCount;
 	}
 }
 
@@ -300,6 +291,7 @@ void Chunk::spawnCactus()
 				}
 
 				++spawnCount;
+				break;
 			}
 		}
 
