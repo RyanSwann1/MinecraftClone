@@ -50,6 +50,7 @@ private:
 	void spawnWater();
 	void spawnTrees();
 	void spawnCactus();
+	void spawnShrubs();
 	void spawnLeaves(const glm::ivec3& startingPosition);
 	void spawnTreeStump(const glm::ivec3& startingPosition);
 };

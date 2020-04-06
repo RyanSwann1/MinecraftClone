@@ -218,6 +218,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 	spawnWater();
 	spawnTrees();
 	spawnCactus();
+	spawnShrubs();
 }
 
 void Chunk::spawnWater()
@@ -305,6 +306,31 @@ void Chunk::spawnCactus()
 				return;
 			}
 		}
+	}
+}
+
+void Chunk::spawnShrubs()
+{
+	int numberOfAttempts = 0;
+	int shrubsSpawned = 0;
+	while (numberOfAttempts < Utilities::MAX_PLANT_SPAWN_ATTEMPTS && shrubsSpawned < Utilities::MAX_SHRUB_PER_CHUNK)
+	{
+		glm::ivec3 spawnPosition;
+		spawnPosition.x = Utilities::getRandomNumber(0, Utilities::CHUNK_WIDTH - 1);
+		spawnPosition.z = Utilities::getRandomNumber(0, Utilities::CHUNK_DEPTH - 1);
+		
+		for (int y = Utilities::CHUNK_HEIGHT - 1; y >= 0; --y)
+		{
+			spawnPosition.y = y;
+			if (getCubeAtLocalPosition(spawnPosition) == static_cast<char>(eCubeType::Invalid) &&
+				getCubeAtLocalPosition({ spawnPosition.x, y - 1, spawnPosition.z }) == static_cast<char>(eCubeType::Sand))
+			{
+				changeCubeAtLocalPosition(spawnPosition, eCubeType::Shrub);
+				++shrubsSpawned;
+			}
+		}
+
+		++numberOfAttempts;
 	}
 }
 
