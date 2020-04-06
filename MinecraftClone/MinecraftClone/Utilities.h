@@ -150,8 +150,8 @@ namespace Utilities
 	constexpr float TOP_LIGHTING_INTENSITY = 1.35f;
 	constexpr float FRONT_FACE_LIGHTING_INTENSITY = 1.2f;
 	constexpr float BACK_FACE_LIGHTING_INTENSITY = 1.2f;
-	constexpr float LEFT_FACE_LIGHTING_INTENSITY = 1.2f;
-	constexpr float RIGHT_FACE_LIGHTING_INTENSITY = 1.2f;
+	constexpr float LEFT_FACE_LIGHTING_INTENSITY = 1.1f;
+	constexpr float RIGHT_FACE_LIGHTING_INTENSITY = 1.1f;
 	constexpr float BOTTOM_FACE_LIGHTING_INTENSITY = 0.4f;
 
 	constexpr std::array<glm::ivec3, 4> CUBE_FACE_FRONT = { glm::ivec3(0, 0, 1), glm::ivec3(1, 0, 1), glm::ivec3(1, 1, 1), glm::ivec3(0, 1, 1) };

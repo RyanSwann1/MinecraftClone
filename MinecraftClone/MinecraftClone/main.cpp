@@ -251,7 +251,6 @@ int main()
 	clock.restart();
 	float messageExpiredTime = 1.0f;
 	float elaspedTime = 0.0f;
-	setUniformLocation1f(shaderID, "uAlpha", 1.0f, uniformLocations);
 	while (window.isOpen())
 	{
 		deltaTime = clock.restart().asSeconds();
