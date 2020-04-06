@@ -50,8 +50,7 @@ private:
 	void spawnWater();
 	void spawnTrees();
 	void spawnCactus();
-	void spawnShrubs();
-	void spawnTallGrass();
+	void spawnPlant(int maxQuantity, eCubeType baseCubeType, eCubeType plantCubeType);
 	void spawnLeaves(const glm::ivec3& startingPosition);
 	void spawnTreeStump(const glm::ivec3& startingPosition);
 };

@@ -219,8 +219,8 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 	spawnWater();
 	spawnTrees();
 	spawnCactus();
-	spawnShrubs();
-	spawnTallGrass();
+	spawnPlant(Utilities::MAX_SHRUB_PER_CHUNK, eCubeType::Sand, eCubeType::Shrub);
+	spawnPlant(Utilities::MAX_TALL_GRASS_PER_CHUNK, eCubeType::Grass, eCubeType::TallGrass);
 }
 
 void Chunk::spawnWater()
@@ -311,36 +311,11 @@ void Chunk::spawnCactus()
 	}
 }
 
-void Chunk::spawnShrubs()
+void Chunk::spawnPlant(int maxQuantity, eCubeType baseCubeType, eCubeType plantCubeType)
 {
 	int numberOfAttempts = 0;
-	int shrubsSpawned = 0;
-	while (numberOfAttempts < Utilities::MAX_PLANT_SPAWN_ATTEMPTS && shrubsSpawned < Utilities::MAX_SHRUB_PER_CHUNK)
-	{
-		glm::ivec3 spawnPosition;
-		spawnPosition.x = Utilities::getRandomNumber(0, Utilities::CHUNK_WIDTH - 1);
-		spawnPosition.z = Utilities::getRandomNumber(0, Utilities::CHUNK_DEPTH - 1);
-		
-		for (int y = Utilities::CHUNK_HEIGHT - 1; y >= 0; --y)
-		{
-			spawnPosition.y = y;
-			if (getCubeAtLocalPosition(spawnPosition) == static_cast<char>(eCubeType::Invalid) &&
-				getCubeAtLocalPosition({ spawnPosition.x, y - 1, spawnPosition.z }) == static_cast<char>(eCubeType::Sand))
-			{
-				changeCubeAtLocalPosition(spawnPosition, eCubeType::Shrub);
-				++shrubsSpawned;
-			}
-		}
-
-		++numberOfAttempts;
-	}
-}
-
-void Chunk::spawnTallGrass()
-{
-	int numberOfAttempts = 0;
-	int tallGrassSpawned = 0;
-	while (numberOfAttempts < Utilities::MAX_PLANT_SPAWN_ATTEMPTS && tallGrassSpawned < Utilities::MAX_TALL_GRASS_PER_CHUNK)
+	int spawnCount = 0;
+	while (numberOfAttempts < Utilities::MAX_PLANT_SPAWN_ATTEMPTS && spawnCount < maxQuantity)
 	{
 		glm::ivec3 spawnPosition;
 		spawnPosition.x = Utilities::getRandomNumber(0, Utilities::CHUNK_WIDTH - 1);
@@ -350,10 +325,10 @@ void Chunk::spawnTallGrass()
 		{
 			spawnPosition.y = y;
 			if (getCubeAtLocalPosition(spawnPosition) == static_cast<char>(eCubeType::Invalid) &&
-				getCubeAtLocalPosition({ spawnPosition.x, y - 1, spawnPosition.z }) == static_cast<char>(eCubeType::Grass))
+				getCubeAtLocalPosition({ spawnPosition.x, y - 1, spawnPosition.z }) == static_cast<char>(baseCubeType))
 			{
-				changeCubeAtLocalPosition(spawnPosition, eCubeType::TallGrass);
-				++tallGrassSpawned;
+				changeCubeAtLocalPosition(spawnPosition, plantCubeType);
+				++spawnCount;
 			}
 		}
 
