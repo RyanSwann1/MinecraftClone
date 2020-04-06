@@ -46,7 +46,8 @@ bool loadTextures(TextureArray & textureArray)
 		!textureArray.addTexture("water.png") ||
 		!textureArray.addTexture("log.png") ||
 		!textureArray.addTexture("leaves.png") ||
-		!textureArray.addTexture("common_cactus_side.png"))
+		!textureArray.addTexture("common_cactus_side.png") ||
+		!textureArray.addTexture("error.png"))
 	{
 		return false;
 	}
