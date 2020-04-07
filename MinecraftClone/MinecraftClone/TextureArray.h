@@ -23,4 +23,6 @@ private:
 	const unsigned int m_slot;
 	unsigned int m_ID;
 	int m_textureCount;
+
+
 };
