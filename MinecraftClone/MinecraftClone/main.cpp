@@ -101,18 +101,15 @@ int main()
 	}
 	shaderHandler->switchToShader(eShaderType::Chunk);
 
-	//unsigned int chunkShaderID = createShaderProgram("ChunkVertexShader.glsl", "ChunkFragmentShader.glsl");
-	//unsigned int skyboxShaderID = createShaderProgram("SkyboxVertexShader.glsl", "SkyboxFragmentShader.glsl");
-	//switchToShader(chunkShaderID);
 	Camera camera(Utilities::PLAYER_STARTING_POSITION);
 
-	//std::unique_ptr<CubeMap> cubeMap = CubeMap::create();
-	//assert(cubeMap);
-	//if (!cubeMap)
-	//{
-	//	std::cout << "Failed to load cube map\n";
-	//	return -1;
-	//}
+	std::unique_ptr<CubeMap> cubeMap = CubeMap::create();
+	assert(cubeMap);
+	if (!cubeMap)
+	{
+		std::cout << "Failed to load cube map\n";
+		return -1;
+	}
 
 	TextureArray textureArray;
 	textureArray.bind();
