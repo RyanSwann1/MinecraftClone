@@ -6,7 +6,9 @@
 #include "Utilities.h"
 #include "VertexArray.h"
 #include "Rectangle.h"
+#include "CubeMap.h"
 #include "glm/gtc/noise.hpp"
+#include "ShaderHandler.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -58,121 +60,6 @@ bool loadTextures(TextureArray & textureArray)
 	return true;
 }
 
-int getUniformLocation(unsigned int shaderID, const std::string& uniformName, std::unordered_map<std::string, int>& uniformLocations)
-{
-	if (uniformLocations.find(uniformName) != uniformLocations.cend())
-	{
-		return uniformLocations[uniformName];
-	}
-	else
-	{
-		int location = glGetUniformLocation(shaderID, uniformName.c_str());
-		if (location == -1)
-		{
-			std::cout << "Failed to find uniform: " << uniformName << "\n";
-		}
-		else
-		{
-			uniformLocations[uniformName] = location;
-		}
-
-		return location;
-	}
-}
-
-void setUniformLocationVec2(unsigned int shaderID, const std::string& uniformName, glm::vec2 position, std::unordered_map<std::string, int>& uniformLocations)
-{
-	glUniform2f(getUniformLocation(shaderID, uniformName, uniformLocations), position.x, position.y);
-}
-
-void setUniformLocation1f(unsigned int shaderID, const std::string& uniformName, float value, std::unordered_map<std::string, int>& uniformLocations)
-{
-	glUniform1f(getUniformLocation(shaderID, uniformName, uniformLocations), value);
-}
-
-void setUniformMat4f(unsigned int shaderID, const std::string& uniformName, glm::mat4 matrix, std::unordered_map<std::string, int>& uniformLocations)
-{
-	glUniformMatrix4fv(getUniformLocation(shaderID, uniformName, uniformLocations), 1, GL_FALSE, glm::value_ptr(matrix));
-}
-
-void setUniform1i(unsigned int shaderID, const std::string& uniformName, int value, std::unordered_map<std::string, int>& uniformLocations)
-{
-	glUniform1i(getUniformLocation(shaderID, uniformName, uniformLocations), value);
-}
-
-void parseShaderFromFile(const std::string& filePath, std::string& shaderSource)
-{
-	std::ifstream stream(filePath);
-	std::string line;
-	std::stringstream stringStream;
-
-	while (getline(stream, line))
-	{
-		stringStream << line << "\n";
-		std::cout << line << "\n";
-	}
-
-	shaderSource = stringStream.str();
-	stream.close();
-	stringStream.clear();
-}
-
-unsigned int createShaderProgram()
-{
-	unsigned int shaderID = glCreateProgram();
-
-	std::string vertexShaderSource;
-	parseShaderFromFile("VertexShader.glsl", vertexShaderSource);
-	std::string fragmentShaderSource;
-	parseShaderFromFile("FragmentShader.glsl", fragmentShaderSource);
-
-	//Create Vertex Shader
-	unsigned int vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-	const char* vertexSrc = vertexShaderSource.c_str();
-	glShaderSource(vertexShaderID, 1, &vertexSrc, nullptr);
-	glCompileShader(vertexShaderID);
-
-	int vertexShaderResult = 0;
-	glGetShaderiv(vertexShaderID, GL_COMPILE_STATUS, &vertexShaderResult);
-	if (vertexShaderResult == GL_FALSE)
-	{
-		int messageLength = 0;
-		glGetShaderiv(vertexShaderID, GL_INFO_LOG_LENGTH, &messageLength);
-		char* errorMessage = static_cast<char*>(alloca(messageLength * sizeof(char)));
-		glGetShaderInfoLog(vertexShaderID, messageLength, &messageLength, errorMessage);
-		std::cout << "Failed to compile: " << errorMessage << "\n";
-	}
-
-	//Create Fragment Shader
-	unsigned int fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-	const char* fragSrc = fragmentShaderSource.c_str();
-	glShaderSource(fragmentShaderID, 1, &fragSrc, nullptr);
-	glCompileShader(fragmentShaderID);
-
-	int fragmentShaderResult = 0;
-	glGetShaderiv(fragmentShaderID, GL_COMPILE_STATUS, &fragmentShaderResult);
-	if (fragmentShaderResult == GL_FALSE)
-	{
-		int messageLength = 0;
-		glGetShaderiv(fragmentShaderID, GL_INFO_LOG_LENGTH, &messageLength);
-		char* errorMessage = static_cast<char*>(alloca(messageLength * sizeof(char)));
-		glGetShaderInfoLog(fragmentShaderID, messageLength, &messageLength, errorMessage);
-		std::cout << "Failed to compile: " << errorMessage << "\n";
-	}
-
-	glAttachShader(shaderID, vertexShaderID);
-	glAttachShader(shaderID, fragmentShaderID);
-	glLinkProgram(shaderID);
-	glValidateProgram(shaderID);
-
-	glUseProgram(shaderID);
-
-	glDeleteShader(vertexShaderID);
-	glDeleteShader(fragmentShaderID);
-	
-	return shaderID;
-}
-
 //https://www.reddit.com/r/VoxelGameDev/comments/376vmv/how_do_you_implement_threading_in_your_game/
 
 //View == Frustrum
@@ -205,10 +92,27 @@ int main()
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
 	glEnable(GL_DEPTH_TEST);
 
+	std::unique_ptr<ShaderHandler> shaderHandler = ShaderHandler::create();
+	assert(shaderHandler);
+	if (!shaderHandler)
+	{
+		std::cout << "Unable to load shader handler\n";
+		return -1;
+	}
+	shaderHandler->switchToShader(eShaderType::Chunk);
 
-
-	unsigned int shaderID = createShaderProgram();
+	//unsigned int chunkShaderID = createShaderProgram("ChunkVertexShader.glsl", "ChunkFragmentShader.glsl");
+	//unsigned int skyboxShaderID = createShaderProgram("SkyboxVertexShader.glsl", "SkyboxFragmentShader.glsl");
+	//switchToShader(chunkShaderID);
 	Camera camera(Utilities::PLAYER_STARTING_POSITION);
+
+	//std::unique_ptr<CubeMap> cubeMap = CubeMap::create();
+	//assert(cubeMap);
+	//if (!cubeMap)
+	//{
+	//	std::cout << "Failed to load cube map\n";
+	//	return -1;
+	//}
 
 	TextureArray textureArray;
 	textureArray.bind();
@@ -219,7 +123,8 @@ int main()
 		return -1;
 	}
 	std::unordered_map<std::string, int> uniformLocations;
-	setUniform1i(shaderID, "uTexture", textureArray.getCurrentSlot(), uniformLocations);
+	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", textureArray.getCurrentSlot());
+	//setUniform1i(chunkShaderID, "uTexture", textureArray.getCurrentSlot(), uniformLocations);
 	
 	glm::vec3 cameraPosition;
 	bool movePlayer = false;
@@ -303,10 +208,10 @@ int main()
 
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
-		setUniformMat4f(shaderID, "uView", view, uniformLocations);
+		shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
 			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 1000.0f); //1000.0f);//(
-		setUniformMat4f(shaderID, "uProjection", projection, uniformLocations);
+		shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
 
 		if (chunkGenerator)
 		{

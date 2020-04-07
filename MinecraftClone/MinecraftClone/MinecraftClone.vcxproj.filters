@@ -48,6 +48,12 @@
     <ClCompile Include="ChunkGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CubeMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glad.h">
@@ -170,9 +176,21 @@
     <ClInclude Include="ChunkGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CubeMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="VertexShader.glsl" />
-    <None Include="FragmentShader.glsl" />
+    <None Include="Shaders\ChunkFragmentShader.glsl" />
+    <None Include="Shaders\ChunkVertexShader.glsl" />
+    <None Include="Shaders\SkyboxFragmentShader.glsl" />
+    <None Include="Shaders\SkyboxVertexShader.glsl" />
+    <None Include="OpenGLShaders\ChunkFragmentShader.glsl" />
+    <None Include="OpenGLShaders\ChunkVertexShader.glsl" />
+    <None Include="OpenGLShaders\SkyboxFragmentShader.glsl" />
+    <None Include="OpenGLShaders\SkyboxVertexShader.glsl" />
   </ItemGroup>
 </Project>

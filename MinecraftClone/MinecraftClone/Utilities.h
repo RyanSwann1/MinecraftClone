@@ -87,6 +87,7 @@ namespace Utilities
 	const glm::vec3 PLAYER_STARTING_POSITION(0.0f, 100.f, 0.0f);
 	const std::string TEXTURE_DIRECTORY = "Textures/";
 
+
 	constexpr std::array<int, 6> LEAVES_DISTANCES =
 	{
 		MAX_LEAVES_DISTANCE, 
@@ -104,6 +105,8 @@ namespace Utilities
 		glm::vec2(1.0f, 1.0f),
 		glm::vec2(0.0f, 1.0f)
 	};
+	
+
 
 	inline void getTextCoords(std::vector<glm::vec3>& textCoords, eCubeSide cubeSide, eCubeType cubeType)
 	{

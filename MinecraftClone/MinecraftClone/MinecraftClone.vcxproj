@@ -133,9 +133,11 @@
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="ChunkGenerator.cpp" />
     <ClCompile Include="ChunkPool.cpp" />
+    <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Rectangle.cpp" />
+    <ClCompile Include="ShaderHandler.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="VertexArray.cpp" />
     <ClCompile Include="VertexArrayPool.cpp" />
@@ -147,6 +149,7 @@
     <ClInclude Include="ChunkGenerator.h" />
     <ClInclude Include="ChunkPool.h" />
     <ClInclude Include="CubeID.h" />
+    <ClInclude Include="CubeMap.h" />
     <ClInclude Include="glad.h" />
     <ClInclude Include="glm\common.hpp" />
     <ClInclude Include="glm\exponential.hpp" />
@@ -177,6 +180,7 @@
     <ClInclude Include="ObjectPool.h" />
     <ClInclude Include="OpenGLErrorCheck.h" />
     <ClInclude Include="Rectangle.h" />
+    <ClInclude Include="ShaderHandler.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="VertexArrayPool.h" />
@@ -184,8 +188,14 @@
     <ClInclude Include="VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="FragmentShader.glsl" />
-    <None Include="VertexShader.glsl" />
+    <None Include="OpenGLShaders\ChunkFragmentShader.glsl" />
+    <None Include="OpenGLShaders\ChunkVertexShader.glsl" />
+    <None Include="OpenGLShaders\SkyboxFragmentShader.glsl" />
+    <None Include="OpenGLShaders\SkyboxVertexShader.glsl" />
+    <None Include="Shaders\ChunkFragmentShader.glsl" />
+    <None Include="Shaders\ChunkVertexShader.glsl" />
+    <None Include="Shaders\SkyboxFragmentShader.glsl" />
+    <None Include="Shaders\SkyboxVertexShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
