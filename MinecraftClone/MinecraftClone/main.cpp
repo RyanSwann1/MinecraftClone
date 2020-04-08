@@ -6,7 +6,7 @@
 #include "Utilities.h"
 #include "VertexArray.h"
 #include "Rectangle.h"
-#include "CubeMap.h"
+#include "SkyBox.h"
 #include "glm/gtc/noise.hpp"
 #include "ShaderHandler.h"
 #include <string>
@@ -99,17 +99,8 @@ int main()
 		std::cout << "Unable to load shader handler\n";
 		return -1;
 	}
-	shaderHandler->switchToShader(eShaderType::Chunk);
 
 	Camera camera(Utilities::PLAYER_STARTING_POSITION);
-
-	std::unique_ptr<CubeMap> cubeMap = CubeMap::create();
-	assert(cubeMap);
-	if (!cubeMap)
-	{
-		std::cout << "Failed to load cube map\n";
-		return -1;
-	}
 
 	TextureArray textureArray;
 	textureArray.bind();
@@ -119,9 +110,17 @@ int main()
 	{
 		return -1;
 	}
-	std::unordered_map<std::string, int> uniformLocations;
-	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", textureArray.getCurrentSlot());
-	//setUniform1i(chunkShaderID, "uTexture", textureArray.getCurrentSlot(), uniformLocations);
+
+	std::unique_ptr<SkyBox> skybox = SkyBox::create();
+	assert(skybox);
+	if (!skybox)
+	{
+		std::cout << "Failed to load Skybox\n";
+		return -1;
+	}
+
+	shaderHandler->setUniform1i(eShaderType::Skybox, "uSkyboxTexture", 0);
+	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", 0);
 	
 	glm::vec3 cameraPosition;
 	bool movePlayer = false;
@@ -205,13 +204,15 @@ int main()
 
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
-		shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
-			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 1000.0f); //1000.0f);//(
-		shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
+			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 1000.0f);
 
 		if (chunkGenerator)
 		{
+			shaderHandler->switchToShader(eShaderType::Chunk);
+			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
+			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
+			//Draw Scene
 			std::lock_guard<std::mutex> renderingLock(renderingMutex);
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK);
@@ -221,7 +222,17 @@ int main()
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			chunkGenerator->renderTransparent();
 			glDisable(GL_BLEND);
+
+			//Draw Skybox
+			glDepthFunc(GL_LEQUAL);
+			shaderHandler->switchToShader(eShaderType::Skybox);
+			shaderHandler->setUniformMat4f(eShaderType::Skybox, "uView", glm::mat4(glm::mat3(view)));
+			shaderHandler->setUniformMat4f(eShaderType::Skybox, "uProjection", projection);
+
+			skybox->render();
+			glDepthFunc(GL_LESS);
 		}
+
 
 		window.display();
 	}

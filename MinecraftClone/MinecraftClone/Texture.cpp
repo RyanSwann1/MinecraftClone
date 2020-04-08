@@ -49,7 +49,7 @@ bool TextureArray::addTexture(const std::string& textureName)
 	}
 	image.flipVertically();
 	glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, m_textureCount, m_textureSize.x, m_textureSize.y, 
-		1, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());
+		1, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr()); 
 	++m_textureCount;
 
 	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);

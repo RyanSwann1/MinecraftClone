@@ -48,10 +48,10 @@
     <ClCompile Include="ChunkGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CubeMap.cpp">
+    <ClCompile Include="ShaderHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderHandler.cpp">
+    <ClCompile Include="SkyBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -176,10 +176,10 @@
     <ClInclude Include="ChunkGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CubeMap.h">
+    <ClInclude Include="ShaderHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderHandler.h">
+    <ClInclude Include="SkyBox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

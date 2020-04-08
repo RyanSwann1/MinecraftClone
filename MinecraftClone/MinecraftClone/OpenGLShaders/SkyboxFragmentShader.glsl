@@ -1,16 +1,11 @@
 #version 330 core
+out vec4 FragColor;
 
-out vec4 color;
-uniform sampler2DArray uTexture;
+in vec3 TexCoords;
 
-in vec3 vTextCoord;
-in float vlightIntensity;
+uniform samplerCube uSkyboxTexture;
 
 void main()
-{
-	color = vlightIntensity * texture(uTexture, vTextCoord);
-	if (color.a == 0)
-	{
-		discard;
-	}
-};
+{    
+    FragColor = texture(uSkyboxTexture, TexCoords);
+}
