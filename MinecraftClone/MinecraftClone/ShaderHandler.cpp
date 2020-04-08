@@ -9,6 +9,7 @@
 namespace 
 {
 	const std::string SHADER_DIRECTORY = "OpenGLShaders/";
+	constexpr int INVALID_UNIFORM_LOCATION = -1;
 
 	bool parseShaderFromFile(const std::string& filePath, std::string& shaderSource)
 	{
@@ -154,7 +155,16 @@ void ShaderHandler::setUniformMat4f(eShaderType shaderType, const std::string& u
 	assert(shader);
 	if (shader)
 	{
-		glUniformMatrix4fv(shader->getUniformLocation(uniformName), 1, GL_FALSE, glm::value_ptr(matrix));
+		int uniformLocation = shader->getUniformLocation(uniformName);
+		assert(uniformLocation != INVALID_UNIFORM_LOCATION);
+		if (uniformLocation != INVALID_UNIFORM_LOCATION)
+		{
+			glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(matrix));
+		}
+		else
+		{
+			std::cout << "Invalid uniform location\n";
+		}
 	}
 	else
 	{
@@ -168,7 +178,17 @@ void ShaderHandler::setUniform1i(eShaderType shaderType, const std::string& unif
 	assert(shader);
 	if (shader)
 	{
-		glUniform1i(shader->getUniformLocation(uniformName), value);
+		int uniformLocation = shader->getUniformLocation(uniformName);
+		assert(uniformLocation != INVALID_UNIFORM_LOCATION);
+		if (uniformLocation != INVALID_UNIFORM_LOCATION)
+		{
+			glUniform1i(uniformLocation, value);
+		}
+		else
+		{
+			std::cout << "Unable to find uniform location\n";
+		}
+		
 	}
 	else
 	{
@@ -222,7 +242,7 @@ ShaderHandler::Shader::~Shader()
 	}
 }
 
-unsigned int ShaderHandler::Shader::getUniformLocation(const std::string& uniformName)
+int ShaderHandler::Shader::getUniformLocation(const std::string& uniformName)
 {
 	if (uniformLocations.find(uniformName) != uniformLocations.cend())
 	{

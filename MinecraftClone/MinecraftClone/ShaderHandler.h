@@ -24,7 +24,7 @@ class ShaderHandler : private NonCopyable, private NonMovable
 		Shader& operator=(Shader&&) noexcept;
 		~Shader();
 
-		unsigned int getUniformLocation(const std::string& uniformName);
+		int getUniformLocation(const std::string& uniformName);
 
 		unsigned int ID;
 		eShaderType type;
