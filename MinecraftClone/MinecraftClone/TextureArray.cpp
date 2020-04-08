@@ -1,4 +1,4 @@
-#include "Texture.h"
+#include "TextureArray.h"
 #include "glad.h"
 #include "CubeID.h"
 #include <SFML/Graphics.hpp>

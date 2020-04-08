@@ -1,4 +1,4 @@
-#include "Texture.h"
+#include "TextureArray.h"
 #include "Camera.h"
 #include "Chunk.h"
 #include "ChunkGenerator.h"
