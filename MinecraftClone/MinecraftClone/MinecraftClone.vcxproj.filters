@@ -21,9 +21,6 @@
     <ClCompile Include="glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -54,15 +51,15 @@
     <ClCompile Include="SkyBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TextureArray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glad.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="khrplatform.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="OpenGLErrorCheck.h">
@@ -180,6 +177,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SkyBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -138,7 +138,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="ShaderHandler.cpp" />
-    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TextureArray.cpp" />
     <ClCompile Include="VertexArray.cpp" />
     <ClCompile Include="VertexArrayPool.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
@@ -181,7 +181,7 @@
     <ClInclude Include="OpenGLErrorCheck.h" />
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="ShaderHandler.h" />
-    <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureArray.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="VertexArrayPool.h" />
     <ClInclude Include="VertexArray.h" />

@@ -1,6 +1,5 @@
 #include "Chunk.h"
 #include "VertexBuffer.h"
-#include "Texture.h"
 #include "VertexBuffer.h"
 #include "glm/gtc/noise.hpp"
 #include <iostream>
