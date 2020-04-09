@@ -7,9 +7,9 @@
 #include "Camera.h"
 #include <iostream>
 
-ChunkGenerator::Regenerate::Regenerate(const Chunk& chunk, VertexArrayFromPool&& vertexArrayFromPool)
+ChunkGenerator::Regenerate::Regenerate(const ChunkFromPool& chunkFromPool, VertexArrayFromPool&& vertexArrayFromPool)
 	: vertexArrayToRegenerate(std::move(vertexArrayFromPool)),
-	chunkToRegenerate(chunk),
+	chunkFromPool(chunkFromPool),
 	regenerated(false)
 {}
 
@@ -55,7 +55,7 @@ ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 			{
 				m_regenerate.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunk.first),
-					std::forward_as_tuple(*chunk.second.object, std::move(VAOFromPool)));
+					std::forward_as_tuple(chunk.second, std::move(VAOFromPool)));
 			}
 			else
 			{
@@ -568,7 +568,7 @@ void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& 
 
 void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 {
-	std::vector<std::reference_wrapper<Chunk>> addedChunks;
+	std::vector<std::reference_wrapper<ChunkFromPool>> addedChunks;
 	glm::ivec3 startPosition(playerPosition);
 	Utilities::getClosestMiddlePosition(startPosition);
 	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z <= startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
@@ -583,9 +583,9 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 				assert(chunkFromPool.object);
 				if (chunkFromPool.object)
 				{
-					Chunk& chunk = *m_chunks.emplace(std::piecewise_construct,
+					ChunkFromPool& chunk = m_chunks.emplace(std::piecewise_construct,
 						std::forward_as_tuple(chunkStartingPosition),
-						std::forward_as_tuple(std::move(chunkFromPool))).first->second.object;
+						std::forward_as_tuple(std::move(chunkFromPool))).first->second;
 
 					addedChunks.push_back(chunk);
 				}
@@ -604,10 +604,10 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 		if (VAOFromPool.object)
 		{
 			VertexArray& VAO = *m_regenerate.emplace(std::piecewise_construct,
-				std::forward_as_tuple(addedChunk.get().getStartingPosition()),
+				std::forward_as_tuple(addedChunk.get().object->getStartingPosition()),
 				std::forward_as_tuple(addedChunk.get(), std::move(VAOFromPool))).first->second.vertexArrayToRegenerate.object;
 
-			generateChunkMesh(VAO, addedChunk.get());
+			generateChunkMesh(VAO, *addedChunk.get().object);
 		}
 		else
 		{
@@ -620,17 +620,17 @@ void ChunkGenerator::handleRegeneration(std::mutex& renderingMutex)
 {
 	for (auto regen = m_regenerate.begin(); regen != m_regenerate.end();)
 	{
-		if (regen->second.chunkToRegenerate.isInUse())
+		if (regen->second.chunkFromPool.object->isInUse())
 		{
 			//If Chunk has no neighbours - then it can be regenerated
-			const glm::ivec3& chunkStartingPosition = regen->second.chunkToRegenerate.getStartingPosition();
+			const glm::ivec3& chunkStartingPosition = regen->second.chunkFromPool.object->getStartingPosition();
 			if (m_chunks.find(Utilities::getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left)) != m_chunks.cend() &&
 				m_chunks.find(Utilities::getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Right)) != m_chunks.cend() &&
 				m_chunks.find(Utilities::getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back)) != m_chunks.cend() &&
 				m_chunks.find(Utilities::getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward)) != m_chunks.cend())
 			{
 
-				generateChunkMesh(*regen->second.vertexArrayToRegenerate.object, regen->second.chunkToRegenerate);
+				generateChunkMesh(*regen->second.vertexArrayToRegenerate.object, *regen->second.chunkFromPool.object);
 				regen->second.regenerated = true;
 			}
 		
@@ -647,7 +647,7 @@ void ChunkGenerator::handleRegeneration(std::mutex& renderingMutex)
 	{
 		if (iter->second.regenerated)
 		{
-			const glm::ivec3& chunkStartingPosition = iter->second.chunkToRegenerate.getStartingPosition();
+			const glm::ivec3& chunkStartingPosition = iter->second.chunkFromPool.object->getStartingPosition();
 			
 			m_VAOs.emplace(std::piecewise_construct,
 				std::forward_as_tuple(chunkStartingPosition), 

@@ -52,10 +52,10 @@ class ChunkGenerator : private NonCopyable, private NonMovable
 {
 	struct Regenerate : private NonCopyable, private NonMovable
 	{
-		Regenerate(const Chunk& chunk, VertexArrayFromPool&& vertexArrayFromPool);
+		Regenerate(const ChunkFromPool& chunkFromPool, VertexArrayFromPool&& vertexArrayFromPool);
 
 		VertexArrayFromPool vertexArrayToRegenerate;
-		const Chunk& chunkToRegenerate;
+		const ChunkFromPool& chunkFromPool;
 		bool regenerated;
 	};
 
