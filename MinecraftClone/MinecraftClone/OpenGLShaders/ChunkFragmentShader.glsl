@@ -2,9 +2,11 @@
 
 out vec4 color;
 uniform sampler2DArray uTexture;
+uniform vec3 uFogColor;
 
 in vec3 vTextCoord;
 in float vlightIntensity;
+in float vVisibility;
 
 void main()
 {
@@ -13,4 +15,6 @@ void main()
 	{
 		discard;
 	}
+
+	color = mix(vec4(uFogColor, 1.0), color, vVisibility);
 };

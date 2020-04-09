@@ -96,6 +96,7 @@ int main()
 	}
 
 	shaderHandler->setUniform1i(eShaderType::Skybox, "uSkyboxTexture", 0);
+	shaderHandler->setUniformVec3(eShaderType::Chunk, "uFogColor", glm::vec3(0.5f, 0.5f, 0.5f));
 	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", 0);
 	
 	Camera camera(Utilities::PLAYER_STARTING_POSITION);
