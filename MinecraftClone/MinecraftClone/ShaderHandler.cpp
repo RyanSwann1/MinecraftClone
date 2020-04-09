@@ -168,7 +168,7 @@ void ShaderHandler::setUniformMat4f(eShaderType shaderType, const std::string& u
 	}
 	else
 	{
-		std::cout << "Couldn't find shader." + uniformName;
+		std::cout << "Couldn't find shader." + uniformName << "\n";
 	}
 }
 
@@ -192,7 +192,7 @@ void ShaderHandler::setUniform1i(eShaderType shaderType, const std::string& unif
 	}
 	else
 	{
-		std::cout << "Couldn't find shader." + uniformName;
+		std::cout << "Couldn't find shader." + uniformName << "\n";
 	}
 }
 
