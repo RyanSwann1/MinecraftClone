@@ -10,19 +10,16 @@
 class TextureArray : private NonCopyable, private NonMovable
 {
 public:
-	TextureArray();
-	
+	static std::unique_ptr<TextureArray> create();
+	~TextureArray();
+
 	unsigned int getCurrentSlot() const;
-	bool addTexture(const std::string& textureName);
 
 	void bind() const;
 	void unbind() const;
 
 private:
-	const glm::ivec2 m_textureSize;
+	TextureArray(unsigned int ID);
 	const unsigned int m_slot;
-	unsigned int m_ID;
-	int m_textureCount;
-
-
+	const unsigned int m_ID;
 };
