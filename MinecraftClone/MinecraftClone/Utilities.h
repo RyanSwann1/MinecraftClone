@@ -17,6 +17,7 @@ enum class eTextureLayer
 	LogTop,
 	Leaves,
 	Cactus,
+	CactusTop,
 	Shrub,
 	TallGrass,
 	Error,
@@ -152,6 +153,20 @@ namespace Utilities
 			break;
 		case eCubeType::Cactus:
 			textureLayer = static_cast<int>(eTextureLayer::Cactus);
+			break;
+		case eCubeType::CactusTop :
+			switch (cubeSide)
+			{
+			case eCubeSide::Back:
+			case eCubeSide::Front:
+			case eCubeSide::Left:
+			case eCubeSide::Right:
+				textureLayer = static_cast<int>(eTextureLayer::Cactus);
+				break;
+			case eCubeSide::Top:
+				textureLayer = static_cast<int>(eTextureLayer::CactusTop);
+				break;
+			}
 			break;
 		case eCubeType::Water :
 			textureLayer = static_cast<int>(eTextureLayer::Water);

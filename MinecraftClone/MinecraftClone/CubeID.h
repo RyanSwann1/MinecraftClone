@@ -11,6 +11,7 @@ enum class eCubeType
 	LogTop,
 	Leaves,
 	Cactus,
+	CactusTop,
 	Shrub,
 	TallGrass
 };

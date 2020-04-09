@@ -276,7 +276,7 @@ void Chunk::spawnCactus()
 		spawnPosition.z = Utilities::getRandomNumber(0, Utilities::CHUNK_DEPTH - 1);
 
 		//Find Spawn Location
-		for (int y = Utilities::CHUNK_HEIGHT - 1; y >= 0; --y)
+		for (int y = Utilities::CHUNK_HEIGHT - Utilities::CACTUS_MAX_HEIGHT - 1; y >= 0; --y)
 		{
 			spawnPosition.y = y;
 			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Sand) &&
@@ -286,7 +286,14 @@ void Chunk::spawnCactus()
 				int cactusHeight = Utilities::getRandomNumber(Utilities::CACTUS_MIN_HEIGHT, Utilities::CACTUS_MAX_HEIGHT);
 				for (int i = 1; i <= cactusHeight; ++i)
 				{
-					changeCubeAtLocalPosition({ spawnPosition.x, spawnPosition.y + i, spawnPosition.z }, eCubeType::Cactus);
+					if (i == cactusHeight)
+					{
+						changeCubeAtLocalPosition({ spawnPosition.x, spawnPosition.y + i, spawnPosition.z }, eCubeType::CactusTop);
+					}
+					else
+					{
+						changeCubeAtLocalPosition({ spawnPosition.x, spawnPosition.y + i, spawnPosition.z }, eCubeType::Cactus);
+					}
 				}
 
 				++spawnCount;

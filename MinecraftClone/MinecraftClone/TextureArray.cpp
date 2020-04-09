@@ -9,7 +9,7 @@ namespace
 {
 	constexpr glm::ivec2 TEXTURE_SIZE = { 16, 16 };
 
-	const std::array<std::string, 12> TEXTURE_FILENAMES =
+	const std::array<std::string, 13> TEXTURE_FILENAMES =
 	{
 		"grass.png",
 		"grass_side.png",
@@ -20,6 +20,7 @@ namespace
 		"logtop.png",
 		"leaves.png",
 		"common_cactus_side.png",
+		"common_cactus_top.png",
 		"common_dead_shrub.png",
 		"common_tall_grass.png",
 		"error.png"
