@@ -255,6 +255,7 @@ void ChunkGenerator::addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType,
 void ChunkGenerator::addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const glm::ivec3& cubePosition, 
 	const std::array<glm::ivec3, 4>& diagonalFace)
 {
+	//Positions
 	glm::ivec3 position = cubePosition;
 	for (const glm::ivec3& i : diagonalFace)
 	{
@@ -262,11 +263,14 @@ void ChunkGenerator::addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType c
 		vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
 		position = cubePosition;
 
+		//Lighting
 		vertexBuffer.lightIntensityVertices.push_back(Utilities::DEFAULT_LIGHTING_INTENSITY);
 	}
 
+	//Texture Coordinates
 	Utilities::getTextCoords(vertexBuffer.textCoords, eCubeSide::Front, cubeType);
 	
+	//Indicies
 	for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
 	{
 		vertexBuffer.indicies.emplace_back(i + vertexBuffer.elementBufferIndex);
@@ -511,7 +515,6 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 		}
 	}
 
-
 	if (!vertexArray.m_regenerate)
 	{
 		if (!vertexArray.m_opaqueVertexBuffer.indicies.empty())
@@ -524,14 +527,6 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 			vertexArray.m_transparentVertexBuffer.bindToVAO = true;
 		}
 	}
-	//if(regenChunk)
-	//{ 
-	//	vertexArray.m_regenerate = true;
-	//}
-	//else
-	//{
-
-	//}
 }
 
 void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex)
