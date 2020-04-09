@@ -100,8 +100,10 @@ namespace
 ShaderHandler::ShaderHandler()
 	: m_shaders()
 {
-	m_shaders.emplace_back(eShaderType::Chunk);
-	m_shaders.emplace_back(eShaderType::Skybox);
+	for (int i = 0; i <= static_cast<int>(eShaderType::Max); ++i)
+	{
+		m_shaders.emplace_back(static_cast<eShaderType>(i));
+	}
 }
 
 ShaderHandler::Shader* ShaderHandler::getShader(eShaderType shaderType)

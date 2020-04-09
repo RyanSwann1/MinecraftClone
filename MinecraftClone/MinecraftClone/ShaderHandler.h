@@ -12,7 +12,8 @@
 enum class eShaderType
 {
 	Chunk,
-	Skybox
+	Skybox,
+	Max = Skybox
 };
 
 class ShaderHandler : private NonCopyable, private NonMovable
