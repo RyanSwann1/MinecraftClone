@@ -248,7 +248,7 @@ void Chunk::spawnTrees()
 		spawnPosition.z = Utilities::getRandomNumber(Utilities::MAX_LEAVES_DISTANCE, Utilities::CHUNK_DEPTH - Utilities::MAX_LEAVES_DISTANCE - 1);
 
 		//Find Spawn Location
-		for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_HEIGHT - Utilities::MAX_LEAVES_DISTANCE; y >= Utilities::SAND_MAX_HEIGHT; --y)
+		for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_HEIGHT - Utilities::MAX_LEAVES_DISTANCE - 1; y >= Utilities::SAND_MAX_HEIGHT; --y)
 		{
 			spawnPosition.y = y;
 			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Grass) &&
