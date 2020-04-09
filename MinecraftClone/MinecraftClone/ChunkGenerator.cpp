@@ -74,7 +74,7 @@ ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
 	std::mutex& cameraMutex, std::mutex& renderingMutex)	
 {
-	while (!resetGame)
+	while (!resetGame && window.isOpen())
 	{
 		std::unique_lock<std::mutex> cameraLock(cameraMutex);
 		glm::ivec3 position = cameraPosition;
