@@ -21,7 +21,7 @@ struct VertexArray : private NonCopyable
 	void unbind() const;
 	
 	bool m_inUse;
-	bool m_awaitingRegeneration;
+	bool m_regenerate;
 	VertexBuffer m_opaqueVertexBuffer;
 	VertexBuffer m_transparentVertexBuffer;
 	unsigned int m_opaqueID;

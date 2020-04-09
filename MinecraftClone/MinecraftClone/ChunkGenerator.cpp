@@ -51,7 +51,7 @@ ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 		{
 			generateChunkMesh(*VAOFromPool.object, *chunk.second.object);
 
-			if (VAOFromPool.object->m_awaitingRegeneration)
+			if (VAOFromPool.object->m_regenerate)
 			{
 				m_regenerate.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunk.first),
@@ -288,7 +288,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 {
 	const glm::ivec3& chunkStartingPosition = chunk.getStartingPosition();
 	const glm::ivec3& chunkEndingPosition = chunk.getEndingPosition();
-	bool regenChunk = false;
+	vertexArray.m_regenerate = false; //Reset regeneration value
 
 	const Chunk* leftNeighbouringChunk = getNeighbouringChunkAtPosition(chunkStartingPosition, eDirection::Left);
 	const Chunk* rightNeighbouringChunk = getNeighbouringChunkAtPosition(chunkStartingPosition, eDirection::Right);
@@ -309,7 +309,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 				}
 				else if (cubeType == eCubeType::Water)
 				{
-					if (!vertexArray.m_awaitingRegeneration)
+					if (!vertexArray.m_regenerate)
 					{
 						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
 					}
@@ -332,7 +332,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 					}
 					else if (!leftNeighbouringChunk)
 					{
-						regenChunk = true;
+						vertexArray.m_regenerate = true;
 					}
 
 					//Right Face
@@ -351,7 +351,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 					}
 					else if (!rightNeighbouringChunk)
 					{
-						regenChunk = true;
+						vertexArray.m_regenerate = true;
 					}
 
 					//Forward Face
@@ -370,7 +370,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 					}
 					else if (!forwardNeighbouringChunk)
 					{
-						regenChunk = true;
+						vertexArray.m_regenerate = true;
 					}
 
 					//Back Face
@@ -389,13 +389,13 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 					}
 					else if (!backNeighbouringChunk)
 					{
-						regenChunk = true;
+						vertexArray.m_regenerate = true;
 					}
 
 					//Top Face
 					if (y == Utilities::CHUNK_HEIGHT - 1 || !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
 					{
-						if (!vertexArray.m_awaitingRegeneration)
+						if (!vertexArray.m_regenerate)
 						{
 							addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
 						}
@@ -431,7 +431,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 					}
 					else if (!leftNeighbouringChunk)
 					{
-						regenChunk = true;
+						vertexArray.m_regenerate = true;
 					}
 					
 					//Right Face
@@ -450,7 +450,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 					}
 					else if (!rightNeighbouringChunk)
 					{
-						regenChunk = true;
+						vertexArray.m_regenerate = true;
 					}
 
 					//Forward Face
@@ -469,7 +469,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 					}
 					else if (!forwardNeighbouringChunk)
 					{
-						regenChunk = true;
+						vertexArray.m_regenerate = true;
 					}
 
 					//Back Face
@@ -488,7 +488,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 					}
 					else if (!backNeighbouringChunk)
 					{
-						regenChunk = true;
+						vertexArray.m_regenerate = true;
 					}
 
 					if (cubeType == eCubeType::LogTop)
@@ -500,7 +500,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 						//Top Face
 						if (y == Utilities::CHUNK_HEIGHT - 1 || !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
 						{
-							if (!vertexArray.m_awaitingRegeneration)
+							if (!vertexArray.m_regenerate)
 							{
 								addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false);
 							}
@@ -511,11 +511,8 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 		}
 	}
 
-	if(regenChunk)
-	{ 
-		vertexArray.m_awaitingRegeneration = true;
-	}
-	else
+
+	if (!vertexArray.m_regenerate)
 	{
 		if (!vertexArray.m_opaqueVertexBuffer.indicies.empty())
 		{
@@ -526,9 +523,15 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 		{
 			vertexArray.m_transparentVertexBuffer.bindToVAO = true;
 		}
-
-		vertexArray.m_awaitingRegeneration = false;
 	}
+	//if(regenChunk)
+	//{ 
+	//	vertexArray.m_regenerate = true;
+	//}
+	//else
+	//{
+
+	//}
 }
 
 void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex)
@@ -631,6 +634,7 @@ void ChunkGenerator::handleRegeneration(std::mutex& renderingMutex)
 				m_chunks.find(Utilities::getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back)) != m_chunks.cend() &&
 				m_chunks.find(Utilities::getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward)) != m_chunks.cend())
 			{
+
 				generateChunkMesh(*regen->second.vertexArrayToRegenerate.object, regen->second.chunkToRegenerate);
 				regen->second.regenerated = true;
 			}
