@@ -17,15 +17,19 @@ enum class eShaderType
 
 class ShaderHandler : private NonCopyable, private NonMovable
 {
-	struct Shader : private NonCopyable
+	class Shader : private NonCopyable
 	{
+	public:
 		Shader(eShaderType shaderType);
 		Shader(Shader&&) noexcept;
 		Shader& operator=(Shader&&) noexcept;
 		~Shader();
 
+		unsigned int getID() const;
+		eShaderType getType() const;
 		int getUniformLocation(const std::string& uniformName);
 
+	private:
 		unsigned int ID;
 		eShaderType type;
 		std::unordered_map<std::string, int> uniformLocations;

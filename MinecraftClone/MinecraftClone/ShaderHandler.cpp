@@ -108,7 +108,7 @@ ShaderHandler::Shader* ShaderHandler::getShader(eShaderType shaderType)
 {
 	auto shader = std::find_if(m_shaders.begin(), m_shaders.end(), [shaderType](const auto& shader)
 	{
-		return shader.type == shaderType;
+		return shader.getType() == shaderType;
 	});
 
 	return (shader != m_shaders.end() ? &(*shader) : nullptr);
@@ -119,11 +119,11 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create()
 	std::unique_ptr<ShaderHandler> shaderHandler = std::unique_ptr<ShaderHandler>(new ShaderHandler());
 	for (const auto& shader : shaderHandler->m_shaders)
 	{
-		switch (shader.type)
+		switch (shader.getType())
 		{
 		case eShaderType::Chunk :
 		{
-			bool shaderLoaded = createShaderProgram(shader.ID, "ChunkVertexShader.glsl", "ChunkFragmentShader.glsl");
+			bool shaderLoaded = createShaderProgram(shader.getID(), "ChunkVertexShader.glsl", "ChunkFragmentShader.glsl");
 			assert(shaderLoaded);
 			if (!shaderLoaded)
 			{
@@ -133,7 +133,7 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create()
 			break;
 		case eShaderType::Skybox :
 		{
-			bool shaderLoaded = createShaderProgram(shader.ID, "SkyboxVertexShader.glsl", "SkyboxFragmentShader.glsl");
+			bool shaderLoaded = createShaderProgram(shader.getID(), "SkyboxVertexShader.glsl", "SkyboxFragmentShader.glsl");
 			assert(shaderLoaded);
 			if (!shaderLoaded)
 			{
@@ -202,7 +202,7 @@ void ShaderHandler::switchToShader(eShaderType shaderType)
 	assert(shader);
 	if (shader)
 	{
-		glUseProgram(shader->ID);
+		glUseProgram(shader->getID());
 	}
 	else
 	{
@@ -240,6 +240,16 @@ ShaderHandler::Shader::~Shader()
 	{
 		glDeleteProgram(ID);
 	}
+}
+
+unsigned int ShaderHandler::Shader::getID() const
+{
+	return ID;
+}
+
+eShaderType ShaderHandler::Shader::getType() const
+{
+	return type;
 }
 
 int ShaderHandler::Shader::getUniformLocation(const std::string& uniformName)
