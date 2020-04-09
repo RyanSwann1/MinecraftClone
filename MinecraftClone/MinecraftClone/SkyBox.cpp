@@ -5,16 +5,6 @@
 
 namespace
 {
-	//vector<std::string> faces;
-	//{
-	//	"right.jpg",
-	//		"left.jpg",
-	//		"top.jpg",
-	//		"bottom.jpg",
-	//		"front.jpg",
-	//		"back.jpg"
-	//};
-
 	std::array<std::string, 6> SKYBOX_FILEPATHS =
 	{
 		"DaylightBox_Right.bmp",
@@ -117,7 +107,6 @@ std::unique_ptr<SkyBox> SkyBox::create()
 		sf::Image image;
 		if (image.loadFromFile(Utilities::TEXTURE_DIRECTORY + SKYBOX_FILEPATHS[i]))
 		{
-			//image.flipVertically();
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, image.getSize().x, 
 				image.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());
 		}

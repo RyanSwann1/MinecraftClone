@@ -39,27 +39,6 @@
 //Select buffer - state - then draw me a triangle
 //Based off of which buffer has been selected, it determines what/how will be 
 
-bool loadTextures(TextureArray & textureArray)
-{
-	if (!textureArray.addTexture("grass.png") ||
-		!textureArray.addTexture("grass_side.png") ||
-		!textureArray.addTexture("sand.png") ||
-		!textureArray.addTexture("stone.png") ||
-		!textureArray.addTexture("water.png") ||
-		!textureArray.addTexture("log.png") ||
-		!textureArray.addTexture("logtop.png") ||
-		!textureArray.addTexture("leaves.png") ||
-		!textureArray.addTexture("common_cactus_side.png") ||
-		!textureArray.addTexture("common_dead_shrub.png") ||
-		!textureArray.addTexture("common_tall_grass.png") ||
-		!textureArray.addTexture("error.png"))
-	{
-		return false;
-	}
-
-	return true;
-}
-
 //https://www.reddit.com/r/VoxelGameDev/comments/376vmv/how_do_you_implement_threading_in_your_game/
 
 //View == Frustrum
@@ -70,7 +49,6 @@ bool loadTextures(TextureArray & textureArray)
 
 //https://devtalk.nvidia.com/default/topic/720651/opengl/access-violation-in-nvoglv32-dll-how-do-i-track-down-the-problem-/
 //https://community.khronos.org/t/how-do-you-implement-texture-arrays/75315
-
 
 //http://ogldev.atspace.co.uk/index.html
 
@@ -100,16 +78,14 @@ int main()
 		return -1;
 	}
 
-	Camera camera(Utilities::PLAYER_STARTING_POSITION);
-
-	TextureArray textureArray;
-	textureArray.bind();
-	bool texturesLoaded = loadTextures(textureArray);
-	assert(texturesLoaded);
-	if (!loadTextures)
+	std::unique_ptr<TextureArray> textureArray = TextureArray::create();
+	assert(textureArray);
+	if (!textureArray)
 	{
+		std::cout << "Failed to load textures\n";
 		return -1;
 	}
+	textureArray->bind();
 
 	std::unique_ptr<SkyBox> skybox = SkyBox::create();
 	assert(skybox);
@@ -122,14 +98,15 @@ int main()
 	shaderHandler->setUniform1i(eShaderType::Skybox, "uSkyboxTexture", 0);
 	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", 0);
 	
+	Camera camera(Utilities::PLAYER_STARTING_POSITION);
 	glm::vec3 cameraPosition;
+	cameraPosition = camera.m_position;
 	bool movePlayer = false;
 	std::atomic<bool> resetGame = false;
 	std::mutex renderingMutex;
 	std::mutex cameraMutex;
 	std::unique_ptr<ChunkGenerator> chunkGenerator = std::make_unique<ChunkGenerator>(camera.m_position);
 
-	cameraPosition = camera.m_position;
 	std::thread chunkGenerationThread([&](std::unique_ptr<ChunkGenerator>* chunkGenerator)
 		{chunkGenerator->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), 
 			std::ref(cameraMutex), std::ref(renderingMutex)); }, &chunkGenerator );
@@ -147,13 +124,6 @@ int main()
 		deltaTime = clock.restart().asSeconds();
 		sf::Vector2i mousePosition = sf::Mouse::getPosition();
 		camera.mouse_callback(mousePosition.x, mousePosition.y);
-		//if (elaspedTime >= messageExpiredTime)
-		//{
-		//	elaspedTime = 0.0f;
-		//	glm::ivec2 playerPosition(camera.m_position.x, camera.m_position.z);
-		//	//std::cout << playerPosition.x << "\n";
-		//	//std::cout << playerPosition.y << "\n";
-		//}
 
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))
