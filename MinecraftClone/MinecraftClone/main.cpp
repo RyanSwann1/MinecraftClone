@@ -9,6 +9,7 @@
 #include "SkyBox.h"
 #include "glm/gtc/noise.hpp"
 #include "ShaderHandler.h"
+#include "Frustum.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -97,7 +98,8 @@ int main()
 
 	shaderHandler->setUniform1i(eShaderType::Skybox, "uSkyboxTexture", 0);
 	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", 0);
-	
+
+	Frustum frustum;
 	Camera camera(Utilities::PLAYER_STARTING_POSITION);
 	glm::vec3 cameraPosition;
 	cameraPosition = camera.m_position;
@@ -177,6 +179,8 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
 			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 1000.0f);
 
+		frustum.update(projection * view);
+		
 		if (chunkGenerator)
 		{
 			shaderHandler->switchToShader(eShaderType::Chunk);
@@ -186,11 +190,11 @@ int main()
 			std::lock_guard<std::mutex> renderingLock(renderingMutex);
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK);
-			chunkGenerator->renderOpaque();
+			chunkGenerator->renderOpaque(frustum);
 			glDisable(GL_CULL_FACE);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			chunkGenerator->renderTransparent();
+			chunkGenerator->renderTransparent(frustum);
 			glDisable(GL_BLEND);
 
 			//Draw Skybox

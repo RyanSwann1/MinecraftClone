@@ -44,6 +44,7 @@
 
 //http://www.lighthouse3d.com/tutorials/maths/
 
+struct Frustum;
 enum class eDirection;
 enum class eCubeSide;
 class VertexArray;
@@ -64,8 +65,8 @@ public:
 
 	void update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
 		std::mutex& cameraMutex, std::mutex& renderingMutex);
-	void renderOpaque() const;
-	void renderTransparent() const;
+	void renderOpaque(const Frustum& frustum) const;
+	void renderTransparent(const Frustum& frustum) const;
 
 private:
 	ChunkPool m_chunkPool;

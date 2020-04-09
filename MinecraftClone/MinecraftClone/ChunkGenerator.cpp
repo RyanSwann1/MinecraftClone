@@ -5,6 +5,7 @@
 #include "CubeID.h"
 #include "Rectangle.h"
 #include "Camera.h"
+#include "Frustum.h"
 #include <iostream>
 
 ChunkGenerator::Regenerate::Regenerate(const ChunkFromPool& chunkFromPool, VertexArrayFromPool&& vertexArrayFromPool)
@@ -86,7 +87,7 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 	}
 }
 
-void ChunkGenerator::renderOpaque() const
+void ChunkGenerator::renderOpaque(const Frustum& frustum) const
 {
 	for (const auto& VAO : m_VAOs)
 	{
@@ -95,7 +96,7 @@ void ChunkGenerator::renderOpaque() const
 			VAO.second.object->attachOpaqueVBO();
 		}
 
-		if (VAO.second.object->m_opaqueVertexBuffer.displayable)
+		if (VAO.second.object->m_opaqueVertexBuffer.displayable && frustum.isChunkInFustrum(VAO.first))
 		{
 			VAO.second.object->bindOpaqueVAO();
 			glDrawElements(GL_TRIANGLES, VAO.second.object->m_opaqueVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
@@ -103,7 +104,7 @@ void ChunkGenerator::renderOpaque() const
 	}
 }
 
-void ChunkGenerator::renderTransparent() const
+void ChunkGenerator::renderTransparent(const Frustum& frustum) const
 {
 	for (const auto& VAO : m_VAOs)
 	{
@@ -112,7 +113,7 @@ void ChunkGenerator::renderTransparent() const
 			VAO.second.object->attachTransparentVBO();
 		}
 
-		if (VAO.second.object->m_transparentVertexBuffer.displayable)
+		if (VAO.second.object->m_transparentVertexBuffer.displayable && frustum.isChunkInFustrum(VAO.first))
 		{
 			VAO.second.object->bindTransparentVAO();
 			glDrawElements(GL_TRIANGLES, VAO.second.object->m_transparentVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
