@@ -568,7 +568,7 @@ void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& 
 
 void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 {
-	std::vector<const Chunk*> addedChunks;
+	std::vector<std::reference_wrapper<Chunk>> addedChunks;
 	glm::ivec3 startPosition(playerPosition);
 	Utilities::getClosestMiddlePosition(startPosition);
 	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z <= startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
@@ -583,7 +583,7 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 				assert(chunkFromPool.object);
 				if (chunkFromPool.object)
 				{
-					const Chunk* chunk = m_chunks.emplace(std::piecewise_construct,
+					Chunk& chunk = *m_chunks.emplace(std::piecewise_construct,
 						std::forward_as_tuple(chunkStartingPosition),
 						std::forward_as_tuple(std::move(chunkFromPool))).first->second.object;
 
@@ -604,10 +604,10 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 		if (VAOFromPool.object)
 		{
 			VertexArray& VAO = *m_regenerate.emplace(std::piecewise_construct,
-				std::forward_as_tuple(addedChunk->getStartingPosition()),
-				std::forward_as_tuple(*addedChunk, std::move(VAOFromPool))).first->second.vertexArrayToRegenerate.object;
+				std::forward_as_tuple(addedChunk.get().getStartingPosition()),
+				std::forward_as_tuple(addedChunk.get(), std::move(VAOFromPool))).first->second.vertexArrayToRegenerate.object;
 
-			generateChunkMesh(VAO, *addedChunk);
+			generateChunkMesh(VAO, addedChunk.get());
 		}
 		else
 		{
