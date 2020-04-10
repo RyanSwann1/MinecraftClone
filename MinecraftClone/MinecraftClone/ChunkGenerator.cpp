@@ -29,7 +29,6 @@ ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 			Utilities::getClosestChunkStartingPosition(chunkStartingPosition);
 
 			ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
-			//ChunkFromPool chunkFromPool(m_chunkPool, chunkStartingPosition);
 			assert(chunkFromPool.getObject());
 			if (chunkFromPool.getObject())
 			{
@@ -48,8 +47,6 @@ ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 	//Generate VAOs
 	for (const auto& chunk : m_chunks)
 	{
-		//VertexArrayFromPool VAOFromPool(m_vertexArrayPool.getNextAvailableObject());
-		//VertexArrayFromPool VAOFromPool(m_vertexArrayPool);
 		ObjectFromPool<VertexArray> VAOFromPool = m_vertexArrayPool.getNextAvailableObject();
 		assert(VAOFromPool.getObject());
 		if (VAOFromPool.getObject())
@@ -607,7 +604,6 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 	for (const auto& addedChunk : addedChunks)
 	{
 		ObjectFromPool<VertexArray> VAOFromPool = m_vertexArrayPool.getNextAvailableObject();
-		//VertexArrayFromPool VAOFromPool(m_vertexArrayPool);
 		assert(VAOFromPool.getObject());
 		if (VAOFromPool.getObject())
 		{
