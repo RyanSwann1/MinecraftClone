@@ -25,16 +25,14 @@
 //float moisture = std::abs(1 * glm::perlin(glm::vec2(15.0f * mx, 15.0f * my)));
 
 Chunk::Chunk()
-	: m_inUse(false),
-	m_startingPosition(),
+	: m_startingPosition(),
 	m_endingPosition(),
 	m_chunk(),
 	m_AABB()
 {}
 
 Chunk::Chunk(const glm::ivec3& startingPosition)
-	: m_inUse(false),
-	m_startingPosition(startingPosition),
+	: m_startingPosition(startingPosition),
 	m_endingPosition(startingPosition.x + Utilities::CHUNK_WIDTH, 
 		startingPosition.y + Utilities::CHUNK_HEIGHT, 
 		startingPosition.z + Utilities::CHUNK_DEPTH),
@@ -46,24 +44,18 @@ Chunk::Chunk(const glm::ivec3& startingPosition)
 }
 
 Chunk::Chunk(Chunk&& orig) noexcept
-	: m_inUse(orig.m_inUse),
-	m_startingPosition(orig.m_startingPosition),
+	: m_startingPosition(orig.m_startingPosition),
 	m_endingPosition(orig.m_endingPosition),
 	m_chunk(std::move(orig.m_chunk)),
 	m_AABB(orig.m_AABB)
-{
-	orig.m_inUse = false;
-}
+{}
 
 Chunk& Chunk::operator=(Chunk&& orig) noexcept
 {
-	m_inUse = orig.m_inUse;
 	m_startingPosition = orig.m_startingPosition;
 	m_endingPosition = orig.m_endingPosition;
 	m_chunk = std::move(orig.m_chunk);
 	m_AABB = orig.m_AABB;
-
-	orig.m_inUse = false;
 
 	return *this;
 }
@@ -71,11 +63,6 @@ Chunk& Chunk::operator=(Chunk&& orig) noexcept
 const Rectangle& Chunk::getAABB() const
 {
 	return m_AABB;
-}
-
-bool Chunk::isInUse() const
-{
-	return m_inUse;
 }
 
 bool Chunk::isPositionInBounds(const glm::ivec3& position) const
@@ -110,11 +97,16 @@ void Chunk::changeCubeAtLocalPosition(const glm::ivec3& position, eCubeType cube
 	m_chunk[Utilities::converTo1D(position)] = static_cast<char>(cubeType);
 }
 
+void Chunk::reset()
+{
+	m_startingPosition = glm::ivec3();
+	m_endingPosition = glm::ivec3();
+	m_AABB = Rectangle();
+	memset(&m_chunk, char(), m_chunk.size());
+}
+
 void Chunk::reuse(const glm::ivec3& startingPosition)
 {	
-	memset(&m_chunk, char(), m_chunk.size());
-
-	m_inUse = true;
 	m_startingPosition = startingPosition;
 	m_endingPosition = glm::ivec3(startingPosition.x + Utilities::CHUNK_WIDTH, startingPosition.y + Utilities::CHUNK_HEIGHT,
 		startingPosition.z + Utilities::CHUNK_DEPTH);
@@ -122,13 +114,6 @@ void Chunk::reuse(const glm::ivec3& startingPosition)
 		glm::ivec2(Utilities::CHUNK_WIDTH / 2, Utilities::CHUNK_DEPTH / 2), 16);
 
 	regen(m_startingPosition);	
-}
-
-void Chunk::release()
-{
-	m_inUse = false;
-	m_startingPosition = glm::ivec3();
-	m_endingPosition = glm::ivec3();
 }
 
 //Scale

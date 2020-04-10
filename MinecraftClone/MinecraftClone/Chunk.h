@@ -24,17 +24,15 @@ public:
 	Chunk& operator=(Chunk&&) noexcept;
 
 	const Rectangle& getAABB() const;
-	bool isInUse() const;
 	bool isPositionInBounds(const glm::ivec3& position) const;
 	const glm::ivec3& getStartingPosition() const;
 	const glm::ivec3& getEndingPosition() const;
 	char getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const;
 	
+	void reset();
 	void reuse(const glm::ivec3& startingPosition);
-	void release();
 
 private:
-	bool m_inUse;
 	glm::ivec3 m_startingPosition;
 	glm::ivec3 m_endingPosition;
 	std::array<char, Utilities::CHUNK_VOLUME> m_chunk;
