@@ -10,44 +10,74 @@ template <class Object>
 struct ObjectInPool : private NonCopyable
 {
 	ObjectInPool()
-		: object()
+		: object(),
+		inUse(false)
 	{}
 	ObjectInPool(ObjectInPool&& orig) noexcept
-		: object(std::move(orig.object))
-	{}
+		: object(std::move(orig.object)),
+		inUse(orig.inUse)
+	{
+		orig.inUse = false;
+	}
 	ObjectInPool& operator=(ObjectInPool&& orig) noexcept
 	{
 		object = std::move(orig.object);
+		inUse = orig.inUse;
 
+		orig.inUse = false;
 		return *this;
 	}
 	virtual ~ObjectInPool() {}
 
 	Object object;
+	bool inUse;
 };
 
 //External Use - Object Pool
-template <class Object, class ObjectPool>
+template <class Object>
 struct ObjectFromPool : private NonCopyable
 {
-	ObjectFromPool(Object* object) 
-		: object(object)
-	{}
-	virtual ~ObjectFromPool() {}
-	ObjectFromPool(ObjectFromPool&& orig) noexcept
-		: object(orig.object)
+	ObjectFromPool(ObjectInPool<Object>* objectInPool) 
+		: objectInPool(objectInPool)
 	{
-		orig.object = nullptr;
+		if (objectInPool)
+		{
+			objectInPool->inUse = true;
+		}
+	}
+	virtual ~ObjectFromPool() 
+	{
+		if (objectInPool)
+		{
+			objectInPool->object.reset();
+			objectInPool->inUse = false;
+		}
+	}
+	ObjectFromPool(ObjectFromPool&& orig) noexcept
+		: objectInPool(orig.objectInPool)
+	{
+		orig.objectInPool = nullptr;
 	}
 	ObjectFromPool& operator=(ObjectFromPool&& orig) noexcept
 	{
-		object = orig.object;
-		orig.object = nullptr;
+		objectInPool = orig.objectInPool;
+		orig.objectInPool = nullptr;
 
 		return *this;
 	}
 
-	Object* object;
+	bool isInUsssse() const
+	{
+		return (objectInPool ? objectInPool->inUse : false);
+	}
+
+	Object* getObject() const 
+	{
+		return (objectInPool ? &objectInPool->object : nullptr);
+	}
+
+private:
+	ObjectInPool<Object>* objectInPool;
 };
 
 //Object Pool
@@ -66,21 +96,22 @@ public:
 
 		m_objectPool.resize(size_t(x * y));
 	}
-	virtual ~ObjectPool() {}
 
-protected:
-	Object* getNextAvailableObject()
-	{		
+	ObjectFromPool<Object> getNextAvailableObject()
+	{	
+		ObjectInPool<Object>* availableObject = nullptr;
 		for (auto& objectInPool : m_objectPool)
 		{
-			if (!objectInPool.object.isInUse())
+			if (!objectInPool.inUse)
 			{
-				return &objectInPool.object;
+				availableObject = &objectInPool;
+				break;
 			}
 		}
 
-		return nullptr;
+		return ObjectFromPool<Object>(availableObject);
 	}
+
 private:
 	std::vector<ObjectInPool<Object>> m_objectPool;
 };
