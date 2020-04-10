@@ -224,6 +224,11 @@ void Chunk::spawnWater()
 
 void Chunk::spawnTrees()
 {
+	if (Utilities::getRandomNumber(0, 100) < Utilities::CHANCE_TREE_SPAWN_IN_CHUNK)
+	{
+		return;
+	}
+	
 	int attemptsCount = 0;
 	int spawnCount = 0;
 	while (attemptsCount < Utilities::MAX_TREE_SPAWN_ATTEMPTS && spawnCount < Utilities::MAX_TREE_PER_CHUNK)

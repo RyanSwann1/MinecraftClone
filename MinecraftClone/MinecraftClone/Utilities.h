@@ -71,7 +71,8 @@ namespace Utilities
 	constexpr int MAX_PLANT_SPAWN_ATTEMPTS = 20;
 	constexpr int MAX_CACTUS_SPAWN_ATTEMPTS = 20;
 	constexpr int MAX_TREE_SPAWN_ATTEMPTS = 5;
-	
+	constexpr int CHANCE_TREE_SPAWN_IN_CHUNK = 50;
+
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
