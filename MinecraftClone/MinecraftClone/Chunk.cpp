@@ -238,14 +238,15 @@ void Chunk::spawnTrees()
 		spawnPosition.z = Utilities::getRandomNumber(Utilities::MAX_LEAVES_DISTANCE, Utilities::CHUNK_DEPTH - Utilities::MAX_LEAVES_DISTANCE - 1);
 
 		//Find Spawn Location
-		for (int y = Utilities::CHUNK_HEIGHT - Utilities::TREE_HEIGHT - Utilities::MAX_LEAVES_DISTANCE - 1; y >= Utilities::SAND_MAX_HEIGHT; --y)
+		for (int y = Utilities::CHUNK_HEIGHT - Utilities::MAX_TREE_HEIGHT - Utilities::MAX_LEAVES_DISTANCE - 1; y >= Utilities::SAND_MAX_HEIGHT; --y)
 		{
 			spawnPosition.y = y;
 			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Grass) &&
 				isCubeAtLocalPosition({ spawnPosition.x, spawnPosition.y + 1, spawnPosition.z }, eCubeType::Invalid))
 			{
-				spawnLeaves(spawnPosition);
-				spawnTreeStump(spawnPosition);
+				int treeHeight = Utilities::getRandomNumber(Utilities::MIN_TREE_HEIGHT, Utilities::MAX_TREE_HEIGHT);
+				spawnLeaves(spawnPosition, treeHeight);
+				spawnTreeStump(spawnPosition, treeHeight);
 				++spawnCount;
 				break;
 			}
@@ -320,9 +321,9 @@ void Chunk::spawnPlant(int maxQuantity, eCubeType baseCubeType, eCubeType plantC
 	}
 }
 
-void Chunk::spawnLeaves(const glm::ivec3& startingPosition)
+void Chunk::spawnLeaves(const glm::ivec3& startingPosition, int treeHeight)
 {
-	int y = startingPosition.y + Utilities::TREE_HEIGHT / 2; //Starting Height
+	int y = startingPosition.y + treeHeight / 2; //Starting Height
 	for (int distance : Utilities::LEAVES_DISTANCES)
 	{
 		++y;
@@ -340,11 +341,11 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition)
 	}
 }
 
-void Chunk::spawnTreeStump(const glm::ivec3& startingPosition)
+void Chunk::spawnTreeStump(const glm::ivec3& startingPosition, int treeHeight)
 {
-	for (int y = startingPosition.y; y <= startingPosition.y + Utilities::TREE_HEIGHT / 2; ++y)
+	for (int y = startingPosition.y; y <= startingPosition.y + treeHeight / 2; ++y)
 	{
-		if (y == startingPosition.y + Utilities::TREE_HEIGHT / 2)
+		if (y == startingPosition.y + treeHeight / 2)
 		{
 			changeCubeAtLocalPosition({ startingPosition.x, y, startingPosition.z }, eCubeType::LogTop);
 		}

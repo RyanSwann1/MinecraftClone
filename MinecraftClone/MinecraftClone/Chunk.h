@@ -49,6 +49,6 @@ private:
 	void spawnTrees();
 	void spawnCactus();
 	void spawnPlant(int maxQuantity, eCubeType baseCubeType, eCubeType plantCubeType);
-	void spawnLeaves(const glm::ivec3& startingPosition);
-	void spawnTreeStump(const glm::ivec3& startingPosition);
+	void spawnLeaves(const glm::ivec3& startingPosition, int treeHeight);
+	void spawnTreeStump(const glm::ivec3& startingPosition, int treeHeight);
 };

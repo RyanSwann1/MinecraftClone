@@ -60,7 +60,8 @@ namespace Utilities
 	constexpr int STONE_MAX_HEIGHT = 12; 
 	constexpr int TREE_SPAWN_CHANCE = 1400;
 	constexpr int CACTUS_SPAWN_CHANCE = 1000;
-	constexpr int TREE_HEIGHT = 9;
+	constexpr int MIN_TREE_HEIGHT = 6;
+	constexpr int MAX_TREE_HEIGHT = 9;
 	constexpr int CACTUS_MIN_HEIGHT = 1;
 	constexpr int CACTUS_MAX_HEIGHT = 4;
 	constexpr int MAX_TREE_PER_CHUNK = 1;
@@ -88,7 +89,6 @@ namespace Utilities
 	constexpr int MAP_SIZE = 8000;
 	const glm::vec3 PLAYER_STARTING_POSITION(0.0f, 100.f, 0.0f);
 	const std::string TEXTURE_DIRECTORY = "Textures/";
-
 
 	constexpr std::array<int, 6> LEAVES_DISTANCES =
 	{
