@@ -8,6 +8,193 @@
 #include "Frustum.h"
 #include <iostream>
 
+namespace
+{
+	constexpr float DEFAULT_LIGHTING_INTENSITY = 1.0f;
+	constexpr float TOP_LIGHTING_INTENSITY = 1.35f;
+	constexpr float FRONT_FACE_LIGHTING_INTENSITY = 1.2f;
+	constexpr float BACK_FACE_LIGHTING_INTENSITY = 1.2f;
+	constexpr float LEFT_FACE_LIGHTING_INTENSITY = 1.1f;
+	constexpr float RIGHT_FACE_LIGHTING_INTENSITY = 1.1f;
+	constexpr float BOTTOM_FACE_LIGHTING_INTENSITY = 0.4f;
+	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
+
+	constexpr std::array<unsigned int, 6> CUBE_FACE_INDICIES =
+	{
+		0, 1, 2,
+		2, 3, 0
+	};
+
+	constexpr std::array<glm::vec2, 4> TEXT_COORDS =
+	{
+		glm::vec2(0.0f, 0.0f),
+		glm::vec2(1.0f, 0.0f),
+		glm::vec2(1.0f, 1.0f),
+		glm::vec2(0.0f, 1.0f)
+	};
+
+	void getTextCoords(std::vector<glm::vec3>& textCoords, eCubeSide cubeSide, eCubeType cubeType)
+	{
+		int textureLayer = 0;
+		switch (cubeType)
+		{
+		case eCubeType::Stone:
+			textureLayer = static_cast<int>(eTextureLayer::Stone);
+			break;
+		case eCubeType::Sand:
+			textureLayer = static_cast<int>(eTextureLayer::Sand);
+			break;
+		case eCubeType::Grass:
+			switch (cubeSide)
+			{
+			case eCubeSide::Back:
+			case eCubeSide::Front:
+			case eCubeSide::Left:
+			case eCubeSide::Right:
+				textureLayer = static_cast<int>(eTextureLayer::GrassSide);
+				break;
+			case eCubeSide::Top:
+				textureLayer = static_cast<int>(eTextureLayer::Grass);
+			}
+			break;
+		case eCubeType::Log:
+			textureLayer = static_cast<int>(eTextureLayer::Log);
+			break;
+		case eCubeType::LogTop:
+			switch (cubeSide)
+			{
+			case eCubeSide::Back:
+			case eCubeSide::Front:
+			case eCubeSide::Left:
+			case eCubeSide::Right:
+				textureLayer = static_cast<int>(eTextureLayer::Log);
+				break;
+			case eCubeSide::Top:
+				textureLayer = static_cast<int>(eTextureLayer::LogTop);
+				break;
+			}
+			break;
+		case eCubeType::Leaves:
+			textureLayer = static_cast<int>(eTextureLayer::Leaves);
+			break;
+		case eCubeType::Cactus:
+			textureLayer = static_cast<int>(eTextureLayer::Cactus);
+			break;
+		case eCubeType::CactusTop:
+			switch (cubeSide)
+			{
+			case eCubeSide::Back:
+			case eCubeSide::Front:
+			case eCubeSide::Left:
+			case eCubeSide::Right:
+				textureLayer = static_cast<int>(eTextureLayer::Cactus);
+				break;
+			case eCubeSide::Top:
+				textureLayer = static_cast<int>(eTextureLayer::CactusTop);
+				break;
+			}
+			break;
+		case eCubeType::Water:
+			textureLayer = static_cast<int>(eTextureLayer::Water);
+			break;
+		case eCubeType::Shrub:
+			textureLayer = static_cast<int>(eTextureLayer::Shrub);
+			break;
+		case eCubeType::TallGrass:
+			textureLayer = static_cast<int>(eTextureLayer::TallGrass);
+			break;
+
+		default:
+			textureLayer = static_cast<int>(eTextureLayer::Error);
+		}
+
+		assert(textureLayer != static_cast<int>(eTextureLayer::Error));
+		for (const auto& i : TEXT_COORDS)
+		{
+			textCoords.emplace_back(i.x, i.y, textureLayer);
+		}
+	}
+
+	void getClosestMiddlePosition(glm::ivec3& position)
+	{
+		if (position.x % (Utilities::CHUNK_WIDTH / 2) < 0)
+		{
+			position.x += std::abs(position.x % Utilities::CHUNK_WIDTH / 2);
+			position.x -= Utilities::CHUNK_WIDTH / 2;
+		}
+		else if (position.x % (Utilities::CHUNK_WIDTH / 2) > 0)
+		{
+			position.x -= std::abs(position.x % Utilities::CHUNK_WIDTH / 2);
+			position.x += Utilities::CHUNK_WIDTH / 2;
+		}
+		if (position.z % (Utilities::CHUNK_DEPTH / 2) < 0)
+		{
+			position.z += std::abs(position.z % Utilities::CHUNK_DEPTH / 2);
+			position.z -= Utilities::CHUNK_DEPTH / 2;
+		}
+		else if (position.z % (Utilities::CHUNK_DEPTH / 2) > 0)
+		{
+			position.z -= std::abs(position.z % Utilities::CHUNK_DEPTH / 2);
+			position.z += Utilities::CHUNK_DEPTH / 2;
+		}
+	}
+
+	void getClosestChunkStartingPosition(glm::ivec3& position)
+	{
+		if (position.x % Utilities::CHUNK_WIDTH < 0)
+		{
+			position.x += std::abs(position.x % Utilities::CHUNK_WIDTH);
+			position.x -= Utilities::CHUNK_WIDTH;
+		}
+		else if (position.x % Utilities::CHUNK_WIDTH > 0)
+		{
+			position.x -= std::abs(position.x % Utilities::CHUNK_WIDTH);
+		}
+		if (position.z % Utilities::CHUNK_DEPTH < 0)
+		{
+			position.z += std::abs(position.z % Utilities::CHUNK_DEPTH);
+			position.z -= Utilities::CHUNK_DEPTH;
+		}
+		else if (position.z % Utilities::CHUNK_DEPTH > 0)
+		{
+			position.z -= std::abs(position.z % Utilities::CHUNK_DEPTH);
+		}
+	}
+
+	glm::ivec3 getNeighbouringChunkPosition(const glm::ivec3& chunkStartingPosition, eDirection direction)
+	{
+		switch (direction)
+		{
+		case eDirection::Left:
+			return glm::ivec3(chunkStartingPosition.x - Utilities::CHUNK_WIDTH, 0, chunkStartingPosition.z);
+
+		case eDirection::Right:
+			return glm::ivec3(chunkStartingPosition.x + Utilities::CHUNK_WIDTH, 0, chunkStartingPosition.z);
+
+		case eDirection::Forward:
+			return glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.z + Utilities::CHUNK_DEPTH);
+
+		case eDirection::Back:
+			return glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.z - Utilities::CHUNK_DEPTH);
+
+		default:
+			assert(false);
+		}
+	}
+
+	constexpr std::array<glm::ivec3, 4> CUBE_FACE_FRONT = { glm::ivec3(0, 0, 1), glm::ivec3(1, 0, 1), glm::ivec3(1, 1, 1), glm::ivec3(0, 1, 1) };
+	constexpr std::array<glm::ivec3, 4> CUBE_FACE_BACK = { glm::ivec3(1, 0, 0), glm::ivec3(0, 0, 0), glm::ivec3(0, 1, 0), glm::ivec3(1, 1, 0) };
+
+	constexpr std::array<glm::ivec3, 4> CUBE_FACE_LEFT = { glm::ivec3(0, 0, 0), glm::ivec3(0, 0, 1), glm::ivec3(0, 1, 1), glm::ivec3(0, 1, 0) };
+	constexpr std::array<glm::ivec3, 4> CUBE_FACE_RIGHT = { glm::ivec3(1, 0, 1), glm::ivec3(1, 0, 0), glm::ivec3(1, 1, 0), glm::ivec3(1, 1, 1) };
+
+	constexpr std::array<glm::ivec3, 4> CUBE_FACE_TOP = { glm::ivec3(0, 1, 1), glm::ivec3(1, 1, 1), glm::ivec3(1, 1, 0), glm::ivec3(0, 1, 0) };
+	constexpr std::array<glm::ivec3, 4> CUBE_FACE_BOTTOM = { glm::ivec3(0, 0, 0), glm::ivec3(1, 0, 0), glm::ivec3(1, 0, 1), glm::ivec3(0, 0, 1) };
+
+	constexpr std::array<glm::ivec3, 4> FIRST_DIAGONAL_FACE = { glm::ivec3(0, 0, 0), glm::ivec3(1, 0, 1), glm::ivec3(1, 1, 1), glm::ivec3(0, 1, 0) };
+	constexpr std::array<glm::ivec3, 4> SECOND_DIAGONAL_FACE = { glm::ivec3(0, 0, 1), glm::ivec3(1, 0, 0), glm::ivec3(1, 1, 0), glm::ivec3(0, 1, 1) };
+}
+
 ChunkGenerator::Regenerate::Regenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool)
 	: vertexArrayToRegenerate(std::move(vertexArrayFromPool)),
 	chunkFromPool(chunkFromPool),
@@ -26,7 +213,7 @@ ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 		for (int x = playerPosition.x - Utilities::VISIBILITY_DISTANCE; x <= playerPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
 			glm::ivec3 chunkStartingPosition(x, 0, z);
-			Utilities::getClosestChunkStartingPosition(chunkStartingPosition);
+			getClosestChunkStartingPosition(chunkStartingPosition);
 
 			ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
 			assert(chunkFromPool.getObject());
@@ -128,7 +315,7 @@ void ChunkGenerator::addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType,
 	switch (cubeSide)
 	{
 	case eCubeSide::Front:
-		for (const glm::ivec3& i : Utilities::CUBE_FACE_FRONT)
+		for (const glm::ivec3& i : CUBE_FACE_FRONT)
 		{
 			position += i;
 			vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
@@ -136,18 +323,18 @@ void ChunkGenerator::addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType,
 		
 			if (transparent)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(Utilities::DEFAULT_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(DEFAULT_LIGHTING_INTENSITY);
 			}
 			else
 			{
-				vertexBuffer.lightIntensityVertices.push_back(Utilities::FRONT_FACE_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(FRONT_FACE_LIGHTING_INTENSITY);
 			}
 		}
 
-		Utilities::getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
+		getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
 		break;
 	case eCubeSide::Back:
-		for (const glm::ivec3& i : Utilities::CUBE_FACE_BACK)
+		for (const glm::ivec3& i : CUBE_FACE_BACK)
 		{
 			position += i;
 			vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
@@ -155,19 +342,19 @@ void ChunkGenerator::addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType,
 			
 			if (transparent)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(Utilities::DEFAULT_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(DEFAULT_LIGHTING_INTENSITY);
 			}
 			else
 			{
-				vertexBuffer.lightIntensityVertices.push_back(Utilities::BACK_FACE_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(BACK_FACE_LIGHTING_INTENSITY);
 			}
 		}
 
-		Utilities::getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
+		getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
 
 		break;
 	case eCubeSide::Left:
-		for (const glm::ivec3& i : Utilities::CUBE_FACE_LEFT)
+		for (const glm::ivec3& i : CUBE_FACE_LEFT)
 		{
 			position += i;
 			vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
@@ -175,17 +362,17 @@ void ChunkGenerator::addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType,
 
 			if (transparent)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(Utilities::DEFAULT_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(DEFAULT_LIGHTING_INTENSITY);
 			}
 			else
 			{
-				vertexBuffer.lightIntensityVertices.push_back(Utilities::LEFT_FACE_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(LEFT_FACE_LIGHTING_INTENSITY);
 			}
 		}
-		Utilities::getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
+		getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
 		break;
 	case eCubeSide::Right:
-		for (const glm::ivec3& i : Utilities::CUBE_FACE_RIGHT)
+		for (const glm::ivec3& i : CUBE_FACE_RIGHT)
 		{
 			position += i;
 			vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
@@ -193,19 +380,19 @@ void ChunkGenerator::addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType,
 
 			if (transparent)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(Utilities::DEFAULT_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(DEFAULT_LIGHTING_INTENSITY);
 			}
 			else
 			{
-				vertexBuffer.lightIntensityVertices.push_back(Utilities::RIGHT_FACE_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(RIGHT_FACE_LIGHTING_INTENSITY);
 			}
 		}
 
-		Utilities::getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
+		getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
 
 		break;
 	case eCubeSide::Top:
-		for (const glm::ivec3& i : Utilities::CUBE_FACE_TOP)
+		for (const glm::ivec3& i : CUBE_FACE_TOP)
 		{
 			position += i;
 			vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
@@ -213,19 +400,19 @@ void ChunkGenerator::addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType,
 
 			if (transparent)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(Utilities::DEFAULT_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(DEFAULT_LIGHTING_INTENSITY);
 			}
 			else
 			{
-				vertexBuffer.lightIntensityVertices.push_back(Utilities::TOP_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(TOP_LIGHTING_INTENSITY);
 			}
 			
 		}
-		Utilities::getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
+		getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
 
 		break;
 	case eCubeSide::Bottom:
-		for (const glm::ivec3& i : Utilities::CUBE_FACE_BOTTOM)
+		for (const glm::ivec3& i : CUBE_FACE_BOTTOM)
 		{
 			position += i;
 			vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
@@ -233,25 +420,25 @@ void ChunkGenerator::addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType,
 
 			if (transparent)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(Utilities::DEFAULT_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(DEFAULT_LIGHTING_INTENSITY);
 			}
 			else
 			{
-				vertexBuffer.lightIntensityVertices.push_back(Utilities::BOTTOM_FACE_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(BOTTOM_FACE_LIGHTING_INTENSITY);
 			}
 		}
 
-		Utilities::getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
+		getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
 
 		break;
 	}
 
-	for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
+	for (unsigned int i : CUBE_FACE_INDICIES)
 	{
 		vertexBuffer.indicies.emplace_back(i + vertexBuffer.elementBufferIndex);
 	}
 
-	vertexBuffer.elementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
+	vertexBuffer.elementBufferIndex += CUBE_FACE_INDICIE_COUNT;
 }
 
 void ChunkGenerator::addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const glm::ivec3& cubePosition, 
@@ -266,19 +453,19 @@ void ChunkGenerator::addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType c
 		position = cubePosition;
 
 		//Lighting
-		vertexBuffer.lightIntensityVertices.push_back(Utilities::DEFAULT_LIGHTING_INTENSITY);
+		vertexBuffer.lightIntensityVertices.push_back(DEFAULT_LIGHTING_INTENSITY);
 	}
 
 	//Texture Coordinates
-	Utilities::getTextCoords(vertexBuffer.textCoords, eCubeSide::Front, cubeType);
+	getTextCoords(vertexBuffer.textCoords, eCubeSide::Front, cubeType);
 	
 	//Indicies
-	for (unsigned int i : Utilities::CUBE_FACE_INDICIES)
+	for (unsigned int i : CUBE_FACE_INDICIES)
 	{
 		vertexBuffer.indicies.emplace_back(i + vertexBuffer.elementBufferIndex);
 	}
 
-	vertexBuffer.elementBufferIndex += Utilities::CUBE_FACE_INDICIE_COUNT;
+	vertexBuffer.elementBufferIndex += CUBE_FACE_INDICIE_COUNT;
 }
 
 bool ChunkGenerator::isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const
@@ -416,8 +603,8 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 				}
 				else if (cubeType == eCubeType::Shrub || cubeType == eCubeType::TallGrass)
 				{
-					addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, Utilities::FIRST_DIAGONAL_FACE);
-					addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, Utilities::SECOND_DIAGONAL_FACE);
+					addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, FIRST_DIAGONAL_FACE);
+					addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, SECOND_DIAGONAL_FACE);
 				}
 				else
 				{
@@ -534,7 +721,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex)
 {
 	glm::ivec3 startingPosition(playerPosition);
-	Utilities::getClosestMiddlePosition(startingPosition);
+	getClosestMiddlePosition(startingPosition);
 	Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Utilities::VISIBILITY_DISTANCE);
 
 	std::lock_guard<std::mutex> renderingLock(renderingMutex);
@@ -572,13 +759,13 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 {
 	std::vector<std::reference_wrapper<ObjectFromPool<Chunk>>> addedChunks;
 	glm::ivec3 startPosition(playerPosition);
-	Utilities::getClosestMiddlePosition(startPosition);
+	getClosestMiddlePosition(startPosition);
 	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z <= startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
 	{
 		for (int x = startPosition.x - Utilities::VISIBILITY_DISTANCE; x <= startPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
 			glm::ivec3 chunkStartingPosition(x, 0, z);
-			Utilities::getClosestChunkStartingPosition(chunkStartingPosition);
+			getClosestChunkStartingPosition(chunkStartingPosition);
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend())
 			{
 				ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
@@ -628,10 +815,10 @@ void ChunkGenerator::handleRegeneration(std::mutex& renderingMutex)
 		{
 			//If Chunk has no neighbours - then it can be regenerated
 			const glm::ivec3& chunkStartingPosition = regen->second.chunkFromPool.getObject()->getStartingPosition();
-			if (m_chunks.find(Utilities::getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left)) != m_chunks.cend() &&
-				m_chunks.find(Utilities::getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Right)) != m_chunks.cend() &&
-				m_chunks.find(Utilities::getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back)) != m_chunks.cend() &&
-				m_chunks.find(Utilities::getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward)) != m_chunks.cend())
+			if (m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left)) != m_chunks.cend() &&
+				m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Right)) != m_chunks.cend() &&
+				m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back)) != m_chunks.cend() &&
+				m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward)) != m_chunks.cend())
 			{
 
 				generateChunkMesh(*regen->second.vertexArrayToRegenerate.getObject(), *regen->second.chunkFromPool.getObject());
