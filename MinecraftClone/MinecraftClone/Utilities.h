@@ -75,7 +75,7 @@ namespace Utilities
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
-	constexpr float MOISTURE_LACUNARITY = 0.5f;
+	constexpr float MOISTURE_LACUNARITY = 5.0f;
 	constexpr float MOISTURE_PERSISTENCE = 0.5f;
 	constexpr int MOISTURE_OCTAVES = 3;
 
