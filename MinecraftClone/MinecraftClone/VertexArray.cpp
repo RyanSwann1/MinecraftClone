@@ -5,8 +5,7 @@
 #include <iostream>
 
 VertexArray::VertexArray()
-	: m_inUse(false),
-	m_regenerate(false),
+	: m_regenerate(false),
 	m_opaqueVertexBuffer(),
 	m_transparentVertexBuffer(),
 	m_opaqueID(Utilities::INVALID_OPENGL_ID),
@@ -26,14 +25,12 @@ VertexArray::~VertexArray()
 }
 
 VertexArray::VertexArray(VertexArray&& orig) noexcept
-	: m_inUse(orig.m_inUse),
-	m_regenerate(orig.m_regenerate),
+	: m_regenerate(orig.m_regenerate),
 	m_opaqueVertexBuffer(std::move(orig.m_opaqueVertexBuffer)),
 	m_transparentVertexBuffer(std::move(orig.m_transparentVertexBuffer)),
 	m_opaqueID(orig.m_opaqueID),
 	m_transparentID(orig.m_transparentID)
 {
-	orig.m_inUse = false;
 	orig.m_regenerate = false;
 	orig.m_opaqueID = Utilities::INVALID_OPENGL_ID; 
 	orig.m_transparentID = Utilities::INVALID_OPENGL_ID;
@@ -41,14 +38,12 @@ VertexArray::VertexArray(VertexArray&& orig) noexcept
 
 VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
 {
-	m_inUse = orig.m_inUse;
 	m_regenerate = orig.m_regenerate;
 	m_opaqueVertexBuffer = std::move(orig.m_opaqueVertexBuffer);
 	m_transparentVertexBuffer = std::move(orig.m_transparentVertexBuffer);
 	m_opaqueID = orig.m_opaqueID;
 	m_transparentID = orig.m_transparentID;
 	
-	orig.m_inUse = false;
 	orig.m_regenerate = false;
 	orig.m_opaqueID = Utilities::INVALID_OPENGL_ID;
 	orig.m_transparentID = Utilities::INVALID_OPENGL_ID;
@@ -56,14 +51,8 @@ VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
 	return *this;
 }
 
-bool VertexArray::isInUse() const
-{
-	return m_inUse;
-}
-
 void VertexArray::reset()
 {
-	m_inUse = false;
 	m_regenerate = false;
 	m_opaqueVertexBuffer.clear();
 	m_transparentVertexBuffer.clear();

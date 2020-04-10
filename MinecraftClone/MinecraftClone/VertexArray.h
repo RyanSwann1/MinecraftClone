@@ -11,7 +11,6 @@ struct VertexArray : private NonCopyable
 	VertexArray(VertexArray&&) noexcept;
 	VertexArray& operator=(VertexArray&&) noexcept;
 	
-	bool isInUse() const;
 	void reset();
 
 	void attachTransparentVBO();
@@ -20,7 +19,6 @@ struct VertexArray : private NonCopyable
 	void bindTransparentVAO() const;
 	void unbind() const;
 	
-	bool m_inUse;
 	bool m_regenerate;
 	VertexBuffer m_opaqueVertexBuffer;
 	VertexBuffer m_transparentVertexBuffer;
