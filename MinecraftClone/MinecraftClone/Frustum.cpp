@@ -1,6 +1,17 @@
 #include "Frustum.h"
 #include "Utilities.h"
 
+//Plane
+Frustum::Plane::Plane()
+	: d(0.0f),
+	n()
+{}
+
+//Frustum
+Frustum::Frustum()
+	: m_planes()
+{}
+
 void Frustum::update(const glm::mat4& mat)
 {
 	m_planes[ePlaneSide::Right].n.x = mat[0][3] - mat[0][0];
