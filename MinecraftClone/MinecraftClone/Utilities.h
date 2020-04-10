@@ -2,9 +2,7 @@
 
 #include "glm/glm.hpp"
 #include "CubeID.h"
-#include <array>
-#include <vector>
-#include <random>
+#include <string>
 
 enum class eTextureLayer
 {
@@ -66,7 +64,7 @@ namespace Utilities
 	constexpr int CACTUS_MAX_HEIGHT = 4;
 	constexpr int MAX_TREE_PER_CHUNK = 1;
 	constexpr int MAX_CACTUS_PER_CHUNK = 1;
-	constexpr int MAX_LEAVES_DISTANCE = 3;
+	
 	constexpr int MAX_SHRUB_PER_CHUNK = 3;
 	constexpr int MAX_TALL_GRASS_PER_CHUNK = 20;
 	constexpr int MAX_PLANT_SPAWN_ATTEMPTS = 20;
@@ -88,56 +86,4 @@ namespace Utilities
 	constexpr int MAP_SIZE = 8000;
 	const glm::vec3 PLAYER_STARTING_POSITION(0.0f, 100.f, 0.0f);
 	const std::string TEXTURE_DIRECTORY = "Textures/";
-
-	constexpr std::array<int, 6> LEAVES_DISTANCES =
-	{
-		MAX_LEAVES_DISTANCE, 
-		MAX_LEAVES_DISTANCE, 
-		MAX_LEAVES_DISTANCE - 1, 
-		MAX_LEAVES_DISTANCE - 1, 
-		MAX_LEAVES_DISTANCE - 2,
-		MAX_LEAVES_DISTANCE - 2
-	};
-
-	//
-	//Extern
-	//
-	
-	inline int converTo1D(const glm::ivec3& position) 
-	{
-		return (position.z * Utilities::CHUNK_WIDTH * Utilities::CHUNK_HEIGHT) + (position.y * Utilities::CHUNK_WIDTH) + position.x;
-	}
-
-	inline glm::ivec3 convertTo3D(int idx) 
-	{
-		glm::ivec3 position;
-		position.z = idx / (Utilities::CHUNK_WIDTH * Utilities::CHUNK_HEIGHT);
-		idx -= (position.z * Utilities::CHUNK_WIDTH * Utilities::CHUNK_HEIGHT);
-		position.y = idx / Utilities::CHUNK_WIDTH;
-		position.x = idx % Utilities::CHUNK_WIDTH;
-		return position;
-	}
-
-	inline int getRandomNumber(int min, int max)
-	{
-		static std::random_device rd;  //Will be used to obtain a seed for the random number engine
-		static std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-		std::uniform_int_distribution<> dis(min, max);
-
-		return dis(gen);
-	}
-
-	inline float clampTo(float value, float min, float max)
-	{
-		if (value < min)
-		{
-			value = min;
-		}
-		else if (value > max)
-		{
-			value = max;
-		}
-
-		return value;
-	}
 }

@@ -2,6 +2,7 @@
 #include "Utilities.h"
 #include "glad.h"
 #include <SFML/Graphics.hpp>
+#include <array>
 
 namespace
 {

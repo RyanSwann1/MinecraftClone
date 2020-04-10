@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "Utilities.h"
+#include <array>
 
 namespace
 {

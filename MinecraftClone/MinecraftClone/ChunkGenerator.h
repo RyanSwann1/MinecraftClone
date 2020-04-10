@@ -10,9 +10,6 @@
 #include <mutex>
 #include <SFML/Graphics.hpp>
 #include <atomic>
-//1. Perlin Noise
-//2. Dynamic Generation
-//3. Dynamic Destruction
 
 //Dyanmic Chunk Generation
 //https://gamedev.stackexchange.com/questions/173820/how-should-i-store-loaded-world-chunks-in-ram-for-my-game-similar-to-minecraft
