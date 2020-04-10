@@ -200,7 +200,7 @@ int main()
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
-			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 1000.0f);
+			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 1400.0f);
 
 		frustum.update(projection * view);
 		

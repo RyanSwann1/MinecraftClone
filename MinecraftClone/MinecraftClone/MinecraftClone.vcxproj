@@ -132,7 +132,6 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="ChunkGenerator.cpp" />
-    <ClCompile Include="ChunkPool.cpp" />
     <ClCompile Include="Frustum.cpp" />
     <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="glad.c" />
@@ -141,14 +140,12 @@
     <ClCompile Include="ShaderHandler.cpp" />
     <ClCompile Include="TextureArray.cpp" />
     <ClCompile Include="VertexArray.cpp" />
-    <ClCompile Include="VertexArrayPool.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Chunk.h" />
     <ClInclude Include="ChunkGenerator.h" />
-    <ClInclude Include="ChunkPool.h" />
     <ClInclude Include="CubeID.h" />
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="SkyBox.h" />
@@ -185,7 +182,6 @@
     <ClInclude Include="ShaderHandler.h" />
     <ClInclude Include="TextureArray.h" />
     <ClInclude Include="Utilities.h" />
-    <ClInclude Include="VertexArrayPool.h" />
     <ClInclude Include="VertexArray.h" />
     <ClInclude Include="VertexBuffer.h" />
   </ItemGroup>
