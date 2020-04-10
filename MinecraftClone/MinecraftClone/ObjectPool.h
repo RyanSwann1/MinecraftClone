@@ -2,7 +2,6 @@
 
 #include "NonMovable.h"
 #include "NonCopyable.h"
-#include "Utilities.h"
 #include <vector>
 
 //Internal Use - Object Pool
@@ -85,16 +84,16 @@ template <class Object>
 class ObjectPool : private NonCopyable, private NonMovable
 {
 public:
-	ObjectPool()
+	ObjectPool(int visibilityDistance, int chunkWidth, int chunkDepth)
 		: m_objectPool()
 	{
 		//Added a little bit more than neccessary due to how the inifinite map generates
-		int x = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_WIDTH;
+		int x = visibilityDistance / chunkWidth;
 		x += x += 2;
-		int y = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_DEPTH;
-		y += y += 2;
+		int z = visibilityDistance / chunkDepth;
+		z += z += 2;
 
-		m_objectPool.resize(size_t(x * y));
+		m_objectPool.resize(size_t(x * z));
 	}
 
 	ObjectFromPool<Object> getNextAvailableObject()

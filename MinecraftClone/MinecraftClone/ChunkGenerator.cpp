@@ -15,8 +15,8 @@ ChunkGenerator::Regenerate::Regenerate(const ObjectFromPool<Chunk>& chunkFromPoo
 {}
 
 ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
-	: m_chunkPool(),
-	m_vertexArrayPool(),
+	: m_chunkPool(Utilities::VISIBILITY_DISTANCE, Utilities::CHUNK_WIDTH, Utilities::CHUNK_DEPTH),
+	m_vertexArrayPool(Utilities::VISIBILITY_DISTANCE, Utilities::CHUNK_WIDTH, Utilities::CHUNK_DEPTH),
 	m_VAOs(),
 	m_chunks()
 {
