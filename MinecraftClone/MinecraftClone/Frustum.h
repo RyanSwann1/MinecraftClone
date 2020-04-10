@@ -15,7 +15,7 @@ class Frustum : private NonCopyable, private NonMovable
 		Right,
 		Top,
 		Bottom,
-		Max
+		Max = Bottom
 	};
 
 	struct Plane
@@ -34,5 +34,5 @@ public:
 	bool isChunkInFustrum(const glm::vec3& chunkStartingPosition) const;
 	
 private:
-	std::array<Plane, static_cast<int>(ePlaneSide::Max)> m_planes;
+	std::array<Plane, static_cast<int>(ePlaneSide::Max) + 1> m_planes;
 };

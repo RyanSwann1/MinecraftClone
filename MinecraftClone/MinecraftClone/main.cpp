@@ -53,6 +53,27 @@
 
 //http://ogldev.atspace.co.uk/index.html
 
+void keepMouseWithinWindow(const sf::Vector2u& windowSize, sf::Vector2i& mousePosition)
+{
+	if (mousePosition.x < 0)
+	{
+		mousePosition.x = 0;
+	}
+	else if (mousePosition.x > windowSize.x)
+	{
+		mousePosition.x = windowSize.x;
+	}
+
+	if (mousePosition.y < 0)
+	{
+		mousePosition.y = 0;
+	}
+	else if (mousePosition.y > windowSize.y)
+	{
+		mousePosition.y = windowSize.y;
+	}
+}
+
 //x + (y * width)
 int main()
 {
@@ -125,6 +146,8 @@ int main()
 	{
 		deltaTime = clock.restart().asSeconds();
 		sf::Vector2i mousePosition = sf::Mouse::getPosition();
+		keepMouseWithinWindow(window.getSize(), mousePosition);
+
 		camera.mouse_callback(mousePosition.x, mousePosition.y);
 
 		sf::Event currentSFMLEvent;
