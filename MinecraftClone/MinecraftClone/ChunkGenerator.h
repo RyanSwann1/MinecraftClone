@@ -1,8 +1,9 @@
 #pragma once
 
-#include "ChunkPool.h"
+#include "ObjectPool.h"
+#include "Chunk.h"
+#include "VertexArray.h"
 #include "glm/gtx/hash.hpp"
-#include "VertexArrayPool.h"
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -53,10 +54,10 @@ class ChunkGenerator : private NonCopyable, private NonMovable
 {
 	struct Regenerate : private NonCopyable, private NonMovable
 	{
-		Regenerate(const ChunkFromPool& chunkFromPool, VertexArrayFromPool&& vertexArrayFromPool);
+		Regenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool);
 
-		VertexArrayFromPool vertexArrayToRegenerate;
-		const ChunkFromPool& chunkFromPool;
+		ObjectFromPool<VertexArray> vertexArrayToRegenerate;
+		const ObjectFromPool<Chunk>& chunkFromPool;
 		bool regenerated;
 	};
 
@@ -69,11 +70,11 @@ public:
 	void renderTransparent(const Frustum& frustum) const;
 
 private:
-	ChunkPool m_chunkPool;
-	VertexArrayPool m_vertexArrayPool;
-	std::unordered_map<glm::ivec3, VertexArrayFromPool> m_VAOs;
+	ObjectPool<Chunk> m_chunkPool;
+	ObjectPool<VertexArray> m_vertexArrayPool;
+	std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>> m_chunks;
+	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_VAOs;
 	std::unordered_map<glm::ivec3, Regenerate> m_regenerate;
-	std::unordered_map<glm::ivec3, ChunkFromPool> m_chunks;
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;

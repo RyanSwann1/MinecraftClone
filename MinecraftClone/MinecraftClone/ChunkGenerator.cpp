@@ -8,7 +8,7 @@
 #include "Frustum.h"
 #include <iostream>
 
-ChunkGenerator::Regenerate::Regenerate(const ChunkFromPool& chunkFromPool, VertexArrayFromPool&& vertexArrayFromPool)
+ChunkGenerator::Regenerate::Regenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool)
 	: vertexArrayToRegenerate(std::move(vertexArrayFromPool)),
 	chunkFromPool(chunkFromPool),
 	regenerated(false)
@@ -28,10 +28,12 @@ ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 			glm::ivec3 chunkStartingPosition(x, 0, z);
 			Utilities::getClosestChunkStartingPosition(chunkStartingPosition);
 
-			ChunkFromPool chunkFromPool(m_chunkPool, chunkStartingPosition);
-			assert(chunkFromPool.object);
-			if (chunkFromPool.object)
+			ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
+			//ChunkFromPool chunkFromPool(m_chunkPool, chunkStartingPosition);
+			assert(chunkFromPool.getObject());
+			if (chunkFromPool.getObject())
 			{
+				chunkFromPool.getObject()->reuse(chunkStartingPosition);
 				m_chunks.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunkStartingPosition),
 					std::forward_as_tuple(std::move(chunkFromPool)));
@@ -42,17 +44,19 @@ ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 			}
 		}
 	}
-
+	
 	//Generate VAOs
 	for (const auto& chunk : m_chunks)
 	{
-		VertexArrayFromPool VAOFromPool(m_vertexArrayPool);
-		assert(VAOFromPool.object);
-		if (VAOFromPool.object)
+		//VertexArrayFromPool VAOFromPool(m_vertexArrayPool.getNextAvailableObject());
+		//VertexArrayFromPool VAOFromPool(m_vertexArrayPool);
+		ObjectFromPool<VertexArray> VAOFromPool = m_vertexArrayPool.getNextAvailableObject();
+		assert(VAOFromPool.getObject());
+		if (VAOFromPool.getObject())
 		{
-			generateChunkMesh(*VAOFromPool.object, *chunk.second.object);
+			generateChunkMesh(*VAOFromPool.getObject(), *chunk.second.getObject());
 
-			if (VAOFromPool.object->m_regenerate)
+			if (VAOFromPool.getObject()->m_regenerate)
 			{
 				m_regenerate.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunk.first),
@@ -91,15 +95,15 @@ void ChunkGenerator::renderOpaque(const Frustum& frustum) const
 {
 	for (const auto& VAO : m_VAOs)
 	{
-		if (VAO.second.object->m_opaqueVertexBuffer.bindToVAO)
+		if (VAO.second.getObject()->m_opaqueVertexBuffer.bindToVAO)
 		{
-			VAO.second.object->attachOpaqueVBO();
+			VAO.second.getObject()->attachOpaqueVBO();
 		}
 
-		if (VAO.second.object->m_opaqueVertexBuffer.displayable && frustum.isChunkInFustrum(VAO.first))
+		if (VAO.second.getObject()->m_opaqueVertexBuffer.displayable && frustum.isChunkInFustrum(VAO.first))
 		{
-			VAO.second.object->bindOpaqueVAO();
-			glDrawElements(GL_TRIANGLES, VAO.second.object->m_opaqueVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+			VAO.second.getObject()->bindOpaqueVAO();
+			glDrawElements(GL_TRIANGLES, VAO.second.getObject()->m_opaqueVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 		}
 	}
 }
@@ -108,15 +112,15 @@ void ChunkGenerator::renderTransparent(const Frustum& frustum) const
 {
 	for (const auto& VAO : m_VAOs)
 	{
-		if (VAO.second.object->m_transparentVertexBuffer.bindToVAO)
+		if (VAO.second.getObject()->m_transparentVertexBuffer.bindToVAO)
 		{
-			VAO.second.object->attachTransparentVBO();
+			VAO.second.getObject()->attachTransparentVBO();
 		}
 
-		if (VAO.second.object->m_transparentVertexBuffer.displayable && frustum.isChunkInFustrum(VAO.first))
+		if (VAO.second.getObject()->m_transparentVertexBuffer.displayable && frustum.isChunkInFustrum(VAO.first))
 		{
-			VAO.second.object->bindTransparentVAO();
-			glDrawElements(GL_TRIANGLES, VAO.second.object->m_transparentVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+			VAO.second.getObject()->bindTransparentVAO();
+			glDrawElements(GL_TRIANGLES, VAO.second.getObject()->m_transparentVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 		}
 	}
 }
@@ -540,8 +544,8 @@ void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& 
 	//Locate Chunks to delete
 	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
 	{
-		const glm::ivec3& chunkStartingPosition = chunk->second.object->getStartingPosition();
-		if (!visibilityRect.contains(chunk->second.object->getAABB()))
+		const glm::ivec3& chunkStartingPosition = chunk->second.getObject()->getStartingPosition();
+		if (!visibilityRect.contains(chunk->second.getObject()->getAABB()))
 		{
 			auto VAO = m_VAOs.find(chunkStartingPosition);
 			if (VAO != m_VAOs.cend())
@@ -569,7 +573,7 @@ void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& 
 
 void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 {
-	std::vector<std::reference_wrapper<ChunkFromPool>> addedChunks;
+	std::vector<std::reference_wrapper<ObjectFromPool<Chunk>>> addedChunks;
 	glm::ivec3 startPosition(playerPosition);
 	Utilities::getClosestMiddlePosition(startPosition);
 	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z <= startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
@@ -580,11 +584,13 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 			Utilities::getClosestChunkStartingPosition(chunkStartingPosition);
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend())
 			{
-				ChunkFromPool chunkFromPool(m_chunkPool, chunkStartingPosition);
-				assert(chunkFromPool.object);
-				if (chunkFromPool.object)
+				ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
+				assert(chunkFromPool.getObject());
+				if (chunkFromPool.getObject())
 				{
-					ChunkFromPool& chunk = m_chunks.emplace(std::piecewise_construct,
+					chunkFromPool.getObject()->reuse(chunkStartingPosition);
+
+					ObjectFromPool<Chunk>& chunk = m_chunks.emplace(std::piecewise_construct,
 						std::forward_as_tuple(chunkStartingPosition),
 						std::forward_as_tuple(std::move(chunkFromPool))).first->second;
 
@@ -600,15 +606,16 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 
 	for (const auto& addedChunk : addedChunks)
 	{
-		VertexArrayFromPool VAOFromPool(m_vertexArrayPool);
-		assert(VAOFromPool.object);
-		if (VAOFromPool.object)
+		ObjectFromPool<VertexArray> VAOFromPool = m_vertexArrayPool.getNextAvailableObject();
+		//VertexArrayFromPool VAOFromPool(m_vertexArrayPool);
+		assert(VAOFromPool.getObject());
+		if (VAOFromPool.getObject())
 		{
 			VertexArray& VAO = *m_regenerate.emplace(std::piecewise_construct,
-				std::forward_as_tuple(addedChunk.get().object->getStartingPosition()),
-				std::forward_as_tuple(addedChunk.get(), std::move(VAOFromPool))).first->second.vertexArrayToRegenerate.object;
+				std::forward_as_tuple(addedChunk.get().getObject()->getStartingPosition()),
+				std::forward_as_tuple(addedChunk.get(), std::move(VAOFromPool))).first->second.vertexArrayToRegenerate.getObject();
 
-			generateChunkMesh(VAO, *addedChunk.get().object);
+			generateChunkMesh(VAO, *addedChunk.get().getObject());
 		}
 		else
 		{
@@ -621,17 +628,17 @@ void ChunkGenerator::handleRegeneration(std::mutex& renderingMutex)
 {
 	for (auto regen = m_regenerate.begin(); regen != m_regenerate.end();)
 	{
-		if (regen->second.chunkFromPool.object->isInUse())
+		if (regen->second.chunkFromPool.isInUsssse())
 		{
 			//If Chunk has no neighbours - then it can be regenerated
-			const glm::ivec3& chunkStartingPosition = regen->second.chunkFromPool.object->getStartingPosition();
+			const glm::ivec3& chunkStartingPosition = regen->second.chunkFromPool.getObject()->getStartingPosition();
 			if (m_chunks.find(Utilities::getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left)) != m_chunks.cend() &&
 				m_chunks.find(Utilities::getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Right)) != m_chunks.cend() &&
 				m_chunks.find(Utilities::getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back)) != m_chunks.cend() &&
 				m_chunks.find(Utilities::getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward)) != m_chunks.cend())
 			{
 
-				generateChunkMesh(*regen->second.vertexArrayToRegenerate.object, *regen->second.chunkFromPool.object);
+				generateChunkMesh(*regen->second.vertexArrayToRegenerate.getObject(), *regen->second.chunkFromPool.getObject());
 				regen->second.regenerated = true;
 			}
 		
@@ -648,7 +655,7 @@ void ChunkGenerator::handleRegeneration(std::mutex& renderingMutex)
 	{
 		if (iter->second.regenerated)
 		{
-			const glm::ivec3& chunkStartingPosition = iter->second.chunkFromPool.object->getStartingPosition();
+			const glm::ivec3& chunkStartingPosition = iter->second.chunkFromPool.getObject()->getStartingPosition();
 			
 			m_VAOs.emplace(std::piecewise_construct,
 				std::forward_as_tuple(chunkStartingPosition), 
@@ -674,7 +681,7 @@ const Chunk* ChunkGenerator::getNeighbouringChunkAtPosition(const glm::ivec3& ch
 		auto chunk = m_chunks.find(glm::ivec3(chunkStartingPosition.x - Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z));
 		if (chunk != m_chunks.cend())
 		{
-			neighbouringChunk = chunk->second.object;
+			neighbouringChunk = chunk->second.getObject();
 		}
 		break;
 	}
@@ -683,7 +690,7 @@ const Chunk* ChunkGenerator::getNeighbouringChunkAtPosition(const glm::ivec3& ch
 		auto chunk = m_chunks.find(glm::ivec3(chunkStartingPosition.x + Utilities::CHUNK_WIDTH, chunkStartingPosition.y, chunkStartingPosition.z));
 		if (chunk != m_chunks.cend())
 		{
-			neighbouringChunk = chunk->second.object;
+			neighbouringChunk = chunk->second.getObject();
 		}
 		break;
 	}
@@ -692,7 +699,7 @@ const Chunk* ChunkGenerator::getNeighbouringChunkAtPosition(const glm::ivec3& ch
 		auto chunk = m_chunks.find(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z + Utilities::CHUNK_DEPTH));
 		if (chunk != m_chunks.cend())
 		{
-			neighbouringChunk = chunk->second.object;
+			neighbouringChunk = chunk->second.getObject();
 		}
 		break;
 	}
@@ -701,7 +708,7 @@ const Chunk* ChunkGenerator::getNeighbouringChunkAtPosition(const glm::ivec3& ch
 		auto chunk = m_chunks.find(glm::ivec3(chunkStartingPosition.x, chunkStartingPosition.y, chunkStartingPosition.z - Utilities::CHUNK_DEPTH));
 		if (chunk != m_chunks.cend())
 		{
-			neighbouringChunk = chunk->second.object;
+			neighbouringChunk = chunk->second.getObject();
 		}
 		break;
 	}
