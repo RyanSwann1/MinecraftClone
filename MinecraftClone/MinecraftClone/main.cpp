@@ -138,13 +138,25 @@ int main()
 	std::cout << glGetError() << "\n";
 
 	float deltaTime = 0.0f;
-	sf::Clock clock;
-	clock.restart();
+	int frames = 0;
+	sf::Clock deltaClock;
+	sf::Clock gameClock;
+	float lastTime = gameClock.getElapsedTime().asSeconds();
+	deltaClock.restart();
 	float messageExpiredTime = 1.0f;
 	float elaspedTime = 0.0f;
 	while (window.isOpen())
 	{
-		deltaTime = clock.restart().asSeconds();
+		deltaTime = deltaClock.restart().asSeconds();
+		++frames;
+		if (gameClock.getElapsedTime().asSeconds() - lastTime >= 1.0f)
+		{
+			std::cout << 1000.0f / frames << "\n";
+			frames = 0;
+			lastTime += 1.0f;
+		}
+
+
 		sf::Vector2i mousePosition = sf::Mouse::getPosition();
 		keepMouseWithinWindow(window.getSize(), mousePosition);
 
@@ -230,7 +242,6 @@ int main()
 			skybox->render();
 			glDepthFunc(GL_LESS);
 		}
-
 
 		window.display();
 	}

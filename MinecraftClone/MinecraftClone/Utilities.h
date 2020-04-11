@@ -86,4 +86,5 @@ namespace Utilities
 	constexpr int MAP_SIZE = 8000;
 	const glm::vec3 PLAYER_STARTING_POSITION(0.0f, 100.f, 0.0f);
 	const std::string TEXTURE_DIRECTORY = "Textures/";
+	const std::string FONTS_DIRECTORY = "Fonts/";
 }
