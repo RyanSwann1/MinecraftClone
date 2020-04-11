@@ -53,6 +53,8 @@
 
 //http://ogldev.atspace.co.uk/index.html
 
+//https://github.com/AlwaysGeeky/Vox/tree/master/source
+
 void keepMouseWithinWindow(const sf::Vector2u& windowSize, sf::Vector2i& mousePosition)
 {
 	if (mousePosition.x < 0)
@@ -207,6 +209,7 @@ int main()
 		
 		if (chunkGenerator)
 		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			shaderHandler->switchToShader(eShaderType::Chunk);
 			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
 			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
