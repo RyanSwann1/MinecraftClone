@@ -55,4 +55,12 @@ void Camera::mouse_callback(double xpos, double ypos)
 	front.y = sin(glm::radians(pitch));
 	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 	m_front = glm::normalize(front);
+
+	forward = glm::vec3(m_front.x, m_front.y, -m_front.z);
+	forward *= m_position;
+	
+	for (float i = 0; i < 10; i += 0.5f)
+	{
+		forward += glm::vec3(forward.x + i, forward.y + i, forward.z + i);
+	}
 }

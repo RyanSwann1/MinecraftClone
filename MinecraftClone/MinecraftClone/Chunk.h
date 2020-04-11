@@ -27,12 +27,15 @@ public:
 	bool isPositionInBounds(const glm::ivec3& position) const;
 	const glm::ivec3& getStartingPosition() const;
 	const glm::ivec3& getEndingPosition() const;
+	char getCubeAtPosition(const glm::ivec3& position) const;
 	char getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const;
 	
+	void removeCubeAtPosition(const glm::ivec3& position);
 	void reset();
 	void reuse(const glm::ivec3& startingPosition);
 
 private:
+	bool inUse;
 	glm::ivec3 m_startingPosition;
 	glm::ivec3 m_endingPosition;
 	std::array<char, Utilities::CHUNK_VOLUME> m_chunk;

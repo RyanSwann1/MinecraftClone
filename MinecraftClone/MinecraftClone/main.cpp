@@ -140,15 +140,25 @@ int main()
 	std::cout << glGetError() << "\n";
 
 	float deltaTime = 0.0f;
-	sf::Clock clock;
-	clock.restart();
+	int frames = 0;
+	sf::Clock deltaClock;
+	sf::Clock gameClock;
+	float lastTime = gameClock.getElapsedTime().asSeconds();
+	deltaClock.restart();
 	float messageExpiredTime = 1.0f;
 	float elaspedTime = 0.0f;
 	while (window.isOpen())
 	{
-		deltaTime = clock.restart().asSeconds();
+		deltaTime = deltaClock.restart().asSeconds();
+		++frames;
+		if (gameClock.getElapsedTime().asSeconds() - lastTime >= 1.0f)
+		{
+			std::cout << 1000.0f / frames << "\n";
+			frames = 0;
+			lastTime += 1.0f;
+		}
+
 		sf::Vector2i mousePosition = sf::Mouse::getPosition();
-		keepMouseWithinWindow(window.getSize(), mousePosition);
 
 		camera.mouse_callback(mousePosition.x, mousePosition.y);
 
@@ -164,6 +174,13 @@ int main()
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
 				{
 					resetGame = true;
+				}
+			}
+			else if (currentSFMLEvent.MouseButtonPressed)
+			{
+				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+				{
+					chunkGenerator->removeCubeAtPosition(camera.forward);
 				}
 			}
 		}
@@ -196,6 +213,8 @@ int main()
 			}
 		}
 
+
+
 		//Bitmasking
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//glClear(GL_DEPTH_BUFFER_BIT);
@@ -209,7 +228,7 @@ int main()
 		
 		if (chunkGenerator)
 		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			shaderHandler->switchToShader(eShaderType::Chunk);
 			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
 			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);

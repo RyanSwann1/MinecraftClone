@@ -260,6 +260,18 @@ ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 	}
 }
 
+void ChunkGenerator::removeCubeAtPosition(const glm::ivec3& position)
+{
+	glm::ivec3 chunkStartingPosition;
+	getClosestChunkStartingPosition(chunkStartingPosition);
+	auto chunk = m_chunks.find(chunkStartingPosition);
+	assert(chunk != m_chunks.end());
+	if (chunk != m_chunks.end())
+	{
+
+	}
+}
+
 void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
 	std::mutex& cameraMutex, std::mutex& renderingMutex)	
 {

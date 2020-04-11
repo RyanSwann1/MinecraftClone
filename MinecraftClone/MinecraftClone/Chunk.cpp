@@ -138,6 +138,15 @@ const glm::ivec3& Chunk::getEndingPosition() const
 	return m_endingPosition;
 }
 
+char Chunk::getCubeAtPosition(const glm::ivec3& position) const
+{
+	glm::ivec3 localPosition(position.x - m_startingPosition.x, position.y - m_startingPosition.y, position.z - m_startingPosition.z);
+	if (isPositionInLocalBounds(position))
+	{
+
+	}
+}
+
 char Chunk::getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const
 {
 	glm::ivec3 positionOnGrid(position.x - m_startingPosition.x, position.y - m_startingPosition.y, position.z - m_startingPosition.z);
@@ -148,6 +157,11 @@ void Chunk::changeCubeAtLocalPosition(const glm::ivec3& position, eCubeType cube
 {
 	assert(isPositionInLocalBounds(position));
 	m_chunk[converTo1D(position)] = static_cast<char>(cubeType);
+}
+
+void Chunk::removeCubeAtPosition(const glm::ivec3& position)
+{
+
 }
 
 void Chunk::reset()

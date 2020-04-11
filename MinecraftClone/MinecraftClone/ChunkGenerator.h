@@ -59,6 +59,8 @@ class ChunkGenerator : private NonCopyable, private NonMovable
 public:
 	ChunkGenerator(const glm::ivec3& playerPosition);
 
+	void removeCubeAtPosition(const glm::ivec3& position);
+
 	void update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
 		std::mutex& cameraMutex, std::mutex& renderingMutex);
 	void renderOpaque(const Frustum& frustum) const;

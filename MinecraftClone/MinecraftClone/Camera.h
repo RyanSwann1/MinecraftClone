@@ -21,6 +21,7 @@ struct Camera
 	float m_speed;
 	glm::vec3 m_position;
 	glm::vec3 m_front;
+	glm::vec3 forward;
 	glm::vec3 m_up;
 
 	float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.

@@ -44,7 +44,7 @@ struct ObjectFromPool : private NonCopyable
 			objectInPool->inUse = true;
 		}
 	}
-	virtual ~ObjectFromPool() 
+	virtual ~ObjectFromPool()
 	{
 		if (objectInPool)
 		{
@@ -77,7 +77,7 @@ struct ObjectFromPool : private NonCopyable
 
 private:
 	ObjectInPool<Object>* objectInPool;
-};
+}; 
 
 //Object Pool
 template <class Object>
