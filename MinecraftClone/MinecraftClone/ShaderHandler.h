@@ -31,23 +31,24 @@ class ShaderHandler : private NonCopyable, private NonMovable
 		int getUniformLocation(const std::string& uniformName);
 
 	private:
-		unsigned int ID;
-		eShaderType type;
-		std::unordered_map<std::string, int> uniformLocations;
+		unsigned int m_ID;
+		eShaderType m_type;
+		std::unordered_map<std::string, int> m_uniformLocations;
 	};
 
 public:
 	static std::unique_ptr<ShaderHandler> create();
 
 	void setUniformMat4f(eShaderType shaderType, const std::string& uniformName, const glm::mat4& matrix);
-
 	void setUniform1i(eShaderType shaderType, const std::string& uniformName, int value);
 	void switchToShader(eShaderType shaderType);
 
 private:
 	ShaderHandler();
 	
-	std::vector<Shader> m_shaders;
-
-	Shader* getShader(eShaderType shaderType);
+	std::array<Shader, static_cast<int>(eShaderType::Max) + 1> m_shader =
+	{
+		eShaderType::Chunk,
+		eShaderType::Skybox
+	};
 };

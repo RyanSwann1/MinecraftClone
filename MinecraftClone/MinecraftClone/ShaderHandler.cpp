@@ -98,28 +98,12 @@ namespace
 }
 
 ShaderHandler::ShaderHandler()
-	: m_shaders()
-{
-	for (int i = 0; i <= static_cast<int>(eShaderType::Max); ++i)
-	{
-		m_shaders.emplace_back(static_cast<eShaderType>(i));
-	}
-}
-
-ShaderHandler::Shader* ShaderHandler::getShader(eShaderType shaderType)
-{
-	auto shader = std::find_if(m_shaders.begin(), m_shaders.end(), [shaderType](const auto& shader)
-	{
-		return shader.getType() == shaderType;
-	});
-
-	return (shader != m_shaders.end() ? &(*shader) : nullptr);
-}
+{}
 
 std::unique_ptr<ShaderHandler> ShaderHandler::create()
 {
 	std::unique_ptr<ShaderHandler> shaderHandler = std::unique_ptr<ShaderHandler>(new ShaderHandler());
-	for (const auto& shader : shaderHandler->m_shaders)
+	for (const auto& shader : shaderHandler->m_shader)
 	{
 		switch (shader.getType())
 		{
@@ -153,123 +137,81 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create()
 
 void ShaderHandler::setUniformMat4f(eShaderType shaderType, const std::string& uniformName, const glm::mat4& matrix)
 {
-	Shader* shader = getShader(shaderType);
-	assert(shader);
-	if (shader)
-	{
-		int uniformLocation = shader->getUniformLocation(uniformName);
-		assert(uniformLocation != INVALID_UNIFORM_LOCATION);
-		if (uniformLocation != INVALID_UNIFORM_LOCATION)
-		{
-			glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(matrix));
-		}
-		else
-		{
-			std::cout << "Invalid uniform location\n";
-		}
-	}
-	else
-	{
-		std::cout << "Couldn't find shader." + uniformName << "\n";
-	}
+	int uniformLocation = m_shader[static_cast<int>(shaderType)].getUniformLocation(uniformName);
+	assert(uniformLocation != INVALID_UNIFORM_LOCATION);
+	glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 void ShaderHandler::setUniform1i(eShaderType shaderType, const std::string& uniformName, int value)
 {
-	Shader* shader = getShader(shaderType);
-	assert(shader);
-	if (shader)
-	{
-		int uniformLocation = shader->getUniformLocation(uniformName);
-		assert(uniformLocation != INVALID_UNIFORM_LOCATION);
-		if (uniformLocation != INVALID_UNIFORM_LOCATION)
-		{
-			glUniform1i(uniformLocation, value);
-		}
-		else
-		{
-			std::cout << "Unable to find uniform location\n";
-		}
-		
-	}
-	else
-	{
-		std::cout << "Couldn't find shader." + uniformName << "\n";
-	}
+	int uniformLocation = m_shader[static_cast<int>(shaderType)].getUniformLocation(uniformName);
+	assert(uniformLocation != INVALID_UNIFORM_LOCATION);
+	glUniform1i(uniformLocation, value);
 }
 
 void ShaderHandler::switchToShader(eShaderType shaderType)
 {
-	Shader* shader = getShader(shaderType);
-	assert(shader);
-	if (shader)
-	{
-		glUseProgram(shader->getID());
-	}
-	else
-	{
-		std::cout << "Couldn't find shader.\n";
-	}
+	glUseProgram(m_shader[static_cast<int>(shaderType)].getID());
 }
 ShaderHandler::Shader::Shader(eShaderType shaderType)
-	: ID(glCreateProgram()),
-	type(shaderType),
-	uniformLocations()
+	: m_ID(glCreateProgram()),
+	m_type(shaderType),
+	m_uniformLocations()
 {}
 
 ShaderHandler::Shader::Shader(Shader&& orig) noexcept
-	: ID(orig.ID),
-	type(orig.type),
-	uniformLocations(std::move(orig.uniformLocations))
+	: m_ID(orig.m_ID),
+	m_type(orig.m_type),
+	m_uniformLocations(std::move(orig.m_uniformLocations))
 {
-	orig.ID = Utilities::INVALID_OPENGL_ID;
+	orig.m_ID = Utilities::INVALID_OPENGL_ID;
 }
 
 ShaderHandler::Shader& ShaderHandler::Shader::operator=(Shader&& orig) noexcept
 {
-	ID = orig.ID;
-	type = orig.type;
-	uniformLocations = std::move(orig.uniformLocations);
+	m_ID = orig.m_ID;
+	m_type = orig.m_type;
+	m_uniformLocations = std::move(orig.m_uniformLocations);
 
-	orig.ID = Utilities::INVALID_OPENGL_ID;
+	orig.m_ID = Utilities::INVALID_OPENGL_ID;
 
 	return *this;
 }
 
 ShaderHandler::Shader::~Shader()
 {
-	if (ID != Utilities::INVALID_OPENGL_ID)
+	if (m_ID != Utilities::INVALID_OPENGL_ID)
 	{
-		glDeleteProgram(ID);
+		glDeleteProgram(m_ID);
 	}
 }
 
 unsigned int ShaderHandler::Shader::getID() const
 {
-	return ID;
+	return m_ID;
 }
 
 eShaderType ShaderHandler::Shader::getType() const
 {
-	return type;
+	return m_type;
 }
 
 int ShaderHandler::Shader::getUniformLocation(const std::string& uniformName)
 {
-	if (uniformLocations.find(uniformName) != uniformLocations.cend())
+	if (m_uniformLocations.find(uniformName) != m_uniformLocations.cend())
 	{
-		return uniformLocations[uniformName];
+		return m_uniformLocations[uniformName];
 	}
 	else
 	{
-		int location = glGetUniformLocation(ID, uniformName.c_str());
+		int location = glGetUniformLocation(m_ID, uniformName.c_str());
 		if (location == -1)
 		{
 			std::cout << "Failed to find uniform: " << uniformName << "\n";
 		}
 		else
 		{
-			uniformLocations[uniformName] = location;
+			m_uniformLocations[uniformName] = location;
 		}
 
 		return location;
