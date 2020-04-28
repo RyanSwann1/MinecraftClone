@@ -62,15 +62,15 @@ namespace Utilities
 	constexpr int MAX_TREE_HEIGHT = 9;
 	constexpr int CACTUS_MIN_HEIGHT = 1;
 	constexpr int CACTUS_MAX_HEIGHT = 4;
-	constexpr int MAX_TREE_PER_CHUNK = 1;
+	constexpr int MAX_TREE_PER_CHUNK = 5;
 	constexpr int MAX_CACTUS_PER_CHUNK = 1;
 	
 	constexpr int MAX_SHRUB_PER_CHUNK = 3;
 	constexpr int MAX_TALL_GRASS_PER_CHUNK = 20;
 	constexpr int MAX_PLANT_SPAWN_ATTEMPTS = 20;
 	constexpr int MAX_CACTUS_SPAWN_ATTEMPTS = 20;
-	constexpr int MAX_TREE_SPAWN_ATTEMPTS = 5;
-	constexpr int CHANCE_TREE_SPAWN_IN_CHUNK = 50;
+	constexpr int MAX_TREE_SPAWN_ATTEMPTS = 10;
+	constexpr int CHANCE_TREE_SPAWN_IN_CHUNK = 25;
 
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
@@ -79,10 +79,10 @@ namespace Utilities
 	constexpr int MOISTURE_OCTAVES = 3;
 
 	constexpr float TERRAIN_LACUNARITY = 5.f;
-	constexpr float TERRAIN_PERSISTENCE = 0.5f;
+	constexpr float TERRAIN_PERSISTENCE = 5.5f;
 	constexpr int TERRAIN_OCTAVES = 8;
 
-	constexpr int VISIBILITY_DISTANCE = 1024;
+	constexpr int VISIBILITY_DISTANCE = 800;
 	constexpr int MAP_SIZE = 8000;
 	const glm::vec3 PLAYER_STARTING_POSITION(0.0f, 100.f, 0.0f);
 	const std::string TEXTURE_DIRECTORY = "Textures/";
