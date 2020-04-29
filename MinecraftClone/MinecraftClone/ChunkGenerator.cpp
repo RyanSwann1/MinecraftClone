@@ -272,6 +272,8 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 		deleteChunks(position, renderingMutex);
 		addChunks(position);
 		regenerateChunks(renderingMutex);
+
+		//std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 	}
 }
 
@@ -757,7 +759,6 @@ void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& 
 
 void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 {
-	std::vector<std::reference_wrapper<ObjectFromPool<Chunk>>> addedChunks;
 	glm::ivec3 startPosition(playerPosition);
 	getClosestMiddlePosition(startPosition);
 	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z <= startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
@@ -769,40 +770,25 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend())
 			{
 				ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
-				assert(chunkFromPool.getObject());
-				if (chunkFromPool.getObject())
+				if (!chunkFromPool.getObject())
 				{
-					chunkFromPool.getObject()->reuse(chunkStartingPosition);
-
-					ObjectFromPool<Chunk>& chunk = m_chunks.emplace(std::piecewise_construct,
-						std::forward_as_tuple(chunkStartingPosition),
-						std::forward_as_tuple(std::move(chunkFromPool))).first->second;
-
-					addedChunks.push_back(chunk);
+					continue;
 				}
-				else
+				ObjectFromPool<VertexArray> vertexArrayFromPool = m_vertexArrayPool.getNextAvailableObject();
+				if (!vertexArrayFromPool.getObject())
 				{
-					std::cout << "Unable to retrieve Chunk not in use\n";
+					continue;
 				}
+
+				ObjectFromPool<Chunk>& addedChunk = m_chunks.emplace(std::piecewise_construct,
+					std::forward_as_tuple(chunkStartingPosition),
+					std::forward_as_tuple(std::move(chunkFromPool))).first->second;
+				addedChunk.getObject()->reuse(chunkStartingPosition);
+
+				m_regenerate.emplace(std::piecewise_construct,
+					std::forward_as_tuple(chunkStartingPosition),
+					std::forward_as_tuple(addedChunk, std::move(vertexArrayFromPool)));
 			}
-		}
-	}
-
-	for (const auto& addedChunk : addedChunks)
-	{
-		ObjectFromPool<VertexArray> VAOFromPool = m_vertexArrayPool.getNextAvailableObject();
-		assert(VAOFromPool.getObject());
-		if (VAOFromPool.getObject())
-		{
-			VertexArray& VAO = *m_regenerate.emplace(std::piecewise_construct,
-				std::forward_as_tuple(addedChunk.get().getObject()->getStartingPosition()),
-				std::forward_as_tuple(addedChunk.get(), std::move(VAOFromPool))).first->second.vertexArrayToRegenerate.getObject();
-
-			generateChunkMesh(VAO, *addedChunk.get().getObject());
-		}
-		else
-		{
-			std::cout << "Unable to retrieve VAO not in use\n";
 		}
 	}
 }
