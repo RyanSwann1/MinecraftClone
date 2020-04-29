@@ -54,109 +54,78 @@ bool Frustum::isChunkInFustrum(const glm::vec3& chunkStartingPosition) const
 
 	for (const auto& plane : m_planes)
 	{
-		int in = 0;
-		int out = 0;
-
 		//Back
 		if (glm::dot(glm::vec3(chunkCentrePosition.x - Utilities::CHUNK_WIDTH / 2,
 			chunkCentrePosition.y - Utilities::CHUNK_HEIGHT / 2,
-			chunkCentrePosition.z - Utilities::CHUNK_DEPTH / 2), plane.n) + plane.d < 0)
+			chunkCentrePosition.z - Utilities::CHUNK_DEPTH / 2), plane.n) + plane.d >= 0)
 		{
-			++out;
-		}
-		else
-		{
-			++in;
+			return true;
 		}
 
 		if (glm::dot(glm::vec3(chunkCentrePosition.x + Utilities::CHUNK_WIDTH / 2,
 			chunkCentrePosition.y - Utilities::CHUNK_HEIGHT / 2,
-			chunkCentrePosition.z - Utilities::CHUNK_DEPTH / 2), plane.n) + plane.d < 0)
+			chunkCentrePosition.z - Utilities::CHUNK_DEPTH / 2), plane.n) + plane.d >= 0)
 		{
 
-			++out;
-		}
-		else
-		{
-			++in;
+			return true;
 		}
 
 		if (glm::dot(glm::vec3(chunkCentrePosition.x - Utilities::CHUNK_WIDTH / 2,
 			chunkCentrePosition.y + Utilities::CHUNK_HEIGHT / 2,
-			chunkCentrePosition.z - Utilities::CHUNK_DEPTH / 2), plane.n) + plane.d < 0)
+			chunkCentrePosition.z - Utilities::CHUNK_DEPTH / 2), plane.n) + plane.d >= 0)
 		{
-			++out;
-		}
-		else
-		{
-			++in;
+			return true;
 		}
 
 		if (glm::dot(glm::vec3(chunkCentrePosition.x + Utilities::CHUNK_WIDTH / 2,
 			chunkCentrePosition.y + Utilities::CHUNK_HEIGHT / 2,
-			chunkCentrePosition.z - Utilities::CHUNK_DEPTH / 2), plane.n) + plane.d < 0)
+			chunkCentrePosition.z - Utilities::CHUNK_DEPTH / 2), plane.n) + plane.d >= 0)
 		{
-			++out;
-		}
-		else
-		{
-			++in;
+			return true;
 		}
 
 		//Front
 		if (glm::dot(glm::vec3(chunkCentrePosition.x - Utilities::CHUNK_WIDTH / 2,
 			chunkCentrePosition.y - Utilities::CHUNK_HEIGHT / 2,
-			chunkCentrePosition.z + Utilities::CHUNK_DEPTH / 2), plane.n) + plane.d < 0)
+			chunkCentrePosition.z + Utilities::CHUNK_DEPTH / 2), plane.n) + plane.d >= 0)
 		{
-			++out;
+
+			return true;
 		}
-		else
-		{
-			++in;
-		}
+
 
 		if (glm::dot(glm::vec3(chunkCentrePosition.x + Utilities::CHUNK_WIDTH / 2,
 			chunkCentrePosition.y - Utilities::CHUNK_HEIGHT / 2,
-			chunkCentrePosition.z + Utilities::CHUNK_DEPTH / 2), plane.n) + plane.d < 0)
+			chunkCentrePosition.z + Utilities::CHUNK_DEPTH / 2), plane.n) + plane.d >= 0)
 		{
-			++out;
-		}
-		else
-		{
-			++in;
+			return true;
 		}
 
 		if (glm::dot(glm::vec3(chunkCentrePosition.x - Utilities::CHUNK_WIDTH / 2,
 			chunkCentrePosition.y + Utilities::CHUNK_HEIGHT / 2,
-			chunkCentrePosition.z + Utilities::CHUNK_DEPTH / 2), plane.n) + plane.d < 0)
+			chunkCentrePosition.z + Utilities::CHUNK_DEPTH / 2), plane.n) + plane.d >= 0)
 		{
-			++out;
-		}
-		else
-		{
-			++in;
+			return true;
 		}
 
 		if (glm::dot(glm::vec3(chunkCentrePosition.x + Utilities::CHUNK_WIDTH / 2,
 			chunkCentrePosition.y + Utilities::CHUNK_HEIGHT / 2,
-			chunkCentrePosition.z + Utilities::CHUNK_DEPTH / 2), plane.n) + plane.d < 0)
-		{
-			++out;
-		}
-		else
-		{
-			++in;
-		}
-
-		if (!in)
-		{
-			return false;
-		}
-		else if (out)
+			chunkCentrePosition.z + Utilities::CHUNK_DEPTH / 2), plane.n) + plane.d >= 0)
 		{
 			return true;
 		}
+
+		return false;
+
+		//if (!in)
+		//{
+		//	return false;
+		//}
+		//else if (out)
+		//{
+		//	return true;
+		//}
 	}
 
-	return true;
+	/*return true;*/
 }
