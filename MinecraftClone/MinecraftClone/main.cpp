@@ -86,7 +86,7 @@ int main()
 	settings.attributeFlags = sf::ContextSettings::Core;
 	sf::Vector2i windowSize(1980, 1080);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft", sf::Style::Default, settings);
-	window.setFramerateLimit(60);
+	window.setVerticalSyncEnabled(true);
 	gladLoadGL();
 
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
@@ -156,9 +156,7 @@ int main()
 			lastTime += 1.0f;
 		}
 
-
 		sf::Vector2i mousePosition = sf::Mouse::getPosition();
-		keepMouseWithinWindow(window.getSize(), mousePosition);
 
 		camera.mouse_callback(mousePosition.x, mousePosition.y);
 
@@ -206,14 +204,12 @@ int main()
 			}
 		}
 
-		//Bitmasking
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//glClear(GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
-			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 1400.0f);
+			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 1000.0f);
 
 		frustum.update(projection * view);
 		
