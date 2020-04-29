@@ -35,14 +35,14 @@ namespace
 
 	void getTextCoords(std::vector<glm::vec3>& textCoords, eCubeSide cubeSide, eCubeType cubeType)
 	{
-		int textureLayer = 0;
+		eTextureLayer textureLayer;
 		switch (cubeType)
 		{
 		case eCubeType::Stone:
-			textureLayer = static_cast<int>(eTextureLayer::Stone);
+			textureLayer = eTextureLayer::Stone;
 			break;
 		case eCubeType::Sand:
-			textureLayer = static_cast<int>(eTextureLayer::Sand);
+			textureLayer = eTextureLayer::Sand;
 			break;
 		case eCubeType::Grass:
 			switch (cubeSide)
@@ -51,14 +51,14 @@ namespace
 			case eCubeSide::Front:
 			case eCubeSide::Left:
 			case eCubeSide::Right:
-				textureLayer = static_cast<int>(eTextureLayer::GrassSide);
+				textureLayer = eTextureLayer::GrassSide;
 				break;
 			case eCubeSide::Top:
-				textureLayer = static_cast<int>(eTextureLayer::Grass);
+				textureLayer = eTextureLayer::Grass;
 			}
 			break;
 		case eCubeType::Log:
-			textureLayer = static_cast<int>(eTextureLayer::Log);
+			textureLayer = eTextureLayer::Log;
 			break;
 		case eCubeType::LogTop:
 			switch (cubeSide)
@@ -67,18 +67,18 @@ namespace
 			case eCubeSide::Front:
 			case eCubeSide::Left:
 			case eCubeSide::Right:
-				textureLayer = static_cast<int>(eTextureLayer::Log);
+				textureLayer = eTextureLayer::Log;
 				break;
 			case eCubeSide::Top:
-				textureLayer = static_cast<int>(eTextureLayer::LogTop);
+				textureLayer = eTextureLayer::LogTop;
 				break;
 			}
 			break;
 		case eCubeType::Leaves:
-			textureLayer = static_cast<int>(eTextureLayer::Leaves);
+			textureLayer = eTextureLayer::Leaves;
 			break;
 		case eCubeType::Cactus:
-			textureLayer = static_cast<int>(eTextureLayer::Cactus);
+			textureLayer = eTextureLayer::Cactus;
 			break;
 		case eCubeType::CactusTop:
 			switch (cubeSide)
@@ -87,31 +87,31 @@ namespace
 			case eCubeSide::Front:
 			case eCubeSide::Left:
 			case eCubeSide::Right:
-				textureLayer = static_cast<int>(eTextureLayer::Cactus);
+				textureLayer = eTextureLayer::Cactus;
 				break;
 			case eCubeSide::Top:
-				textureLayer = static_cast<int>(eTextureLayer::CactusTop);
+				textureLayer = eTextureLayer::CactusTop;
 				break;
 			}
 			break;
 		case eCubeType::Water:
-			textureLayer = static_cast<int>(eTextureLayer::Water);
+			textureLayer = eTextureLayer::Water;
 			break;
 		case eCubeType::Shrub:
-			textureLayer = static_cast<int>(eTextureLayer::Shrub);
+			textureLayer = eTextureLayer::Shrub;
 			break;
 		case eCubeType::TallGrass:
-			textureLayer = static_cast<int>(eTextureLayer::TallGrass);
+			textureLayer = eTextureLayer::TallGrass;
 			break;
 
 		default:
-			textureLayer = static_cast<int>(eTextureLayer::Error);
+			textureLayer = eTextureLayer::Error;
 		}
 
-		assert(textureLayer != static_cast<int>(eTextureLayer::Error));
+		assert(textureLayer != eTextureLayer::Error);
 		for (const auto& i : TEXT_COORDS)
 		{
-			textCoords.emplace_back(i.x, i.y, textureLayer);
+			textCoords.emplace_back(i.x, i.y, static_cast<int>(textureLayer));
 		}
 	}
 
