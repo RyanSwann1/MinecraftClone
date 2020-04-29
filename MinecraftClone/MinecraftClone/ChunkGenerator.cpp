@@ -809,27 +809,18 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 
 void ChunkGenerator::regenerateChunks(std::mutex& renderingMutex)
 {
-	for (auto regen = m_regenerate.begin(); regen != m_regenerate.end();)
+	for (auto regen = m_regenerate.begin(); regen != m_regenerate.end(); ++regen)
 	{
-		if (regen->second.chunkFromPool.isInUsssse())
+		//If Chunk has no neighbours - then it can be regenerated
+		const glm::ivec3& chunkStartingPosition = regen->second.chunkFromPool.getObject()->getStartingPosition();
+		if (m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left)) != m_chunks.cend() &&
+			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Right)) != m_chunks.cend() &&
+			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back)) != m_chunks.cend() &&
+			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward)) != m_chunks.cend())
 		{
-			//If Chunk has no neighbours - then it can be regenerated
-			const glm::ivec3& chunkStartingPosition = regen->second.chunkFromPool.getObject()->getStartingPosition();
-			if (m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left)) != m_chunks.cend() &&
-				m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Right)) != m_chunks.cend() &&
-				m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back)) != m_chunks.cend() &&
-				m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward)) != m_chunks.cend())
-			{
 
-				generateChunkMesh(*regen->second.vertexArrayToRegenerate.getObject(), *regen->second.chunkFromPool.getObject());
-				regen->second.regenerated = true;
-			}
-		
-			++regen;
-		}
-		else
-		{
-			regen = m_regenerate.erase(regen);
+			generateChunkMesh(*regen->second.vertexArrayToRegenerate.getObject(), *regen->second.chunkFromPool.getObject());
+			regen->second.regenerated = true;
 		}
 	}
 

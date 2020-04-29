@@ -65,11 +65,6 @@ struct ObjectFromPool : private NonCopyable
 		return *this;
 	}
 
-	bool isInUsssse() const
-	{
-		return (objectInPool ? objectInPool->inUse : false);
-	}
-
 	Object* getObject() const 
 	{
 		return (objectInPool ? &objectInPool->object : nullptr);
