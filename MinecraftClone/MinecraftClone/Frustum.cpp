@@ -116,16 +116,5 @@ bool Frustum::isChunkInFustrum(const glm::vec3& chunkStartingPosition) const
 		}
 
 		return false;
-
-		//if (!in)
-		//{
-		//	return false;
-		//}
-		//else if (out)
-		//{
-		//	return true;
-		//}
 	}
-
-	/*return true;*/
 }
