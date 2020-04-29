@@ -217,45 +217,27 @@ ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 
 			ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
 			assert(chunkFromPool.getObject());
-			if (chunkFromPool.getObject())
+			if (!chunkFromPool.getObject())
 			{
-				chunkFromPool.getObject()->reuse(chunkStartingPosition);
-				m_chunks.emplace(std::piecewise_construct,
-					std::forward_as_tuple(chunkStartingPosition),
-					std::forward_as_tuple(std::move(chunkFromPool)));
+				continue;
 			}
-			else
-			{
-				std::cout << "Unable to retrieve Chunk not in use.\n";
-			}
-		}
-	}
-	
-	//Generate VAOs
-	for (const auto& chunk : m_chunks)
-	{
-		ObjectFromPool<VertexArray> VAOFromPool = m_vertexArrayPool.getNextAvailableObject();
-		assert(VAOFromPool.getObject());
-		if (VAOFromPool.getObject())
-		{
-			generateChunkMesh(*VAOFromPool.getObject(), *chunk.second.getObject());
 
-			if (VAOFromPool.getObject()->m_regenerate)
+			ObjectFromPool<VertexArray> VAOFromPool = m_vertexArrayPool.getNextAvailableObject();
+			assert(VAOFromPool.getObject());
+			if (!VAOFromPool.getObject())
 			{
-				m_regenerate.emplace(std::piecewise_construct,
-					std::forward_as_tuple(chunk.first),
-					std::forward_as_tuple(chunk.second, std::move(VAOFromPool)));
+				continue;
 			}
-			else
-			{
-				m_VAOs.emplace(std::piecewise_construct,
-					std::forward_as_tuple(chunk.first),
-					std::forward_as_tuple(std::move(VAOFromPool)));
-			}
-		}
-		else
-		{ 
-			std::cout << "Unable to retrieve VAO not in use \n";
+
+			ObjectFromPool<Chunk>& addedChunk = m_chunks.emplace(std::piecewise_construct,
+				std::forward_as_tuple(chunkStartingPosition),
+				std::forward_as_tuple(std::move(chunkFromPool))).first->second;
+
+			addedChunk.getObject()->reuse(chunkStartingPosition);
+
+			m_regenerate.emplace(std::piecewise_construct,
+				std::forward_as_tuple(chunkStartingPosition),
+				std::forward_as_tuple(addedChunk, std::move(VAOFromPool)));
 		}
 	}
 }
@@ -513,12 +495,15 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 {
 	const glm::ivec3& chunkStartingPosition = chunk.getStartingPosition();
 	const glm::ivec3& chunkEndingPosition = chunk.getEndingPosition();
-	vertexArray.m_regenerate = false; //Reset regeneration value
 
 	const Chunk* leftNeighbouringChunk = getNeighbouringChunkAtPosition(chunkStartingPosition, eDirection::Left);
+	assert(leftNeighbouringChunk);
 	const Chunk* rightNeighbouringChunk = getNeighbouringChunkAtPosition(chunkStartingPosition, eDirection::Right);
+	assert(rightNeighbouringChunk);
 	const Chunk* forwardNeighbouringChunk = getNeighbouringChunkAtPosition(chunkStartingPosition, eDirection::Forward);
+	assert(forwardNeighbouringChunk);
 	const Chunk* backNeighbouringChunk = getNeighbouringChunkAtPosition(chunkStartingPosition, eDirection::Back);
+	assert(backNeighbouringChunk);
 
 	for (int z = chunkStartingPosition.z; z < chunkEndingPosition.z; ++z)
 	{
