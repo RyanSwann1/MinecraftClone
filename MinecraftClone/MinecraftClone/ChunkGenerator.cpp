@@ -271,7 +271,7 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 
 		deleteChunks(position, renderingMutex);
 		addChunks(position);
-		handleRegeneration(renderingMutex);
+		regenerateChunks(renderingMutex);
 	}
 }
 
@@ -807,7 +807,7 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 	}
 }
 
-void ChunkGenerator::handleRegeneration(std::mutex& renderingMutex)
+void ChunkGenerator::regenerateChunks(std::mutex& renderingMutex)
 {
 	for (auto regen = m_regenerate.begin(); regen != m_regenerate.end();)
 	{

@@ -80,5 +80,5 @@ private:
 	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::vec3& playerPosition);
-	void handleRegeneration(std::mutex& renderingMutex);
+	void regenerateChunks(std::mutex& renderingMutex);
 };
