@@ -78,8 +78,8 @@ namespace Utilities
 	constexpr float MOISTURE_PERSISTENCE = 0.5f;
 	constexpr int MOISTURE_OCTAVES = 3;
 
-	constexpr float TERRAIN_LACUNARITY = 15.f;
-	constexpr float TERRAIN_PERSISTENCE = 0.5f;
+	constexpr float TERRAIN_LACUNARITY = 5.f;
+	constexpr float TERRAIN_PERSISTENCE = 5.5f;
 	constexpr int TERRAIN_OCTAVES = 8;
 
 	constexpr int VISIBILITY_DISTANCE = 1024;

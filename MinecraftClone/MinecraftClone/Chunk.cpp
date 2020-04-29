@@ -154,12 +154,14 @@ void Chunk::reset()
 {
 	m_startingPosition = glm::ivec3();
 	m_endingPosition = glm::ivec3();
+
 	m_AABB = Rectangle();
-	memset(&m_chunk, char(), m_chunk.size());
 }
 
 void Chunk::reuse(const glm::ivec3& startingPosition)
 {	
+	memset(&m_chunk, char(), m_chunk.size());
+
 	m_startingPosition = startingPosition;
 	m_endingPosition = glm::ivec3(startingPosition.x + Utilities::CHUNK_WIDTH, startingPosition.y + Utilities::CHUNK_HEIGHT,
 		startingPosition.z + Utilities::CHUNK_DEPTH);
