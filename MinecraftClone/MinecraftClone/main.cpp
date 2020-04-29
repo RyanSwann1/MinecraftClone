@@ -87,7 +87,6 @@ int main()
 	sf::Vector2i windowSize(1980, 1080);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft", sf::Style::Default, settings);
 	window.setVerticalSyncEnabled(true);
-	//window.setFramerateLimit(15);
 	gladLoadGL();
 
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
@@ -152,7 +151,7 @@ int main()
 		++frames;
 		if (gameClock.getElapsedTime().asSeconds() - lastTime >= 1.0f)
 		{
-			std::cout << 1000.0f / frames << "\n";
+			//std::cout << 1000.0f / frames << "\n";
 			frames = 0;
 			lastTime += 1.0f;
 		}

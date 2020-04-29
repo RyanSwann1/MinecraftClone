@@ -273,45 +273,26 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 		addChunks(position);
 		regenerateChunks(renderingMutex);
 
+		std::lock_guard<std::mutex> renderingLock(renderingMutex);
 		if(!m_deletionQueue.empty())
 		{
 			const glm::ivec3& chunkStartingPosition = m_deletionQueue.front();
-		
-			std::unique_lock<std::mutex> renderingLock(renderingMutex);
+
 			auto VAO = m_VAOs.find(chunkStartingPosition);
 			assert(VAO != m_VAOs.end());
 			if (VAO != m_VAOs.end())
 			{
 				m_VAOs.erase(VAO);
 			}
-			renderingLock.unlock();
+
 			m_deletionQueue.pop_front();
-
-			//auto chunk = m_chunks.find(chunkStartingPosition);
-			//assert(chunk != m_chunks.end());
-			//if (chunk != m_chunks.end())
-			//{
-			//	m_chunks.erase(chunk);
-			//}
-
-
-			//renderingLock.unlock();
-
-			//auto chunk = m_chunks.find(chunkStartingPosition);
-			//assert(chunk != m_chunks.end());
-			//if (chunk != m_chunks.end())
-			//{
-			//	m_chunks.erase(chunk);
-			//}
 		}
 
 		if (!m_regenerationQueue.empty())
 		{
 			const glm::ivec3& chunkStartingPosition = m_regenerationQueue.front();
 
-			std::unique_lock<std::mutex> renderingLock(renderingMutex);
 			auto regen = m_regenerate.find(chunkStartingPosition);
-			assert(regen != m_regenerate.end());
 			if (regen != m_regenerate.end())
 			{
 				m_VAOs.emplace(std::piecewise_construct,
@@ -321,7 +302,6 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 				m_regenerate.erase(regen);
 			}
 
-			renderingLock.unlock();
 			m_regenerationQueue.pop_front();
 		}
 	}
@@ -776,7 +756,6 @@ void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& 
 	getClosestMiddlePosition(startingPosition);
 	Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Utilities::VISIBILITY_DISTANCE);
 
-	//std::lock_guard<std::mutex> renderingLock(renderingMutex);
 	//Locate Chunks to delete
 	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
 	{
@@ -784,36 +763,15 @@ void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& 
 		if (!visibilityRect.contains(chunk->second.getObject()->getAABB()))
 		{
 			auto regenerate = m_regenerate.find(chunkStartingPosition);
-			//assert(regenerate != m_regenerate.cend());
 			if (regenerate != m_regenerate.cend())
 			{
 				m_regenerate.erase(regenerate);
 			}
 			else
 			{
+				assert(std::find(m_deletionQueue.cbegin(), m_deletionQueue.cend(), chunkStartingPosition) == m_deletionQueue.end());
 				m_deletionQueue.push_back(chunkStartingPosition);
-				//if (std::find(m_deletionQueue.cbegin(), m_deletionQueue.cend(), chunkStartingPosition) == m_deletionQueue.end())
-				//{
-				//	
-				//}
 			}
-
-			
-
-			//auto VAO = m_VAOs.find(chunkStartingPosition);
-			//if (VAO != m_VAOs.cend())
-			//{
-			//	m_VAOs.erase(VAO);
-			//}
-			//else
-			//{
-			//	auto regenerate = m_regenerate.find(chunkStartingPosition);
-			//	//assert(regenerate != m_regenerate.cend());
-			//	if (regenerate != m_regenerate.cend())
-			//	{
-			//		m_regenerate.erase(regenerate);
-			//	}
-			//}
 
 			chunk = m_chunks.erase(chunk);
 		}
@@ -864,10 +822,10 @@ void ChunkGenerator::regenerateChunks(std::mutex& renderingMutex)
 {
 	for (auto regen = m_regenerate.begin(); regen != m_regenerate.end(); ++regen)
 	{
-
 		//If Chunk has no neighbours - then it can be regenerated
 		const glm::ivec3& chunkStartingPosition = regen->second.chunkFromPool.getObject()->getStartingPosition();
-		if (m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left)) != m_chunks.cend() &&
+		if (!regen->second.regenerated && 
+			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left)) != m_chunks.cend() &&
 			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Right)) != m_chunks.cend() &&
 			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back)) != m_chunks.cend() &&
 			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward)) != m_chunks.cend())
@@ -875,31 +833,10 @@ void ChunkGenerator::regenerateChunks(std::mutex& renderingMutex)
 			generateChunkMesh(*regen->second.vertexArrayToRegenerate.getObject(), *regen->second.chunkFromPool.getObject());
 			regen->second.regenerated = true;
 
-			if (std::find(m_regenerationQueue.cbegin(), m_regenerationQueue.cend(), chunkStartingPosition) == m_regenerationQueue.cend())
-			{
-				m_regenerationQueue.push_back(regen->first);
-			}
+			assert(std::find(m_regenerationQueue.cbegin(), m_regenerationQueue.cend(), chunkStartingPosition) == m_regenerationQueue.cend());
+			m_regenerationQueue.push_back(regen->first);	
 		}
 	}
-
-	//std::lock_guard<std::mutex> renderingLock(renderingMutex);
-	//for (auto iter = m_regenerate.begin(); iter != m_regenerate.end();)
-	//{
-	//	if (iter->second.regenerated)
-	//	{
-	//		const glm::ivec3& chunkStartingPosition = iter->second.chunkFromPool.getObject()->getStartingPosition();
-	//		
-	//		m_VAOs.emplace(std::piecewise_construct,
-	//			std::forward_as_tuple(chunkStartingPosition), 
-	//			std::forward_as_tuple(std::move(iter->second.vertexArrayToRegenerate)));
-
-	//		iter = m_regenerate.erase(iter);
-	//	}
-	//	else
-	//	{
-	//		++iter;
-	//	}
-	//}
 }
 
 const Chunk* ChunkGenerator::getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const
