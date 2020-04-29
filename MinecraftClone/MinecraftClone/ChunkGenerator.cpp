@@ -519,10 +519,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 				}
 				else if (cubeType == eCubeType::Water)
 				{
-					if (!vertexArray.m_regenerate)
-					{
-						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
-					}
+					addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
 				}
 				else if (cubeType == eCubeType::Leaves)
 				{
@@ -535,14 +532,9 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
 						}
 					}
-					else if (leftNeighbouringChunk &&
-						!isCubeAtPosition(leftPosition, *leftNeighbouringChunk))
+					else if (!isCubeAtPosition(leftPosition, *leftNeighbouringChunk))
 					{
 						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
-					}
-					else if (!leftNeighbouringChunk)
-					{
-						vertexArray.m_regenerate = true;
 					}
 
 					//Right Face
@@ -554,14 +546,9 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
 						}
 					}
-					else if (rightNeighbouringChunk &&
-						!isCubeAtPosition(rightPosition, *rightNeighbouringChunk))
+					else if (!isCubeAtPosition(rightPosition, *rightNeighbouringChunk))
 					{
 						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
-					}
-					else if (!rightNeighbouringChunk)
-					{
-						vertexArray.m_regenerate = true;
 					}
 
 					//Forward Face
@@ -573,14 +560,9 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
 						}
 					}
-					else if (forwardNeighbouringChunk &&
-						!isCubeAtPosition(forwardPosition, *forwardNeighbouringChunk))
+					else if (!isCubeAtPosition(forwardPosition, *forwardNeighbouringChunk))
 					{
 						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
-					}
-					else if (!forwardNeighbouringChunk)
-					{
-						vertexArray.m_regenerate = true;
 					}
 
 					//Back Face
@@ -592,23 +574,16 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
 						}
 					}
-					else if (backNeighbouringChunk &&
-						!isCubeAtPosition(backPosition, *backNeighbouringChunk))
+					else if (!isCubeAtPosition(backPosition, *backNeighbouringChunk))
 					{
 						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
 					}
-					else if (!backNeighbouringChunk)
-					{
-						vertexArray.m_regenerate = true;
-					}
+
 
 					//Top Face
 					if (y == Utilities::CHUNK_HEIGHT - 1 || !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
 					{
-						if (!vertexArray.m_regenerate)
-						{
-							addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
-						}
+						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
 					}
 
 					//Bottom Face
@@ -634,15 +609,11 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false);
 						}
 					}
-					else if (leftNeighbouringChunk &&
-						!isCubeAtPosition(leftPosition, *leftNeighbouringChunk))
+					else if (!isCubeAtPosition(leftPosition, *leftNeighbouringChunk))
 					{
 						addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false);
 					}
-					else if (!leftNeighbouringChunk)
-					{
-						vertexArray.m_regenerate = true;
-					}
+
 					
 					//Right Face
 					glm::ivec3 rightPosition(x + 1, y, z);
@@ -653,14 +624,9 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, false);
 						}
 					}
-					else if (rightNeighbouringChunk &&
-						!isCubeAtPosition(rightPosition, *rightNeighbouringChunk))
+					else if (!isCubeAtPosition(rightPosition, *rightNeighbouringChunk))
 					{
 						addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, false);
-					}
-					else if (!rightNeighbouringChunk)
-					{
-						vertexArray.m_regenerate = true;
 					}
 
 					//Forward Face
@@ -672,14 +638,9 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false);
 						}
 					}
-					else if (forwardNeighbouringChunk &&
-						!isCubeAtPosition(forwardPosition, *forwardNeighbouringChunk))
+					else if (!isCubeAtPosition(forwardPosition, *forwardNeighbouringChunk))
 					{
 						addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false);
-					}
-					else if (!forwardNeighbouringChunk)
-					{
-						vertexArray.m_regenerate = true;
 					}
 
 					//Back Face
@@ -691,14 +652,9 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false);
 						}
 					}
-					else if (backNeighbouringChunk &&
-						!isCubeAtPosition(backPosition, *backNeighbouringChunk))
+					else if (!isCubeAtPosition(backPosition, *backNeighbouringChunk))
 					{
 						addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false);
-					}
-					else if (!backNeighbouringChunk)
-					{
-						vertexArray.m_regenerate = true;
 					}
 
 					if (cubeType == eCubeType::LogTop)
@@ -710,10 +666,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 						//Top Face
 						if (y == Utilities::CHUNK_HEIGHT - 1 || !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
 						{
-							if (!vertexArray.m_regenerate)
-							{
-								addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false);
-							}
+							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false);
 						}
 					}
 				}
@@ -721,17 +674,14 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 		}
 	}
 
-	if (!vertexArray.m_regenerate)
+	if (!vertexArray.m_opaqueVertexBuffer.indicies.empty())
 	{
-		if (!vertexArray.m_opaqueVertexBuffer.indicies.empty())
-		{
-			vertexArray.m_opaqueVertexBuffer.bindToVAO = true;
-		}
+		vertexArray.m_opaqueVertexBuffer.bindToVAO = true;
+	}
 
-		if (!vertexArray.m_transparentVertexBuffer.indicies.empty())
-		{
-			vertexArray.m_transparentVertexBuffer.bindToVAO = true;
-		}
+	if (!vertexArray.m_transparentVertexBuffer.indicies.empty())
+	{
+		vertexArray.m_transparentVertexBuffer.bindToVAO = true;
 	}
 }
 

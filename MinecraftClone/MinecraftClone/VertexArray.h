@@ -19,7 +19,6 @@ struct VertexArray : private NonCopyable
 	void bindTransparentVAO() const;
 	void unbind() const;
 	
-	bool m_regenerate;
 	VertexBuffer m_opaqueVertexBuffer;
 	VertexBuffer m_transparentVertexBuffer;
 	unsigned int m_opaqueID;
