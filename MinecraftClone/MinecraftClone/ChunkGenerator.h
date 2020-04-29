@@ -10,7 +10,7 @@
 #include <mutex>
 #include <SFML/Graphics.hpp>
 #include <atomic>
-#include <queue>
+#include <deque>
 
 //Dyanmic Chunk Generation
 //https://gamedev.stackexchange.com/questions/173820/how-should-i-store-loaded-world-chunks-in-ram-for-my-game-similar-to-minecraft
@@ -71,8 +71,8 @@ private:
 	std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>> m_chunks;
 	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_VAOs;
 	std::unordered_map<glm::ivec3, Regenerate> m_regenerate;
-	std::queue<glm::ivec3> m_deletionQueue;
-	std::queue<glm::ivec3> m_regenerationQueue;
+	std::deque<glm::ivec3> m_deletionQueue;
+	std::deque<glm::ivec3> m_regenerationQueue;
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
