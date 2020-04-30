@@ -84,9 +84,9 @@ public:
 	{
 		//Added a little bit more than neccessary due to how the inifinite map generates
 		int x = visibilityDistance / chunkWidth;
-		x += x += 2;
+		x += x += 1;
 		int z = visibilityDistance / chunkDepth;
-		z += z += 2;
+		z += z += 1;
 
 		m_objectPool.resize(size_t(x * z));
 	}
