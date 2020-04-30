@@ -23,7 +23,7 @@ public:
 	Chunk(Chunk&&) noexcept;
 	Chunk& operator=(Chunk&&) noexcept;
 
-	bool shadow(const glm::ivec3& position) const;
+	bool isCubeBeneathCanopy(const glm::ivec3& position) const;
 	const Rectangle& getAABB() const;
 	bool isPositionInBounds(const glm::ivec3& position) const;
 	const glm::ivec3& getStartingPosition() const;
@@ -41,7 +41,8 @@ private:
 
 	bool isPositionInLocalBounds(const glm::ivec3& position) const;
 	bool isCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType) const;
-	int getElevationValue(int x, int y) const;
+	int getElevationValue(int x, int y, float biomeLacunarity, float biomeLersistence, 
+		int biomeoctaves, int biomeRedistribution) const;
 	float getMoistureValue(int x, int y) const;
 	
 	void changeCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType);

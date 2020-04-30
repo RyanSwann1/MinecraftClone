@@ -113,7 +113,7 @@ Chunk& Chunk::operator=(Chunk&& orig) noexcept
 	return *this;
 }
 
-bool Chunk::shadow(const glm::ivec3& position) const
+bool Chunk::isCubeBeneathCanopy(const glm::ivec3& position) const
 {
 	if (!isPositionInBounds(glm::ivec3(position.x, position.y + 1, position.z)))
 	{
@@ -228,18 +228,21 @@ void Chunk::reuse(const glm::ivec3& startingPosition)
 
 void Chunk::regen(const glm::ivec3& startingPosition)
 {
+	//https://www.reddit.com/r/proceduralgeneration/search?q=biome%20transition&restrict_sr=1
+
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
 	{
 		for (int x = startingPosition.x; x < startingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 		{
-			int elevation = getElevationValue(x, z);
 			float moisture = getMoistureValue(x, z);
 			eCubeType cubeType;
-			glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
-
+			
 			//Desert Biome
 			if (moisture >= 0.5f)
 			{
+				int elevation = getElevationValue(x, z, Utilities::DESERT_LACUNARITY, Utilities::DESERT_PERSISTENCE, 
+					Utilities::TERRAIN_OCTAVES, Utilities::DESERT_REDISTRIBUTION);
+				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 				for (int y = elevation; y >= 0; --y)
 				{
 					if (y <= Utilities::STONE_MAX_HEIGHT)
@@ -257,6 +260,9 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			//Plains Biome
 			else
 			{
+				int elevation = getElevationValue(x, z, Utilities::PLAINS_LACUNARITY, Utilities::PLAINS_PERSISTENCE, 
+					Utilities::TERRAIN_OCTAVES, Utilities::PLAINS_REDISTRIBUTION);
+				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 				for (int y = elevation; y >= 0; --y)
 				{
 					if (y <= Utilities::STONE_MAX_HEIGHT)
@@ -451,16 +457,23 @@ bool Chunk::isCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType
 	return m_chunk[converTo1D(position)] == static_cast<char>(cubeType);
 }
 
-int Chunk::getElevationValue(int x, int z) const
+
+//constexpr float TERRAIN_LACUNARITY = 5.f;
+//constexpr float TERRAIN_PERSISTENCE = 8.5f;
+//constexpr int TERRAIN_OCTAVES = 8;
+
+
+int Chunk::getElevationValue(int x, int z, float biomeLacunarity, float biomePersistence, 
+	int biomeOctaves, int biomeRedistribution) const
 {
 	double ex = x / static_cast<float>(Utilities::MAP_SIZE);
 	double ey = z / static_cast<float>(Utilities::MAP_SIZE);
 
 	float elevation = 0.0f;
 
-	float persistence = Utilities::TERRAIN_PERSISTENCE;
-	float lacunarity = Utilities::TERRAIN_LACUNARITY;
-	for (int i = 0; i < Utilities::TERRAIN_OCTAVES; ++i)
+	float persistence = biomePersistence;
+	float lacunarity = biomeLacunarity;
+	for (int i = 0; i < biomeOctaves; ++i)
 	{
 		elevation += persistence * glm::perlin(glm::vec2(ex * lacunarity, ey * lacunarity));
 
@@ -468,9 +481,9 @@ int Chunk::getElevationValue(int x, int z) const
 		lacunarity *= 2.0f;
 	}
 
-	persistence = Utilities::TERRAIN_PERSISTENCE;
+	persistence = biomePersistence;
 	float total = 0.0f;
-	for (int i = 0; i < Utilities::TERRAIN_OCTAVES; ++i)
+	for (int i = 0; i < biomeOctaves; ++i)
 	{
 		total += persistence;
 		persistence /= 2.0f;
@@ -480,8 +493,9 @@ int Chunk::getElevationValue(int x, int z) const
 	{
 		elevation = 0.0f;
 	}
-	elevation = glm::pow(elevation, 1.25f);
+	elevation = glm::pow(elevation, biomeRedistribution);
 	elevation /= total;
+
 	elevation = elevation * (float)Utilities::CHUNK_HEIGHT - 1;
 	elevation = clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
 
@@ -490,8 +504,8 @@ int Chunk::getElevationValue(int x, int z) const
 
 float Chunk::getMoistureValue(int x, int z) const
 {
-	double mx = x / 1000.0f * 1.0f;
-	double my = z / 1000.0f * 1.0f;
+	double mx = x / 2000.0f * 1.0f;
+	double my = z / 2000.0f * 1.0f;
 
 	float moisture = 0.0f;
 	float moisturePersistence = Utilities::MOISTURE_PERSISTENCE;
