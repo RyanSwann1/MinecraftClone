@@ -53,12 +53,12 @@ public:
 		return m_container.find(position) != m_container.cend();
 	}
 
-	bool isEmpty()
+	bool isEmpty() const
 	{
 		return m_container.empty();
 	}
 
-	const glm::ivec3& front()
+	const glm::ivec3& front() const
 	{
 		assert(m_previousNode || m_container.empty());
 		auto iter = m_container.find(m_previousNode->position);
@@ -107,7 +107,7 @@ public:
 		}
 	}
 
-	void printAll()
+	void printAll() const
 	{
 		if (m_previousNode)
 		{
