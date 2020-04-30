@@ -113,6 +113,30 @@ Chunk& Chunk::operator=(Chunk&& orig) noexcept
 	return *this;
 }
 
+bool Chunk::shadow(const glm::ivec3& position) const
+{
+	if (!isPositionInBounds(glm::ivec3(position.x, position.y + 1, position.z)))
+	{
+		return false;
+	}
+
+	glm::ivec3 startingPositionOnGrid(position.x - m_startingPosition.x, position.y - m_startingPosition.y, position.z - m_startingPosition.z);
+	if (!isCubeAtLocalPosition(startingPositionOnGrid, eCubeType::Invalid) &&
+		isCubeAtLocalPosition(glm::ivec3(startingPositionOnGrid.x, startingPositionOnGrid.y + 1, startingPositionOnGrid.z), eCubeType::Invalid))
+	{
+		for (int y = Utilities::CHUNK_HEIGHT - 1; y > startingPositionOnGrid.y + 2; --y)
+		{
+			glm::ivec3 positionOnGrid = glm::ivec3(position.x - m_startingPosition.x, y, position.z - m_startingPosition.z);
+			if (!isCubeAtLocalPosition(positionOnGrid, eCubeType::Invalid))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 const Rectangle& Chunk::getAABB() const
 {
 	return m_AABB;
@@ -160,7 +184,7 @@ void Chunk::reset()
 
 void Chunk::reuse(const glm::ivec3& startingPosition)
 {	
-	memset(&m_chunk, char(), m_chunk.size());
+	memset(&m_chunk, static_cast<char>(eCubeType::Invalid), m_chunk.size());
 
 	m_startingPosition = startingPosition;
 	m_endingPosition = glm::ivec3(startingPosition.x + Utilities::CHUNK_WIDTH, startingPosition.y + Utilities::CHUNK_HEIGHT,
