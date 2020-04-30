@@ -257,9 +257,9 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 		regenerateChunks(renderingMutex);
 		
 		std::lock_guard<std::mutex> renderingLock(renderingMutex);
-		if(!m_deletionQueue.empty())
+		if(!m_deletions.isEmpty())
 		{
-			const glm::ivec3& chunkStartingPosition = m_deletionQueue.front();
+			const glm::ivec3& chunkStartingPosition = m_deletions.front();
 
 			auto VAO = m_VAOs.find(chunkStartingPosition);
 			assert(VAO != m_VAOs.end());
@@ -268,12 +268,12 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 				m_VAOs.erase(VAO);
 			}
 
-			m_deletionQueue.pop_front();
+			m_deletions.remove(chunkStartingPosition);
 		}
 
-		if (!m_regenerationQueue.empty())
+		if (!m_regenerations.isEmpty())
 		{
-			const glm::ivec3& chunkStartingPosition = m_regenerationQueue.front();
+			const glm::ivec3& chunkStartingPosition = m_regenerations.front();
 
 			auto regen = m_regenerate.find(chunkStartingPosition);
 			if (regen != m_regenerate.end())
@@ -285,7 +285,7 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 				m_regenerate.erase(regen);
 			}
 
-			m_regenerationQueue.pop_front();
+			m_regenerations.remove(chunkStartingPosition);
 		}
 	}
 }
@@ -736,7 +736,7 @@ void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& 
 			}
 			else
 			{
-				m_deletionQueue.push_back(chunkStartingPosition);
+				m_deletions.add(chunkStartingPosition);
 			}
 
 			chunk = m_chunks.erase(chunk);
@@ -771,18 +771,7 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 					continue;
 				}
 
-				for (auto iter = m_deletionQueue.begin(); iter != m_deletionQueue.end();)
-				{
-					if ((*iter) == chunkStartingPosition)
-					{
-						m_deletionQueue.erase(iter);
-						break;
-					}
-					else
-					{
-						++iter;
-					}
-				}
+				m_deletions.remove(chunkStartingPosition);
 
 				ObjectFromPool<Chunk>& addedChunk = m_chunks.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunkStartingPosition),
@@ -810,11 +799,11 @@ void ChunkGenerator::regenerateChunks(std::mutex& renderingMutex)
 			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back)) != m_chunks.cend() &&
 			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward)) != m_chunks.cend())
 		{
-			if (std::find(m_regenerationQueue.cbegin(), m_regenerationQueue.cend(), chunkStartingPosition) == m_regenerationQueue.cend())
+			if (!m_regenerations.contains(regen->first))
 			{
 				generateChunkMesh(*regen->second.vertexArrayToRegenerate.getObject(), *regen->second.chunkFromPool.getObject());
 				regen->second.regenerated = true;
-				m_regenerationQueue.push_back(regen->first);
+				m_regenerations.add(regen->first);
 			}
 		}
 	}

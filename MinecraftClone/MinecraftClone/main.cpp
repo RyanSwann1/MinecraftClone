@@ -77,6 +77,24 @@ void keepMouseWithinWindow(const sf::Vector2u& windowSize, sf::Vector2i& mousePo
 //x + (y * width)
 int main()
 {
+	//LinkedUnorderedMap deletions;
+
+	//deletions.add(glm::ivec3(1, 1, 1));
+	//deletions.add(glm::ivec3(2, 2, 2));
+	//deletions.add(glm::ivec3(3, 3, 3));
+
+	//deletions.remove(glm::ivec3(1, 1, 1));
+	//deletions.printAll();
+
+	//deletions.remove(glm::ivec3(2, 2, 2));
+	//deletions.printAll();
+
+	//deletions.add(glm::ivec3(1, 1, 1));
+	//deletions.printAll();
+
+	//deletions.add(glm::ivec3(2, 2, 2));
+	//deletions.printAll();
+
 	sf::ContextSettings settings;
 	settings.depthBits = 24;
 	settings.stencilBits = 8;
