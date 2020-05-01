@@ -122,7 +122,8 @@ bool Chunk::isCubeBeneathCanopy(const glm::ivec3& position) const
 
 	glm::ivec3 startingPositionOnGrid(position.x - m_startingPosition.x, position.y - m_startingPosition.y, position.z - m_startingPosition.z);
 	if (!isCubeAtLocalPosition(startingPositionOnGrid, eCubeType::Invalid) &&
-		isCubeAtLocalPosition(glm::ivec3(startingPositionOnGrid.x, startingPositionOnGrid.y + 1, startingPositionOnGrid.z), eCubeType::Invalid))
+		isCubeAtLocalPosition(glm::ivec3(startingPositionOnGrid.x, startingPositionOnGrid.y + 1, startingPositionOnGrid.z), eCubeType::Invalid) || 
+		isCubeAtLocalPosition(glm::ivec3(startingPositionOnGrid.x, startingPositionOnGrid.y + 1, startingPositionOnGrid.z), eCubeType::TallGrass))
 	{
 		for (int y = Utilities::CHUNK_HEIGHT - 1; y > startingPositionOnGrid.y + 2; --y)
 		{

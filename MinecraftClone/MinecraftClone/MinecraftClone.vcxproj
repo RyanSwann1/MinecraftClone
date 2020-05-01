@@ -148,6 +148,7 @@
     <ClInclude Include="ChunkGenerator.h" />
     <ClInclude Include="CubeID.h" />
     <ClInclude Include="Frustum.h" />
+    <ClInclude Include="LinkedUnorderedMap.h" />
     <ClInclude Include="SkyBox.h" />
     <ClInclude Include="glad.h" />
     <ClInclude Include="glm\common.hpp" />
