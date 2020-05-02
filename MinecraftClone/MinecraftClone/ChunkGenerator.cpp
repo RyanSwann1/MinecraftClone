@@ -542,7 +542,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 				bool shadow = false;
 				if (cubeType != eCubeType::Stone)
 				{
-					shadow = chunk.shadow(position);
+					shadow = chunk.isCubeBelowCovering(position);
 				}
 
 				if (cubeType == eCubeType::Invalid)

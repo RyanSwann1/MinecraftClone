@@ -113,7 +113,7 @@ Chunk& Chunk::operator=(Chunk&& orig) noexcept
 	return *this;
 }
 
-bool Chunk::shadow(const glm::ivec3& position) const
+bool Chunk::isCubeBelowCovering(const glm::ivec3& position) const
 {
 	if (!isPositionInBounds(glm::ivec3(position.x, position.y + 1, position.z)))
 	{
