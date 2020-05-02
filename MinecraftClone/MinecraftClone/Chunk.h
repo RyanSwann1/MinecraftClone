@@ -14,6 +14,12 @@
 //Saving/Storing
 //https://www.reddit.com/r/proceduralgeneration/comments/3gwbux/question_how_does_the_world_remember_changes/
 
+enum class eBiomeType
+{
+	Plains = 0,
+	Desert
+};
+
 //position.y * (CHUNK_AREA) + position.z * CHUNK_SIZE + position.x;
 class Chunk : private NonCopyable
 {
@@ -36,6 +42,7 @@ public:
 private:
 	glm::ivec3 m_startingPosition;
 	glm::ivec3 m_endingPosition;
+	std::array<std::array<int, 32>, 32> m_heightMap;
 	std::array<char, Utilities::CHUNK_VOLUME> m_chunk;
 	Rectangle m_AABB;
 
@@ -53,4 +60,8 @@ private:
 	void spawnPlant(int maxQuantity, eCubeType baseCubeType, eCubeType plantCubeType);
 	void spawnLeaves(const glm::ivec3& startingPosition, int treeHeight);
 	void spawnTreeStump(const glm::ivec3& startingPosition, int treeHeight);
+
+	eBiomeType getBiomeTypeAtPosition(int x, int y) const;
+	void constructHeightMap(const glm::ivec2& startingPositionOnGrid);
+	int getElevationAtPosition(const glm::ivec2& positionOnGrid) const;
 };

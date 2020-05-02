@@ -50,6 +50,7 @@ namespace
 		idx -= (position.z * Utilities::CHUNK_WIDTH * Utilities::CHUNK_HEIGHT);
 		position.y = idx / Utilities::CHUNK_WIDTH;
 		position.x = idx % Utilities::CHUNK_WIDTH;
+
 		return position;
 	}
 
@@ -74,6 +75,29 @@ namespace
 		}
 
 		return value;
+	}
+
+	float bilinearInterpolation(float bottomLeft, float topLeft, float bottomRight, float topRight,
+		float xMin, float xMax,
+		float zMin, float zMax,
+		float x, float z)
+	{
+		float   width = xMax - xMin,
+			height = zMax - zMin,
+
+			xDistanceToMaxValue = xMax - x,
+			zDistanceToMaxValue = zMax - z,
+
+			xDistanceToMinValue = x - xMin,
+			zDistanceToMinValue = z - zMin;
+
+		return 1.0f / (width * height) *
+			(
+				bottomLeft * xDistanceToMaxValue * zDistanceToMaxValue +
+				bottomRight * xDistanceToMinValue * zDistanceToMaxValue +
+				topLeft * xDistanceToMaxValue * zDistanceToMinValue +
+				topRight * xDistanceToMinValue * zDistanceToMinValue
+				);
 	}
 }
 
@@ -230,19 +254,23 @@ void Chunk::reuse(const glm::ivec3& startingPosition)
 void Chunk::regen(const glm::ivec3& startingPosition)
 {
 	//https://www.reddit.com/r/proceduralgeneration/search?q=biome%20transition&restrict_sr=1
+	
+	constructHeightMap(glm::ivec2(startingPosition.x, startingPosition.z));
 
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
 	{
 		for (int x = startingPosition.x; x < startingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 		{
+			glm::ivec2 positionOnGrid(x - startingPosition.x, z - startingPosition.z);
 			float moisture = getMoistureValue(x, z);
 			eCubeType cubeType;
 			
 			//Desert Biome
 			if (moisture >= 0.5f)
 			{
-				int elevation = getElevationValue(x, z, Utilities::DESERT_LACUNARITY, Utilities::DESERT_PERSISTENCE, 
-					Utilities::TERRAIN_OCTAVES, Utilities::DESERT_REDISTRIBUTION);
+				int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
+				//int elevation = getElevationValue(x, z, Utilities::DESERT_LACUNARITY, Utilities::DESERT_PERSISTENCE, 
+				//	Utilities::TERRAIN_OCTAVES, Utilities::DESERT_REDISTRIBUTION);
 				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 				for (int y = elevation; y >= 0; --y)
 				{
@@ -261,8 +289,9 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			//Plains Biome
 			else
 			{
-				int elevation = getElevationValue(x, z, Utilities::PLAINS_LACUNARITY, Utilities::PLAINS_PERSISTENCE, 
-					Utilities::TERRAIN_OCTAVES, Utilities::PLAINS_REDISTRIBUTION);
+				int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
+				//int elevation = getElevationValue(x, z, Utilities::PLAINS_LACUNARITY, Utilities::PLAINS_PERSISTENCE, 
+				//	Utilities::TERRAIN_OCTAVES, Utilities::PLAINS_REDISTRIBUTION);
 				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 				for (int y = elevation; y >= 0; --y)
 				{
@@ -442,6 +471,59 @@ void Chunk::spawnTreeStump(const glm::ivec3& startingPosition, int treeHeight)
 	}
 }
 
+eBiomeType Chunk::getBiomeTypeAtPosition(int x, int y) const
+{
+	float moisture = getMoistureValue(x, y);
+	if (moisture >= 0.5f)
+	{
+		return eBiomeType::Desert;
+	}
+	else
+	{
+		return eBiomeType::Plains;
+	}
+}
+
+void Chunk::constructHeightMap(const glm::ivec2& startingPositionOnGrid)
+{
+	int bottomLeft = getElevationAtPosition(glm::ivec2(startingPositionOnGrid.x, startingPositionOnGrid.y));
+	int bottomRight = getElevationAtPosition(glm::ivec2(startingPositionOnGrid.x + Utilities::CHUNK_WIDTH, startingPositionOnGrid.y));
+	int topLeft = getElevationAtPosition(glm::ivec2(startingPositionOnGrid.x, startingPositionOnGrid.y + Utilities::CHUNK_DEPTH));
+	int topRight = getElevationAtPosition(glm::ivec2(startingPositionOnGrid.x + Utilities::CHUNK_WIDTH, startingPositionOnGrid.y + Utilities::CHUNK_DEPTH));
+
+	for (int z = 0; z < + Utilities::CHUNK_DEPTH; ++z)
+	{
+		for (int x = 0; x < + Utilities::CHUNK_WIDTH; ++x)
+		{
+			int h = bilinearInterpolation(bottomLeft, topLeft, bottomRight, topRight,
+				0, Utilities::CHUNK_WIDTH,
+				0, Utilities::CHUNK_DEPTH,
+				z, x);
+
+			m_heightMap[x][z] = h;
+		}
+	}
+}
+
+int Chunk::getElevationAtPosition(const glm::ivec2& positionOnGrid) const
+{
+	float biomeType = getMoistureValue(positionOnGrid.x, positionOnGrid.y);
+	//Desert Biome
+	if (biomeType >= 0.5f)
+	{
+		//int Chunk::getElevationValue(int x, int z, float biomeLacunarity, float biomePersistence,
+		//	int biomeOctaves, int biomeRedistribution) const
+		return getElevationValue(positionOnGrid.x, positionOnGrid.y, Utilities::DESERT_LACUNARITY, 
+			Utilities::DESERT_PERSISTENCE, Utilities::TERRAIN_OCTAVES, Utilities::DESERT_REDISTRIBUTION);
+	}
+	//Plains Biome
+	else
+	{
+		return getElevationValue(positionOnGrid.x, positionOnGrid.y, Utilities::PLAINS_LACUNARITY,
+			Utilities::PLAINS_PERSISTENCE, Utilities::TERRAIN_OCTAVES, Utilities::PLAINS_REDISTRIBUTION);
+	}
+}
+
 bool Chunk::isPositionInLocalBounds(const glm::ivec3& position) const
 {
 	return (position.x >= 0 &&
@@ -462,7 +544,6 @@ bool Chunk::isCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType
 //constexpr float TERRAIN_LACUNARITY = 5.f;
 //constexpr float TERRAIN_PERSISTENCE = 8.5f;
 //constexpr int TERRAIN_OCTAVES = 8;
-
 
 int Chunk::getElevationValue(int x, int z, float biomeLacunarity, float biomePersistence, 
 	int biomeOctaves, int biomeRedistribution) const
@@ -490,11 +571,13 @@ int Chunk::getElevationValue(int x, int z, float biomeLacunarity, float biomePer
 		persistence /= 2.0f;
 	}
 
+	//total += biomeRedistribution;
 	if (elevation < 0)
 	{
 		elevation = 0.0f;
 	}
-	elevation = glm::pow(elevation, biomeRedistribution);
+	//elevation = glm::pow(elevation, biomeRedistribution);
+	
 	elevation /= total;
 
 	elevation = elevation * (float)Utilities::CHUNK_HEIGHT - 1;
@@ -505,8 +588,8 @@ int Chunk::getElevationValue(int x, int z, float biomeLacunarity, float biomePer
 
 float Chunk::getMoistureValue(int x, int z) const
 {
-	double mx = x / 2000.0f * 1.0f;
-	double my = z / 2000.0f * 1.0f;
+	double mx = x / 4000.0f * 1.0f;
+	double my = z / 4000.0f * 1.0f;
 
 	float moisture = 0.0f;
 	float moisturePersistence = Utilities::MOISTURE_PERSISTENCE;
