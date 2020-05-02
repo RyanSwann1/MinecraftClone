@@ -386,7 +386,7 @@ void Chunk::spawnPlant(int maxQuantity, eCubeType baseCubeType, eCubeType plantC
 		spawnPosition.x = getRandomNumber(0, Utilities::CHUNK_WIDTH - 1);
 		spawnPosition.z = getRandomNumber(0, Utilities::CHUNK_DEPTH - 1);
 
-		for (int y = Utilities::CHUNK_HEIGHT - 1; y >= 0; --y)
+		for (int y = Utilities::CHUNK_HEIGHT - 5; y >= Utilities::WATER_MAX_HEIGHT; --y)
 		{
 			spawnPosition.y = y;
 			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Invalid) &&
@@ -469,6 +469,12 @@ int Chunk::getElevationValue(int x, int z) const
 		lacunarity *= 2.0f;
 	}
 
+
+	//elevation = (elevation - -1) / (1 - -1) * (Utilities::CHUNK_HEIGHT - 1);
+
+
+	//elevation = clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
+	
 	persistence = Utilities::TERRAIN_PERSISTENCE;
 	float total = 0.0f;
 	for (int i = 0; i < Utilities::TERRAIN_OCTAVES; ++i)
@@ -477,14 +483,20 @@ int Chunk::getElevationValue(int x, int z) const
 		persistence /= 2.0f;
 	}
 
-	if (elevation < 0)
-	{
-		elevation = 0.0f;
-	}
-	elevation = glm::pow(elevation, 1.25f);
+	//if (elevation < 0)
+	//{
+	//	elevation = 0.0f;
+	//}
+	
 	elevation /= total;
+	//elevation = glm::pow(elevation, 0.95f);
+
+	//elevation = (elevation - -1) / (1 - -1)  * (Utilities::CHUNK_HEIGHT - 1) + 1;
+	//elevation = (elevation - -1) / (1 - -1) * (Utilities::CHUNK_HEIGHT - 1) + 1;
+
+	//elevation = elevation / Utilities::CHUNK_HEIGHT;
+	elevation = glm::pow(elevation, 0.7f);
 	elevation = elevation * (float)Utilities::CHUNK_HEIGHT - 1;
-	elevation = clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
 
 	return elevation;
 }
