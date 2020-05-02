@@ -268,7 +268,7 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 				m_VAOs.erase(VAO);
 			}
 
-			m_deletions.remove(chunkStartingPosition);
+			m_deletions.pop();
 		}
 
 		if (!m_regenerations.isEmpty())
@@ -285,7 +285,7 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 				m_regenerate.erase(regen);
 			}
 
-			m_regenerations.remove(chunkStartingPosition);
+			m_regenerations.pop();
 		}
 	}
 }
@@ -542,7 +542,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 				bool shadow = false;
 				if (cubeType != eCubeType::Stone)
 				{
-					shadow = chunk.isCubeBeneathCanopy(position);
+					shadow = chunk.isCubeBelowCovering(position);
 				}
 
 				if (cubeType == eCubeType::Invalid)

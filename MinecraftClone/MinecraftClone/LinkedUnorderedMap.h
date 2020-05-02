@@ -60,7 +60,7 @@ public:
 
 	const glm::ivec3& front() const
 	{
-		assert(m_previousNode || m_container.empty());
+		assert(m_previousNode && !m_container.empty());
 		auto iter = m_container.find(m_previousNode->position);
 		assert(iter != m_container.end());
 		return iter->second.position;
@@ -72,7 +72,16 @@ public:
 		auto iter = m_container.find(m_previousNode->position);
 		assert(iter != m_container.end());
 
-		m_previousNode = iter->second.previous;
+		if (!iter->second.previous)
+		{
+			m_previousNode = nullptr;
+		}
+		else
+		{
+			m_previousNode = iter->second.previous;
+			m_previousNode->next = nullptr;
+		}
+
 		m_container.erase(iter);
 	}
 
@@ -133,6 +142,6 @@ public:
 	}
 
 private:
-	Node* m_previousNode;
+	Node* m_previousNode; //Queue instead
 	std::unordered_map<glm::ivec3, Node> m_container;
 };

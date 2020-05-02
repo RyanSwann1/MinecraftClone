@@ -49,35 +49,35 @@ class ObjectPool;
 template <class Object>
 struct ObjectFromPool : private NonCopyable
 {
-	ObjectFromPool(ObjectInPool<Object>* objectInPool, ObjectPool<Object>& objectPool) 
+	ObjectFromPool(ObjectInPool<Object>* objectInPool, std::function<void(int)> func)
 		: objectInPool(objectInPool),
-		objectPool(objectPool)
+		m_func(func)
 	{
 		if (objectInPool)
 		{
 			objectInPool->inUse = true;
 		}
 	}
-	~ObjectFromPool() 
+	~ObjectFromPool()
 	{
 		if (objectInPool)
 		{
 			objectInPool->object.reset();
 			objectInPool->inUse = false;
-			
-			objectPool.get().releaseID(objectInPool->ID);
+
+			m_func(objectInPool->ID);
 		}
 	}
 	ObjectFromPool(ObjectFromPool&& orig) noexcept
 		: objectInPool(orig.objectInPool),
-		objectPool(orig.objectPool)
+		m_func(orig.m_func)
 	{
 		orig.objectInPool = nullptr;
 	}
 	ObjectFromPool& operator=(ObjectFromPool&& orig) noexcept
 	{
 		objectInPool = orig.objectInPool;
-		objectPool = orig.objectPool;
+		m_func = orig.m_func;
 
 		orig.objectInPool = nullptr;
 
@@ -91,14 +91,15 @@ struct ObjectFromPool : private NonCopyable
 
 private:
 	ObjectInPool<Object>* objectInPool;
-	std::reference_wrapper<ObjectPool<Object>> objectPool;
+	std::function<void(int)> m_func;
 };
+
+using std::placeholders::_1;
 
 //Object Pool
 template <class Object>
 class ObjectPool : private NonCopyable, private NonMovable
 {
-	friend class ObjectFromPool<Object>;
 public:
 	ObjectPool(int visibilityDistance, int chunkWidth, int chunkDepth)
 		: m_objectPool()
@@ -123,11 +124,11 @@ public:
 		{
 			int ID = m_availableObjects.top();
 			m_availableObjects.pop();
-			return ObjectFromPool<Object>(&m_objectPool[ID], *this);
+			return ObjectFromPool<Object>(&m_objectPool[ID], std::bind(&ObjectPool<Object>::releaseID, this, _1));
 		}
 		else
 		{
-			return ObjectFromPool<Object>(nullptr, *this);
+			return ObjectFromPool<Object>(nullptr, std::bind(&ObjectPool<Object>::releaseID, this, _1));
 		}
 	}
 
