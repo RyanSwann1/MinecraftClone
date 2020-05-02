@@ -62,7 +62,7 @@ namespace
 		return dis(gen);
 	}
 
-	float clampTo(float value, float min, float max)
+	float clampTo(int value, int min, int max)
 	{
 		if (value < min)
 		{
@@ -488,15 +488,19 @@ int Chunk::getElevationValue(int x, int z) const
 	//	elevation = 0.0f;
 	//}
 	
-	elevation /= total;
-	//elevation = glm::pow(elevation, 0.95f);
+		//elevation = glm::pow(elevation, 0.95f);
 
 	//elevation = (elevation - -1) / (1 - -1)  * (Utilities::CHUNK_HEIGHT - 1) + 1;
 	//elevation = (elevation - -1) / (1 - -1) * (Utilities::CHUNK_HEIGHT - 1) + 1;
 
 	//elevation = elevation / Utilities::CHUNK_HEIGHT;
-	elevation = glm::pow(elevation, 0.7f);
+	//elevation = (elevation - -1) / (1 - -1) * (Utilities::CHUNK_HEIGHT - 1);
+
+	elevation = (elevation + 1) / 2;
+	elevation += glm::pow(elevation, 2.5f);
+	elevation /= total;
 	elevation = elevation * (float)Utilities::CHUNK_HEIGHT - 1;
+	elevation = clampTo(elevation, 0, Utilities::CHUNK_HEIGHT - 1);
 
 	return elevation;
 }
@@ -516,10 +520,8 @@ float Chunk::getMoistureValue(int x, int z) const
 		moisturePersistence /= 2.0f;
 		moistureLacunarity *= 2.0f;
 	}
-	if (moisture < 0)
-	{
-		moisture = 0.0f;
-	}
+
+	moisture = (moisture + 1) / 2;
 
 	return moisture;
 }
