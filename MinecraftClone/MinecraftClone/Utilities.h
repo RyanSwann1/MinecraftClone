@@ -82,7 +82,7 @@ namespace Utilities
 	constexpr float TERRAIN_PERSISTENCE = 8.5f;
 	constexpr int TERRAIN_OCTAVES = 8;
 
-	constexpr int VISIBILITY_DISTANCE = 1024;
+	constexpr int VISIBILITY_DISTANCE = 864;
 	constexpr int MAP_SIZE = 8000;
 	const glm::vec3 PLAYER_STARTING_POSITION(0.0f, 100.f, 0.0f);
 	const std::string TEXTURE_DIRECTORY = "Textures/";
