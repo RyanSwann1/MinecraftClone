@@ -6,7 +6,7 @@
 #include "glm/gtx/hash.hpp"
 #include <iostream>
 
-class LinkedUnorderedMap
+class PositionStack
 {
 	struct Node
 	{
@@ -22,21 +22,21 @@ class LinkedUnorderedMap
 	};
 
 public:
-	LinkedUnorderedMap()
-		: m_previousNode(nullptr),
+	PositionStack()
+		: m_previousAddedNode(nullptr),
 		m_container()
 	{}
 
 	void add(const glm::ivec3& position)
 	{
-		if (m_previousNode)
+		if (m_previousAddedNode)
 		{
 			Node& addedNode = m_container.emplace(std::piecewise_construct,
 				std::forward_as_tuple(position),
-				std::forward_as_tuple(position, m_previousNode)).first->second;
+				std::forward_as_tuple(position, m_previousAddedNode)).first->second;
 
-			m_previousNode->next = &addedNode;
-			m_previousNode = &addedNode;
+			m_previousAddedNode->next = &addedNode;
+			m_previousAddedNode = &addedNode;
 		}
 		else
 		{
@@ -44,7 +44,7 @@ public:
 				std::forward_as_tuple(position),
 				std::forward_as_tuple(position, nullptr)).first->second;
 
-			m_previousNode = &addedNode;
+			m_previousAddedNode = &addedNode;
 		}
 	}
 
@@ -60,26 +60,26 @@ public:
 
 	const glm::ivec3& front() const
 	{
-		assert(m_previousNode && !m_container.empty());
-		auto iter = m_container.find(m_previousNode->position);
+		assert(m_previousAddedNode && !m_container.empty());
+		auto iter = m_container.find(m_previousAddedNode->position);
 		assert(iter != m_container.end());
 		return iter->second.position;
 	}
 
 	void pop()
 	{
-		assert(m_previousNode || m_container.empty());
-		auto iter = m_container.find(m_previousNode->position);
+		assert(m_previousAddedNode || m_container.empty());
+		auto iter = m_container.find(m_previousAddedNode->position);
 		assert(iter != m_container.end());
 
 		if (!iter->second.previous)
 		{
-			m_previousNode = nullptr;
+			m_previousAddedNode = nullptr;
 		}
 		else
 		{
-			m_previousNode = iter->second.previous;
-			m_previousNode->next = nullptr;
+			m_previousAddedNode = iter->second.previous;
+			m_previousAddedNode->next = nullptr;
 		}
 
 		m_container.erase(iter);
@@ -105,11 +105,11 @@ public:
 			
 			if(!nextNode && previousNode)
 			{
-				m_previousNode = previousNode;
+				m_previousAddedNode = previousNode;
 			}
 			else if (!nextNode && !previousNode)
 			{
-				m_previousNode = nullptr;
+				m_previousAddedNode = nullptr;
 			}
 
 			m_container.erase(iter);
@@ -118,9 +118,9 @@ public:
 
 	void printAll() const
 	{
-		if (m_previousNode)
+		if (m_previousAddedNode)
 		{
-			Node* node = m_previousNode;
+			Node* node = m_previousAddedNode;
 			while (node)
 			{
 				std::cout << node->position.x << "\n";
@@ -142,6 +142,6 @@ public:
 	}
 
 private:
-	Node* m_previousNode; //Queue instead
+	Node* m_previousAddedNode;
 	std::unordered_map<glm::ivec3, Node> m_container;
 };
