@@ -176,7 +176,7 @@
     <ClInclude Include="Frustum.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LinkedUnorderedMap.h">
+    <ClInclude Include="PositionQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

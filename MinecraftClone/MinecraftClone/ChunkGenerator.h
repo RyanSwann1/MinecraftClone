@@ -4,7 +4,7 @@
 #include "Chunk.h"
 #include "VertexArray.h"
 #include "glm/gtx/hash.hpp"
-#include "LinkedUnorderedMap.h"
+#include "PositionQueue.h"
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -71,8 +71,8 @@ private:
 	std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>> m_chunks;
 	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_VAOs;
 	std::unordered_map<glm::ivec3, ChunkMeshToGenerate> m_chunkMeshesToGenerate;
-	PositionStack m_chunksToDelete;
-	PositionStack m_generatedChunkMeshes;
+	PositionQueue m_chunksToDelete;
+	PositionQueue m_generatedChunkMeshes;
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;

@@ -6,6 +6,7 @@
 #include "glm/gtx/hash.hpp"
 #include <iostream>
 
+//Queue data structure with O(1) best case for quiries
 
 class PositionQueue
 {
@@ -140,7 +141,6 @@ public:
 			{
 				previousNode->next = nextNode;
 				nextNode->previous = previousNode;
-
 			}
 			else
 			{
