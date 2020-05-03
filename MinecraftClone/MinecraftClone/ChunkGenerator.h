@@ -53,7 +53,7 @@ class ChunkGenerator : private NonCopyable, private NonMovable
 	{
 		ChunkMeshToGenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool);
 
-		ObjectFromPool<VertexArray> vertexArrayToRegenerate;
+		ObjectFromPool<VertexArray> vertexArrayFromPool;
 		const ObjectFromPool<Chunk>& chunkFromPool;
 	};
 
@@ -84,5 +84,5 @@ private:
 	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::vec3& playerPosition);
-	void regenerateChunks(std::mutex& renderingMutex);
+	void generateChunkMeshes(std::mutex& renderingMutex);
 };
