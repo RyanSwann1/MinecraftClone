@@ -196,10 +196,9 @@ namespace
 	constexpr std::array<glm::ivec3, 4> SECOND_DIAGONAL_FACE = { glm::ivec3(0, 0, 1), glm::ivec3(1, 0, 0), glm::ivec3(1, 1, 0), glm::ivec3(0, 1, 1) };
 }
 
-ChunkGenerator::Regenerate::Regenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool)
-	: vertexArrayToRegenerate(std::move(vertexArrayFromPool)),
-	chunkFromPool(chunkFromPool),
-	regenerated(false)
+ChunkGenerator::ChunkMeshToGenerate::ChunkMeshToGenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool)
+	: vertexArrayFromPool(std::move(vertexArrayFromPool)),
+	chunkFromPool(chunkFromPool)
 {}
 
 ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
@@ -236,7 +235,7 @@ ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 
 			addedChunk.getObject()->reuse(chunkStartingPosition);
 
-			m_regenerate.emplace(std::piecewise_construct,
+			m_chunkMeshesToGenerate.emplace(std::piecewise_construct,
 				std::forward_as_tuple(chunkStartingPosition),
 				std::forward_as_tuple(addedChunk, std::move(VAOFromPool)));
 		}
@@ -254,12 +253,12 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 
 		deleteChunks(position, renderingMutex);
 		addChunks(position);
-		regenerateChunks(renderingMutex);
+		generateChunkMeshes(renderingMutex);
 		
 		std::lock_guard<std::mutex> renderingLock(renderingMutex);
-		if(!m_deletions.isEmpty())
+		if(!m_chunksToDelete.isEmpty())
 		{
-			const glm::ivec3& chunkStartingPosition = m_deletions.front();
+			const glm::ivec3& chunkStartingPosition = m_chunksToDelete.front();
 
 			auto VAO = m_VAOs.find(chunkStartingPosition);
 			assert(VAO != m_VAOs.end());
@@ -268,24 +267,24 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 				m_VAOs.erase(VAO);
 			}
 
-			m_deletions.pop();
+			m_chunksToDelete.pop();
 		}
 
-		if (!m_regenerations.isEmpty())
+		if (!m_generatedChunkMeshes.isEmpty())
 		{
-			const glm::ivec3& chunkStartingPosition = m_regenerations.front();
+			const glm::ivec3& chunkStartingPosition = m_generatedChunkMeshes.front();
 
-			auto regen = m_regenerate.find(chunkStartingPosition);
-			if (regen != m_regenerate.end())
+			auto chunkMeshToGenerate = m_chunkMeshesToGenerate.find(chunkStartingPosition);
+			if (chunkMeshToGenerate != m_chunkMeshesToGenerate.end())
 			{
 				m_VAOs.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunkStartingPosition),
-					std::forward_as_tuple(std::move(regen->second.vertexArrayToRegenerate)));
+					std::forward_as_tuple(std::move(chunkMeshToGenerate->second.vertexArrayFromPool)));
 
-				m_regenerate.erase(regen);
+				m_chunkMeshesToGenerate.erase(chunkMeshToGenerate);
 			}
 
-			m_regenerations.pop();
+			m_generatedChunkMeshes.pop();
 		}
 	}
 }
@@ -729,17 +728,17 @@ void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& 
 		const glm::ivec3& chunkStartingPosition = chunk->second.getObject()->getStartingPosition();
 		if (!visibilityRect.contains(chunk->second.getObject()->getAABB()))
 		{
-			auto regenerate = m_regenerate.find(chunkStartingPosition);
-			if (regenerate != m_regenerate.cend())
+			auto chunkMeshToGenerate = m_chunkMeshesToGenerate.find(chunkStartingPosition);
+			if (chunkMeshToGenerate != m_chunkMeshesToGenerate.cend())
 			{
-				m_regenerate.erase(regenerate);
+				m_chunkMeshesToGenerate.erase(chunkMeshToGenerate);
 			}
-			else if(!m_deletions.contains(chunkStartingPosition))
+			else if(!m_chunksToDelete.contains(chunkStartingPosition))
 			{
-				m_deletions.add(chunkStartingPosition);
+				m_chunksToDelete.add(chunkStartingPosition);
 			}
 
-			m_regenerations.remove(chunkStartingPosition);
+			m_generatedChunkMeshes.remove(chunkStartingPosition);
 
 			chunk = m_chunks.erase(chunk);
 		}
@@ -773,8 +772,8 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 					continue;
 				}
 
-				m_deletions.remove(chunkStartingPosition);
-				m_regenerations.remove(chunkStartingPosition);
+				m_chunksToDelete.remove(chunkStartingPosition);
+				m_generatedChunkMeshes.remove(chunkStartingPosition);
 
 				ObjectFromPool<Chunk>& addedChunk = m_chunks.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunkStartingPosition),
@@ -782,7 +781,7 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 
 				addedChunk.getObject()->reuse(chunkStartingPosition);
 
-				m_regenerate.emplace(std::piecewise_construct,
+				m_chunkMeshesToGenerate.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunkStartingPosition),
 					std::forward_as_tuple(addedChunk, std::move(vertexArrayFromPool)));
 			}
@@ -790,26 +789,24 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 	}
 }
 
-void ChunkGenerator::regenerateChunks(std::mutex& renderingMutex)
+void ChunkGenerator::generateChunkMeshes(std::mutex& renderingMutex)
 {
-	for (auto regen = m_regenerate.begin(); regen != m_regenerate.end(); ++regen)
+	for (auto chunkMeshToGenerate = m_chunkMeshesToGenerate.begin(); chunkMeshToGenerate != m_chunkMeshesToGenerate.end(); ++chunkMeshToGenerate)
 	{
-		//If Chunk has no neighbours - then it can be regenerated
-		const glm::ivec3& chunkStartingPosition = regen->second.chunkFromPool.getObject()->getStartingPosition();
-		if (!regen->second.regenerated && 
-			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left)) != m_chunks.cend() &&
+		//If Chunk has no neighbours - then it can be Generated
+		const glm::ivec3& chunkStartingPosition = chunkMeshToGenerate->second.chunkFromPool.getObject()->getStartingPosition();
+		if (m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left)) != m_chunks.cend() &&
 			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Right)) != m_chunks.cend() &&
 			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back)) != m_chunks.cend() &&
 			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward)) != m_chunks.cend())
 		{
-			if (!m_regenerations.contains(regen->first))
+			if (!m_generatedChunkMeshes.contains(chunkMeshToGenerate->first))
 			{
-				m_regenerations.remove(regen->first);
-				assert(!m_deletions.contains(regen->first));
+				m_generatedChunkMeshes.remove(chunkMeshToGenerate->first);
+				assert(!m_chunksToDelete.contains(chunkMeshToGenerate->first));
 
-				generateChunkMesh(*regen->second.vertexArrayToRegenerate.getObject(), *regen->second.chunkFromPool.getObject());
-				regen->second.regenerated = true;
-				m_regenerations.add(regen->first);
+				generateChunkMesh(*chunkMeshToGenerate->second.vertexArrayFromPool.getObject(), *chunkMeshToGenerate->second.chunkFromPool.getObject());
+				m_generatedChunkMeshes.add(chunkMeshToGenerate->first);
 			}
 		}
 	}

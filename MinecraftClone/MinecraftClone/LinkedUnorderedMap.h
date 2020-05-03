@@ -6,6 +6,7 @@
 #include "glm/gtx/hash.hpp"
 #include <iostream>
 
+
 class PositionQueue
 {
 	struct Node
@@ -35,6 +36,7 @@ public:
 			assert(!m_initialNodeAdded && !m_recentNodeAdded);
 			Node& addedNode = m_container.emplace(std::piecewise_construct,
 				std::forward_as_tuple(position),
+
 				std::forward_as_tuple(position, nullptr)).first->second;
 
 			m_initialNodeAdded = &addedNode;
@@ -74,15 +76,18 @@ public:
 
 	const glm::ivec3& front() const
 	{
+
 		assert(m_initialNodeAdded && m_recentNodeAdded && !m_container.empty());
 		
 		auto iter = m_container.find(m_initialNodeAdded->position);
+
 		assert(iter != m_container.end());
 		return iter->second.position;
 	}
 
 	void pop()
 	{
+
 		assert(m_initialNodeAdded && m_recentNodeAdded && !m_container.empty());
 
 		auto iter = m_container.find(m_initialNodeAdded->position);
@@ -90,12 +95,15 @@ public:
 		
 		if (m_container.size() == 1)
 		{
+
 			assert(m_initialNodeAdded == m_recentNodeAdded);
 			m_initialNodeAdded = nullptr;
 			m_recentNodeAdded = nullptr;
+
 		}
 		else if(m_container.size() > 1)
 		{
+
 			assert(m_initialNodeAdded->next);
 			m_initialNodeAdded = m_initialNodeAdded->next;
 			m_initialNodeAdded->previous = nullptr;
@@ -132,12 +140,14 @@ public:
 			{
 				previousNode->next = nextNode;
 				nextNode->previous = previousNode;
+
 			}
 			else
 			{
 				assert(m_container.size() == 1);
 				m_initialNodeAdded = nullptr;
 				m_recentNodeAdded = nullptr;
+
 			}
 
 			m_container.erase(iter);
@@ -147,5 +157,6 @@ public:
 private:
 	Node* m_initialNodeAdded;
 	Node* m_recentNodeAdded;
+
 	std::unordered_map<glm::ivec3, Node> m_container;
 };

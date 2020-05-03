@@ -49,13 +49,12 @@ class VertexArray;
 struct CubeDetails;
 class ChunkGenerator : private NonCopyable, private NonMovable
 {
-	struct Regenerate : private NonCopyable, private NonMovable
+	struct ChunkMeshToGenerate : private NonCopyable, private NonMovable
 	{
-		Regenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool);
+		ChunkMeshToGenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool);
 
-		ObjectFromPool<VertexArray> vertexArrayToRegenerate;
+		ObjectFromPool<VertexArray> vertexArrayFromPool;
 		const ObjectFromPool<Chunk>& chunkFromPool;
-		bool regenerated;
 	};
 
 public:
@@ -71,9 +70,9 @@ private:
 	ObjectPool<VertexArray> m_vertexArrayPool;
 	std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>> m_chunks;
 	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_VAOs;
-	std::unordered_map<glm::ivec3, Regenerate> m_regenerate;
-	PositionQueue m_deletions;
-	PositionQueue m_regenerations;
+	std::unordered_map<glm::ivec3, ChunkMeshToGenerate> m_chunkMeshesToGenerate;
+	PositionStack m_chunksToDelete;
+	PositionStack m_generatedChunkMeshes;
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
@@ -85,5 +84,5 @@ private:
 	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::vec3& playerPosition);
-	void regenerateChunks(std::mutex& renderingMutex);
+	void generateChunkMeshes(std::mutex& renderingMutex);
 };
