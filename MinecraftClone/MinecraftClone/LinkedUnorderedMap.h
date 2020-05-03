@@ -38,9 +38,11 @@ public:
 				std::forward_as_tuple(position, nullptr)).first->second;
 
 			m_initialNodeAdded = &addedNode;
+			m_recentNodeAdded = &addedNode;
 		}
 		else if (m_container.size() == 1)
 		{
+			assert(m_initialNodeAdded && m_recentNodeAdded);
 			Node& addedNode = m_container.emplace(std::piecewise_construct,
 				std::forward_as_tuple(position),
 				std::forward_as_tuple(position, m_initialNodeAdded)).first->second;
@@ -50,8 +52,7 @@ public:
 		}
 		else if (m_container.size() > 1)
 		{
-			assert(m_initialNodeAdded != m_recentNodeAdded);
-
+			assert(m_initialNodeAdded && m_recentNodeAdded);
 			Node& addedNode = m_container.emplace(std::piecewise_construct,
 				std::forward_as_tuple(position),
 				std::forward_as_tuple(position, m_recentNodeAdded)).first->second;
@@ -101,16 +102,6 @@ public:
 		}
 
 		m_container.erase(iter);
-
-		//if (!iter->second.previous)
-		//{
-		//	m_previousNode = nullptr;
-		//}
-		//else
-		//{
-		//	m_previousNode = iter->second.previous;
-		//	m_previousNode->next = nullptr;
-		//}
 	}
 
 	void remove(const glm::ivec3& position)
@@ -151,59 +142,7 @@ public:
 
 			m_container.erase(iter);
 		}
-		//if (previousNode && nextNode)
-//{
-//	assert(*m_initialNodeAdded != (*iter->second) && *m_recentNodeAdded != (*iter->second));
-//	previousNode->next = nextNode;
-//	nextNode->previous = previousNode;
-//}
-//else
-//{
-
-
-//	if (previousNode)
-//	{
-//		m_recentNodeAdded = previousNode;
-//	}
-//	else
-//	{
-//		m_initialNode
-//	}
-//	if (nextNode)
-//	{
-//		m_initialNodeAdded = nextNode;
-//	}
-//	else
-//	{
-
-//	}
-//}
 	}
-
-	//void printAll() const
-	//{
-	//	if (m_previousNode)
-	//	{
-	//		Node* node = m_previousNode;
-	//		while (node)
-	//		{
-	//			std::cout << node->position.x << "\n";
-	//			if (node->previous)
-	//			{
-	//				node = node->previous;
-	//			}
-	//			else
-	//			{
-	//				node = nullptr;
-	//			}
-	//		}
-	//	}
-	//	else
-	//	{
-	//		std::cout << "Nothing\n";
-	//	}
-	//	std::cout << "\n";
-	//}
 
 private:
 	Node* m_initialNodeAdded;
