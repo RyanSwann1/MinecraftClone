@@ -6,7 +6,7 @@
 #include "glm/gtx/hash.hpp"
 #include <iostream>
 
-class LinkedUnorderedMap
+class PositionQueue
 {
 	struct Node
 	{
@@ -22,29 +22,42 @@ class LinkedUnorderedMap
 	};
 
 public:
-	LinkedUnorderedMap()
-		: m_previousNode(nullptr),
+	PositionQueue()
+		: m_initialNodeAdded(nullptr),
+		m_recentNodeAdded(nullptr),
 		m_container()
 	{}
 
 	void add(const glm::ivec3& position)
 	{
-		if (m_previousNode)
+		if (m_container.empty())
 		{
-			Node& addedNode = m_container.emplace(std::piecewise_construct,
-				std::forward_as_tuple(position),
-				std::forward_as_tuple(position, m_previousNode)).first->second;
-
-			m_previousNode->next = &addedNode;
-			m_previousNode = &addedNode;
-		}
-		else
-		{
+			assert(!m_initialNodeAdded && !m_recentNodeAdded);
 			Node& addedNode = m_container.emplace(std::piecewise_construct,
 				std::forward_as_tuple(position),
 				std::forward_as_tuple(position, nullptr)).first->second;
 
-			m_previousNode = &addedNode;
+			m_initialNodeAdded = &addedNode;
+		}
+		else if (m_container.size() == 1)
+		{
+			Node& addedNode = m_container.emplace(std::piecewise_construct,
+				std::forward_as_tuple(position),
+				std::forward_as_tuple(position, m_initialNodeAdded)).first->second;
+			 
+			m_initialNodeAdded->next = &addedNode;
+			m_recentNodeAdded = &addedNode;
+		}
+		else if (m_container.size() > 1)
+		{
+			assert(m_initialNodeAdded != m_recentNodeAdded);
+
+			Node& addedNode = m_container.emplace(std::piecewise_construct,
+				std::forward_as_tuple(position),
+				std::forward_as_tuple(position, m_recentNodeAdded)).first->second;
+
+			m_recentNodeAdded->next = &addedNode;
+			m_recentNodeAdded = &addedNode;
 		}
 	}
 
@@ -60,29 +73,44 @@ public:
 
 	const glm::ivec3& front() const
 	{
-		assert(m_previousNode && !m_container.empty());
-		auto iter = m_container.find(m_previousNode->position);
+		assert(m_initialNodeAdded && m_recentNodeAdded && !m_container.empty());
+		
+		auto iter = m_container.find(m_initialNodeAdded->position);
 		assert(iter != m_container.end());
 		return iter->second.position;
 	}
 
 	void pop()
 	{
-		assert(m_previousNode || m_container.empty());
-		auto iter = m_container.find(m_previousNode->position);
-		assert(iter != m_container.end());
+		assert(m_initialNodeAdded && m_recentNodeAdded && !m_container.empty());
 
-		if (!iter->second.previous)
+		auto iter = m_container.find(m_initialNodeAdded->position);
+		assert(iter != m_container.end());
+		
+		if (m_container.size() == 1)
 		{
-			m_previousNode = nullptr;
+			assert(m_initialNodeAdded == m_recentNodeAdded);
+			m_initialNodeAdded = nullptr;
+			m_recentNodeAdded = nullptr;
 		}
-		else
+		else if(m_container.size() > 1)
 		{
-			m_previousNode = iter->second.previous;
-			m_previousNode->next = nullptr;
+			assert(m_initialNodeAdded->next);
+			m_initialNodeAdded = m_initialNodeAdded->next;
+			m_initialNodeAdded->previous = nullptr;
 		}
 
 		m_container.erase(iter);
+
+		//if (!iter->second.previous)
+		//{
+		//	m_previousNode = nullptr;
+		//}
+		//else
+		//{
+		//	m_previousNode = iter->second.previous;
+		//	m_previousNode->next = nullptr;
+		//}
 	}
 
 	void remove(const glm::ivec3& position)
@@ -90,58 +118,95 @@ public:
 		auto iter = m_container.find(position);
 		if (iter != m_container.end())
 		{
+			assert(m_initialNodeAdded && m_recentNodeAdded);
 			Node* previousNode = iter->second.previous;
 			Node* nextNode = iter->second.next;
 
-			if (previousNode)
+			//Top
+			if (!nextNode && previousNode)
+			{
+				m_recentNodeAdded = previousNode;
+				m_recentNodeAdded->next = nullptr;
+				previousNode->next = nullptr;
+			}
+			//Bottom
+			else if (!previousNode && nextNode)
+			{
+				m_initialNodeAdded = nextNode;
+				m_initialNodeAdded->previous = nullptr;
+				nextNode->previous = nullptr;
+			}
+			//Inbetween
+			else if (previousNode && nextNode)
 			{
 				previousNode->next = nextNode;
-			}
-
-			if (nextNode)
-			{
 				nextNode->previous = previousNode;
 			}
-			
-			if(!nextNode && previousNode)
+			else
 			{
-				m_previousNode = previousNode;
-			}
-			else if (!nextNode && !previousNode)
-			{
-				m_previousNode = nullptr;
+				assert(m_container.size() == 1);
+				m_initialNodeAdded = nullptr;
+				m_recentNodeAdded = nullptr;
 			}
 
 			m_container.erase(iter);
 		}
+		//if (previousNode && nextNode)
+//{
+//	assert(*m_initialNodeAdded != (*iter->second) && *m_recentNodeAdded != (*iter->second));
+//	previousNode->next = nextNode;
+//	nextNode->previous = previousNode;
+//}
+//else
+//{
+
+
+//	if (previousNode)
+//	{
+//		m_recentNodeAdded = previousNode;
+//	}
+//	else
+//	{
+//		m_initialNode
+//	}
+//	if (nextNode)
+//	{
+//		m_initialNodeAdded = nextNode;
+//	}
+//	else
+//	{
+
+//	}
+//}
 	}
 
-	void printAll() const
-	{
-		if (m_previousNode)
-		{
-			Node* node = m_previousNode;
-			while (node)
-			{
-				std::cout << node->position.x << "\n";
-				if (node->previous)
-				{
-					node = node->previous;
-				}
-				else
-				{
-					node = nullptr;
-				}
-			}
-		}
-		else
-		{
-			std::cout << "Nothing\n";
-		}
-		std::cout << "\n";
-	}
+	//void printAll() const
+	//{
+	//	if (m_previousNode)
+	//	{
+	//		Node* node = m_previousNode;
+	//		while (node)
+	//		{
+	//			std::cout << node->position.x << "\n";
+	//			if (node->previous)
+	//			{
+	//				node = node->previous;
+	//			}
+	//			else
+	//			{
+	//				node = nullptr;
+	//			}
+	//		}
+	//	}
+	//	else
+	//	{
+	//		std::cout << "Nothing\n";
+	//	}
+	//	std::cout << "\n";
+	//}
 
 private:
-	Node* m_previousNode; //Queue instead
+	Node* m_initialNodeAdded;
+	Node* m_recentNodeAdded;
 	std::unordered_map<glm::ivec3, Node> m_container;
 };

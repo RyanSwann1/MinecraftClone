@@ -124,6 +124,7 @@ public:
 		{
 			int ID = m_availableObjects.top();
 			m_availableObjects.pop();
+			assert(ID < m_objectPool.size());
 			return ObjectFromPool<Object>(&m_objectPool[ID], std::bind(&ObjectPool<Object>::releaseID, this, _1));
 		}
 		else

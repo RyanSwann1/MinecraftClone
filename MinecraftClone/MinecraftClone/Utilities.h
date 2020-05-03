@@ -48,7 +48,7 @@ enum class eDirection
 namespace Utilities
 {
 	constexpr int CHUNK_WIDTH = 32;
-	constexpr int CHUNK_HEIGHT = 160;
+	constexpr int CHUNK_HEIGHT = 224;
 	constexpr int CHUNK_DEPTH = 32;
 	constexpr int CHUNK_VOLUME = CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH;
 
@@ -82,7 +82,7 @@ namespace Utilities
 	constexpr float TERRAIN_PERSISTENCE = 2.5f;
 	constexpr int TERRAIN_OCTAVES = 8;
 
-	constexpr int VISIBILITY_DISTANCE = 832;
+	constexpr int VISIBILITY_DISTANCE = 864;
 	constexpr int MAP_SIZE = 8000;
 	const glm::vec3 PLAYER_STARTING_POSITION(0.0f, 100.f, 0.0f);
 	const std::string TEXTURE_DIRECTORY = "Textures/";
