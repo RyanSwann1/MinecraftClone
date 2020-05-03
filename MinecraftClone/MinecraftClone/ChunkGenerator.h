@@ -49,9 +49,9 @@ class VertexArray;
 struct CubeDetails;
 class ChunkGenerator : private NonCopyable, private NonMovable
 {
-	struct Regenerate : private NonCopyable, private NonMovable
+	struct ChunkMeshToGenerate : private NonCopyable, private NonMovable
 	{
-		Regenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool);
+		ChunkMeshToGenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool);
 
 		ObjectFromPool<VertexArray> vertexArrayToRegenerate;
 		const ObjectFromPool<Chunk>& chunkFromPool;
@@ -70,7 +70,7 @@ private:
 	ObjectPool<VertexArray> m_vertexArrayPool;
 	std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>> m_chunks;
 	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_VAOs;
-	std::unordered_map<glm::ivec3, Regenerate> m_regenerate;
+	std::unordered_map<glm::ivec3, ChunkMeshToGenerate> m_chunkMeshToGenerate;
 	PositionStack m_deletions;
 	PositionStack m_regenerations;
 
