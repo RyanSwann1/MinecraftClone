@@ -256,9 +256,9 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 		regenerateChunks(renderingMutex);
 		
 		std::lock_guard<std::mutex> renderingLock(renderingMutex);
-		if(!m_deletions.isEmpty())
+		if(!m_chunksToDelete.isEmpty())
 		{
-			const glm::ivec3& chunkStartingPosition = m_deletions.front();
+			const glm::ivec3& chunkStartingPosition = m_chunksToDelete.front();
 
 			auto VAO = m_VAOs.find(chunkStartingPosition);
 			assert(VAO != m_VAOs.end());
@@ -267,7 +267,7 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 				m_VAOs.erase(VAO);
 			}
 
-			m_deletions.pop();
+			m_chunksToDelete.pop();
 		}
 
 		if (!m_regenerations.isEmpty())
@@ -733,9 +733,9 @@ void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& 
 			{
 				m_chunkMeshToGenerate.erase(regenerate);
 			}
-			else if(!m_deletions.contains(chunkStartingPosition))
+			else if(!m_chunksToDelete.contains(chunkStartingPosition))
 			{
-				m_deletions.add(chunkStartingPosition);
+				m_chunksToDelete.add(chunkStartingPosition);
 			}
 
 			m_regenerations.remove(chunkStartingPosition);
@@ -772,7 +772,7 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 					continue;
 				}
 
-				m_deletions.remove(chunkStartingPosition);
+				m_chunksToDelete.remove(chunkStartingPosition);
 				m_regenerations.remove(chunkStartingPosition);
 
 				ObjectFromPool<Chunk>& addedChunk = m_chunks.emplace(std::piecewise_construct,
@@ -803,7 +803,7 @@ void ChunkGenerator::regenerateChunks(std::mutex& renderingMutex)
 			if (!m_regenerations.contains(regen->first))
 			{
 				m_regenerations.remove(regen->first);
-				assert(!m_deletions.contains(regen->first));
+				assert(!m_chunksToDelete.contains(regen->first));
 
 				generateChunkMesh(*regen->second.vertexArrayToRegenerate.getObject(), *regen->second.chunkFromPool.getObject());
 				m_regenerations.add(regen->first);

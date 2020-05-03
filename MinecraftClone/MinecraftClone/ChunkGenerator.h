@@ -71,7 +71,7 @@ private:
 	std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>> m_chunks;
 	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_VAOs;
 	std::unordered_map<glm::ivec3, ChunkMeshToGenerate> m_chunkMeshToGenerate;
-	PositionStack m_deletions;
+	PositionStack m_chunksToDelete;
 	PositionStack m_regenerations;
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
