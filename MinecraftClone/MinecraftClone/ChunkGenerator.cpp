@@ -734,12 +734,11 @@ void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& 
 			{
 				m_regenerate.erase(regenerate);
 			}
-			else
+			else if(!m_deletions.contains(chunkStartingPosition))
 			{
 				m_deletions.add(chunkStartingPosition);
 			}
 
-		
 			m_regenerations.remove(chunkStartingPosition);
 
 			chunk = m_chunks.erase(chunk);
@@ -806,6 +805,7 @@ void ChunkGenerator::regenerateChunks(std::mutex& renderingMutex)
 			if (!m_regenerations.contains(regen->first))
 			{
 				m_regenerations.remove(regen->first);
+				assert(!m_deletions.contains(regen->first));
 
 				generateChunkMesh(*regen->second.vertexArrayToRegenerate.getObject(), *regen->second.chunkFromPool.getObject());
 				regen->second.regenerated = true;
