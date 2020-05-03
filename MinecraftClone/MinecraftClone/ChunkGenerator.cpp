@@ -198,8 +198,7 @@ namespace
 
 ChunkGenerator::Regenerate::Regenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool)
 	: vertexArrayToRegenerate(std::move(vertexArrayFromPool)),
-	chunkFromPool(chunkFromPool),
-	regenerated(false)
+	chunkFromPool(chunkFromPool)
 {}
 
 ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
@@ -796,8 +795,7 @@ void ChunkGenerator::regenerateChunks(std::mutex& renderingMutex)
 	{
 		//If Chunk has no neighbours - then it can be regenerated
 		const glm::ivec3& chunkStartingPosition = regen->second.chunkFromPool.getObject()->getStartingPosition();
-		if (!regen->second.regenerated && 
-			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left)) != m_chunks.cend() &&
+		if (m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left)) != m_chunks.cend() &&
 			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Right)) != m_chunks.cend() &&
 			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back)) != m_chunks.cend() &&
 			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward)) != m_chunks.cend())
@@ -808,7 +806,6 @@ void ChunkGenerator::regenerateChunks(std::mutex& renderingMutex)
 				assert(!m_deletions.contains(regen->first));
 
 				generateChunkMesh(*regen->second.vertexArrayToRegenerate.getObject(), *regen->second.chunkFromPool.getObject());
-				regen->second.regenerated = true;
 				m_regenerations.add(regen->first);
 			}
 		}

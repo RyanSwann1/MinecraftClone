@@ -55,7 +55,6 @@ class ChunkGenerator : private NonCopyable, private NonMovable
 
 		ObjectFromPool<VertexArray> vertexArrayToRegenerate;
 		const ObjectFromPool<Chunk>& chunkFromPool;
-		bool regenerated;
 	};
 
 public:
