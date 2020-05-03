@@ -270,9 +270,9 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 			m_chunksToDelete.pop();
 		}
 
-		if (!m_regenerations.isEmpty())
+		if (!m_generatedChunkMeshes.isEmpty())
 		{
-			const glm::ivec3& chunkStartingPosition = m_regenerations.front();
+			const glm::ivec3& chunkStartingPosition = m_generatedChunkMeshes.front();
 
 			auto regen = m_chunkMeshToGenerate.find(chunkStartingPosition);
 			if (regen != m_chunkMeshToGenerate.end())
@@ -284,7 +284,7 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 				m_chunkMeshToGenerate.erase(regen);
 			}
 
-			m_regenerations.pop();
+			m_generatedChunkMeshes.pop();
 		}
 	}
 }
@@ -738,7 +738,7 @@ void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& 
 				m_chunksToDelete.add(chunkStartingPosition);
 			}
 
-			m_regenerations.remove(chunkStartingPosition);
+			m_generatedChunkMeshes.remove(chunkStartingPosition);
 
 			chunk = m_chunks.erase(chunk);
 		}
@@ -773,7 +773,7 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 				}
 
 				m_chunksToDelete.remove(chunkStartingPosition);
-				m_regenerations.remove(chunkStartingPosition);
+				m_generatedChunkMeshes.remove(chunkStartingPosition);
 
 				ObjectFromPool<Chunk>& addedChunk = m_chunks.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunkStartingPosition),
@@ -800,13 +800,13 @@ void ChunkGenerator::regenerateChunks(std::mutex& renderingMutex)
 			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back)) != m_chunks.cend() &&
 			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward)) != m_chunks.cend())
 		{
-			if (!m_regenerations.contains(regen->first))
+			if (!m_generatedChunkMeshes.contains(regen->first))
 			{
-				m_regenerations.remove(regen->first);
+				m_generatedChunkMeshes.remove(regen->first);
 				assert(!m_chunksToDelete.contains(regen->first));
 
 				generateChunkMesh(*regen->second.vertexArrayToRegenerate.getObject(), *regen->second.chunkFromPool.getObject());
-				m_regenerations.add(regen->first);
+				m_generatedChunkMeshes.add(regen->first);
 			}
 		}
 	}
