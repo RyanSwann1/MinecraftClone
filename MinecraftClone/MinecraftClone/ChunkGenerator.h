@@ -83,6 +83,6 @@ private:
 		const std::array<glm::ivec3, 4>& diagonalFace);
 	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
-	void addChunks(const glm::vec3& playerPosition);
+	void addChunks(const glm::ivec3& playerPosition);
 	void generateChunkMeshes(std::mutex& renderingMutex);
 };

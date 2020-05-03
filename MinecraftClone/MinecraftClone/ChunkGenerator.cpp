@@ -20,6 +20,17 @@ namespace
 	constexpr float BOTTOM_FACE_LIGHTING_INTENSITY = 0.4f;
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 
+	struct ChunktoAdd
+	{
+		ChunktoAdd(float distanceFromCamera, const glm::ivec3& startingPosition)
+			: distanceFromCamera(distanceFromCamera),
+			startingPosition(startingPosition)
+		{}
+
+		float distanceFromCamera;
+		glm::ivec3 startingPosition;
+	};
+
 	constexpr std::array<unsigned int, 6> CUBE_FACE_INDICIES =
 	{
 		0, 1, 2,
@@ -181,6 +192,13 @@ namespace
 		default:
 			assert(false);
 		}
+	}
+
+	float getSqrMagnitude(const glm::ivec3& positionA, const glm::ivec3& positionB)
+	{
+		return glm::pow(positionA.x - positionB.x, 2) +
+			glm::pow(positionA.y - positionB.y, 2) +
+			glm::pow(positionA.z - positionB.z, 2);
 	}
 
 	constexpr std::array<glm::ivec3, 4> CUBE_FACE_FRONT = { glm::ivec3(0, 0, 1), glm::ivec3(1, 0, 1), glm::ivec3(1, 1, 1), glm::ivec3(0, 1, 1) };
@@ -749,8 +767,10 @@ void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& 
 	}
 }
 
-void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
+void ChunkGenerator::addChunks(const glm::ivec3& playerPosition)
 {
+	std::vector<ChunktoAdd> chunksToAdd;
+
 	glm::ivec3 startPosition(playerPosition);
 	getClosestMiddlePosition(startPosition);
 	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z <= startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
@@ -759,33 +779,45 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 		{
 			glm::ivec3 chunkStartingPosition(x, 0, z);
 			getClosestChunkStartingPosition(chunkStartingPosition);
+
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend() && m_VAOs.find(chunkStartingPosition) == m_VAOs.cend())
 			{
-				ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
-				if (!chunkFromPool.getObject())
-				{
-					continue;
-				}
-				ObjectFromPool<VertexArray> vertexArrayFromPool = m_vertexArrayPool.getNextAvailableObject();
-				if (!vertexArrayFromPool.getObject())
-				{
-					continue;
-				}
-
-				m_chunksToDelete.remove(chunkStartingPosition);
-				m_generatedChunkMeshes.remove(chunkStartingPosition);
-
-				ObjectFromPool<Chunk>& addedChunk = m_chunks.emplace(std::piecewise_construct,
-					std::forward_as_tuple(chunkStartingPosition),
-					std::forward_as_tuple(std::move(chunkFromPool))).first->second;
-
-				addedChunk.getObject()->reuse(chunkStartingPosition);
-
-				m_chunkMeshesToGenerate.emplace(std::piecewise_construct,
-					std::forward_as_tuple(chunkStartingPosition),
-					std::forward_as_tuple(addedChunk, std::move(vertexArrayFromPool)));
+				float distance = getSqrMagnitude(chunkStartingPosition, playerPosition);
+				chunksToAdd.emplace_back(distance, chunkStartingPosition);
 			}
 		}
+	}
+
+	std::sort(chunksToAdd.begin(), chunksToAdd.end(), [](const auto& a, const auto& b)
+	{
+		return a.distanceFromCamera < b.distanceFromCamera;
+	});
+
+	for (const auto& chunkToAdd : chunksToAdd)
+	{
+		ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
+		if (!chunkFromPool.getObject())
+		{
+			continue;
+		}
+		ObjectFromPool<VertexArray> vertexArrayFromPool = m_vertexArrayPool.getNextAvailableObject();
+		if (!vertexArrayFromPool.getObject())
+		{
+			continue;
+		}
+
+		m_chunksToDelete.remove(chunkToAdd.startingPosition);
+		m_generatedChunkMeshes.remove(chunkToAdd.startingPosition);
+
+		ObjectFromPool<Chunk>& addedChunk = m_chunks.emplace(std::piecewise_construct,
+			std::forward_as_tuple(chunkToAdd.startingPosition),
+			std::forward_as_tuple(std::move(chunkFromPool))).first->second;
+
+		addedChunk.getObject()->reuse(chunkToAdd.startingPosition);
+
+		m_chunkMeshesToGenerate.emplace(std::piecewise_construct,
+			std::forward_as_tuple(chunkToAdd.startingPosition),
+			std::forward_as_tuple(addedChunk, std::move(vertexArrayFromPool)));
 	}
 }
 
