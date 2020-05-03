@@ -70,7 +70,7 @@ private:
 	ObjectPool<VertexArray> m_vertexArrayPool;
 	std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>> m_chunks;
 	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_VAOs;
-	std::unordered_map<glm::ivec3, ChunkMeshToGenerate> m_chunkMeshToGenerate;
+	std::unordered_map<glm::ivec3, ChunkMeshToGenerate> m_chunkMeshesToGenerate;
 	PositionStack m_chunksToDelete;
 	PositionStack m_generatedChunkMeshes;
 

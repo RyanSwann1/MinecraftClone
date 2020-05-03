@@ -235,7 +235,7 @@ ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 
 			addedChunk.getObject()->reuse(chunkStartingPosition);
 
-			m_chunkMeshToGenerate.emplace(std::piecewise_construct,
+			m_chunkMeshesToGenerate.emplace(std::piecewise_construct,
 				std::forward_as_tuple(chunkStartingPosition),
 				std::forward_as_tuple(addedChunk, std::move(VAOFromPool)));
 		}
@@ -274,14 +274,14 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 		{
 			const glm::ivec3& chunkStartingPosition = m_generatedChunkMeshes.front();
 
-			auto regen = m_chunkMeshToGenerate.find(chunkStartingPosition);
-			if (regen != m_chunkMeshToGenerate.end())
+			auto regen = m_chunkMeshesToGenerate.find(chunkStartingPosition);
+			if (regen != m_chunkMeshesToGenerate.end())
 			{
 				m_VAOs.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunkStartingPosition),
 					std::forward_as_tuple(std::move(regen->second.vertexArrayToRegenerate)));
 
-				m_chunkMeshToGenerate.erase(regen);
+				m_chunkMeshesToGenerate.erase(regen);
 			}
 
 			m_generatedChunkMeshes.pop();
@@ -728,10 +728,10 @@ void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& 
 		const glm::ivec3& chunkStartingPosition = chunk->second.getObject()->getStartingPosition();
 		if (!visibilityRect.contains(chunk->second.getObject()->getAABB()))
 		{
-			auto regenerate = m_chunkMeshToGenerate.find(chunkStartingPosition);
-			if (regenerate != m_chunkMeshToGenerate.cend())
+			auto regenerate = m_chunkMeshesToGenerate.find(chunkStartingPosition);
+			if (regenerate != m_chunkMeshesToGenerate.cend())
 			{
-				m_chunkMeshToGenerate.erase(regenerate);
+				m_chunkMeshesToGenerate.erase(regenerate);
 			}
 			else if(!m_chunksToDelete.contains(chunkStartingPosition))
 			{
@@ -781,7 +781,7 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 
 				addedChunk.getObject()->reuse(chunkStartingPosition);
 
-				m_chunkMeshToGenerate.emplace(std::piecewise_construct,
+				m_chunkMeshesToGenerate.emplace(std::piecewise_construct,
 					std::forward_as_tuple(chunkStartingPosition),
 					std::forward_as_tuple(addedChunk, std::move(vertexArrayFromPool)));
 			}
@@ -791,7 +791,7 @@ void ChunkGenerator::addChunks(const glm::vec3& playerPosition)
 
 void ChunkGenerator::regenerateChunks(std::mutex& renderingMutex)
 {
-	for (auto regen = m_chunkMeshToGenerate.begin(); regen != m_chunkMeshToGenerate.end(); ++regen)
+	for (auto regen = m_chunkMeshesToGenerate.begin(); regen != m_chunkMeshesToGenerate.end(); ++regen)
 	{
 		//If Chunk has no neighbours - then it can be regenerated
 		const glm::ivec3& chunkStartingPosition = regen->second.chunkFromPool.getObject()->getStartingPosition();
