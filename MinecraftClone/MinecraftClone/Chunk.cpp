@@ -63,7 +63,7 @@ namespace
 		return dis(gen);
 	}
 
-	float clampTo(float value, float min, float max)
+	float clampTo(int value, int min, int max)
 	{
 		if (value < min)
 		{
@@ -421,7 +421,7 @@ void Chunk::spawnPlant(int maxQuantity, eCubeType baseCubeType, eCubeType plantC
 		spawnPosition.x = getRandomNumber(0, Utilities::CHUNK_WIDTH - 1);
 		spawnPosition.z = getRandomNumber(0, Utilities::CHUNK_DEPTH - 1);
 
-		for (int y = Utilities::CHUNK_HEIGHT - 1; y >= 0; --y)
+		for (int y = Utilities::CHUNK_HEIGHT - 5; y >= Utilities::WATER_MAX_HEIGHT; --y)
 		{
 			spawnPosition.y = y;
 			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Invalid) &&
@@ -564,6 +564,7 @@ int Chunk::getElevationValue(int x, int z, float biomeLacunarity, float biomePer
 	}
 
 	persistence = biomePersistence;
+
 	float total = 0.0f;
 	for (int i = 0; i < biomeOctaves; ++i)
 	{
@@ -571,17 +572,28 @@ int Chunk::getElevationValue(int x, int z, float biomeLacunarity, float biomePer
 		persistence /= 2.0f;
 	}
 
-	//total += biomeRedistribution;
-	if (elevation < 0)
-	{
-		elevation = 0.0f;
-	}
+
 	//elevation = glm::pow(elevation, biomeRedistribution);
 	
+	//if (elevation < 0)
+	//{
+	//	elevation = 0.0f;
+	//}
+	
+		//elevation = glm::pow(elevation, 0.95f);
+
+	//elevation = (elevation - -1) / (1 - -1)  * (Utilities::CHUNK_HEIGHT - 1) + 1;
+	//elevation = (elevation - -1) / (1 - -1) * (Utilities::CHUNK_HEIGHT - 1) + 1;
+
+	//elevation = elevation / Utilities::CHUNK_HEIGHT;
+	//elevation = (elevation - -1) / (1 - -1) * (Utilities::CHUNK_HEIGHT - 1);
+
+	elevation = (elevation + 1) / 2;
+	elevation += glm::pow(elevation, 2.5f);
 	elevation /= total;
 
 	elevation = elevation * (float)Utilities::CHUNK_HEIGHT - 1;
-	elevation = clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
+	elevation = clampTo(elevation, 0, Utilities::CHUNK_HEIGHT - 1);
 
 	return elevation;
 }
@@ -601,10 +613,8 @@ float Chunk::getMoistureValue(int x, int z) const
 		moisturePersistence /= 2.0f;
 		moistureLacunarity *= 2.0f;
 	}
-	if (moisture < 0)
-	{
-		moisture = 0.0f;
-	}
+
+	moisture = (moisture + 1) / 2;
 
 	return moisture;
 }

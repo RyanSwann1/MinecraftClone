@@ -4,7 +4,7 @@
 #include "Chunk.h"
 #include "VertexArray.h"
 #include "glm/gtx/hash.hpp"
-#include "LinkedUnorderedMap.h"
+#include "PositionQueue.h"
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -42,6 +42,17 @@
 
 //http://www.lighthouse3d.com/tutorials/maths/
 
+struct ChunktoAdd
+{
+	ChunktoAdd(float distanceFromCamera, const glm::ivec3& startingPosition)
+		: distanceFromCamera(distanceFromCamera),
+		startingPosition(startingPosition)
+	{}
+
+	float distanceFromCamera;
+	glm::ivec3 startingPosition;
+};
+
 struct Frustum;
 enum class eDirection;
 enum class eCubeSide;
@@ -49,13 +60,12 @@ class VertexArray;
 struct CubeDetails;
 class ChunkGenerator : private NonCopyable, private NonMovable
 {
-	struct Regenerate : private NonCopyable, private NonMovable
+	struct ChunkMeshToGenerate : private NonCopyable, private NonMovable
 	{
-		Regenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool);
+		ChunkMeshToGenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool);
 
-		ObjectFromPool<VertexArray> vertexArrayToRegenerate;
+		ObjectFromPool<VertexArray> vertexArrayFromPool;
 		const ObjectFromPool<Chunk>& chunkFromPool;
-		bool regenerated;
 	};
 
 public:
@@ -71,9 +81,10 @@ private:
 	ObjectPool<VertexArray> m_vertexArrayPool;
 	std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>> m_chunks;
 	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_VAOs;
-	std::unordered_map<glm::ivec3, Regenerate> m_regenerate;
-	LinkedUnorderedMap m_deletions;
-	LinkedUnorderedMap m_regenerations;
+	std::unordered_map<glm::ivec3, ChunkMeshToGenerate> m_chunkMeshesToGenerate;
+	PositionQueue m_chunksToDelete;
+	PositionQueue m_generatedChunkMeshes;
+	std::vector<ChunktoAdd> m_chunksToAdd;
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
@@ -84,6 +95,6 @@ private:
 		const std::array<glm::ivec3, 4>& diagonalFace);
 	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
-	void addChunks(const glm::vec3& playerPosition);
-	void regenerateChunks(std::mutex& renderingMutex);
+	void addChunks(const glm::ivec3& playerPosition);
+	void generateChunkMeshes(std::mutex& renderingMutex);
 };
