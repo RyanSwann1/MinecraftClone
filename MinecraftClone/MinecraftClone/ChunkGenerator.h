@@ -42,6 +42,17 @@
 
 //http://www.lighthouse3d.com/tutorials/maths/
 
+struct ChunktoAdd
+{
+	ChunktoAdd(float distanceFromCamera, const glm::ivec3& startingPosition)
+		: distanceFromCamera(distanceFromCamera),
+		startingPosition(startingPosition)
+	{}
+
+	float distanceFromCamera;
+	glm::ivec3 startingPosition;
+};
+
 struct Frustum;
 enum class eDirection;
 enum class eCubeSide;
@@ -73,6 +84,7 @@ private:
 	std::unordered_map<glm::ivec3, ChunkMeshToGenerate> m_chunkMeshesToGenerate;
 	PositionQueue m_chunksToDelete;
 	PositionQueue m_generatedChunkMeshes;
+	std::vector<ChunktoAdd> m_chunksToAdd;
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
