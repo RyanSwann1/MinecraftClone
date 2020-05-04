@@ -255,7 +255,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 {
 	//https://www.reddit.com/r/proceduralgeneration/search?q=biome%20transition&restrict_sr=1
 	
-	constructHeightMap(glm::ivec2(startingPosition.x, startingPosition.z));
+	//constructHeightMap(glm::ivec2(startingPosition.x, startingPosition.z));
 
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
 	{
@@ -268,9 +268,9 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			//Desert Biome
 			if (moisture >= 0.5f)
 			{
-				int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
-				//int elevation = getElevationValue(x, z, Utilities::DESERT_LACUNARITY, Utilities::DESERT_PERSISTENCE, 
-				//	Utilities::TERRAIN_OCTAVES, Utilities::DESERT_REDISTRIBUTION);
+				//int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
+				int elevation = getElevationValue(x, z, Utilities::DESERT_LACUNARITY, Utilities::DESERT_PERSISTENCE, 
+					Utilities::TERRAIN_OCTAVES, Utilities::DESERT_REDISTRIBUTION);
 				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 				for (int y = elevation; y >= 0; --y)
 				{
@@ -289,9 +289,9 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			//Plains Biome
 			else
 			{
-				int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
-				//int elevation = getElevationValue(x, z, Utilities::PLAINS_LACUNARITY, Utilities::PLAINS_PERSISTENCE, 
-				//	Utilities::TERRAIN_OCTAVES, Utilities::PLAINS_REDISTRIBUTION);
+				//int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
+				int elevation = getElevationValue(x, z, Utilities::PLAINS_LACUNARITY, Utilities::PLAINS_PERSISTENCE, 
+					Utilities::TERRAIN_OCTAVES, Utilities::PLAINS_REDISTRIBUTION);
 				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 				for (int y = elevation; y >= 0; --y)
 				{
