@@ -53,9 +53,9 @@ struct NeighbouringChunks : private NonCopyable, private NonMovable
 	const Chunk& bottomChunk;
 };
 
-struct ChunktoAdd
+struct ChunkToAdd
 {
-	ChunktoAdd(float distanceFromCamera, const glm::ivec3& startingPosition);
+	ChunkToAdd(float distanceFromCamera, const glm::ivec3& startingPosition);
 
 	float distanceFromCamera;
 	glm::ivec3 startingPosition;
@@ -92,7 +92,7 @@ private:
 	std::unordered_map<glm::ivec3, ChunkMeshToGenerate> m_chunkMeshesToGenerate;
 	PositionQueue m_chunksToDelete;
 	PositionQueue m_generatedChunkMeshes;
-	std::vector<ChunktoAdd> m_chunksToAdd;
+	std::vector<ChunkToAdd> m_chunksToAdd;
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;

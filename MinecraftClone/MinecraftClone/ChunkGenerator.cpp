@@ -213,7 +213,7 @@ NeighbouringChunks::NeighbouringChunks(const Chunk& leftChunk, const Chunk& righ
 {}
 
 //ChunksToAdd
-ChunktoAdd::ChunktoAdd(float distanceFromCamera, const glm::ivec3& startingPosition)
+ChunkToAdd::ChunkToAdd(float distanceFromCamera, const glm::ivec3& startingPosition)
 	: distanceFromCamera(distanceFromCamera),
 	startingPosition(startingPosition)
 {}
