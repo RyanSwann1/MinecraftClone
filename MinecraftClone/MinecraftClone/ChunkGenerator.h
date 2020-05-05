@@ -42,12 +42,20 @@
 
 //http://www.lighthouse3d.com/tutorials/maths/
 
+struct NeighbouringChunks : private NonCopyable, private NonMovable
+{
+	NeighbouringChunks(const Chunk& leftChunk, const Chunk& rightChunk,
+		const Chunk& topChunk, const Chunk& bottomChunk);
+
+	const Chunk& leftChunk;
+	const Chunk& rightChunk;
+	const Chunk& topChunk;
+	const Chunk& bottomChunk;
+};
+
 struct ChunktoAdd
 {
-	ChunktoAdd(float distanceFromCamera, const glm::ivec3& startingPosition)
-		: distanceFromCamera(distanceFromCamera),
-		startingPosition(startingPosition)
-	{}
+	ChunktoAdd(float distanceFromCamera, const glm::ivec3& startingPosition);
 
 	float distanceFromCamera;
 	glm::ivec3 startingPosition;
@@ -93,7 +101,7 @@ private:
 		bool transparent, bool shadow = false);
 	void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const glm::ivec3& cubePosition, 
 		const std::array<glm::ivec3, 4>& diagonalFace);
-	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
+	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks);
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);
 	void generateChunkMeshes(std::mutex& renderingMutex);
