@@ -47,7 +47,7 @@ private:
 
 	bool isPositionInLocalBounds(const glm::ivec3& position) const;
 	bool isCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType) const;
-	int getElevationValue(int x, int y) const;
+	int getElevationAtPosition(int x, int y) const;
 	eBiomeType getBiomeType(int x, int y) const;
 	
 	void changeCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType);

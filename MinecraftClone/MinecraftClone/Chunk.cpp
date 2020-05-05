@@ -233,10 +233,10 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 	{
 		for (int x = startingPosition.x; x < startingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 		{
-			int elevation = getElevationValue(x, z);
+			int elevation = getElevationAtPosition(x, z);
 			glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
-
 			eCubeType cubeType;
+
 			switch (getBiomeType(x, z))
 			{
 			case eBiomeType::Plains :
@@ -456,7 +456,7 @@ bool Chunk::isCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType
 	return m_chunk[converTo1D(position)] == static_cast<char>(cubeType);
 }
 
-int Chunk::getElevationValue(int x, int z) const
+int Chunk::getElevationAtPosition(int x, int z) const
 {
 	double ex = x / static_cast<float>(Utilities::MAP_SIZE);
 	double ey = z / static_cast<float>(Utilities::MAP_SIZE);
@@ -472,12 +472,6 @@ int Chunk::getElevationValue(int x, int z) const
 		persistence /= 2.0f;
 		lacunarity *= 2.0f;
 	}
-
-
-	//elevation = (elevation - -1) / (1 - -1) * (Utilities::CHUNK_HEIGHT - 1);
-
-
-	//elevation = clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
 	
 	persistence = Utilities::TERRAIN_PERSISTENCE;
 	float total = 0.0f;
@@ -487,19 +481,6 @@ int Chunk::getElevationValue(int x, int z) const
 		persistence /= 2.0f;
 	}
 
-	//if (elevation < 0)
-	//{
-	//	elevation = 0.0f;
-	//}
-	
-		//elevation = glm::pow(elevation, 0.95f);
-
-	//elevation = (elevation - -1) / (1 - -1)  * (Utilities::CHUNK_HEIGHT - 1) + 1;
-	//elevation = (elevation - -1) / (1 - -1) * (Utilities::CHUNK_HEIGHT - 1) + 1;
-
-	//elevation = elevation / Utilities::CHUNK_HEIGHT;
-	//elevation = (elevation - -1) / (1 - -1) * (Utilities::CHUNK_HEIGHT - 1);
-
 	elevation = (elevation + 1) / 2;
 	elevation += glm::pow(elevation, 2.5f);
 	elevation /= total;
@@ -508,6 +489,8 @@ int Chunk::getElevationValue(int x, int z) const
 
 	return elevation;
 }
+
+//elevation = (elevation - -1) / (1 - -1) * (Utilities::CHUNK_HEIGHT - 1) + 1;
 
 eBiomeType Chunk::getBiomeType(int x, int z) const
 {
