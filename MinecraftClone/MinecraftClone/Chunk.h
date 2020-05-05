@@ -17,7 +17,9 @@
 enum class eBiomeType
 {
 	Plains = 0,
-	Desert
+	Desert,
+	Mountains,
+	Islands
 };
 
 //position.y * (CHUNK_AREA) + position.z * CHUNK_SIZE + position.x;
@@ -49,7 +51,8 @@ private:
 
 	bool isPositionInLocalBounds(const glm::ivec3& position) const;
 	bool isCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType) const;
-	int getElevationAtPosition(int x, int y) const;
+	int getElevationAtPosition(int x, int y, float terrainLacunarity, float terrainPersistence, 
+		float terrainOctaves, float terrainRedistribution, int maxHeight) const;
 	eBiomeType getBiomeType(int x, int y) const;
 	
 	void changeCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType);

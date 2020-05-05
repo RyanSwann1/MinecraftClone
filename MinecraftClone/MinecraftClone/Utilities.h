@@ -74,16 +74,40 @@ namespace Utilities
 
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
-	constexpr float BIOME_LACUNARITY = 5.0f;
+	constexpr float BIOME_LACUNARITY = 25.0f;
 	constexpr float BIOME_PERSISTENCE = 0.5f;
 	constexpr int BIOME_OCTAVES = 12;
 
-	constexpr float TERRAIN_LACUNARITY = 25.0f;
-	constexpr float TERRAIN_PERSISTENCE = 2.5f;
+	constexpr float DESERT_LACUNARITY = 30.0f;
+	constexpr float DESERT_PERSISTENCE = 10.0f;
+	constexpr int DESERT_OCTAVES = 8;
+	constexpr float DESERT_REDISTRIBUTION = 1.5f;
+	constexpr int DESERT_MAX_HEIGHT = 50;
+
+	constexpr float PLAINS_LACUNARITY = 25.0f;
+	constexpr float PLAINS_PERSISTENCE = 5.0f;
+	constexpr int PLAINS_OCTAVES = 8;
+	constexpr float PLAINS_REDISTRIBUTION = 1.05f;
+	constexpr int PLAINS_MAX_HEIGHT = 50;
+
+	constexpr float MOUNTAINS_LACUNARITY = 50.0f;
+	constexpr float MOUNTAINS_PERSISTENCE = 50.0f;
+	constexpr int MOUNTAINS_OCTAVES = 16;
+	constexpr float MOUNTAINS_REDISTRIBUTION = 1.8f;
+	constexpr int MOUNTAINS_MAX_HEIGHT = 168;
+
+	constexpr float ISLANDS_LACUNARITY = 25.0f;
+	constexpr float ISLANDS_PERSISTENCE = 50.0f;
+	constexpr int ISLANDS_OCTAVES = 16;
+	constexpr float ISLANDS_REDISTRIBUTION = 2.25f;
+	constexpr int ISLANDS_MAX_HEIGHT = 45;
+
+	constexpr float TERRAIN_LACUNARITY = 35.0f;
+	constexpr float TERRAIN_PERSISTENCE = 11.5f;
 
 	constexpr int TERRAIN_OCTAVES = 8;
 
-	constexpr int VISIBILITY_DISTANCE = 832;
+	constexpr int VISIBILITY_DISTANCE = 1024;
 
 
 	constexpr int MAP_SIZE = 8000;
