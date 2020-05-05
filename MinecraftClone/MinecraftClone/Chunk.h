@@ -61,7 +61,6 @@ private:
 	void spawnLeaves(const glm::ivec3& startingPosition, int treeHeight);
 	void spawnTreeStump(const glm::ivec3& startingPosition, int treeHeight);
 
-	eBiomeType getBiomeTypeAtPosition(int x, int y) const;
 	void constructHeightMap(const glm::ivec2& startingPositionOnGrid);
 	int getElevationAtPosition(const glm::ivec2& positionOnGrid) const;
 };

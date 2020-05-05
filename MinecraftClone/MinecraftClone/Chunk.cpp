@@ -255,9 +255,6 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			{
 			case eBiomeType::Plains :
 			{
-				//int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
-				int elevation = getElevationValue(x, z, Utilities::DESERT_LACUNARITY, Utilities::DESERT_PERSISTENCE, 
-					Utilities::TERRAIN_OCTAVES, Utilities::DESERT_REDISTRIBUTION);
 				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 				for (int y = elevation; y >= 0; --y)
 				{
@@ -280,9 +277,6 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			break;
 			case eBiomeType::Desert:
 			{
-				//int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
-				int elevation = getElevationValue(x, z, Utilities::PLAINS_LACUNARITY, Utilities::PLAINS_PERSISTENCE, 
-					Utilities::TERRAIN_OCTAVES, Utilities::PLAINS_REDISTRIBUTION);
 				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 				for (int y = elevation; y >= 0; --y)
 				{
@@ -462,19 +456,6 @@ void Chunk::spawnTreeStump(const glm::ivec3& startingPosition, int treeHeight)
 	}
 }
 
-eBiomeType Chunk::getBiomeTypeAtPosition(int x, int y) const
-{
-	float moisture = getMoistureValue(x, y);
-	if (moisture >= 0.5f)
-	{
-		return eBiomeType::Desert;
-	}
-	else
-	{
-		return eBiomeType::Plains;
-	}
-}
-
 void Chunk::constructHeightMap(const glm::ivec2& startingPositionOnGrid)
 {
 	int bottomLeft = getElevationAtPosition(glm::ivec2(startingPositionOnGrid.x, startingPositionOnGrid.y));
@@ -498,21 +479,7 @@ void Chunk::constructHeightMap(const glm::ivec2& startingPositionOnGrid)
 
 int Chunk::getElevationAtPosition(const glm::ivec2& positionOnGrid) const
 {
-	float biomeType = getMoistureValue(positionOnGrid.x, positionOnGrid.y);
-	//Desert Biome
-	if (biomeType >= 0.5f)
-	{
-		//int Chunk::getElevationValue(int x, int z, float biomeLacunarity, float biomePersistence,
-		//	int biomeOctaves, int biomeRedistribution) const
-		return getElevationValue(positionOnGrid.x, positionOnGrid.y, Utilities::DESERT_LACUNARITY, 
-			Utilities::DESERT_PERSISTENCE, Utilities::TERRAIN_OCTAVES, Utilities::DESERT_REDISTRIBUTION);
-	}
-	//Plains Biome
-	else
-	{
-		return getElevationValue(positionOnGrid.x, positionOnGrid.y, Utilities::PLAINS_LACUNARITY,
-			Utilities::PLAINS_PERSISTENCE, Utilities::TERRAIN_OCTAVES, Utilities::PLAINS_REDISTRIBUTION);
-	}
+
 }
 
 bool Chunk::isPositionInLocalBounds(const glm::ivec3& position) const
@@ -538,9 +505,9 @@ int Chunk::getElevationAtPosition(int x, int z) const
 
 	float elevation = 0.0f;
 
-	float persistence = biomePersistence;
-	float lacunarity = biomeLacunarity;
-	for (int i = 0; i < biomeOctaves; ++i)
+	float persistence = Utilities::TERRAIN_PERSISTENCE;
+	float lacunarity = Utilities::TERRAIN_LACUNARITY;
+	for (int i = 0; i < Utilities::TERRAIN_OCTAVES; ++i)
 	{
 		elevation += persistence * glm::perlin(glm::vec2(ex * lacunarity, ey * lacunarity));
 
@@ -550,7 +517,7 @@ int Chunk::getElevationAtPosition(int x, int z) const
 	
 	persistence = Utilities::TERRAIN_PERSISTENCE;
 	float total = 0.0f;
-	for (int i = 0; i < biomeOctaves; ++i)
+	for (int i = 0; i < Utilities::TERRAIN_OCTAVES; ++i)
 	{
 		total += persistence;
 		persistence /= 2.0f;
