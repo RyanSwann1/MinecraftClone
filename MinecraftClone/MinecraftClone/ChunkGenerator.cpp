@@ -204,6 +204,20 @@ namespace
 	constexpr std::array<glm::ivec3, 4> SECOND_DIAGONAL_FACE = { glm::ivec3(0, 0, 1), glm::ivec3(1, 0, 0), glm::ivec3(1, 1, 0), glm::ivec3(0, 1, 1) };
 }
 
+//NeighbouringChunks
+NeighbouringChunks::NeighbouringChunks(const Chunk& leftChunk, const Chunk& rightChunk, const Chunk& topChunk, const Chunk& bottomChunk)
+	: leftChunk(leftChunk),
+	rightChunk(rightChunk),
+	forwardChunk(topChunk),
+	backChunk(bottomChunk)
+{}
+
+//ChunksToAdd
+ChunkToAdd::ChunkToAdd(float distanceFromCamera, const glm::ivec3& startingPosition)
+	: distanceFromCamera(distanceFromCamera),
+	startingPosition(startingPosition)
+{}
+
 //ChunkMeshToGenerate
 ChunkGenerator::ChunkMeshToGenerate::ChunkMeshToGenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool)
 	: vertexArrayFromPool(std::move(vertexArrayFromPool)),
@@ -502,19 +516,10 @@ bool ChunkGenerator::isCubeAtPosition(const glm::ivec3& position, const Chunk& c
 		cubeType != static_cast<char>(eCubeType::TallGrass) ? true : false);
 }
 
-void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk)
+void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks)
 {
 	const glm::ivec3& chunkStartingPosition = chunk.getStartingPosition();
 	const glm::ivec3& chunkEndingPosition = chunk.getEndingPosition();
-
-	const Chunk* leftNeighbouringChunk = getNeighbouringChunkAtPosition(chunkStartingPosition, eDirection::Left);
-	assert(leftNeighbouringChunk);
-	const Chunk* rightNeighbouringChunk = getNeighbouringChunkAtPosition(chunkStartingPosition, eDirection::Right);
-	assert(rightNeighbouringChunk);
-	const Chunk* forwardNeighbouringChunk = getNeighbouringChunkAtPosition(chunkStartingPosition, eDirection::Forward);
-	assert(forwardNeighbouringChunk);
-	const Chunk* backNeighbouringChunk = getNeighbouringChunkAtPosition(chunkStartingPosition, eDirection::Back);
-	assert(backNeighbouringChunk);
 
 	for (int z = chunkStartingPosition.z; z < chunkEndingPosition.z; ++z)
 	{
@@ -549,7 +554,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
 						}
 					}
-					else if (!isCubeAtPosition(leftPosition, *leftNeighbouringChunk))
+					else if (!isCubeAtPosition(leftPosition, neighbouringChunks.leftChunk))
 					{
 						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
 					}
@@ -563,7 +568,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
 						}
 					}
-					else if (!isCubeAtPosition(rightPosition, *rightNeighbouringChunk))
+					else if (!isCubeAtPosition(rightPosition, neighbouringChunks.rightChunk))
 					{
 						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
 					}
@@ -577,7 +582,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
 						}
 					}
-					else if (!isCubeAtPosition(forwardPosition, *forwardNeighbouringChunk))
+					else if (!isCubeAtPosition(forwardPosition, neighbouringChunks.forwardChunk))
 					{
 						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
 					}
@@ -591,7 +596,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
 						}
 					}
-					else if (!isCubeAtPosition(backPosition, *backNeighbouringChunk))
+					else if (!isCubeAtPosition(backPosition, neighbouringChunks.backChunk))
 					{
 						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
 					}
@@ -626,7 +631,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false, shadow);
 						}
 					}
-					else if (!isCubeAtPosition(leftPosition, *leftNeighbouringChunk))
+					else if (!isCubeAtPosition(leftPosition, neighbouringChunks.leftChunk))
 					{
 						addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false, shadow);
 					}
@@ -641,7 +646,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, false, shadow);
 						}
 					}
-					else if (!isCubeAtPosition(rightPosition, *rightNeighbouringChunk))
+					else if (!isCubeAtPosition(rightPosition, neighbouringChunks.rightChunk))
 					{
 						addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, false, shadow);
 					}
@@ -655,7 +660,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false, shadow);
 						}
 					}
-					else if (!isCubeAtPosition(forwardPosition, *forwardNeighbouringChunk))
+					else if (!isCubeAtPosition(forwardPosition, neighbouringChunks.forwardChunk))
 					{
 						addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false, shadow);
 					}
@@ -669,7 +674,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
 						}
 					}
-					else if (!isCubeAtPosition(backPosition, *backNeighbouringChunk))
+					else if (!isCubeAtPosition(backPosition, neighbouringChunks.backChunk))
 					{
 						addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
 					}
@@ -799,17 +804,24 @@ void ChunkGenerator::generateChunkMeshes(std::mutex& renderingMutex)
 	{
 		//If Chunk has no neighbours - then it can be Generated
 		const glm::ivec3& chunkStartingPosition = chunkMeshToGenerate->second.chunkFromPool.getObject()->getStartingPosition();
-		if (m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left)) != m_chunks.cend() &&
-			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Right)) != m_chunks.cend() &&
-			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back)) != m_chunks.cend() &&
-			m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward)) != m_chunks.cend())
+		auto leftChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left));
+		auto rightChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Right));
+		auto forwardChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward));
+		auto backChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back));
+
+		if (leftChunk != m_chunks.cend() &&
+			rightChunk != m_chunks.cend() &&
+			forwardChunk != m_chunks.cend() &&
+			backChunk != m_chunks.cend())
 		{
 			if (!m_generatedChunkMeshes.contains(chunkMeshToGenerate->first))
 			{
 				m_generatedChunkMeshes.remove(chunkMeshToGenerate->first);
 				assert(!m_chunksToDelete.contains(chunkMeshToGenerate->first));
 
-				generateChunkMesh(*chunkMeshToGenerate->second.vertexArrayFromPool.getObject(), *chunkMeshToGenerate->second.chunkFromPool.getObject());
+				generateChunkMesh(*chunkMeshToGenerate->second.vertexArrayFromPool.getObject(), *chunkMeshToGenerate->second.chunkFromPool.getObject(),
+				{*leftChunk->second.getObject(), *rightChunk->second.getObject(), *forwardChunk->second.getObject(), *backChunk->second.getObject()});
+
 				m_generatedChunkMeshes.add(chunkMeshToGenerate->first);
 			}
 		}

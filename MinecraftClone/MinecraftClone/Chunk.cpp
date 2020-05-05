@@ -63,20 +63,6 @@ namespace
 		return dis(gen);
 	}
 
-	float clampTo(int value, int min, int max)
-	{
-		if (value < min)
-		{
-			value = min;
-		}
-		else if (value > max)
-		{
-			value = max;
-		}
-
-		return value;
-	}
-
 	float bilinearInterpolation(float bottomLeft, float topLeft, float bottomRight, float topRight,
 		float xMin, float xMax,
 		float zMin, float zMax,
@@ -261,37 +247,17 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 	{
 		for (int x = startingPosition.x; x < startingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 		{
-			glm::ivec2 positionOnGrid(x - startingPosition.x, z - startingPosition.z);
-			float moisture = getMoistureValue(x, z);
+			int elevation = getElevationAtPosition(x, z);
+			glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 			eCubeType cubeType;
-			
-			//Desert Biome
-			if (moisture >= 0.5f)
+
+			switch (getBiomeType(x, z))
+			{
+			case eBiomeType::Plains :
 			{
 				//int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
 				int elevation = getElevationValue(x, z, Utilities::DESERT_LACUNARITY, Utilities::DESERT_PERSISTENCE, 
 					Utilities::TERRAIN_OCTAVES, Utilities::DESERT_REDISTRIBUTION);
-				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
-				for (int y = elevation; y >= 0; --y)
-				{
-					if (y <= Utilities::STONE_MAX_HEIGHT)
-					{
-						cubeType = eCubeType::Stone;
-					}
-					else 
-					{
-						cubeType = eCubeType::Sand;
-					}
-
-					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
-				}
-			}
-			//Plains Biome
-			else
-			{
-				//int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
-				int elevation = getElevationValue(x, z, Utilities::PLAINS_LACUNARITY, Utilities::PLAINS_PERSISTENCE, 
-					Utilities::TERRAIN_OCTAVES, Utilities::PLAINS_REDISTRIBUTION);
 				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 				for (int y = elevation; y >= 0; --y)
 				{
@@ -310,6 +276,31 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 
 					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
 				}
+			}
+			break;
+			case eBiomeType::Desert:
+			{
+				//int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
+				int elevation = getElevationValue(x, z, Utilities::PLAINS_LACUNARITY, Utilities::PLAINS_PERSISTENCE, 
+					Utilities::TERRAIN_OCTAVES, Utilities::PLAINS_REDISTRIBUTION);
+				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
+				for (int y = elevation; y >= 0; --y)
+				{
+					if (y <= Utilities::STONE_MAX_HEIGHT)
+					{
+						cubeType = eCubeType::Stone;
+					}
+					else
+					{
+						cubeType = eCubeType::Sand;
+					}
+
+					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
+				}
+			}
+			break;
+			default:
+				assert(false);
 			}
 		}
 	}
@@ -540,13 +531,7 @@ bool Chunk::isCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType
 	return m_chunk[converTo1D(position)] == static_cast<char>(cubeType);
 }
 
-
-//constexpr float TERRAIN_LACUNARITY = 5.f;
-//constexpr float TERRAIN_PERSISTENCE = 8.5f;
-//constexpr int TERRAIN_OCTAVES = 8;
-
-int Chunk::getElevationValue(int x, int z, float biomeLacunarity, float biomePersistence, 
-	int biomeOctaves, int biomeRedistribution) const
+int Chunk::getElevationAtPosition(int x, int z) const
 {
 	double ex = x / static_cast<float>(Utilities::MAP_SIZE);
 	double ey = z / static_cast<float>(Utilities::MAP_SIZE);
@@ -562,9 +547,8 @@ int Chunk::getElevationValue(int x, int z, float biomeLacunarity, float biomePer
 		persistence /= 2.0f;
 		lacunarity *= 2.0f;
 	}
-
-	persistence = biomePersistence;
-
+	
+	persistence = Utilities::TERRAIN_PERSISTENCE;
 	float total = 0.0f;
 	for (int i = 0; i < biomeOctaves; ++i)
 	{
@@ -572,49 +556,50 @@ int Chunk::getElevationValue(int x, int z, float biomeLacunarity, float biomePer
 		persistence /= 2.0f;
 	}
 
-
-	//elevation = glm::pow(elevation, biomeRedistribution);
-	
-	//if (elevation < 0)
-	//{
-	//	elevation = 0.0f;
-	//}
-	
-		//elevation = glm::pow(elevation, 0.95f);
-
-	//elevation = (elevation - -1) / (1 - -1)  * (Utilities::CHUNK_HEIGHT - 1) + 1;
-	//elevation = (elevation - -1) / (1 - -1) * (Utilities::CHUNK_HEIGHT - 1) + 1;
-
-	//elevation = elevation / Utilities::CHUNK_HEIGHT;
-	//elevation = (elevation - -1) / (1 - -1) * (Utilities::CHUNK_HEIGHT - 1);
-
-	elevation = (elevation + 1) / 2;
-	elevation += glm::pow(elevation, 2.5f);
 	elevation /= total;
 
+	elevation = (elevation + 1) / 2;
+	elevation = glm::pow(elevation, 3.0f);
 	elevation = elevation * (float)Utilities::CHUNK_HEIGHT - 1;
-	elevation = clampTo(elevation, 0, Utilities::CHUNK_HEIGHT - 1);
 
 	return elevation;
 }
 
-float Chunk::getMoistureValue(int x, int z) const
-{
-	double mx = x / 4000.0f * 1.0f;
-	double my = z / 4000.0f * 1.0f;
+//elevation = (elevation - -1) / (1 - -1) * (Utilities::CHUNK_HEIGHT - 1) + 1;
 
-	float moisture = 0.0f;
-	float moisturePersistence = Utilities::MOISTURE_PERSISTENCE;
-	float moistureLacunarity = Utilities::MOISTURE_LACUNARITY;
-	for (int i = 0; i < Utilities::MOISTURE_OCTAVES; ++i)
+eBiomeType Chunk::getBiomeType(int x, int z) const
+{
+	double bx = x / 1000.0f;
+	double by = z / 1000.0f;
+
+	float biomeType = 0.0f;
+	float moisturePersistence = Utilities::BIOME_PERSISTENCE;
+	float moistureLacunarity = Utilities::BIOME_LACUNARITY;
+	for (int i = 0; i < Utilities::BIOME_OCTAVES; ++i)
 	{
-		moisture += moisturePersistence * glm::perlin(glm::vec2(mx * moistureLacunarity, my * moistureLacunarity));
+		biomeType += moisturePersistence * glm::perlin(glm::vec2(bx * moistureLacunarity, by * moistureLacunarity));
 
 		moisturePersistence /= 2.0f;
 		moistureLacunarity *= 2.0f;
 	}
 
-	moisture = (moisture + 1) / 2;
+	float persistence = Utilities::BIOME_PERSISTENCE;
+	float total = 0.0f;
+	for (int i = 0; i < Utilities::BIOME_OCTAVES; ++i)
+	{
+		total += persistence;
+		persistence /= 2.0f;
+	}
 
-	return moisture;
+	biomeType /= total;
+	biomeType = (biomeType + 1) / 2;
+
+	if (biomeType >= 0.35f)
+	{
+		return eBiomeType::Plains;
+	}
+	else
+	{
+		return eBiomeType::Desert;
+	}
 }

@@ -42,12 +42,20 @@
 
 //http://www.lighthouse3d.com/tutorials/maths/
 
-struct ChunktoAdd
+struct NeighbouringChunks : private NonCopyable, private NonMovable
 {
-	ChunktoAdd(float distanceFromCamera, const glm::ivec3& startingPosition)
-		: distanceFromCamera(distanceFromCamera),
-		startingPosition(startingPosition)
-	{}
+	NeighbouringChunks(const Chunk& leftChunk, const Chunk& rightChunk,
+		const Chunk& topChunk, const Chunk& bottomChunk);
+
+	const Chunk& leftChunk;
+	const Chunk& rightChunk;
+	const Chunk& forwardChunk;
+	const Chunk& backChunk;
+};
+
+struct ChunkToAdd
+{
+	ChunkToAdd(float distanceFromCamera, const glm::ivec3& startingPosition);
 
 	float distanceFromCamera;
 	glm::ivec3 startingPosition;
@@ -84,7 +92,7 @@ private:
 	std::unordered_map<glm::ivec3, ChunkMeshToGenerate> m_chunkMeshesToGenerate;
 	PositionQueue m_chunksToDelete;
 	PositionQueue m_generatedChunkMeshes;
-	std::vector<ChunktoAdd> m_chunksToAdd;
+	std::vector<ChunkToAdd> m_chunksToAdd;
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
@@ -93,7 +101,7 @@ private:
 		bool transparent, bool shadow = false);
 	void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const glm::ivec3& cubePosition, 
 		const std::array<glm::ivec3, 4>& diagonalFace);
-	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
+	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks);
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);
 	void generateChunkMeshes(std::mutex& renderingMutex);
