@@ -79,24 +79,24 @@ namespace
 
 	float bilinearInterpolation(float bottomLeft, float topLeft, float bottomRight, float topRight,
 		float xMin, float xMax,
-		float zMin, float zMax,
-		float x, float z)
+		float yMin, float yMax,
+		float x, float y)
 	{
 		float   width = xMax - xMin,
-			height = zMax - zMin,
+			height = yMax - yMin,
 
 			xDistanceToMaxValue = xMax - x,
-			zDistanceToMaxValue = zMax - z,
+			yDistanceToMaxValue = yMax - y,
 
 			xDistanceToMinValue = x - xMin,
-			zDistanceToMinValue = z - zMin;
+			yDistanceToMinValue = y - yMin;
 
 		return 1.0f / (width * height) *
 			(
-				bottomLeft * xDistanceToMaxValue * zDistanceToMaxValue +
-				bottomRight * xDistanceToMinValue * zDistanceToMaxValue +
-				topLeft * xDistanceToMaxValue * zDistanceToMinValue +
-				topRight * xDistanceToMinValue * zDistanceToMinValue
+				bottomLeft * xDistanceToMaxValue * yDistanceToMaxValue +
+				bottomRight * xDistanceToMinValue * yDistanceToMaxValue +
+				topLeft * xDistanceToMaxValue * yDistanceToMinValue +
+				topRight * xDistanceToMinValue * yDistanceToMinValue
 				);
 	}
 }
@@ -104,6 +104,7 @@ namespace
 Chunk::Chunk()
 	: m_startingPosition(),
 	m_endingPosition(),
+	m_heightMap(),
 	m_chunk(),
 	m_AABB()
 {}
@@ -255,7 +256,69 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 {
 	//https://www.reddit.com/r/proceduralgeneration/search?q=biome%20transition&restrict_sr=1
 	
-	constructHeightMap(glm::ivec2(startingPosition.x, startingPosition.z));
+	//constructHeightMap({ startingPosition.x, startingPosition.z }, { position.x, position.y }, { position.x + 8, position.y + 8 });
+	
+	int xMin = startingPosition.x;
+	int xMax = startingPosition.x + Utilities::CHUNK_WIDTH;
+	int yMin = startingPosition.z;
+	int yMax = startingPosition.z + Utilities::CHUNK_DEPTH;
+
+	//int xMin = 0;
+	//int xMax = 0;
+	//int yMin = 0;
+	//int yMax = 0;
+
+	constructHeightMap({ startingPosition.x, startingPosition.z }, xMin, xMax, yMin, yMax);
+	//for (int y = 8; y < Utilities::CHUNK_DEPTH - 8; y += 8)
+	//{
+	//	for(int x = 8; x < Utilities::CHUNK_WIDTH - 8; x += 8)
+	//	{ 
+	//		constructHeightMap({ startingPosition.x, startingPosition.z }, xMin, xMax, yMin, yMax);
+
+	//		xMin = startingPosition.x + x;
+	//		std::cout << xMin << "\n";
+	//		xMax = startingPosition.x + x + x;
+	//		std::cout << xMax << "\n";
+	//	}
+
+	//	xMin = startingPosition.x;
+	//	xMax = startingPosition.x + 8;
+	//	yMin = startingPosition.z + y;
+	//	yMax = startingPosition.z + y + y;
+	//}
+
+	//constructHeightMap({ startingPosition.x, startingPosition.z }, xMin, xMax, yMin + i, yMax + i);
+	//for (int i = 8; i < 32; i += 8)
+	//{
+	//	constructHeightMap({ startingPosition.x, startingPosition.z }, xMin + i, xMax + i, yMin + i, yMax + i);
+
+	//	//xMin += i;
+	//	//xMax += i;
+	//	//yMin += i;
+	//	//yMax += i;
+	//}
+
+	//do
+	//{
+
+
+
+
+	//} while(i < 32 - 1)
+	
+
+	//int i = 0;
+	//do
+	//{
+	//	constructHeightMap(startingPosition, { position.x, position.y }, { position.x + 8, position.y + 8 });
+
+	//	position.x += 8;
+	//	position.y += 8;
+	//	i += 8;
+	//}
+	// while (i < 32 - 1);
+
+	//constructHeightMap(glm::ivec2(startingPosition.x, startingPosition.z));
 
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
 	{
@@ -298,10 +361,6 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 					if (y <= Utilities::STONE_MAX_HEIGHT)
 					{
 						cubeType = eCubeType::Stone;
-					}
-					else if (y <= Utilities::SAND_MAX_HEIGHT)
-					{
-						cubeType = eCubeType::Sand;
 					}
 					else
 					{
@@ -421,7 +480,7 @@ void Chunk::spawnPlant(int maxQuantity, eCubeType baseCubeType, eCubeType plantC
 		spawnPosition.x = getRandomNumber(0, Utilities::CHUNK_WIDTH - 1);
 		spawnPosition.z = getRandomNumber(0, Utilities::CHUNK_DEPTH - 1);
 
-		for (int y = Utilities::CHUNK_HEIGHT - 1; y >= 0; --y)
+		for (int y = Utilities::CHUNK_HEIGHT - 1; y >= Utilities::WATER_MAX_HEIGHT; --y)
 		{
 			spawnPosition.y = y;
 			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Invalid) &&
@@ -484,42 +543,87 @@ eBiomeType Chunk::getBiomeTypeAtPosition(int x, int y) const
 	}
 }
 
-void Chunk::constructHeightMap(const glm::ivec2& startingPositionOnGrid)
+void Chunk::constructHeightMap(const glm::ivec2& chunkStartingPosition, int xMin, int xMax, int yMin, int yMax)
 {
-	int bottomLeft = getElevationAtPosition(glm::ivec2(startingPositionOnGrid.x, startingPositionOnGrid.y));
-	int bottomRight = getElevationAtPosition(glm::ivec2(startingPositionOnGrid.x + Utilities::CHUNK_WIDTH, startingPositionOnGrid.y));
-	int topLeft = getElevationAtPosition(glm::ivec2(startingPositionOnGrid.x, startingPositionOnGrid.y + Utilities::CHUNK_DEPTH));
-	int topRight = getElevationAtPosition(glm::ivec2(startingPositionOnGrid.x + Utilities::CHUNK_WIDTH, startingPositionOnGrid.y + Utilities::CHUNK_DEPTH));
+	//glm::ivec2 result = endingPosition - startingPosition;
+	//int bottomLeft = getElevationAtPosition(startingPosition);
+	//int bottomRight = getElevationAtPosition(glm::ivec2(startingPosition.x + result.x, startingPosition.y));
+	//int topLeft = getElevationAtPosition(glm::ivec2(startingPosition.x, startingPosition.y + result.y));
+	//int topRight = getElevationAtPosition(glm::ivec2(startingPosition.x + result.x, startingPosition.y + result.y));
 
-	for (int z = 0; z < + Utilities::CHUNK_DEPTH; ++z)
+	//
+	//for (int y = 0; y < + Utilities::CHUNK_DEPTH; ++y)
+	//{
+	//	for (int x = 0; x < + Utilities::CHUNK_WIDTH; ++x)
+	//	{
+	//		int h = bilinearInterpolation(bottomLeft, topLeft, bottomRight, topRight,
+	//			0, Utilities::CHUNK_WIDTH,
+	//			0, Utilities::CHUNK_DEPTH,
+	//			y, x);
+
+	//		m_heightMap[x][y] = h;
+	//	}
+	//}
+
+	int bottomLeft = getElevationAtPosition(xMin, yMin);
+	int bottomRight = getElevationAtPosition(xMax, yMin);
+	int topLeft = getElevationAtPosition(xMin, yMax);
+	int topRight = getElevationAtPosition(xMax, yMax);
+
+	//xMin -= chunkStartingPosition.x;
+	//xMax -= chunkStartingPosition.x;
+	//if (xMax == Utilities::CHUNK_WIDTH)
+	//{
+	//	--xMax;
+	//}
+	//yMin -= chunkStartingPosition.y;
+	//yMax -= chunkStartingPosition.y;
+	//if (yMax == Utilities::CHUNK_DEPTH)
+	//{
+	//	--yMax;
+	//}
+	for (int y = 0; y < 32; ++y)
 	{
-		for (int x = 0; x < + Utilities::CHUNK_WIDTH; ++x)
+		for (int x = 0; x < 32; ++x)
 		{
 			int h = bilinearInterpolation(bottomLeft, topLeft, bottomRight, topRight,
-				0, Utilities::CHUNK_WIDTH,
-				0, Utilities::CHUNK_DEPTH,
-				z, x);
+				0, 32, //x
+				0, 32, //y
+				x, y);
 
-			m_heightMap[x][z] = h;
+			m_heightMap[y][x] = h;
 		}
 	}
+
+	//for (int z = 0; z < +Utilities::CHUNK_DEPTH; ++z)
+	//{
+	//	for (int x = 0; x < +Utilities::CHUNK_WIDTH; ++x)
+	//	{
+	//		int h = bilinearInterpolation(bottomLeft, topLeft, bottomRight, topRight,
+	//			0, Utilities::CHUNK_WIDTH, //x
+	//			0, Utilities::CHUNK_DEPTH, //y
+	//			x, z);
+
+	//		m_heightMap[z][x] = h;
+	//	}
+	//}
 }
 
-int Chunk::getElevationAtPosition(const glm::ivec2& positionOnGrid) const
+int Chunk::getElevationAtPosition(int x, int y) const
 {
-	float biomeType = getMoistureValue(positionOnGrid.x, positionOnGrid.y);
+	float biomeType = getMoistureValue(x, y);
 	//Desert Biome
 	if (biomeType >= 0.5f)
 	{
 		//int Chunk::getElevationValue(int x, int z, float biomeLacunarity, float biomePersistence,
 		//	int biomeOctaves, int biomeRedistribution) const
-		return getElevationValue(positionOnGrid.x, positionOnGrid.y, Utilities::DESERT_LACUNARITY, 
+		return getElevationValue(x, y, Utilities::DESERT_LACUNARITY, 
 			Utilities::DESERT_PERSISTENCE, Utilities::TERRAIN_OCTAVES, Utilities::DESERT_REDISTRIBUTION);
 	}
 	//Plains Biome
 	else
 	{
-		return getElevationValue(positionOnGrid.x, positionOnGrid.y, Utilities::PLAINS_LACUNARITY,
+		return getElevationValue(x, y, Utilities::PLAINS_LACUNARITY,
 			Utilities::PLAINS_PERSISTENCE, Utilities::TERRAIN_OCTAVES, Utilities::PLAINS_REDISTRIBUTION);
 	}
 }
@@ -572,16 +676,12 @@ int Chunk::getElevationValue(int x, int z, float biomeLacunarity, float biomePer
 	}
 
 	//total += biomeRedistribution;
-	if (elevation < 0)
-	{
-		elevation = 0.0f;
-	}
 	//elevation = glm::pow(elevation, biomeRedistribution);
 	
 	elevation /= total;
-
+	elevation = (elevation + 1) / 2;
+	elevation = glm::pow(elevation, biomeRedistribution);
 	elevation = elevation * (float)Utilities::CHUNK_HEIGHT - 1;
-	elevation = clampTo(elevation, 0.0f, (float)Utilities::CHUNK_HEIGHT - 1.0f);
 
 	return elevation;
 }
@@ -601,10 +701,18 @@ float Chunk::getMoistureValue(int x, int z) const
 		moisturePersistence /= 2.0f;
 		moistureLacunarity *= 2.0f;
 	}
-	if (moisture < 0)
+
+	float persistence = Utilities::MOISTURE_PERSISTENCE;
+	float total = 0.0f;
+	for (int i = 0; i < Utilities::MOISTURE_OCTAVES; ++i)
 	{
-		moisture = 0.0f;
+		total += persistence;
+		persistence /= 2.0f;
 	}
 
+	moisture /= total;
+	moisture = (moisture + 1) / 2;
+
+	
 	return moisture;
 }
