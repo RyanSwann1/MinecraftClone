@@ -49,8 +49,8 @@ struct NeighbouringChunks : private NonCopyable, private NonMovable
 
 	const Chunk& leftChunk;
 	const Chunk& rightChunk;
-	const Chunk& topChunk;
-	const Chunk& bottomChunk;
+	const Chunk& forwardChunk;
+	const Chunk& backChunk;
 };
 
 struct ChunkToAdd

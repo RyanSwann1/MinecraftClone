@@ -234,29 +234,12 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 		for (int x = startingPosition.x; x < startingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 		{
 			int elevation = getElevationValue(x, z);
-			float moisture = getMoistureValue(x, z);
-			eCubeType cubeType;
 			glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 
-			//Desert Biome
-			if (moisture >= 0.5f)
+			eCubeType cubeType;
+			switch (getBiomeType(x, z))
 			{
-				for (int y = elevation; y >= 0; --y)
-				{
-					if (y <= Utilities::STONE_MAX_HEIGHT)
-					{
-						cubeType = eCubeType::Stone;
-					}
-					else 
-					{
-						cubeType = eCubeType::Sand;
-					}
-
-					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
-				}
-			}
-			//Plains Biome
-			else
+			case eBiomeType::Plains :
 			{
 				for (int y = elevation; y >= 0; --y)
 				{
@@ -275,6 +258,27 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 
 					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
 				}
+			}
+			break;
+			case eBiomeType::Desert:
+			{
+				for (int y = elevation; y >= 0; --y)
+				{
+					if (y <= Utilities::STONE_MAX_HEIGHT)
+					{
+						cubeType = eCubeType::Stone;
+					}
+					else
+					{
+						cubeType = eCubeType::Sand;
+					}
+
+					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
+				}
+			}
+			break;
+			default:
+				assert(false);
 			}
 		}
 	}
@@ -505,23 +509,30 @@ int Chunk::getElevationValue(int x, int z) const
 	return elevation;
 }
 
-float Chunk::getMoistureValue(int x, int z) const
+eBiomeType Chunk::getBiomeType(int x, int z) const
 {
-	double mx = x / 1000.0f * 1.0f;
-	double my = z / 1000.0f * 1.0f;
+	double bx = x / 1000.0f * 1.0f;
+	double by = z / 1000.0f * 1.0f;
 
-	float moisture = 0.0f;
-	float moisturePersistence = Utilities::MOISTURE_PERSISTENCE;
-	float moistureLacunarity = Utilities::MOISTURE_LACUNARITY;
-	for (int i = 0; i < Utilities::MOISTURE_OCTAVES; ++i)
+	float biomeType = 0.0f;
+	float moisturePersistence = Utilities::BIOME_PERSISTENCE;
+	float moistureLacunarity = Utilities::BIOME_LACUNARITY;
+	for (int i = 0; i < Utilities::BIOME_OCTAVES; ++i)
 	{
-		moisture += moisturePersistence * glm::perlin(glm::vec2(mx * moistureLacunarity, my * moistureLacunarity));
+		biomeType += moisturePersistence * glm::perlin(glm::vec2(bx * moistureLacunarity, by * moistureLacunarity));
 
 		moisturePersistence /= 2.0f;
 		moistureLacunarity *= 2.0f;
 	}
 
-	moisture = (moisture + 1) / 2;
+	biomeType = (biomeType + 1) / 2;	
 
-	return moisture;
+	if (biomeType >= 0.35f)
+	{
+		return eBiomeType::Plains;
+	}
+	else
+	{
+		return eBiomeType::Desert;
+	}
 }

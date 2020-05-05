@@ -74,9 +74,9 @@ namespace Utilities
 
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
-	constexpr float MOISTURE_LACUNARITY = 5.0f;
-	constexpr float MOISTURE_PERSISTENCE = 0.5f;
-	constexpr int MOISTURE_OCTAVES = 3;
+	constexpr float BIOME_LACUNARITY = 5.0f;
+	constexpr float BIOME_PERSISTENCE = 0.5f;
+	constexpr int BIOME_OCTAVES = 12;
 
 	constexpr float TERRAIN_LACUNARITY = 7.5f;
 	constexpr float TERRAIN_PERSISTENCE = 2.5f;

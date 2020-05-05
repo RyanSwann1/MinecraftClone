@@ -208,8 +208,8 @@ namespace
 NeighbouringChunks::NeighbouringChunks(const Chunk& leftChunk, const Chunk& rightChunk, const Chunk& topChunk, const Chunk& bottomChunk)
 	: leftChunk(leftChunk),
 	rightChunk(rightChunk),
-	topChunk(topChunk),
-	bottomChunk(bottomChunk)
+	forwardChunk(topChunk),
+	backChunk(bottomChunk)
 {}
 
 //ChunksToAdd
@@ -582,7 +582,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
 						}
 					}
-					else if (!isCubeAtPosition(forwardPosition, neighbouringChunks.topChunk))
+					else if (!isCubeAtPosition(forwardPosition, neighbouringChunks.forwardChunk))
 					{
 						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
 					}
@@ -596,7 +596,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
 						}
 					}
-					else if (!isCubeAtPosition(backPosition, neighbouringChunks.bottomChunk))
+					else if (!isCubeAtPosition(backPosition, neighbouringChunks.backChunk))
 					{
 						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
 					}
@@ -660,7 +660,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false, shadow);
 						}
 					}
-					else if (!isCubeAtPosition(forwardPosition, neighbouringChunks.topChunk))
+					else if (!isCubeAtPosition(forwardPosition, neighbouringChunks.forwardChunk))
 					{
 						addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false, shadow);
 					}
@@ -674,7 +674,7 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
 						}
 					}
-					else if (!isCubeAtPosition(backPosition, neighbouringChunks.bottomChunk))
+					else if (!isCubeAtPosition(backPosition, neighbouringChunks.backChunk))
 					{
 						addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
 					}
@@ -806,12 +806,13 @@ void ChunkGenerator::generateChunkMeshes(std::mutex& renderingMutex)
 		const glm::ivec3& chunkStartingPosition = chunkMeshToGenerate->second.chunkFromPool.getObject()->getStartingPosition();
 		auto leftChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left));
 		auto rightChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Right));
-		auto topChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward));
-		auto bottomChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back));
+		auto forwardChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward));
+		auto backChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back));
+
 		if (leftChunk != m_chunks.cend() &&
 			rightChunk != m_chunks.cend() &&
-			topChunk != m_chunks.cend() &&
-			bottomChunk != m_chunks.cend())
+			forwardChunk != m_chunks.cend() &&
+			backChunk != m_chunks.cend())
 		{
 			if (!m_generatedChunkMeshes.contains(chunkMeshToGenerate->first))
 			{
@@ -819,7 +820,7 @@ void ChunkGenerator::generateChunkMeshes(std::mutex& renderingMutex)
 				assert(!m_chunksToDelete.contains(chunkMeshToGenerate->first));
 
 				generateChunkMesh(*chunkMeshToGenerate->second.vertexArrayFromPool.getObject(), *chunkMeshToGenerate->second.chunkFromPool.getObject(),
-				{*leftChunk->second.getObject(), *rightChunk->second.getObject(), *topChunk->second.getObject(), *bottomChunk->second.getObject()});
+				{*leftChunk->second.getObject(), *rightChunk->second.getObject(), *forwardChunk->second.getObject(), *backChunk->second.getObject()});
 
 				m_generatedChunkMeshes.add(chunkMeshToGenerate->first);
 			}

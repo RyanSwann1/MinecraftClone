@@ -14,6 +14,12 @@
 //Saving/Storing
 //https://www.reddit.com/r/proceduralgeneration/comments/3gwbux/question_how_does_the_world_remember_changes/
 
+enum class eBiomeType
+{
+	Plains = 0,
+	Desert
+};
+
 //position.y * (CHUNK_AREA) + position.z * CHUNK_SIZE + position.x;
 class Chunk : private NonCopyable
 {
@@ -42,7 +48,7 @@ private:
 	bool isPositionInLocalBounds(const glm::ivec3& position) const;
 	bool isCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType) const;
 	int getElevationValue(int x, int y) const;
-	float getMoistureValue(int x, int y) const;
+	eBiomeType getBiomeType(int x, int y) const;
 	
 	void changeCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType);
 	void regen(const glm::ivec3& startingPosition);
