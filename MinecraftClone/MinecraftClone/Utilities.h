@@ -62,7 +62,7 @@ namespace Utilities
 	constexpr int MAX_TREE_HEIGHT = 9;
 	constexpr int CACTUS_MIN_HEIGHT = 1;
 	constexpr int CACTUS_MAX_HEIGHT = 4;
-	constexpr int MAX_TREE_PER_CHUNK = 3;
+	constexpr int MAX_TREE_PER_CHUNK = 1;
 	constexpr int MAX_CACTUS_PER_CHUNK = 1;
 	
 	constexpr int MAX_SHRUB_PER_CHUNK = 3;
@@ -78,7 +78,7 @@ namespace Utilities
 	constexpr float BIOME_PERSISTENCE = 0.5f;
 	constexpr int BIOME_OCTAVES = 12;
 
-	constexpr float TERRAIN_LACUNARITY = 7.5f;
+	constexpr float TERRAIN_LACUNARITY = 25.0f;
 	constexpr float TERRAIN_PERSISTENCE = 2.5f;
 	constexpr int TERRAIN_OCTAVES = 8;
 

@@ -61,20 +61,6 @@ namespace
 
 		return dis(gen);
 	}
-
-	float clampTo(int value, int min, int max)
-	{
-		if (value < min)
-		{
-			value = min;
-		}
-		else if (value > max)
-		{
-			value = max;
-		}
-
-		return value;
-	}
 }
 
 Chunk::Chunk()
@@ -481,11 +467,11 @@ int Chunk::getElevationAtPosition(int x, int z) const
 		persistence /= 2.0f;
 	}
 
-	elevation = (elevation + 1) / 2;
-	elevation += glm::pow(elevation, 2.5f);
+	
 	elevation /= total;
+	elevation = (elevation + 1) / 2;
+	elevation = glm::pow(elevation, 3.0f);
 	elevation = elevation * (float)Utilities::CHUNK_HEIGHT - 1;
-	elevation = clampTo(elevation, 0, Utilities::CHUNK_HEIGHT - 1);
 
 	return elevation;
 }
@@ -494,8 +480,8 @@ int Chunk::getElevationAtPosition(int x, int z) const
 
 eBiomeType Chunk::getBiomeType(int x, int z) const
 {
-	double bx = x / 1000.0f * 1.0f;
-	double by = z / 1000.0f * 1.0f;
+	double bx = x / 1000.0f;
+	double by = z / 1000.0f;
 
 	float biomeType = 0.0f;
 	float moisturePersistence = Utilities::BIOME_PERSISTENCE;
@@ -508,7 +494,16 @@ eBiomeType Chunk::getBiomeType(int x, int z) const
 		moistureLacunarity *= 2.0f;
 	}
 
-	biomeType = (biomeType + 1) / 2;	
+	float persistence = Utilities::BIOME_PERSISTENCE;
+	float total = 0.0f;
+	for (int i = 0; i < Utilities::BIOME_OCTAVES; ++i)
+	{
+		total += persistence;
+		persistence /= 2.0f;
+	}
+
+	biomeType /= total;
+	biomeType = (biomeType + 1) / 2;
 
 	if (biomeType >= 0.35f)
 	{
