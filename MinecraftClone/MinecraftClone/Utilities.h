@@ -8,6 +8,7 @@ enum class eTextureLayer
 {
 	Grass = 0,
 	GrassSide,
+	Dirt,
 	Sand,
 	Stone,
 	Water,

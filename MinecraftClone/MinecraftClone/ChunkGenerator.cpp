@@ -40,6 +40,9 @@ namespace
 		eTextureLayer textureLayer;
 		switch (cubeType)
 		{
+		case eCubeType::Dirt:
+			textureLayer = eTextureLayer::Dirt;
+			break;
 		case eCubeType::Stone:
 			textureLayer = eTextureLayer::Stone;
 			break;

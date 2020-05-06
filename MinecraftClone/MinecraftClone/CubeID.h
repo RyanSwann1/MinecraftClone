@@ -4,6 +4,7 @@ enum class eCubeType
 {
 	Invalid = 0,
 	Grass,
+	Dirt,
 	Sand,
 	Stone,
 	Water,

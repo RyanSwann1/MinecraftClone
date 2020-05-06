@@ -227,6 +227,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			{
 			case eBiomeType::Plains :
 			{
+				bool firstBlockPlaced = false;
 				for (int y = elevation; y >= 0; --y)
 				{
 					if (y <= Utilities::STONE_MAX_HEIGHT)
@@ -235,7 +236,15 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 					}
 					else
 					{
-						cubeType = eCubeType::Grass;
+						if (firstBlockPlaced)
+						{
+							cubeType = eCubeType::Dirt;
+						}
+						else
+						{
+							cubeType = eCubeType::Grass;
+							firstBlockPlaced = true;
+						}
 					}
 
 					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
