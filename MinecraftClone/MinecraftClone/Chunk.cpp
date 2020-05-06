@@ -233,10 +233,6 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 					{
 						cubeType = eCubeType::Stone;
 					}
-					else if (y <= Utilities::SAND_MAX_HEIGHT)
-					{
-						cubeType = eCubeType::Sand;
-					}
 					else
 					{
 						cubeType = eCubeType::Grass;
