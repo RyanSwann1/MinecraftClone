@@ -99,8 +99,8 @@ private:
 
 	void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition, 
 		bool transparent, bool shadow = false);
-	void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const glm::ivec3& cubePosition, 
-		const std::array<glm::ivec3, 4>& diagonalFace);
+	void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const glm::ivec3& cubePosition,
+		const std::array<glm::ivec3, 4>& diagonalFace, bool shadow = false);
 	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks);
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);

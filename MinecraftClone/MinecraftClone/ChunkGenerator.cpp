@@ -16,7 +16,7 @@ namespace
 	constexpr float BACK_FACE_LIGHTING_INTENSITY = 0.8f;
 	constexpr float LEFT_FACE_LIGHTING_INTENSITY = 0.75f;
 	constexpr float RIGHT_FACE_LIGHTING_INTENSITY = 0.75f;
-	constexpr float SHADOW_INTENSITY = 0.7f;
+	constexpr float SHADOW_INTENSITY = 0.4f;
 	constexpr float BOTTOM_FACE_LIGHTING_INTENSITY = 0.4f;
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
 	constexpr int THREAD_TRANSFER_PER_FRAME = 4;
@@ -484,7 +484,7 @@ void ChunkGenerator::addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType,
 }
 
 void ChunkGenerator::addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const glm::ivec3& cubePosition, 
-	const std::array<glm::ivec3, 4>& diagonalFace)
+	const std::array<glm::ivec3, 4>& diagonalFace, bool shadow)
 {
 	//Positions
 	glm::ivec3 position = cubePosition;
@@ -495,7 +495,15 @@ void ChunkGenerator::addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType c
 		position = cubePosition;
 
 		//Lighting
-		vertexBuffer.lightIntensityVertices.push_back(DEFAULT_LIGHTING_INTENSITY);
+		if (shadow)
+		{
+			vertexBuffer.lightIntensityVertices.push_back(SHADOW_INTENSITY);
+		}
+		else
+		{
+			vertexBuffer.lightIntensityVertices.push_back(DEFAULT_LIGHTING_INTENSITY);
+		}
+		
 	}
 
 	//Texture Coordinates
@@ -620,8 +628,8 @@ void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& ch
 				}
 				else if (cubeType == eCubeType::Shrub || cubeType == eCubeType::TallGrass)
 				{
-					addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, FIRST_DIAGONAL_FACE);
-					addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, SECOND_DIAGONAL_FACE);
+					addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, FIRST_DIAGONAL_FACE, shadow);
+					addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, SECOND_DIAGONAL_FACE, shadow);
 				}
 				else
 				{
