@@ -61,6 +61,14 @@ struct ChunkToAdd
 	glm::ivec3 startingPosition;
 };
 
+struct ChunkMeshToGenerate : private NonCopyable, private NonMovable
+{
+	ChunkMeshToGenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool);
+
+	ObjectFromPool<VertexArray> vertexArrayFromPool;
+	const ObjectFromPool<Chunk>& chunkFromPool;
+};
+
 struct Frustum;
 enum class eDirection;
 enum class eCubeSide;
@@ -68,14 +76,6 @@ class VertexArray;
 struct CubeDetails;
 class ChunkGenerator : private NonCopyable, private NonMovable
 {
-	struct ChunkMeshToGenerate : private NonCopyable, private NonMovable
-	{
-		ChunkMeshToGenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool);
-
-		ObjectFromPool<VertexArray> vertexArrayFromPool;
-		const ObjectFromPool<Chunk>& chunkFromPool;
-	};
-
 public:
 	ChunkGenerator(const glm::ivec3& playerPosition);
 
@@ -97,19 +97,7 @@ private:
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
 
-
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);
 	void generateChunkMeshes(std::mutex& renderingMutex);
-
-	void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition, 
-		bool transparent, bool shadow = false) const;
-	void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const glm::ivec3& cubePosition,
-		const std::array<glm::ivec3, 4>& diagonalFace, bool shadow = false) const;
-
-	void generateOuterChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks) const;
-	void generateInnerChunkMesh(VertexArray& vertexArray, const Chunk& chunk) const;
-	void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType, VertexArray& vertexArray) const;
-	void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks, 
-		eCubeType cubeType, VertexArray& vertexArray) const;
 };
