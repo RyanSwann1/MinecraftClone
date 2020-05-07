@@ -207,15 +207,6 @@ void ChunkGenerator::renderTransparent(const Frustum& frustum) const
 	}
 }
 
-bool ChunkGenerator::isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const
-{
-	char cubeType = chunk.getCubeDetailsWithoutBoundsCheck(position);
-	return (cubeType != static_cast<char>(eCubeType::Invalid) && 
-		cubeType != static_cast<char>(eCubeType::Water) && 
-		cubeType != static_cast<char>(eCubeType::Shrub) &&
-		cubeType != static_cast<char>(eCubeType::TallGrass) ? true : false);
-}
-
 void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex)
 {
 	glm::ivec3 startingPosition(playerPosition);
@@ -330,10 +321,6 @@ void ChunkGenerator::generateChunkMeshes(std::mutex& renderingMutex)
 
 				generateChunkMesh(chunkMeshToGenerate->second,
 					{ *leftChunk->second.getObject(), *rightChunk->second.getObject(), *forwardChunk->second.getObject(), *backChunk->second.getObject() });
-
-				//generateOuterChunkMesh(vertexArray, *chunkMeshToGenerate->second.chunkFromPool.getObject(),
-				//	{ *leftChunk->second.getObject(), *rightChunk->second.getObject(), *forwardChunk->second.getObject(), *backChunk->second.getObject() });
-				//generateInnerChunkMesh(vertexArray, *chunkMeshToGenerate->second.chunkFromPool.getObject());
 				
 				m_generatedChunkMeshes.add(chunkMeshToGenerate->first);
 			}

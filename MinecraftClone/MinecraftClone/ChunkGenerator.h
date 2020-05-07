@@ -95,7 +95,6 @@ private:
 	std::vector<ChunkToAdd> m_chunksToAdd;
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
-	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
 
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);

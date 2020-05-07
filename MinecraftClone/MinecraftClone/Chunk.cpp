@@ -102,7 +102,6 @@ Chunk& Chunk::operator=(Chunk&& orig) noexcept
 bool Chunk::isCubeAtPosition(const glm::ivec3& position) const
 {
 	char cubeType = getCubeDetailsWithoutBoundsCheck(position);
-
 	return (cubeType != static_cast<char>(eCubeType::Invalid) &&
 		cubeType != static_cast<char>(eCubeType::Water) &&
 		cubeType != static_cast<char>(eCubeType::Shrub) &&
