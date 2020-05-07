@@ -97,12 +97,19 @@ private:
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 	bool isCubeAtPosition(const glm::ivec3& position, const Chunk& chunk) const;
 
-	void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition, 
-		bool transparent, bool shadow = false);
-	void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const glm::ivec3& cubePosition,
-		const std::array<glm::ivec3, 4>& diagonalFace, bool shadow = false);
-	void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks);
+
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);
 	void generateChunkMeshes(std::mutex& renderingMutex);
+
+	void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition, 
+		bool transparent, bool shadow = false) const;
+	void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const glm::ivec3& cubePosition,
+		const std::array<glm::ivec3, 4>& diagonalFace, bool shadow = false) const;
+
+	void generateOuterChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks) const;
+	void generateInnerChunkMesh(VertexArray& vertexArray, const Chunk& chunk) const;
+	void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType, VertexArray& vertexArray) const;
+	void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks, 
+		eCubeType cubeType, VertexArray& vertexArray) const;
 };

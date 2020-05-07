@@ -327,7 +327,7 @@ void ChunkGenerator::renderTransparent(const Frustum& frustum) const
 }
 
 void ChunkGenerator::addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition, 
-	bool transparent, bool shadow)
+	bool transparent, bool shadow) const
 {
 	glm::ivec3 position = cubePosition;
 	switch (cubeSide)
@@ -484,7 +484,7 @@ void ChunkGenerator::addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType,
 }
 
 void ChunkGenerator::addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const glm::ivec3& cubePosition, 
-	const std::array<glm::ivec3, 4>& diagonalFace, bool shadow)
+	const std::array<glm::ivec3, 4>& diagonalFace, bool shadow) const
 {
 	//Positions
 	glm::ivec3 position = cubePosition;
@@ -527,194 +527,84 @@ bool ChunkGenerator::isCubeAtPosition(const glm::ivec3& position, const Chunk& c
 		cubeType != static_cast<char>(eCubeType::TallGrass) ? true : false);
 }
 
-void ChunkGenerator::generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks)
+void ChunkGenerator::generateOuterChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks) const
 {
 	const glm::ivec3& chunkStartingPosition = chunk.getStartingPosition();
 	const glm::ivec3& chunkEndingPosition = chunk.getEndingPosition();
 
+	//Vertical
 	for (int z = chunkStartingPosition.z; z < chunkEndingPosition.z; ++z)
 	{
-		for (int y = chunkStartingPosition.y; y < chunkEndingPosition.y; ++y)
+		for (int y = chunkEndingPosition.y - 1; y >= chunkStartingPosition.y; --y)
 		{
-			for (int x = chunkStartingPosition.x; x < chunkEndingPosition.x; ++x)
+			eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck({ chunkStartingPosition.x, y, z }));
+			if (cubeType != eCubeType::Invalid)
 			{
-				glm::ivec3 position(x, y, z);
-				eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(position));
-				bool shadow = false;
-				if (cubeType != eCubeType::Stone)
-				{
-					shadow = chunk.isCubeBelowCovering(position);
-				}
-
-				if (cubeType == eCubeType::Invalid)
-				{
-					continue;
-				}
-				else if (cubeType == eCubeType::Water)
-				{
-					addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
-				}
-				else if (cubeType == eCubeType::Leaves)
-				{
-					//Left Face
-					glm::ivec3 leftPosition(x - 1, y, z);
-					if (chunk.isPositionInBounds(leftPosition))
-					{
-						if (!isCubeAtPosition(leftPosition, chunk))
-						{
-							addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
-						}
-					}
-					else if (!isCubeAtPosition(leftPosition, neighbouringChunks.leftChunk))
-					{
-						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
-					}
-
-					//Right Face
-					glm::ivec3 rightPosition(x + 1, y, z);
-					if (chunk.isPositionInBounds(rightPosition))
-					{
-						if (!isCubeAtPosition(rightPosition, chunk))
-						{
-							addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
-						}
-					}
-					else if (!isCubeAtPosition(rightPosition, neighbouringChunks.rightChunk))
-					{
-						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
-					}
-
-					//Forward Face
-					glm::ivec3 forwardPosition(x, y, z + 1);
-					if (chunk.isPositionInBounds(forwardPosition))
-					{
-						if (!isCubeAtPosition(forwardPosition, chunk))
-						{
-							addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
-						}
-					}
-					else if (!isCubeAtPosition(forwardPosition, neighbouringChunks.forwardChunk))
-					{
-						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
-					}
-
-					//Back Face
-					glm::ivec3 backPosition(x, y, z - 1);
-					if (chunk.isPositionInBounds(backPosition))
-					{
-						if (!isCubeAtPosition(backPosition, chunk))
-						{
-							addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
-						}
-					}
-					else if (!isCubeAtPosition(backPosition, neighbouringChunks.backChunk))
-					{
-						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
-					}
-
-
-					//Top Face
-					if (y == Utilities::CHUNK_HEIGHT - 1 || !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
-					{
-						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
-					}
-
-					//Bottom Face
-					if (!isCubeAtPosition({ x, y - 1, z }, chunk))
-					{
-						addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Bottom, position, true);
-					}
-				
-				}
-				else if (cubeType == eCubeType::Shrub || cubeType == eCubeType::TallGrass)
-				{
-					addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, FIRST_DIAGONAL_FACE, shadow);
-					addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, SECOND_DIAGONAL_FACE, shadow);
-				}
-				else
-				{
-					//Left Face
-					glm::ivec3 leftPosition(x - 1, y, z);
-					if (chunk.isPositionInBounds(leftPosition))
-					{
-						if (!isCubeAtPosition(leftPosition, chunk))
-						{
-							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false, shadow);
-						}
-					}
-					else if (!isCubeAtPosition(leftPosition, neighbouringChunks.leftChunk))
-					{
-						addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false, shadow);
-					}
-
-					
-					//Right Face
-					glm::ivec3 rightPosition(x + 1, y, z);
-					if (chunk.isPositionInBounds(rightPosition))
-					{
-						if (!isCubeAtPosition(rightPosition, chunk))
-						{
-							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, false, shadow);
-						}
-					}
-					else if (!isCubeAtPosition(rightPosition, neighbouringChunks.rightChunk))
-					{
-						addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, false, shadow);
-					}
-
-					//Forward Face
-					glm::ivec3 forwardPosition(x, y, z + 1);
-					if (chunk.isPositionInBounds(forwardPosition))
-					{
-						if (!isCubeAtPosition(forwardPosition, chunk))
-						{
-							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false, shadow);
-						}
-					}
-					else if (!isCubeAtPosition(forwardPosition, neighbouringChunks.forwardChunk))
-					{
-						addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false, shadow);
-					}
-
-					//Back Face
-					glm::ivec3 backPosition(x, y, z - 1);
-					if (chunk.isPositionInBounds(backPosition))
-					{
-						if (!isCubeAtPosition(backPosition, chunk))
-						{
-							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
-						}
-					}
-					else if (!isCubeAtPosition(backPosition, neighbouringChunks.backChunk))
-					{
-						addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
-					}
-
-					if (cubeType == eCubeType::LogTop)
-					{
-						addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
-					}
-					else
-					{
-						//Top Face
-						if (y == Utilities::CHUNK_HEIGHT - 1 || !isCubeAtPosition(glm::ivec3(x, y + 1, z), chunk))
-						{
-							addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
-						}
-					}
-				}
+				generateChunkOuterCubeMesh({ chunkStartingPosition.x, y, z }, chunk, neighbouringChunks, cubeType, vertexArray);
 			}
 		}
 	}
 
-	if (!vertexArray.m_opaqueVertexBuffer.indicies.empty())
+	for (int z = chunkStartingPosition.z; z < chunkEndingPosition.z; ++z)
 	{
-		vertexArray.m_opaqueVertexBuffer.bindToVAO = true;
+		for (int y = chunkEndingPosition.y - 1; y >= chunkStartingPosition.y; --y)
+		{
+			eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck({ chunkEndingPosition.x - 1, y, z }));
+
+			if (cubeType != eCubeType::Invalid)
+			{
+				generateChunkOuterCubeMesh({ chunkEndingPosition.x - 1, y, z }, chunk, neighbouringChunks, cubeType, vertexArray);
+			}
+		}
 	}
 
-	if (!vertexArray.m_transparentVertexBuffer.indicies.empty())
+	//Horizontal
+	for (int y = chunkEndingPosition.y - 1; y >= chunkStartingPosition.y; --y)
 	{
-		vertexArray.m_transparentVertexBuffer.bindToVAO = true;
+		for(int x = chunkStartingPosition.x; x < chunkEndingPosition.x; ++x)
+		{ 
+			eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck({ x, y, chunkStartingPosition.z }));
+
+			if (cubeType != eCubeType::Invalid)
+			{
+				generateChunkOuterCubeMesh({ x, y, chunkStartingPosition.z }, chunk, neighbouringChunks, cubeType, vertexArray);
+			}
+		}
+	}
+
+	for (int y = chunkEndingPosition.y - 1; y >= chunkStartingPosition.y; --y)
+	{
+		for (int x = chunkStartingPosition.x; x < chunkEndingPosition.x; ++x)
+		{
+			eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck({ x, y, chunkEndingPosition.z - 1 }));
+
+			if (cubeType != eCubeType::Invalid)
+			{
+				generateChunkOuterCubeMesh({ x, y, chunkEndingPosition.z - 1 }, chunk, neighbouringChunks, cubeType, vertexArray);
+			}
+		}
+	}
+}
+
+void ChunkGenerator::generateInnerChunkMesh(VertexArray& vertexArray, const Chunk& chunk) const
+{
+	const glm::ivec3& chunkStartingPosition = chunk.getStartingPosition();
+	const glm::ivec3& chunkEndingPosition = chunk.getEndingPosition();
+
+	for (int z = chunkStartingPosition.z + 1; z < chunkEndingPosition.z - 1; ++z)
+	{
+		for (int y = chunkEndingPosition.y - 1; y >= chunkStartingPosition.y; --y)
+		{
+			for (int x = chunkStartingPosition.x + 1; x < chunkEndingPosition.x - 1; ++x)
+			{
+				glm::ivec3 position(x, y, z);
+				eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(position));
+				if(cubeType != eCubeType::Invalid)
+				{
+					generateChunkInnerCubeMesh(position, chunk, cubeType, vertexArray);
+				}		
+			}
+		}
 	}
 }
 
@@ -830,10 +720,264 @@ void ChunkGenerator::generateChunkMeshes(std::mutex& renderingMutex)
 				m_generatedChunkMeshes.remove(chunkMeshToGenerate->first);
 				assert(!m_chunksToDelete.contains(chunkMeshToGenerate->first));
 
-				generateChunkMesh(*chunkMeshToGenerate->second.vertexArrayFromPool.getObject(), *chunkMeshToGenerate->second.chunkFromPool.getObject(),
-				{*leftChunk->second.getObject(), *rightChunk->second.getObject(), *forwardChunk->second.getObject(), *backChunk->second.getObject()});
+				VertexArray& vertexArray = *chunkMeshToGenerate->second.vertexArrayFromPool.getObject();
+
+				generateOuterChunkMesh(vertexArray, *chunkMeshToGenerate->second.chunkFromPool.getObject(),
+					{ *leftChunk->second.getObject(), *rightChunk->second.getObject(), *forwardChunk->second.getObject(), *backChunk->second.getObject() });
+
+				generateInnerChunkMesh(vertexArray, *chunkMeshToGenerate->second.chunkFromPool.getObject());
+				
+				if (!vertexArray.m_opaqueVertexBuffer.indicies.empty())
+				{
+					vertexArray.m_opaqueVertexBuffer.bindToVAO = true;
+				}
+
+				if (!vertexArray.m_transparentVertexBuffer.indicies.empty())
+				{
+					vertexArray.m_transparentVertexBuffer.bindToVAO = true;
+				}
 
 				m_generatedChunkMeshes.add(chunkMeshToGenerate->first);
+			}
+		}
+	}
+}
+
+void ChunkGenerator::generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType, VertexArray& vertexArray) const
+{
+	assert(chunk.isPositionInBounds(position));
+
+	bool shadow = false;
+	if (cubeType != eCubeType::Stone)
+	{
+		shadow = chunk.isCubeBelowCovering(position);
+	}
+
+	if (cubeType == eCubeType::Water)
+	{
+		addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
+	}
+	else if (cubeType == eCubeType::Leaves)
+	{
+		if (!isCubeAtPosition({ position.x - 1, position.y, position.z }, chunk))
+		{
+			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
+		}
+
+		if (!isCubeAtPosition({ position.x + 1, position.y, position.z }, chunk))
+		{
+			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
+		}
+
+		if (!isCubeAtPosition({ position.x, position.y, position.z + 1 }, chunk))
+		{
+			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
+		}
+
+		if (!isCubeAtPosition({ position.x, position.y, position.z - 1 }, chunk))
+		{
+			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
+		}
+
+		//Top Face
+		if (position.y == Utilities::CHUNK_HEIGHT - 1 || 
+			!isCubeAtPosition({ position.x, position.y + 1, position.z }, chunk))
+		{
+			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
+		}
+
+		//Bottom Face
+		if (!isCubeAtPosition({ position.x, position.y - 1, position.z }, chunk))
+		{
+			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Bottom, position, true);
+		}
+
+	}
+	else if (cubeType == eCubeType::Shrub || cubeType == eCubeType::TallGrass)
+	{
+		addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, FIRST_DIAGONAL_FACE, shadow);
+		addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, SECOND_DIAGONAL_FACE, shadow);
+	}
+	else
+	{
+		if (!isCubeAtPosition({ position.x - 1, position.y, position.z }, chunk))
+		{
+			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false, shadow);
+		}
+
+		if (!isCubeAtPosition({ position.x + 1, position.y, position.z }, chunk))
+		{
+			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, false, shadow);
+		}
+
+		if (!isCubeAtPosition({ position.x, position.y, position.z + 1 }, chunk))
+		{
+			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false, shadow);
+		}
+
+		if (!isCubeAtPosition({ position.x, position.y, position.z - 1 }, chunk))
+		{
+			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
+		}
+
+		if (cubeType == eCubeType::LogTop)
+		{
+			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
+		}
+		else
+		{
+			//Top Face
+			if (position.y == Utilities::CHUNK_HEIGHT - 1 || 
+				!isCubeAtPosition({ position.x, position.y + 1, position.z }, chunk))
+			{
+				addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
+			}
+		}
+	}
+}
+
+void ChunkGenerator::generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks, 
+	eCubeType cubeType, VertexArray& vertexArray) const
+{
+	assert(chunk.isPositionInBounds(position));
+
+	bool shadow = false;
+	if (cubeType != eCubeType::Stone)
+	{
+		shadow = chunk.isCubeBelowCovering(position);
+	}
+
+	if (cubeType == eCubeType::Water)
+	{
+		addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
+	}
+	else if (cubeType == eCubeType::Leaves)
+	{
+		if (chunk.isAvailableCubePosition({ position.x - 1, position.y, position.z }))
+		{
+			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
+		}
+		if (chunk.isAvailableCubePosition({ position.x + 1, position.y, position.z }))
+		{
+			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
+		}
+		if (chunk.isAvailableCubePosition({ position.x, position.y, position.z + 1}))
+		{
+			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
+		}
+		if (chunk.isAvailableCubePosition({ position.x, position.y, position.z - 1}))
+		{
+			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
+		}
+
+		if (neighbouringChunks.leftChunk.isAvailableCubePosition({ position.x - 1, position.y, position.z }))
+		{
+			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
+		}
+		else if	(neighbouringChunks.leftChunk.isAvailableCubePosition({ position.x + 1, position.y, position.z }))
+		{
+			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
+		}
+		if (neighbouringChunks.forwardChunk.isAvailableCubePosition({ position.x, position.y, position.z + 1}))
+		{
+			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
+		}
+		else if (neighbouringChunks.backChunk.isAvailableCubePosition({ position.x, position.y, position.z - 1}))
+		{
+			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
+		}
+
+		//Top Face
+		if (position.y == Utilities::CHUNK_HEIGHT - 1 ||
+			!isCubeAtPosition({ position.x, position.y + 1, position.z }, chunk))
+		{
+			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
+		}
+
+		//Bottom Face
+		if (!isCubeAtPosition({ position.x, position.y - 1, position.z }, chunk))
+		{
+			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Bottom, position, true);
+		}
+	}
+	else if (cubeType == eCubeType::Shrub || cubeType == eCubeType::TallGrass)
+	{
+		addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, FIRST_DIAGONAL_FACE, shadow);
+		addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, SECOND_DIAGONAL_FACE, shadow);
+	}
+	else
+	{
+		if (chunk.isAvailableCubePosition({ position.x - 1, position.y, position.z }))
+		{
+			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, true);
+		}
+		if (chunk.isAvailableCubePosition({ position.x + 1, position.y, position.z }))
+		{
+			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, true);
+		}
+		if (chunk.isAvailableCubePosition({ position.x, position.y, position.z + 1 }))
+		{
+			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, true);
+		}
+		if (chunk.isAvailableCubePosition({ position.x, position.y, position.z - 1 }))
+		{
+			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, true);
+		}
+
+		if (neighbouringChunks.leftChunk.isAvailableCubePosition({ position.x - 1, position.y, position.z }))
+		{
+			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, true);
+		}
+		else if (neighbouringChunks.leftChunk.isAvailableCubePosition({ position.x + 1, position.y, position.z }))
+		{
+			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, true);
+		}
+		if (neighbouringChunks.forwardChunk.isAvailableCubePosition({ position.x, position.y, position.z + 1 }))
+		{
+			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, true);
+		}
+		else if (neighbouringChunks.backChunk.isAvailableCubePosition({ position.x, position.y, position.z - 1 }))
+		{
+			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, true);
+		}
+
+		//if (!chunk.isPositionInBounds({ position.x - 1, position.y, position.z }) || 
+		//	neighbouringChunks.leftChunk.isPositionInBounds({ position.x - 1, position.y, position.z }) &&
+		//	!isCubeAtPosition({ position.x - 1, position.y, position.z }, neighbouringChunks.leftChunk))
+		//{
+		//	addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false, shadow);
+		//}
+		//else if (!chunk.isPositionInBounds({ position.x + 1, position.y, position.z }) ||
+		//	neighbouringChunks.rightChunk.isPositionInBounds({ position.x + 1, position.y, position.z }) &&
+		//	!isCubeAtPosition({ position.x + 1, position.y, position.z }, neighbouringChunks.rightChunk))
+		//{
+		//	addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, false, shadow);
+		//}
+
+		//if (!chunk.isPositionInBounds({ position.x, position.y, position.z + 1}) ||
+		//	neighbouringChunks.forwardChunk.isPositionInBounds({ position.x, position.y, position.z + 1}) &&
+		//	!isCubeAtPosition({ position.x, position.y, position.z + 1 }, neighbouringChunks.forwardChunk))
+		//{
+		//	addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false, shadow);
+		//}
+		//else if (!chunk.isPositionInBounds({ position.x, position.y, position.z - 1 }) ||
+		//	neighbouringChunks.backChunk.isPositionInBounds({ position.x, position.y, position.z - 1}) &&
+		//	!isCubeAtPosition({ position.x, position.y, position.z - 1 }, neighbouringChunks.backChunk))
+		//{
+		//	addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
+		//}
+
+		if (cubeType == eCubeType::LogTop)
+		{
+			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
+		}
+		else
+		{
+			//Top Face
+			if (position.y == Utilities::CHUNK_HEIGHT - 1 ||
+				!isCubeAtPosition({ position.x, position.y + 1, position.z }, chunk))
+			{
+				addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
 			}
 		}
 	}

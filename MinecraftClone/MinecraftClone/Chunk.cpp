@@ -99,6 +99,16 @@ Chunk& Chunk::operator=(Chunk&& orig) noexcept
 	return *this;
 }
 
+bool Chunk::isAvailableCubePosition(const glm::ivec3& position) const
+{
+	if (isPositionInBounds(position))
+	{
+		return m_chunk[converTo1D(position)] != static_cast<char>(eCubeType::Invalid);
+	}
+
+	return false;
+}
+
 bool Chunk::isCubeBelowCovering(const glm::ivec3& position) const
 {
 	if (!isPositionInBounds(glm::ivec3(position.x, position.y + 1, position.z)))
@@ -152,6 +162,7 @@ const glm::ivec3& Chunk::getEndingPosition() const
 char Chunk::getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const
 {
 	glm::ivec3 positionOnGrid(position.x - m_startingPosition.x, position.y - m_startingPosition.y, position.z - m_startingPosition.z);
+	assert(isPositionInLocalBounds(positionOnGrid));
 	return m_chunk[converTo1D(positionOnGrid)];
 }
 
