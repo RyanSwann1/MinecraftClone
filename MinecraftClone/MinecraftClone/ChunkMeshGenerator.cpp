@@ -246,12 +246,12 @@ void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		shadow = chunk.isCubeBelowCovering(position);
 	}
 
-	if (cubeType == eCubeType::Water)
+	switch (cubeType)
 	{
+	case eCubeType::Water:
 		addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
-	}
-	else if (cubeType == eCubeType::Leaves)
-	{
+		break;
+	case eCubeType::Leaves:
 		if (isFacingOpaqueCube({ position.x - 1, position.y, position.z }, chunk))
 		{
 			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
@@ -284,14 +284,13 @@ void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		{
 			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Bottom, position, true);
 		}
-	}
-	else if (cubeType == eCubeType::Shrub || cubeType == eCubeType::TallGrass)
-	{
+		break;
+	case eCubeType::TallGrass:
+	case eCubeType::Shrub:
 		addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, FIRST_DIAGONAL_FACE, shadow);
 		addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, SECOND_DIAGONAL_FACE, shadow);
-	}
-	else
-	{
+		break;
+	default:
 		if (isFacingTransparentCube({ position.x - 1, position.y, position.z }, chunk))
 		{
 			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false, shadow);
@@ -312,13 +311,12 @@ void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
 		}
 
-		if (cubeType == eCubeType::LogTop)
+		if(cubeType == eCubeType::LogTop)
 		{
 			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
 		}
 		else
 		{
-			//Top Face
 			if (position.y == Utilities::CHUNK_HEIGHT - 1 ||
 				isFacingTransparentCube({ position.x, position.y + 1, position.z }, chunk))
 			{
@@ -338,11 +336,12 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		shadow = chunk.isCubeBelowCovering(position);
 	}
 
-	if (cubeType == eCubeType::Water)
+	switch (cubeType)
 	{
+	case eCubeType::Water:
 		addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
-	}
-	else if (cubeType == eCubeType::Leaves)
+		break;
+	case eCubeType::Leaves:
 	{
 		//Left Face
 		glm::ivec3 leftPosition(position.x - 1, position.y, position.z);
@@ -402,7 +401,7 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 
 
 		//Top Face
-		if (position.y == Utilities::CHUNK_HEIGHT - 1 || 
+		if (position.y == Utilities::CHUNK_HEIGHT - 1 ||
 			isFacingOpaqueCube({ position.x, position.y + 1, position.z }, chunk))
 		{
 			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
@@ -413,14 +412,14 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		{
 			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Bottom, position, true);
 		}
-
 	}
-	else if (cubeType == eCubeType::Shrub || cubeType == eCubeType::TallGrass)
-	{
+		break;
+	case eCubeType::TallGrass:
+	case eCubeType::Shrub:
 		addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, FIRST_DIAGONAL_FACE, shadow);
 		addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, SECOND_DIAGONAL_FACE, shadow);
-	}
-	else
+		break;
+	default:
 	{
 		//Left Face
 		glm::ivec3 leftPosition(position.x - 1, position.y, position.z);
@@ -485,12 +484,13 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		else
 		{
 			//Top Face
-			if (position.y == Utilities::CHUNK_HEIGHT - 1 || 
+			if (position.y == Utilities::CHUNK_HEIGHT - 1 ||
 				isFacingTransparentCube({ position.x, position.y + 1, position.z }, chunk))
 			{
 				addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
 			}
 		}
+	}
 	}
 }
 
