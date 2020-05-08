@@ -1,5 +1,7 @@
 #pragma once
 
+#include "NonCopyable.h"
+#include "NonMovable.h"
 #include <bitset>
 #include <vector>
 
@@ -21,7 +23,7 @@ enum class eCubeType
 	Max = TallGrass
 };
 
-class CubeTypeComparison
+class CubeTypeComparison : private NonCopyable, private NonMovable
 {
 public:
 	CubeTypeComparison(const std::vector<eCubeType>& cubeTypes)
