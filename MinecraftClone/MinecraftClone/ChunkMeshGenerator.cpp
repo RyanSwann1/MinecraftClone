@@ -240,12 +240,6 @@ void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 {
 	assert(chunk.isPositionInBounds(position));
 
-	bool shadow = false;
-	if (cubeType != eCubeType::Stone)
-	{
-		shadow = chunk.isCubeBelowCovering(position);
-	}
-
 	switch (cubeType)
 	{
 	case eCubeType::Water:
@@ -287,10 +281,18 @@ void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		break;
 	case eCubeType::TallGrass:
 	case eCubeType::Shrub:
+	{
+		bool shadow = chunk.isCubeBelowCovering(position);
+
 		addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, FIRST_DIAGONAL_FACE, shadow);
 		addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, SECOND_DIAGONAL_FACE, shadow);
+	}
+
 		break;
 	default:
+	{
+		bool shadow = chunk.isCubeBelowCovering(position);
+
 		if (isFacingTransparentCube({ position.x - 1, position.y, position.z }, chunk))
 		{
 			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false, shadow);
@@ -311,7 +313,7 @@ void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
 		}
 
-		if(cubeType == eCubeType::LogTop)
+		if (cubeType == eCubeType::LogTop)
 		{
 			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
 		}
@@ -324,17 +326,12 @@ void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 			}
 		}
 	}
+	}
 }
 
 void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks, eCubeType cubeType, VertexArray& vertexArray)
 {
 	assert(chunk.isPositionInBounds(position));
-
-	bool shadow = false;
-	if (cubeType != eCubeType::Stone)
-	{
-		shadow = chunk.isCubeBelowCovering(position);
-	}
 
 	switch (cubeType)
 	{
@@ -416,11 +413,18 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		break;
 	case eCubeType::TallGrass:
 	case eCubeType::Shrub:
+	{
+		bool shadow = chunk.isCubeBelowCovering(position);
+
 		addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, FIRST_DIAGONAL_FACE, shadow);
 		addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, SECOND_DIAGONAL_FACE, shadow);
+	}
+
 		break;
 	default:
 	{
+		bool shadow = chunk.isCubeBelowCovering(position);
+
 		//Left Face
 		glm::ivec3 leftPosition(position.x - 1, position.y, position.z);
 		if (chunk.isPositionInBounds(leftPosition))

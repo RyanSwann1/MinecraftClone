@@ -127,25 +127,14 @@ bool Chunk::isAvailableCubePosition(const glm::ivec3& position) const
 	return false;
 }
 
-bool Chunk::isCubeBelowCovering(const glm::ivec3& position) const
+bool Chunk::isCubeBelowCovering(const glm::ivec3& startingPosition) const
 {
-	if (!isPositionInBounds(glm::ivec3(position.x, position.y + 1, position.z)))
+	for (int y = startingPosition.y + 1; y <= startingPosition.y + 8 && y < Utilities::CHUNK_HEIGHT - 1; ++y)
 	{
-		return false;
-	}
-
-	glm::ivec3 startingPositionOnGrid(position.x - m_startingPosition.x, position.y - m_startingPosition.y, position.z - m_startingPosition.z);
-	if (!isCubeAtLocalPosition(startingPositionOnGrid, eCubeType::Invalid) &&
-		isCubeAtLocalPosition(glm::ivec3(startingPositionOnGrid.x, startingPositionOnGrid.y + 1, startingPositionOnGrid.z), eCubeType::Invalid) || 
-		isCubeAtLocalPosition(glm::ivec3(startingPositionOnGrid.x, startingPositionOnGrid.y + 1, startingPositionOnGrid.z), eCubeType::TallGrass))
-	{
-		for (int y = Utilities::CHUNK_HEIGHT - 1; y > startingPositionOnGrid.y + 2; --y)
+		eCubeType cubeAtPosition = static_cast<eCubeType>(getCubeDetailsWithoutBoundsCheck({ startingPosition.x, y, startingPosition.z }));
+		if (cubeAtPosition == eCubeType::Leaves)
 		{
-			glm::ivec3 positionOnGrid = glm::ivec3(position.x - m_startingPosition.x, y, position.z - m_startingPosition.z);
-			if (!isCubeAtLocalPosition(positionOnGrid, eCubeType::Invalid))
-			{
-				return true;
-			}
+			return true;
 		}
 	}
 
