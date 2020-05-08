@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "CubeID.h"
+#include "CubeType.h"
 #include "Utilities.h"
 #include "Rectangle.h"
 #include "NonCopyable.h"
@@ -30,9 +30,10 @@ public:
 	Chunk(const glm::ivec3& startingPosition);
 	Chunk(Chunk&&) noexcept;
 	Chunk& operator=(Chunk&&) noexcept;
-
-
-	bool isCubeBelowCovering(const glm::ivec3& position) const;
+	
+	bool isCubeAtPosition(const glm::ivec3& position) const;
+	bool isAvailableCubePosition(const glm::ivec3& position) const;
+	bool isCubeBelowCovering(const glm::ivec3& startingPosition) const;
 	const Rectangle& getAABB() const;
 	bool isPositionInBounds(const glm::ivec3& position) const;
 	const glm::ivec3& getStartingPosition() const;

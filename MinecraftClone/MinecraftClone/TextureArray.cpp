@@ -1,6 +1,6 @@
 #include "TextureArray.h"
 #include "glad.h"
-#include "CubeID.h"
+#include "CubeType.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "Utilities.h"
@@ -10,10 +10,11 @@ namespace
 {
 	constexpr glm::ivec2 TEXTURE_SIZE = { 16, 16 };
 
-	const std::array<std::string, 13> TEXTURE_FILENAMES =
+	const std::array<std::string, 14> TEXTURE_FILENAMES =
 	{
 		"grass.png",
 		"grass_side.png",
+		"dirt.png",
 		"sand.png",
 		"stone.png",
 		"water.png",
