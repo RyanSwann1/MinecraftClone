@@ -14,6 +14,27 @@
 //Saving/Storing
 //https://www.reddit.com/r/proceduralgeneration/comments/3gwbux/question_how_does_the_world_remember_changes/
 
+struct HeightMapNode
+{
+	HeightMapNode()
+		:height(0),
+		biomeTransition(false)
+	{}
+
+	HeightMapNode(int height)
+		: height(height),
+		biomeTransition(false)
+	{}
+
+	int height;
+	bool biomeTransition;
+};
+
+enum class eTransitionType
+{
+
+};
+
 enum class eBiomeType
 {
 	Plains = 0,
@@ -31,7 +52,6 @@ public:
 	Chunk(Chunk&&) noexcept;
 	Chunk& operator=(Chunk&&) noexcept;
 
-
 	bool isCubeBelowCovering(const glm::ivec3& position) const;
 	const Rectangle& getAABB() const;
 	bool isPositionInBounds(const glm::ivec3& position) const;
@@ -45,7 +65,7 @@ public:
 private:
 	glm::ivec3 m_startingPosition;
 	glm::ivec3 m_endingPosition;
-	std::array<std::array<int, 32>, 32> m_heightMap;
+	std::array<std::array<HeightMapNode, 32>, 32> m_heightMap;
 	std::array<char, Utilities::CHUNK_VOLUME> m_chunk;
 	Rectangle m_AABB;
 
@@ -66,4 +86,6 @@ private:
 
 	void constructHeightMap(const glm::ivec2& startingPositionOnGrid);
 	int getElevationAtPosition(const glm::ivec2& positionOnGrid) const;
+	bool isPositionOnBiomeTransition(const glm::ivec2& position, int searchRadius) const;
+	int addNoiseToPosition(int height);
 };
