@@ -1,8 +1,9 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "CubeID.h"
+#include "CubeType.h"
 #include <string>
+#include <array>
 
 enum class eTextureLayer
 {
@@ -82,6 +83,26 @@ namespace Utilities
 	constexpr float TERRAIN_LACUNARITY = 25.0f;
 	constexpr float TERRAIN_PERSISTENCE = 2.5f;
 	constexpr int TERRAIN_OCTAVES = 8;
+
+	const CubeTypeComparison TRANSPARENT_CUBE_TYPES =
+	{
+		{eCubeType::Water,
+		eCubeType::Leaves,
+		eCubeType::Shrub,
+		eCubeType::TallGrass}
+	};
+
+	const CubeTypeComparison OPAQUE_CUBE_TYPES =
+	{
+		{eCubeType::Grass,
+		eCubeType::Dirt,
+		eCubeType::Sand,
+		eCubeType::Stone,
+		eCubeType::Log,
+		eCubeType::LogTop,
+		eCubeType::Cactus,
+		eCubeType::CactusTop}
+	};
 
 	constexpr int VISIBILITY_DISTANCE = 1024;
 	constexpr int MAP_SIZE = 8000;
