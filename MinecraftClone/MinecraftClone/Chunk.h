@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "CubeID.h"
+#include "CubeType.h"
 #include "Utilities.h"
 #include "Rectangle.h"
 #include "NonCopyable.h"

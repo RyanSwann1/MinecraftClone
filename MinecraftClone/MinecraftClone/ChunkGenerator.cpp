@@ -2,7 +2,7 @@
 #include "Utilities.h"
 #include "VertexBuffer.h"
 #include "VertexArray.h"
-#include "CubeID.h"
+#include "CubeType.h"
 #include "Rectangle.h"
 #include "Camera.h"
 #include "Frustum.h"

@@ -99,9 +99,18 @@ Chunk& Chunk::operator=(Chunk&& orig) noexcept
 	return *this;
 }
 
+constexpr std::array<eCubeType, 4> TRANSPARENT_CUBE_TYPES =
+{
+	eCubeType::Water,
+	eCubeType::Leaves,
+	eCubeType::Shrub,
+	eCubeType::TallGrass
+};
+
 bool Chunk::isCubeAtPosition(const glm::ivec3& position) const
 {
 	char cubeType = getCubeDetailsWithoutBoundsCheck(position);
+
 	return (cubeType != static_cast<char>(eCubeType::Invalid) &&
 		cubeType != static_cast<char>(eCubeType::Water) &&
 		cubeType != static_cast<char>(eCubeType::Shrub) &&

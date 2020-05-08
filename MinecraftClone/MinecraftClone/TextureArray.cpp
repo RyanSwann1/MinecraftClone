@@ -1,6 +1,6 @@
 #include "TextureArray.h"
 #include "glad.h"
-#include "CubeID.h"
+#include "CubeType.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "Utilities.h"

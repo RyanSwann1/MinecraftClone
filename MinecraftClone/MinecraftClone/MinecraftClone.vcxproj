@@ -148,7 +148,7 @@
     <ClInclude Include="Chunk.h" />
     <ClInclude Include="ChunkGenerator.h" />
     <ClInclude Include="ChunkMeshGenerator.h" />
-    <ClInclude Include="CubeID.h" />
+    <ClInclude Include="CubeType.h" />
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="PositionQueue.h" />
     <ClInclude Include="SkyBox.h" />
