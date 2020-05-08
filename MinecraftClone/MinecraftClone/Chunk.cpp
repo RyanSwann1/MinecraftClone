@@ -136,6 +136,10 @@ bool Chunk::isCubeBelowCovering(const glm::ivec3& startingPosition) const
 		{
 			return true;
 		}
+		else if (cubeAtPosition != eCubeType::Invalid && cubeAtPosition != eCubeType::TallGrass)
+		{
+			return false;
+		}
 	}
 
 	return false;
