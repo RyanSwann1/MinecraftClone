@@ -53,6 +53,7 @@ namespace Utilities
 	constexpr int CHUNK_HEIGHT = 224;
 	constexpr int CHUNK_DEPTH = 32;
 	constexpr int CHUNK_VOLUME = CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH;
+	constexpr int MAX_SHADOW_HEIGHT = 8;
 
 	constexpr float WATER_ALPHA_VALUE = 0.5f;
 	constexpr int SAND_MAX_HEIGHT = 17;
