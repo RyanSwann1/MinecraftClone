@@ -76,8 +76,8 @@ namespace Utilities
 
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
-	constexpr float BIOME_LACUNARITY = 25.0f;
-	constexpr float BIOME_PERSISTENCE = 0.5f;
+	constexpr float BIOME_LACUNARITY = 2.5f;
+	constexpr float BIOME_PERSISTENCE = 1.0f;
 	constexpr int BIOME_OCTAVES = 12;
 
 	constexpr float DESERT_LACUNARITY = 30.0f;
@@ -92,17 +92,23 @@ namespace Utilities
 	constexpr float PLAINS_REDISTRIBUTION = 1.05f;
 	constexpr int PLAINS_MAX_HEIGHT = 50;
 
-	constexpr float MOUNTAINS_LACUNARITY = 50.0f;
-	constexpr float MOUNTAINS_PERSISTENCE = 50.0f;
+	constexpr float MOUNTAINS_LACUNARITY = 25.0f;
+	constexpr float MOUNTAINS_PERSISTENCE = 25.0f;
 	constexpr int MOUNTAINS_OCTAVES = 16;
 	constexpr float MOUNTAINS_REDISTRIBUTION = 1.8f;
-	constexpr int MOUNTAINS_MAX_HEIGHT = 168;
+	constexpr int MOUNTAINS_MAX_HEIGHT = 224;
 
 	constexpr float ISLANDS_LACUNARITY = 25.0f;
 	constexpr float ISLANDS_PERSISTENCE = 50.0f;
 	constexpr int ISLANDS_OCTAVES = 16;
 	constexpr float ISLANDS_REDISTRIBUTION = 2.25f;
-	constexpr int ISLANDS_MAX_HEIGHT = 45;
+	constexpr int ISLANDS_MAX_HEIGHT = 35;
+
+	constexpr float DESERT_MOUNTAINS_LACUNARITY = 1.0f;
+	constexpr float DESERT_MOUNTAINS_PERSISTENCE = 5.0f;
+	constexpr int DESERT_MOUNTAINS_OCTAVES = 8;
+	constexpr float DESERT_MOUNTAINS_REDISTRIBUTION = 2.5f;
+	constexpr int DESERT_MOUNTAINS_MAX_HEIGHT = 20;
 
 	constexpr float TERRAIN_LACUNARITY = 35.0f;
 	constexpr float TERRAIN_PERSISTENCE = 11.5f;
@@ -130,7 +136,6 @@ namespace Utilities
 	};
 
 	constexpr int VISIBILITY_DISTANCE = 1024;
-
 
 	constexpr int MAP_SIZE = 8000;
 	const glm::vec3 PLAYER_STARTING_POSITION(0.0f, 100.f, 0.0f);

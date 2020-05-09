@@ -19,7 +19,9 @@ enum class eBiomeType
 	Plains = 0,
 	Desert,
 	Mountains,
-	Islands
+	Islands,
+	//Transitions
+	DesertMountains
 };
 
 //position.y * (CHUNK_AREA) + position.z * CHUNK_SIZE + position.x;

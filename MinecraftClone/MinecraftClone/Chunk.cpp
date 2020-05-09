@@ -85,6 +85,30 @@ namespace
 				topRight * xDistanceToMinValue * zDistanceToMinValue
 				);
 	}
+
+
+	float smoothstep(float edge0, float edge1, float x)
+	{
+		// Scale, bias and saturate x to 0..1 range
+		x = x * x * (3 - 2 * x);
+		// Evaluate polynomial
+		return (edge0 * x) + (edge1 * (1 - x));
+	}
+
+	float smoothInterpolation(float bottomLeft, float topLeft, float bottomRight,
+		float topRight, float xMin, float xMax, float zMin,
+		float zMax, float x, float z)
+	{
+		float width = xMax - xMin, height = zMax - zMin;
+		float xValue = 1 - (x - xMin) / width;
+		float zValue = 1 - (z - zMin) / height;
+
+		// std::cout << xValue << std::endl;
+
+		float a = smoothstep(bottomLeft, bottomRight, xValue);
+		float b = smoothstep(topLeft, topRight, xValue);
+		return smoothstep(a, b, zValue);
+	}
 }
 
 Chunk::Chunk()
@@ -263,7 +287,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 {
 	//https://www.reddit.com/r/proceduralgeneration/search?q=biome%20transition&restrict_sr=1
 	
-	//constructHeightMap(glm::ivec2(startingPosition.x, startingPosition.z));
+	constructHeightMap({ startingPosition.x, startingPosition.z });
 
 	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
 	{
@@ -276,8 +300,9 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			{
 			case eBiomeType::Plains :
 			{
-				int elevation = getElevationAtPosition(x, z, Utilities::PLAINS_LACUNARITY, Utilities::PLAINS_PERSISTENCE, 
-					Utilities::PLAINS_OCTAVES, Utilities::PLAINS_REDISTRIBUTION, Utilities::PLAINS_MAX_HEIGHT);
+				int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
+				//int elevation = getElevationAtPosition(x, z, Utilities::PLAINS_LACUNARITY, Utilities::PLAINS_PERSISTENCE, 
+				//	Utilities::PLAINS_OCTAVES, Utilities::PLAINS_REDISTRIBUTION, Utilities::PLAINS_MAX_HEIGHT);
 				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 				bool firstBlockPlaced = false;
 				for (int y = elevation; y >= 0; --y)
@@ -305,8 +330,9 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			break;
 			case eBiomeType::Desert:
 			{
-				int elevation = getElevationAtPosition(x, z, Utilities::DESERT_LACUNARITY, Utilities::DESERT_PERSISTENCE,
-					Utilities::DESERT_OCTAVES, Utilities::DESERT_REDISTRIBUTION, Utilities::DESERT_MAX_HEIGHT);
+				int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
+				//int elevation = getElevationAtPosition(x, z, Utilities::DESERT_LACUNARITY, Utilities::DESERT_PERSISTENCE,
+				//	Utilities::DESERT_OCTAVES, Utilities::DESERT_REDISTRIBUTION, Utilities::DESERT_MAX_HEIGHT);
 				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 				for (int y = elevation; y >= 0; --y)
 				{
@@ -325,8 +351,9 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			break;
 			case eBiomeType::Mountains :
 			{
-				int elevation = getElevationAtPosition(x, z, Utilities::MOUNTAINS_LACUNARITY, Utilities::MOUNTAINS_PERSISTENCE,
-					Utilities::MOUNTAINS_OCTAVES, Utilities::MOUNTAINS_REDISTRIBUTION, Utilities::MOUNTAINS_MAX_HEIGHT);
+				int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
+				//int elevation = getElevationAtPosition(x, z, Utilities::MOUNTAINS_LACUNARITY, Utilities::MOUNTAINS_PERSISTENCE,
+				//	Utilities::MOUNTAINS_OCTAVES, Utilities::MOUNTAINS_REDISTRIBUTION, Utilities::MOUNTAINS_MAX_HEIGHT);
 				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 				for (int y = elevation; y >= 0; --y)
 				{
@@ -338,23 +365,51 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			break;
 			case eBiomeType::Islands:
 			{
-				int elevation = getElevationAtPosition(x, z, Utilities::ISLANDS_LACUNARITY, Utilities::ISLANDS_PERSISTENCE,
-					Utilities::ISLANDS_OCTAVES, Utilities::ISLANDS_REDISTRIBUTION, Utilities::ISLANDS_MAX_HEIGHT);
+				int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
+				//int elevation = getElevationAtPosition(x, z, Utilities::ISLANDS_LACUNARITY, Utilities::ISLANDS_PERSISTENCE,
+				//	Utilities::ISLANDS_OCTAVES, Utilities::ISLANDS_REDISTRIBUTION, Utilities::ISLANDS_MAX_HEIGHT);
 				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 				for (int y = elevation; y >= 0; --y)
 				{
+					cubeType = eCubeType::Stone;
 					if (y <= Utilities::STONE_MAX_HEIGHT)
 					{
-						cubeType = eCubeType::Stone;
+						
 					}
-					else if (y <= Utilities::SAND_MAX_HEIGHT)
+					//else if (y <= Utilities::SAND_MAX_HEIGHT)
+					//{
+					//	cubeType = eCubeType::Sand;
+					//}
+					//else
+					//{
+					//	cubeType = eCubeType::Grass;
+					//}
+
+					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
+				}
+			}
+			break;
+			case eBiomeType::DesertMountains:
+			{
+				int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
+				//int elevation = getElevationAtPosition(x, z, Utilities::ISLANDS_LACUNARITY, Utilities::ISLANDS_PERSISTENCE,
+				//	Utilities::ISLANDS_OCTAVES, Utilities::ISLANDS_REDISTRIBUTION, Utilities::ISLANDS_MAX_HEIGHT);
+				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
+				for (int y = elevation; y >= 0; --y)
+				{
+					cubeType = eCubeType::Stone;
+					if (y <= Utilities::STONE_MAX_HEIGHT)
 					{
-						cubeType = eCubeType::Sand;
+
 					}
-					else
-					{
-						cubeType = eCubeType::Grass;
-					}
+					//else if (y <= Utilities::SAND_MAX_HEIGHT)
+					//{
+					//	cubeType = eCubeType::Sand;
+					//}
+					//else
+					//{
+					//	cubeType = eCubeType::Grass;
+					//}
 
 					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
 				}
@@ -534,7 +589,7 @@ void Chunk::constructHeightMap(const glm::ivec2& startingPositionOnGrid)
 	{
 		for (int x = 0; x < + Utilities::CHUNK_WIDTH; ++x)
 		{
-			int h = bilinearInterpolation(bottomLeft, topLeft, bottomRight, topRight,
+			int h = smoothInterpolation(bottomLeft, topLeft, bottomRight, topRight,
 				0, Utilities::CHUNK_WIDTH,
 				0, Utilities::CHUNK_DEPTH,
 				z, x);
@@ -544,9 +599,26 @@ void Chunk::constructHeightMap(const glm::ivec2& startingPositionOnGrid)
 	}
 }
 
-int Chunk::getElevationAtPosition(const glm::ivec2& positionOnGrid) const
+int Chunk::getElevationAtPosition(const glm::ivec2& position) const
 {
-
+	switch (getBiomeType(position.x, position.y))
+	{
+	case eBiomeType::Plains :
+		return getElevationAtPosition(position.x, position.y, Utilities::PLAINS_LACUNARITY, Utilities::PLAINS_PERSISTENCE,
+			Utilities::PLAINS_OCTAVES, Utilities::PLAINS_REDISTRIBUTION, Utilities::PLAINS_MAX_HEIGHT);
+	case eBiomeType::Desert:
+		return getElevationAtPosition(position.x, position.y, Utilities::DESERT_LACUNARITY, Utilities::DESERT_PERSISTENCE,
+			Utilities::DESERT_OCTAVES, Utilities::DESERT_REDISTRIBUTION, Utilities::DESERT_MAX_HEIGHT);
+	case eBiomeType::Islands:
+		return getElevationAtPosition(position.x, position.y, Utilities::ISLANDS_LACUNARITY, Utilities::ISLANDS_PERSISTENCE,
+			Utilities::ISLANDS_OCTAVES, Utilities::ISLANDS_REDISTRIBUTION, Utilities::ISLANDS_MAX_HEIGHT);
+	case eBiomeType::Mountains:
+		return getElevationAtPosition(position.x, position.y, Utilities::MOUNTAINS_LACUNARITY, Utilities::MOUNTAINS_PERSISTENCE,
+			Utilities::MOUNTAINS_OCTAVES, Utilities::MOUNTAINS_REDISTRIBUTION, Utilities::MOUNTAINS_MAX_HEIGHT);
+	case eBiomeType::DesertMountains:
+		return getElevationAtPosition(position.x, position.y, Utilities::DESERT_MOUNTAINS_LACUNARITY, Utilities::DESERT_MOUNTAINS_PERSISTENCE,
+			Utilities::DESERT_MOUNTAINS_OCTAVES, Utilities::DESERT_MOUNTAINS_REDISTRIBUTION, Utilities::DESERT_MOUNTAINS_MAX_HEIGHT);
+	}
 }
 
 bool Chunk::isPositionInLocalBounds(const glm::ivec3& position) const
@@ -604,8 +676,8 @@ int Chunk::getElevationAtPosition(int x, int y, float terrainLacunarity, float t
 
 eBiomeType Chunk::getBiomeType(int x, int z) const
 {
-	double bx = x / 3000.0f;
-	double by = z / 3000.0f;
+	double bx = x / 8000.0f;
+	double by = z / 8000.0f;
 
 	float biomeType = 0.0f;
 	float moisturePersistence = Utilities::BIOME_PERSISTENCE;
@@ -629,7 +701,7 @@ eBiomeType Chunk::getBiomeType(int x, int z) const
 	biomeType /= total;
 	biomeType = (biomeType + 1) / 2;
 
-	if (biomeType >= 0.75f)
+	if (biomeType >= 0.65f)
 	{
 		return eBiomeType::Plains;
 	}
@@ -637,9 +709,9 @@ eBiomeType Chunk::getBiomeType(int x, int z) const
 	{
 		return eBiomeType::Desert;
 	}
-	else if (biomeType >= 0.20f)
+	else if (biomeType >= 0.48f)
 	{
-		return eBiomeType::Islands;
+		return eBiomeType::DesertMountains;
 	}
 	else
 	{
