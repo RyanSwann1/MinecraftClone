@@ -24,6 +24,7 @@ enum class eBiomeType
 	DesertMountains
 };
 
+//y * WIDTH + x
 //position.y * (CHUNK_AREA) + position.z * CHUNK_SIZE + position.x;
 class Chunk : private NonCopyable
 {
@@ -48,7 +49,9 @@ public:
 private:
 	glm::ivec3 m_startingPosition;
 	glm::ivec3 m_endingPosition;
-	std::array<std::array<int, 32>, 32> m_heightMap;
+	std::array<int, Utilities::CHUNK_WIDTH * Utilities::CHUNK_DEPTH> m_heightMap;
+	std::array<std::array<eBiomeType, 32>, 32> m_biomeMap;
+
 	std::array<char, Utilities::CHUNK_VOLUME> m_chunk;
 	Rectangle m_AABB;
 
@@ -67,6 +70,7 @@ private:
 	void spawnLeaves(const glm::ivec3& startingPosition, int treeHeight);
 	void spawnTreeStump(const glm::ivec3& startingPosition, int treeHeight);
 
+	void constructBiomeMap(const glm::ivec2& startingPosition);
 	void constructHeightMap(const glm::ivec2& startingPositionOnGrid);
-	int getElevationAtPosition(const glm::ivec2& positionOnGrid) const;
+	int getElevationAtPosition(const glm::ivec2& positionOnGrid) const;	
 };

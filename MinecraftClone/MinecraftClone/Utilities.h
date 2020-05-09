@@ -135,6 +135,7 @@ namespace Utilities
 		eCubeType::CactusTop}
 	};
 
+	//constexpr int VISIBILITY_DISTANCE = 128;
 	constexpr int VISIBILITY_DISTANCE = 1024;
 
 	constexpr int MAP_SIZE = 8000;
