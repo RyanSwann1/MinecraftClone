@@ -221,7 +221,7 @@ void generateInnerChunkMesh(VertexArray& vertexArray, const Chunk& chunk)
 
 	for (int z = chunkStartingPosition.z + 1; z < chunkEndingPosition.z - 1; ++z)
 	{
-		for (int y = chunkStartingPosition.y; y < chunkEndingPosition.y; ++y)
+		for (int y = chunkStartingPosition.y + 1; y < chunkEndingPosition.y - 1; ++y)
 		{
 			for (int x = chunkStartingPosition.x + 1; x < chunkEndingPosition.x - 1; ++x)
 			{

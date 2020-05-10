@@ -190,16 +190,13 @@ bool Chunk::isAvailableCubePosition(const glm::ivec3& position) const
 
 bool Chunk::isCubeBelowCovering(const glm::ivec3& startingPosition) const
 {
-	for (int y = startingPosition.y + 1; y <= startingPosition.y + 8 && y < Utilities::CHUNK_HEIGHT - 1; ++y)
+	for (int y = startingPosition.y + 1; 
+		y <= startingPosition.y + Utilities::MAX_SHADOW_HEIGHT && y < Utilities::CHUNK_HEIGHT - 1; ++y)
 	{
 		eCubeType cubeAtPosition = static_cast<eCubeType>(getCubeDetailsWithoutBoundsCheck({ startingPosition.x, y, startingPosition.z }));
 		if (cubeAtPosition == eCubeType::Leaves)
 		{
 			return true;
-		}
-		else if (cubeAtPosition != eCubeType::Invalid && cubeAtPosition != eCubeType::TallGrass)
-		{
-			return false;
 		}
 	}
 
