@@ -50,7 +50,7 @@ enum class eDirection
 namespace Utilities
 {
 	constexpr int CHUNK_WIDTH = 32;
-	constexpr int CHUNK_HEIGHT = 224;
+	constexpr int CHUNK_HEIGHT = 320;
 	constexpr int CHUNK_DEPTH = 32;
 	constexpr int CHUNK_VOLUME = CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH;
 
@@ -93,13 +93,13 @@ namespace Utilities
 	constexpr int PLAINS_MAX_HEIGHT = 50;
 
 	constexpr float MOUNTAINS_LACUNARITY = 25.0f;
-	constexpr float MOUNTAINS_PERSISTENCE = 25.0f;
+	constexpr float MOUNTAINS_PERSISTENCE = 5.0f;
 	constexpr int MOUNTAINS_OCTAVES = 16;
-	constexpr float MOUNTAINS_REDISTRIBUTION = 1.8f;
-	constexpr int MOUNTAINS_MAX_HEIGHT = 224;
+	constexpr float MOUNTAINS_REDISTRIBUTION = 15.0f;
+	constexpr int MOUNTAINS_MAX_HEIGHT = 288;
 
 	constexpr float ISLANDS_LACUNARITY = 25.0f;
-	constexpr float ISLANDS_PERSISTENCE = 50.0f;
+	constexpr float ISLANDS_PERSISTENCE = 5.0f;
 	constexpr int ISLANDS_OCTAVES = 16;
 	constexpr float ISLANDS_REDISTRIBUTION = 2.25f;
 	constexpr int ISLANDS_MAX_HEIGHT = 35;
@@ -107,8 +107,8 @@ namespace Utilities
 	constexpr float DESERT_MOUNTAINS_LACUNARITY = 1.0f;
 	constexpr float DESERT_MOUNTAINS_PERSISTENCE = 5.0f;
 	constexpr int DESERT_MOUNTAINS_OCTAVES = 8;
-	constexpr float DESERT_MOUNTAINS_REDISTRIBUTION = 2.5f;
-	constexpr int DESERT_MOUNTAINS_MAX_HEIGHT = 20;
+	constexpr float DESERT_MOUNTAINS_REDISTRIBUTION = 2.8f;
+	constexpr int DESERT_MOUNTAINS_MAX_HEIGHT = 5;
 
 	constexpr float TERRAIN_LACUNARITY = 35.0f;
 	constexpr float TERRAIN_PERSISTENCE = 11.5f;

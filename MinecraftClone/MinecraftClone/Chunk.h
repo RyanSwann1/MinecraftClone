@@ -51,7 +51,6 @@ private:
 	glm::ivec3 m_endingPosition;
 	std::array<int, Utilities::CHUNK_WIDTH * Utilities::CHUNK_DEPTH> m_heightMap;
 	std::array<std::array<eBiomeType, 32>, 32> m_biomeMap;
-
 	std::array<char, Utilities::CHUNK_VOLUME> m_chunk;
 	Rectangle m_AABB;
 

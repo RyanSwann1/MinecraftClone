@@ -307,19 +307,15 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 	{
 		for (int x = startingPosition.x; x < startingPosition.x + Utilities::CHUNK_WIDTH; ++x)
 		{
-			//int elevation = getElevationAtPosition(x, z);
 			eCubeType cubeType;
 
-			switch (getBiomeType(x, z))//, position.ym_biomeMap[z - startingPosition.z][x - startingPosition.x])
+			switch (getBiomeType(x, z))
 			{
 			case eBiomeType::Plains :
 			{
 				int elevation = m_heightMap[converTo1D( x - startingPosition.x, z - startingPosition.z )];
-				//int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
-				//int elevation = getElevationAtPosition(x, z, Utilities::PLAINS_LACUNARITY, Utilities::PLAINS_PERSISTENCE, 
-				//	Utilities::PLAINS_OCTAVES, Utilities::PLAINS_REDISTRIBUTION, Utilities::PLAINS_MAX_HEIGHT);
 				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
-				bool firstBlockPlaced = false;
+
 				for (int y = elevation; y >= 0; --y)
 				{
 					if (y <= Utilities::STONE_MAX_HEIGHT)
@@ -328,15 +324,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 					}
 					else
 					{
-						if (firstBlockPlaced)
-						{
-							cubeType = eCubeType::Dirt;
-						}
-						else
-						{
-							cubeType = eCubeType::Grass;
-							firstBlockPlaced = true;
-						}
+						(y == elevation ? cubeType = eCubeType::Grass : cubeType = eCubeType::Dirt);
 					}
 
 					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
@@ -346,10 +334,8 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			case eBiomeType::Desert:
 			{
 				int elevation = m_heightMap[converTo1D(x - startingPosition.x, z - startingPosition.z)];
-				//int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
-				//int elevation = getElevationAtPosition(x, z, Utilities::DESERT_LACUNARITY, Utilities::DESERT_PERSISTENCE,
-				//	Utilities::DESERT_OCTAVES, Utilities::DESERT_REDISTRIBUTION, Utilities::DESERT_MAX_HEIGHT);
 				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
+
 				for (int y = elevation; y >= 0; --y)
 				{
 					if (y <= Utilities::STONE_MAX_HEIGHT)
@@ -368,12 +354,22 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			case eBiomeType::Mountains :
 			{
 				int elevation = m_heightMap[converTo1D(x - startingPosition.x, z - startingPosition.z)];
-				//int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
-				//int elevation = getElevationAtPosition(x, z, Utilities::MOUNTAINS_LACUNARITY, Utilities::MOUNTAINS_PERSISTENCE,
-				//	Utilities::MOUNTAINS_OCTAVES, Utilities::MOUNTAINS_REDISTRIBUTION, Utilities::MOUNTAINS_MAX_HEIGHT);
 				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
+				for (int y = elevation; y <= elevation + 2 && y < Utilities::CHUNK_HEIGHT - 1; ++y)
+				{
+					if (y == elevation + 2)
+					{
+						changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, eCubeType::Grass);
+					}
+					else
+					{
+						changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, eCubeType::Dirt);
+					}
+				}
 				for (int y = elevation; y >= 0; --y)
 				{
+
+
 					cubeType = eCubeType::Stone;
 
 					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
@@ -383,9 +379,6 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			case eBiomeType::Islands:
 			{
 				int elevation = m_heightMap[converTo1D(x - startingPosition.x, z - startingPosition.z)];
-				//int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
-				//int elevation = getElevationAtPosition(x, z, Utilities::ISLANDS_LACUNARITY, Utilities::ISLANDS_PERSISTENCE,
-				//	Utilities::ISLANDS_OCTAVES, Utilities::ISLANDS_REDISTRIBUTION, Utilities::ISLANDS_MAX_HEIGHT);
 				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 				for (int y = elevation; y >= 0; --y)
 				{
@@ -394,15 +387,6 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 					{
 						
 					}
-					//else if (y <= Utilities::SAND_MAX_HEIGHT)
-					//{
-					//	cubeType = eCubeType::Sand;
-					//}
-					//else
-					//{
-					//	cubeType = eCubeType::Grass;
-					//}
-
 					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
 				}
 			}
@@ -410,26 +394,10 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			case eBiomeType::DesertMountains:
 			{
 				int elevation = m_heightMap[converTo1D(x - startingPosition.x, z - startingPosition.z)];
-				//int elevation = m_heightMap[z - startingPosition.z][x - startingPosition.x];
-				//int elevation = getElevationAtPosition(x, z, Utilities::ISLANDS_LACUNARITY, Utilities::ISLANDS_PERSISTENCE,
-				//	Utilities::ISLANDS_OCTAVES, Utilities::ISLANDS_REDISTRIBUTION, Utilities::ISLANDS_MAX_HEIGHT);
 				glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
 				for (int y = elevation; y >= 0; --y)
 				{
 					cubeType = eCubeType::Stone;
-					if (y <= Utilities::STONE_MAX_HEIGHT)
-					{
-
-					}
-					//else if (y <= Utilities::SAND_MAX_HEIGHT)
-					//{
-					//	cubeType = eCubeType::Sand;
-					//}
-					//else
-					//{
-					//	cubeType = eCubeType::Grass;
-					//}
-
 					changeCubeAtLocalPosition({ positionOnGrid.x, y, positionOnGrid.z }, cubeType);
 				}
 			}
