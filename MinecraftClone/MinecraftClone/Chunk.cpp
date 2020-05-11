@@ -107,16 +107,6 @@ constexpr std::array<eCubeType, 4> TRANSPARENT_CUBE_TYPES =
 	eCubeType::TallGrass
 };
 
-bool Chunk::isAvailableCubePosition(const glm::ivec3& position) const
-{
-	if (isPositionInBounds(position))
-	{
-		return m_chunk[converTo1D(position)] != static_cast<char>(eCubeType::Invalid);
-	}
-
-	return false;
-}
-
 bool Chunk::isCubeBelowCovering(const glm::ivec3& startingPosition) const
 {
 	for (int y = startingPosition.y + 1; 
