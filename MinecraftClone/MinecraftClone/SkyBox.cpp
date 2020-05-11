@@ -6,7 +6,7 @@
 
 namespace
 {
-	std::array<std::string, 6> SKYBOX_FILEPATHS =
+	const std::array<std::string, 6> SKYBOX_FILEPATHS =
 	{
 		"DaylightBox_Right.bmp",
 		"DaylightBox_Left.bmp",
@@ -16,7 +16,7 @@ namespace
 		"DaylightBox_Back.bmp"
 	};
 
-	std::array<float, 108> SKYBOX_VERTICES = 
+	constexpr std::array<float, 108> SKYBOX_VERTICES = 
 	{       
 		-1.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,

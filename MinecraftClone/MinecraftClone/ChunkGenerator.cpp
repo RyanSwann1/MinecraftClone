@@ -11,7 +11,7 @@
 
 namespace
 {
-	constexpr int THREAD_TRANSFER_PER_FRAME = 8;
+	constexpr int THREAD_TRANSFER_PER_FRAME = 1;
 
 	void getClosestMiddlePosition(glm::ivec3& position)
 	{
