@@ -99,14 +99,6 @@ Chunk& Chunk::operator=(Chunk&& orig) noexcept
 	return *this;
 }
 
-constexpr std::array<eCubeType, 4> TRANSPARENT_CUBE_TYPES =
-{
-	eCubeType::Water,
-	eCubeType::Leaves,
-	eCubeType::Shrub,
-	eCubeType::TallGrass
-};
-
 bool Chunk::isCubeBelowCovering(const glm::ivec3& startingPosition) const
 {
 	for (int y = startingPosition.y + 1; 
