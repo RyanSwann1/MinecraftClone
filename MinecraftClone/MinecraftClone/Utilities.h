@@ -50,7 +50,7 @@ enum class eDirection
 namespace Utilities
 {
 	constexpr int CHUNK_WIDTH = 32;
-	constexpr int CHUNK_HEIGHT = 224;
+	constexpr int CHUNK_HEIGHT = 320;
 	constexpr int CHUNK_DEPTH = 32;
 	constexpr int CHUNK_VOLUME = CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH;
 	constexpr int MAX_SHADOW_HEIGHT = 8;
@@ -81,7 +81,7 @@ namespace Utilities
 	constexpr float BIOME_PERSISTENCE = 0.5f;
 	constexpr int BIOME_OCTAVES = 12;
 
-	constexpr float TERRAIN_LACUNARITY = 25.0f;
+	constexpr float TERRAIN_LACUNARITY = 8.0f;
 	constexpr float TERRAIN_PERSISTENCE = 2.5f;
 	constexpr int TERRAIN_OCTAVES = 8;
 
