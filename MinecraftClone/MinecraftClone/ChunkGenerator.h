@@ -11,7 +11,6 @@
 #include <mutex>
 #include <SFML/Graphics.hpp>
 #include <atomic>
-#include <deque>
 
 //Dyanmic Chunk Generation
 //https://gamedev.stackexchange.com/questions/173820/how-should-i-store-loaded-world-chunks-in-ram-for-my-game-similar-to-minecraft
@@ -53,14 +52,6 @@ struct NeighbouringChunks : private NonCopyable, private NonMovable
 	const Chunk& backChunk;
 };
 
-struct ChunkToAdd
-{
-	ChunkToAdd(float distanceFromCamera, const glm::ivec3& startingPosition);
-
-	float distanceFromCamera;
-	glm::ivec3 startingPosition;
-};
-
 struct ChunkMeshToGenerate : private NonCopyable, private NonMovable
 {
 	ChunkMeshToGenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool);
@@ -92,7 +83,6 @@ private:
 	std::unordered_map<glm::ivec3, ChunkMeshToGenerate> m_chunkMeshesToGenerate;
 	PositionQueue m_chunksToDelete;
 	PositionQueue m_generatedChunkMeshes;
-	std::vector<ChunkToAdd> m_chunksToAdd;
 
 	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
 
