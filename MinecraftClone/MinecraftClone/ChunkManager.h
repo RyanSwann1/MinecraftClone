@@ -65,10 +65,10 @@ enum class eDirection;
 enum class eCubeSide;
 class VertexArray;
 struct CubeDetails;
-class ChunkGenerator : private NonCopyable, private NonMovable
+class ChunkManager : private NonCopyable, private NonMovable
 {
 public:
-	ChunkGenerator(const glm::ivec3& playerPosition);
+	ChunkManager(const glm::ivec3& playerPosition);
 
 	void update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
 		std::mutex& cameraMutex, std::mutex& renderingMutex);

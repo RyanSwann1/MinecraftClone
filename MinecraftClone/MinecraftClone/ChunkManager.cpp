@@ -1,4 +1,4 @@
-#include "ChunkGenerator.h"
+#include "ChunkManager.h"
 #include "Utilities.h"
 #include "VertexBuffer.h"
 #include "VertexArray.h"
@@ -12,8 +12,6 @@
 
 namespace
 {
-
-
 	constexpr int THREAD_TRANSFER_PER_FRAME = 1;
 
 	void getClosestMiddlePosition(glm::ivec3& position)
@@ -108,7 +106,7 @@ ChunkMeshToGenerate::ChunkMeshToGenerate(const ObjectFromPool<Chunk>& chunkFromP
 {}
 
 //ChunkGenerator
-ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
+ChunkManager::ChunkManager(const glm::ivec3& playerPosition)
 	: m_chunkPool(Utilities::VISIBILITY_DISTANCE, Utilities::CHUNK_WIDTH, Utilities::CHUNK_DEPTH),
 	m_vertexArrayPool(Utilities::VISIBILITY_DISTANCE, Utilities::CHUNK_WIDTH, Utilities::CHUNK_DEPTH),
 	m_chunks(),
@@ -120,7 +118,7 @@ ChunkGenerator::ChunkGenerator(const glm::ivec3& playerPosition)
 	addChunks(playerPosition);
 }
 
-void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
+void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
 	std::mutex& cameraMutex, std::mutex& renderingMutex)	
 {
 	while (!resetGame && window.isOpen())
@@ -170,7 +168,7 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 	}
 }
 
-void ChunkGenerator::renderOpaque(const Frustum& frustum) const
+void ChunkManager::renderOpaque(const Frustum& frustum) const
 {
 	for (const auto& VAO : m_VAOs)
 	{
@@ -187,7 +185,7 @@ void ChunkGenerator::renderOpaque(const Frustum& frustum) const
 	}
 }
 
-void ChunkGenerator::renderTransparent(const Frustum& frustum) const
+void ChunkManager::renderTransparent(const Frustum& frustum) const
 {
 	for (const auto& VAO : m_VAOs)
 	{
@@ -204,7 +202,7 @@ void ChunkGenerator::renderTransparent(const Frustum& frustum) const
 	}
 }
 
-void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex)
+void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex)
 {
 	glm::ivec3 startingPosition(playerPosition);
 	getClosestMiddlePosition(startingPosition);
@@ -237,7 +235,7 @@ void ChunkGenerator::deleteChunks(const glm::ivec3& playerPosition, std::mutex& 
 	}
 }
 
-void ChunkGenerator::addChunks(const glm::ivec3& playerPosition)
+void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 {
 	struct ChunkToAdd
 	{
@@ -304,7 +302,7 @@ void ChunkGenerator::addChunks(const glm::ivec3& playerPosition)
 	}
 }
 
-void ChunkGenerator::generateChunkMeshes()
+void ChunkManager::generateChunkMeshes()
 {
 	for (auto chunkMeshToGenerate = m_chunkMeshesToGenerate.begin(); chunkMeshToGenerate != m_chunkMeshesToGenerate.end(); ++chunkMeshToGenerate)
 	{
@@ -334,7 +332,7 @@ void ChunkGenerator::generateChunkMeshes()
 	}
 }
 
-const Chunk* ChunkGenerator::getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const
+const Chunk* ChunkManager::getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const
 {
 	const Chunk* neighbouringChunk = nullptr;
 

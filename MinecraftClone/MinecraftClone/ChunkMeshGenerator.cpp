@@ -1,5 +1,5 @@
 #include "ChunkMeshGenerator.h"
-#include "ChunkGenerator.h"
+#include "ChunkManager.h"
 
 namespace
 {
@@ -124,6 +124,13 @@ namespace
 	constexpr std::array<glm::ivec3, 4> FIRST_DIAGONAL_FACE = { glm::ivec3(0, 0, 0), glm::ivec3(1, 0, 1), glm::ivec3(1, 1, 1), glm::ivec3(0, 1, 0) };
 	constexpr std::array<glm::ivec3, 4> SECOND_DIAGONAL_FACE = { glm::ivec3(0, 0, 1), glm::ivec3(1, 0, 0), glm::ivec3(1, 1, 0), glm::ivec3(0, 1, 1) };
 }
+
+//CHUNK MESH GENERATOR
+//ChunkMeshGenerator::ChunkMeshGenerator()
+//{
+//
+//}
+//
 
 void generateOuterChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks);
 void generateInnerChunkMesh(VertexArray& vertexArray, const Chunk& chunk);

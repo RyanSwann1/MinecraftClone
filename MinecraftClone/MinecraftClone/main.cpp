@@ -1,7 +1,7 @@
 #include "TextureArray.h"
 #include "Camera.h"
 #include "Chunk.h"
-#include "ChunkGenerator.h"
+#include "ChunkManager.h"
 #include "VertexBuffer.h"
 #include "Utilities.h"
 #include "VertexArray.h"
@@ -129,11 +129,11 @@ int main()
 	std::atomic<bool> resetGame = false;
 	std::mutex renderingMutex;
 	std::mutex cameraMutex;
-	std::unique_ptr<ChunkGenerator> chunkGenerator = std::make_unique<ChunkGenerator>(camera.m_position);
+	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>(camera.m_position);
 
-	std::thread chunkGenerationThread([&](std::unique_ptr<ChunkGenerator>* chunkGenerator)
+	std::thread chunkGenerationThread([&](std::unique_ptr<ChunkManager>* chunkGenerator)
 		{chunkGenerator->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), 
-			std::ref(cameraMutex), std::ref(renderingMutex)); }, &chunkGenerator );
+			std::ref(cameraMutex), std::ref(renderingMutex)); }, &chunkManager );
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -183,12 +183,12 @@ int main()
 			resetGame = false;
 			camera.m_position = Utilities::PLAYER_STARTING_POSITION;
 			cameraPosition = camera.m_position;
-			chunkGenerator.reset();
-			chunkGenerator = std::make_unique<ChunkGenerator>(cameraPosition);
+			chunkManager.reset();
+			chunkManager = std::make_unique<ChunkManager>(cameraPosition);
 
-			chunkGenerationThread = std::thread{ [&](std::unique_ptr<ChunkGenerator>* chunkGenerator)
-				{chunkGenerator->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), 
-					std::ref(cameraMutex), std::ref(renderingMutex)); }, &chunkGenerator };
+			chunkGenerationThread = std::thread{ [&](std::unique_ptr<ChunkManager>* chunkManager)
+				{chunkManager->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), 
+					std::ref(cameraMutex), std::ref(renderingMutex)); }, &chunkManager };
 		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) ||
@@ -214,7 +214,7 @@ int main()
 
 		frustum.update(projection * view);
 		
-		if (chunkGenerator)
+		if (chunkManager)
 		{
 			shaderHandler->switchToShader(eShaderType::Chunk);
 			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
@@ -223,11 +223,11 @@ int main()
 			std::lock_guard<std::mutex> renderingLock(renderingMutex);
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK);
-			chunkGenerator->renderOpaque(frustum);
+			chunkManager->renderOpaque(frustum);
 			glDisable(GL_CULL_FACE);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			chunkGenerator->renderTransparent(frustum);
+			chunkManager->renderTransparent(frustum);
 			glDisable(GL_BLEND);
 
 			//Draw Skybox
