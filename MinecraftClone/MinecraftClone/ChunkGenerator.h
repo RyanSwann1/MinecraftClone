@@ -98,5 +98,5 @@ private:
 
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);
-	void generateChunkMeshes(std::mutex& renderingMutex);
+	void generateChunkMeshes();
 };

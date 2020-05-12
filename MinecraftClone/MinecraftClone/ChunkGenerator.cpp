@@ -298,7 +298,7 @@ void ChunkGenerator::addChunks(const glm::ivec3& playerPosition)
 	}
 }
 
-void ChunkGenerator::generateChunkMeshes(std::mutex& renderingMutex)
+void ChunkGenerator::generateChunkMeshes()
 {
 	for (auto chunkMeshToGenerate = m_chunkMeshesToGenerate.begin(); chunkMeshToGenerate != m_chunkMeshesToGenerate.end(); ++chunkMeshToGenerate)
 	{
