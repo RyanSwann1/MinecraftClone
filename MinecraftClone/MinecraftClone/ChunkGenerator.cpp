@@ -134,7 +134,7 @@ void ChunkGenerator::update(const glm::vec3& cameraPosition, const sf::Window& w
 
 		deleteChunks(position, renderingMutex);
 		addChunks(position);
-		generateChunkMeshes(renderingMutex);
+		generateChunkMeshes();
 		
 		std::lock_guard<std::mutex> renderingLock(renderingMutex);
 		for (int i = 0; i < THREAD_TRANSFER_PER_FRAME; ++i)
