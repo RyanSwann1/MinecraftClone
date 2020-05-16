@@ -84,8 +84,6 @@ private:
 	PositionQueue m_chunksToDelete;
 	PositionQueue m_generatedChunkMeshes;
 
-	const Chunk* getNeighbouringChunkAtPosition(const glm::ivec3& chunkStartingPosition, eDirection direction) const;
-
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);
 	void generateChunkMeshes();
