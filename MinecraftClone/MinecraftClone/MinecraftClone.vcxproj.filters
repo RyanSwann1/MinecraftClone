@@ -173,9 +173,6 @@
     <ClInclude Include="Frustum.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PositionQueue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ChunkMeshGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
