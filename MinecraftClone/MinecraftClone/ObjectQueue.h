@@ -8,7 +8,7 @@
 #include "glm/gtx/hash.hpp"
 
 template <class Object>
-struct ObjectQueueNode : private NonCopyable
+struct ObjectQueueNode 
 {
 public:
 	ObjectQueueNode(const glm::ivec3& position)
@@ -16,25 +16,25 @@ public:
 		previous(nullptr),
 		next(nullptr)
 	{}
-	ObjectQueueNode(ObjectQueueNode&& orig) noexcept
-		: position(orig.position),
-		previous(orig.previous),
-		next(orig.next)
-	{
-		orig.previous = nullptr;
-		orig.next = nullptr;
-	}
-	ObjectQueueNode& operator=(ObjectQueueNode&& orig) noexcept
-	{
-		position = orig.position;
-		previous = orig.previous;
-		next = orig.next;
+	//ObjectQueueNode(ObjectQueueNode&& orig) noexcept
+	//	: position(orig.position),
+	//	previous(orig.previous),
+	//	next(orig.next)
+	//{
+	//	orig.previous = nullptr;
+	//	orig.next = nullptr;
+	//}
+	//ObjectQueueNode& operator=(ObjectQueueNode&& orig) noexcept
+	//{
+	//	position = orig.position;
+	//	previous = orig.previous;
+	//	next = orig.next;
 
-		orig.previous = nullptr;
-		orig.next = nullptr;
+	//	orig.previous = nullptr;
+	//	orig.next = nullptr;
 
-		return *this;
-	}
+	//	return *this;
+	//}
 
 	glm::ivec3 position;
 	Object* previous;
@@ -46,6 +46,15 @@ struct PositionNode : public ObjectQueueNode<PositionNode>
 	PositionNode(const glm::ivec3& position)
 		: ObjectQueueNode(position)
 	{}
+
+	//PositionNode(PositionNode&& orig) 
+	//	: ObjectQueueNode(std::move(orig))
+	//{}
+
+	//PositionNode& operator=(PositionNode&& orig)
+	//{
+	//	ObjectQueueNode::operator=(std::move(orig));
+	//}
 };
 
 template <class Object>
@@ -58,14 +67,15 @@ public:
 		m_container()
 	{}
 
-	void add(Object&& newObject)
+	void add(Object& newObject)
 	{
+		glm::ivec3 position = newObject.position;
 		if (m_container.empty())
 		{
 			assert(!m_initialObjectAdded && !m_recentObjectAdded);
 			Object& addedObject = m_container.emplace(std::piecewise_construct,
-				std::forward_as_tuple(newObject.position),
-				std::forward_as_tuple(std::move(newObject))).first->second;
+				std::forward_as_tuple(position),
+				std::forward_as_tuple(newObject)).first->second;
 
 			addedObject.previous = nullptr;
 			m_initialObjectAdded = &addedObject;
@@ -75,8 +85,8 @@ public:
 		{
 			assert(m_initialObjectAdded && m_recentObjectAdded);
 			Object& addedObject = m_container.emplace(std::piecewise_construct,
-				std::forward_as_tuple(newObject.position),
-				std::forward_as_tuple(std::move(newObject))).first->second;
+				std::forward_as_tuple(position),
+				std::forward_as_tuple(newObject)).first->second;
 
 			addedObject.previous = m_initialObjectAdded;
 			m_initialObjectAdded->next = &addedObject;
@@ -86,8 +96,8 @@ public:
 		{
 			assert(m_initialObjectAdded && m_recentObjectAdded);
 			Object& addedObject = m_container.emplace(std::piecewise_construct,
-				std::forward_as_tuple(newObject.position),
-				std::forward_as_tuple(std::move(newObject))).first->second;
+				std::forward_as_tuple(position),
+				std::forward_as_tuple(newObject)).first->second;
 
 			addedObject.previous = m_recentObjectAdded;
 			m_recentObjectAdded->next = &addedObject;

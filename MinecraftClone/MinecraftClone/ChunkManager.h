@@ -83,8 +83,6 @@ private:
 	std::unordered_map<glm::ivec3, ChunkMeshToGenerate> m_chunkMeshesToGenerate;
 	ObjectQueue<PositionNode> m_deletedChunks;
 	ObjectQueue<PositionNode> m_generatedChunkMeshes;
-	//PositionQueue m_deletedChunks;
-	//PositionQueue m_generatedChunkMeshes;
 
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);

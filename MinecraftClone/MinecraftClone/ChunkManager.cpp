@@ -221,7 +221,8 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& re
 			}
 			else if(!m_deletedChunks.contains(chunkStartingPosition))
 			{
-				m_deletedChunks.add({ chunkStartingPosition });
+				PositionNode positionNode(chunkStartingPosition);
+				m_deletedChunks.add(positionNode);
 			}
 
 			m_generatedChunkMeshes.remove(chunkStartingPosition);
@@ -273,7 +274,8 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 
 	while (!chunksToAdd.empty())
 	{
-		const ChunkToAdd& chunkToAdd = chunksToAdd.front();
+		ChunkToAdd chunkToAdd = chunksToAdd.front();
+		chunksToAdd.pop_front();
 		ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
 		if (!chunkFromPool.getObject())
 		{
@@ -297,8 +299,6 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 		m_chunkMeshesToGenerate.emplace(std::piecewise_construct,
 			std::forward_as_tuple(chunkToAdd.startingPosition),
 			std::forward_as_tuple(addedChunk, std::move(vertexArrayFromPool)));
-		
-		chunksToAdd.pop_front();
 	}
 }
 
@@ -326,7 +326,8 @@ void ChunkManager::generateChunkMeshes()
 				generateChunkMesh(chunkMeshToGenerate->second,
 					{ *leftChunk->second.getObject(), *rightChunk->second.getObject(), *forwardChunk->second.getObject(), *backChunk->second.getObject() });
 				
-				m_generatedChunkMeshes.add({ chunkMeshToGenerate->first });
+				PositionNode positionNode(chunkMeshToGenerate->first);
+				m_generatedChunkMeshes.add(positionNode);
 			}
 		}
 	}
