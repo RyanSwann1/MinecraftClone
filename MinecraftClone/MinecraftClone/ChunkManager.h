@@ -4,7 +4,7 @@
 #include "Chunk.h"
 #include "VertexArray.h"
 #include "glm/gtx/hash.hpp"
-#include "PositionQueue.h"
+#include "ObjectQueue.h"
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -81,8 +81,10 @@ private:
 	std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>> m_chunks;
 	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_VAOs;
 	std::unordered_map<glm::ivec3, ChunkMeshToGenerate> m_chunkMeshesToGenerate;
-	PositionQueue m_deletedChunks;
-	PositionQueue m_generatedChunkMeshes;
+	ObjectQueue<PositionNode> m_deletedChunks;
+	ObjectQueue<PositionNode> m_generatedChunkMeshes;
+	//PositionQueue m_deletedChunks;
+	//PositionQueue m_generatedChunkMeshes;
 
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);

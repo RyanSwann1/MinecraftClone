@@ -136,7 +136,7 @@ void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& win
 		{
 			if (!m_deletedChunks.isEmpty())
 			{
-				const glm::ivec3& chunkStartingPosition = m_deletedChunks.front();
+				const glm::ivec3& chunkStartingPosition = m_deletedChunks.front().position;
 
 				auto VAO = m_VAOs.find(chunkStartingPosition);
 				assert(VAO != m_VAOs.end());
@@ -150,7 +150,7 @@ void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& win
 
 			if (!m_generatedChunkMeshes.isEmpty())
 			{
-				const glm::ivec3& chunkStartingPosition = m_generatedChunkMeshes.front();
+				const glm::ivec3& chunkStartingPosition = m_generatedChunkMeshes.front().position;
 
 				auto chunkMeshToGenerate = m_chunkMeshesToGenerate.find(chunkStartingPosition);
 				if (chunkMeshToGenerate != m_chunkMeshesToGenerate.end())
@@ -221,7 +221,7 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& re
 			}
 			else if(!m_deletedChunks.contains(chunkStartingPosition))
 			{
-				m_deletedChunks.add(chunkStartingPosition);
+				m_deletedChunks.add({ chunkStartingPosition });
 			}
 
 			m_generatedChunkMeshes.remove(chunkStartingPosition);
@@ -326,7 +326,7 @@ void ChunkManager::generateChunkMeshes()
 				generateChunkMesh(chunkMeshToGenerate->second,
 					{ *leftChunk->second.getObject(), *rightChunk->second.getObject(), *forwardChunk->second.getObject(), *backChunk->second.getObject() });
 				
-				m_generatedChunkMeshes.add(chunkMeshToGenerate->first);
+				m_generatedChunkMeshes.add({ chunkMeshToGenerate->first });
 			}
 		}
 	}
