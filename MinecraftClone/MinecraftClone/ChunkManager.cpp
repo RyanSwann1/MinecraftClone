@@ -221,8 +221,7 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& re
 			}
 			else if(!m_deletedChunks.contains(chunkStartingPosition))
 			{
-				PositionNode positionNode(chunkStartingPosition);
-				m_deletedChunks.add(positionNode);
+				m_deletedChunks.add(chunkStartingPosition, { chunkStartingPosition });
 			}
 
 			m_generatedChunkMeshes.remove(chunkStartingPosition);
@@ -326,8 +325,7 @@ void ChunkManager::generateChunkMeshes()
 				generateChunkMesh(chunkMeshToGenerate->second,
 					{ *leftChunk->second.getObject(), *rightChunk->second.getObject(), *forwardChunk->second.getObject(), *backChunk->second.getObject() });
 				
-				PositionNode positionNode(chunkMeshToGenerate->first);
-				m_generatedChunkMeshes.add(positionNode);
+				m_generatedChunkMeshes.add(chunkMeshToGenerate->first, { chunkMeshToGenerate->first });
 			}
 		}
 	}
