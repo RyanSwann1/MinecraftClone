@@ -1,65 +1,98 @@
 #pragma once
 
+#include "NonCopyable.h"
+#include "NonMovable.h"
 #include "glm/glm.hpp"
 #include <assert.h>
 #include <unordered_map>
 #include "glm/gtx/hash.hpp"
 #include <iostream>
 
-//Queue data structure with O(1) best case for quiries
-
-class PositionQueue
+template <class Object>
+class ObjectQueueNode : private NonCopyable
 {
-	struct Node
-	{
-		Node(const glm::ivec3& position, Node* previous)
-			: position(position),
-			previous(previous),
-			next(nullptr)
-		{}
-
-		glm::ivec3 position;
-		Node* previous;
-		Node* next;
-	};
-
 public:
-	PositionQueue()
+	ObjectQueueNode(const glm::ivec3& position)
+		: position(position),
+		previous(nullptr),
+		next(nullptr)
+	{}
+	ObjectQueueNode(ObjectQueueNode&& orig) noexcept
+		: position(orig.position),
+		previous(orig.previous),
+		next(orig.next)
+	{
+		orig.previous = nullptr;
+		orig.next = nullptr;
+	}
+	ObjectQueueNode& operator=(ObjectQueueNode&& orig) noexcept
+	{
+		position = orig.position;
+		previous = orig.previous;
+		next = orig.next;
+
+		orig.previous = nullptr;
+		orig.next = nullptr;
+
+		return *this;
+	}
+
+	glm::ivec3 position;
+	Object* previous;
+	Object* next;
+};
+
+class PositionNode : public ObjectQueueNode<PositionNode>
+{
+public:
+	PositionNode(const glm::ivec3& position)
+		: ObjectQueueNode(position)
+	{}
+};
+
+//Queue data structure with O(1) best case for quiries
+template <class Object>
+class ObjectQueue
+{
+public:
+	ObjectQueue()
 		: m_initialNodeAdded(nullptr),
 		m_recentNodeAdded(nullptr),
 		m_container()
 	{}
 
-	void add(const glm::ivec3& position)
+	void add(Object&& node)
 	{
 		if (m_container.empty())
 		{
 			assert(!m_initialNodeAdded && !m_recentNodeAdded);
-			Node& addedNode = m_container.emplace(std::piecewise_construct,
-				std::forward_as_tuple(position),
+			Object& addedNode = m_container.emplace(std::piecewise_construct,
+				std::forward_as_tuple(node.position),
+				std::forward_as_tuple(std::move(node))).first->second;
 
-				std::forward_as_tuple(position, nullptr)).first->second;
-
+			addedNode.previous = nullptr;
 			m_initialNodeAdded = &addedNode;
 			m_recentNodeAdded = &addedNode;
 		}
 		else if (m_container.size() == 1)
 		{
 			assert(m_initialNodeAdded && m_recentNodeAdded);
-			Node& addedNode = m_container.emplace(std::piecewise_construct,
-				std::forward_as_tuple(position),
-				std::forward_as_tuple(position, m_initialNodeAdded)).first->second;
+			Object& addedNode = m_container.emplace(std::piecewise_construct,
+				std::forward_as_tuple(node.position),
+				std::forward_as_tuple(std::move(node))).first->second;
 			 
+			addedNode.previous = m_initialNodeAdded;
 			m_initialNodeAdded->next = &addedNode;
 			m_recentNodeAdded = &addedNode;
 		}
 		else if (m_container.size() > 1)
 		{
 			assert(m_initialNodeAdded && m_recentNodeAdded);
-			Node& addedNode = m_container.emplace(std::piecewise_construct,
-				std::forward_as_tuple(position),
-				std::forward_as_tuple(position, m_recentNodeAdded)).first->second;
+			Object& addedNode = m_container.emplace(std::piecewise_construct,
+				std::forward_as_tuple(node.position),
+				std::forward_as_tuple(std::move(node))).first->second;
 
+			addedNode.previous = m_recentNodeAdded;
 			m_recentNodeAdded->next = &addedNode;
 			m_recentNodeAdded = &addedNode;
 		}
@@ -75,20 +108,18 @@ public:
 		return m_container.empty();
 	}
 
-	const glm::ivec3& front() const
+	Object& front() 
 	{
-
 		assert(m_initialNodeAdded && m_recentNodeAdded && !m_container.empty());
 		
 		auto iter = m_container.find(m_initialNodeAdded->position);
 
 		assert(iter != m_container.end());
-		return iter->second.position;
+		return iter->second;
 	}
 
 	void pop()
 	{
-
 		assert(m_initialNodeAdded && m_recentNodeAdded && !m_container.empty());
 
 		auto iter = m_container.find(m_initialNodeAdded->position);
@@ -96,7 +127,6 @@ public:
 		
 		if (m_container.size() == 1)
 		{
-
 			assert(m_initialNodeAdded == m_recentNodeAdded);
 			m_initialNodeAdded = nullptr;
 			m_recentNodeAdded = nullptr;
@@ -104,7 +134,6 @@ public:
 		}
 		else if(m_container.size() > 1)
 		{
-
 			assert(m_initialNodeAdded->next);
 			m_initialNodeAdded = m_initialNodeAdded->next;
 			m_initialNodeAdded->previous = nullptr;
@@ -119,8 +148,8 @@ public:
 		if (iter != m_container.end())
 		{
 			assert(m_initialNodeAdded && m_recentNodeAdded);
-			Node* previousNode = iter->second.previous;
-			Node* nextNode = iter->second.next;
+			Object* previousNode = iter->second.previous;
+			Object* nextNode = iter->second.next;
 
 			//Top
 			if (!nextNode && previousNode)
@@ -147,7 +176,6 @@ public:
 				assert(m_container.size() == 1);
 				m_initialNodeAdded = nullptr;
 				m_recentNodeAdded = nullptr;
-
 			}
 
 			m_container.erase(iter);
@@ -155,8 +183,8 @@ public:
 	}
 
 private:
-	Node* m_initialNodeAdded;
-	Node* m_recentNodeAdded;
+	Object* m_initialNodeAdded;
+	Object* m_recentNodeAdded;
 
-	std::unordered_map<glm::ivec3, Node> m_container;
+	std::unordered_map<glm::ivec3, Object> m_container;
 };

@@ -150,7 +150,7 @@
     <ClInclude Include="ChunkMeshGenerator.h" />
     <ClInclude Include="CubeType.h" />
     <ClInclude Include="Frustum.h" />
-    <ClInclude Include="PositionQueue.h" />
+    <ClInclude Include="ObjectQueue.h" />
     <ClInclude Include="SkyBox.h" />
     <ClInclude Include="glad.h" />
     <ClInclude Include="glm\common.hpp" />

@@ -145,11 +145,10 @@ void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const g
 bool isFacingTransparentCube(const glm::ivec3& cubePosition, const Chunk& chunk);
 bool isFacingOpaqueCube(const glm::ivec3& cubePosition, const Chunk& chunk);
 
-void generateChunkMesh(ChunkMeshToGenerate& chunkMeshToGenerate, const NeighbouringChunks& neighbouringChunks)
+void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks)
 {
-	auto& vertexArray = *chunkMeshToGenerate.vertexArrayFromPool.getObject();
-	generateInnerChunkMesh(vertexArray, *chunkMeshToGenerate.chunkFromPool.getObject());
-	generateOuterChunkMesh(vertexArray, *chunkMeshToGenerate.chunkFromPool.getObject(), neighbouringChunks);
+	generateInnerChunkMesh(vertexArray, chunk);
+	generateOuterChunkMesh(vertexArray, chunk, neighbouringChunks);
 
 	if (!vertexArray.m_opaqueVertexBuffer.indicies.empty())
 	{

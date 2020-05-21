@@ -4,13 +4,14 @@
 #include "Chunk.h"
 #include "VertexArray.h"
 #include "glm/gtx/hash.hpp"
-#include "PositionQueue.h"
+#include "ObjectQueue.h"
 #include <vector>
 #include <memory>
 #include <unordered_map>
 #include <mutex>
 #include <SFML/Graphics.hpp>
 #include <atomic>
+#include <functional>
 
 //Dyanmic Chunk Generation
 //https://gamedev.stackexchange.com/questions/173820/how-should-i-store-loaded-world-chunks-in-ram-for-my-game-similar-to-minecraft
@@ -52,14 +53,29 @@ struct NeighbouringChunks : private NonCopyable, private NonMovable
 	const Chunk& backChunk;
 };
 
-struct ChunkMeshToGenerate : private NonCopyable, private NonMovable
+struct GeneratedChunkMesh : public ObjectQueueNode<GeneratedChunkMesh>
 {
-	ChunkMeshToGenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool);
+	GeneratedChunkMesh(ObjectFromPool<VertexArray>&& vertexArrayFromPool, const glm::ivec3& chunkStartingPosition);
+	GeneratedChunkMesh(GeneratedChunkMesh&&) noexcept;
+	GeneratedChunkMesh& operator=(GeneratedChunkMesh&&) noexcept;
 
 	ObjectFromPool<VertexArray> vertexArrayFromPool;
-	const ObjectFromPool<Chunk>& chunkFromPool;
 };
 
+struct ChunkToAdd
+{
+	ChunkToAdd(float distanceFromCamera, const glm::ivec3& startingPosition, const Chunk& chunk)
+		: distanceFromCamera(distanceFromCamera),
+		startingPosition(startingPosition),
+		chunk(chunk)
+	{}
+
+	float distanceFromCamera;
+	glm::ivec3 startingPosition;
+	std::reference_wrapper<const Chunk> chunk;
+};
+
+struct ChunkToAdd;
 struct Frustum;
 enum class eDirection;
 enum class eCubeSide;
@@ -80,9 +96,9 @@ private:
 	ObjectPool<VertexArray> m_vertexArrayPool;
 	std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>> m_chunks;
 	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_VAOs;
-	std::unordered_map<glm::ivec3, ChunkMeshToGenerate> m_chunkMeshesToGenerate;
-	PositionQueue m_chunksToDelete;
-	PositionQueue m_generatedChunkMeshes;
+	ObjectQueue<GeneratedChunkMesh> m_generatedChunkMeshes;
+	ObjectQueue<PositionNode> m_deletedChunks;
+	std::deque<ChunkToAdd> m_chunkMeshesToGenerate;
 
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);
