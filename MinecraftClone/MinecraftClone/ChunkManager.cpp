@@ -112,7 +112,7 @@ ChunkManager::ChunkManager(const glm::ivec3& playerPosition)
 	m_chunks(),
 	m_VAOs(),
 	m_chunkMeshesToGenerate(),
-	m_chunksToDelete(),
+	m_deletedChunks(),
 	m_generatedChunkMeshes()
 {
 	addChunks(playerPosition);
@@ -134,9 +134,9 @@ void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& win
 		std::lock_guard<std::mutex> renderingLock(renderingMutex);
 		for (int i = 0; i < THREAD_TRANSFER_PER_FRAME; ++i)
 		{
-			if (!m_chunksToDelete.isEmpty())
+			if (!m_deletedChunks.isEmpty())
 			{
-				const glm::ivec3& chunkStartingPosition = m_chunksToDelete.front();
+				const glm::ivec3& chunkStartingPosition = m_deletedChunks.front();
 
 				auto VAO = m_VAOs.find(chunkStartingPosition);
 				assert(VAO != m_VAOs.end());
@@ -145,7 +145,7 @@ void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& win
 					m_VAOs.erase(VAO);
 				}
 
-				m_chunksToDelete.pop();
+				m_deletedChunks.pop();
 			}
 
 			if (!m_generatedChunkMeshes.isEmpty())
@@ -219,9 +219,9 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& re
 			{
 				m_chunkMeshesToGenerate.erase(chunkMeshToGenerate);
 			}
-			else if(!m_chunksToDelete.contains(chunkStartingPosition))
+			else if(!m_deletedChunks.contains(chunkStartingPosition))
 			{
-				m_chunksToDelete.add(chunkStartingPosition);
+				m_deletedChunks.add(chunkStartingPosition);
 			}
 
 			m_generatedChunkMeshes.remove(chunkStartingPosition);
@@ -285,7 +285,7 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 			continue;
 		}
 
-		m_chunksToDelete.remove(chunkToAdd.startingPosition);
+		m_deletedChunks.remove(chunkToAdd.startingPosition);
 		m_generatedChunkMeshes.remove(chunkToAdd.startingPosition);
 
 		ObjectFromPool<Chunk>& addedChunk = m_chunks.emplace(std::piecewise_construct,
@@ -321,7 +321,7 @@ void ChunkManager::generateChunkMeshes()
 			if (!m_generatedChunkMeshes.contains(chunkMeshToGenerate->first))
 			{
 				m_generatedChunkMeshes.remove(chunkMeshToGenerate->first);
-				assert(!m_chunksToDelete.contains(chunkMeshToGenerate->first));
+				assert(!m_deletedChunks.contains(chunkMeshToGenerate->first));
 
 				generateChunkMesh(chunkMeshToGenerate->second,
 					{ *leftChunk->second.getObject(), *rightChunk->second.getObject(), *forwardChunk->second.getObject(), *backChunk->second.getObject() });
