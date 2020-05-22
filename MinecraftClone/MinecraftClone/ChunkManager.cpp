@@ -246,6 +246,18 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& re
 
 void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 {
+	struct ChunkToAdd
+	{
+		ChunkToAdd(float distanceFromCamera, const glm::ivec3& startingPosition)
+			: distanceFromCamera(distanceFromCamera),
+			startingPosition(startingPosition)
+		{}
+
+		float distanceFromCamera;
+		glm::ivec3 startingPosition;
+	};
+
+	std::vector<ChunkToAdd> chunksToAdd;
 	glm::ivec3 startPosition(playerPosition);
 	getClosestMiddlePosition(startPosition);
 	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z <= startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
@@ -257,23 +269,33 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend() && m_VAOs.find(chunkStartingPosition) == m_VAOs.cend())
 			{
-				ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
-				if (!chunkFromPool.getObject())
-				{
-					continue;
-				}
-
-				ObjectFromPool<Chunk>& addedChunk = m_chunks.emplace(std::piecewise_construct,
-					std::forward_as_tuple(chunkStartingPosition),
-					std::forward_as_tuple(std::move(chunkFromPool))).first->second;
-				
-				addedChunk.getObject()->reuse(chunkStartingPosition);
-
-				m_deletedChunksQueue.remove(chunkStartingPosition);
-				m_generatedChunkMeshesQueue.remove(chunkStartingPosition);
-				m_chunkMeshesToGenerateQueue.add(chunkStartingPosition, { chunkStartingPosition });
+				chunksToAdd.emplace_back(getSqrMagnitude(chunkStartingPosition, playerPosition), chunkStartingPosition);
 			}
 		}
+	}
+
+	std::sort(chunksToAdd.begin(), chunksToAdd.end(), [](const auto& a, const auto& b)
+	{
+		return a.distanceFromCamera < b.distanceFromCamera;
+	});
+
+	for (const auto& chunkToAdd : chunksToAdd)
+	{
+		ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
+		if (!chunkFromPool.getObject())
+		{
+			continue;
+		}
+
+		ObjectFromPool<Chunk>& addedChunk = m_chunks.emplace(std::piecewise_construct,
+			std::forward_as_tuple(chunkToAdd.startingPosition),
+			std::forward_as_tuple(std::move(chunkFromPool))).first->second;
+
+		addedChunk.getObject()->reuse(chunkToAdd.startingPosition);
+
+		m_deletedChunksQueue.remove(chunkToAdd.startingPosition);
+		m_generatedChunkMeshesQueue.remove(chunkToAdd.startingPosition);
+		m_chunkMeshesToGenerateQueue.add(chunkToAdd.startingPosition, { chunkToAdd.startingPosition });
 	}
 }
 
