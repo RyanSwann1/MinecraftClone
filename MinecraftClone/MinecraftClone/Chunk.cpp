@@ -162,7 +162,7 @@ void Chunk::reset()
 
 void Chunk::reuse(const glm::ivec3& startingPosition)
 {	
-	memset(&m_chunk, static_cast<char>(eCubeType::Invalid), m_chunk.size());
+	memset(&m_chunk, static_cast<char>(eCubeType::Air), m_chunk.size());
 
 	m_startingPosition = startingPosition;
 	m_endingPosition = glm::ivec3(startingPosition.x + Utilities::CHUNK_WIDTH, startingPosition.y + Utilities::CHUNK_HEIGHT,
@@ -280,7 +280,7 @@ void Chunk::spawnWater()
 		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
 		{
 			glm::ivec3 position(x, Utilities::WATER_MAX_HEIGHT, z);
-			if (isCubeAtLocalPosition(position, eCubeType::Invalid))
+			if (isCubeAtLocalPosition(position, eCubeType::Air))
 			{
 				changeCubeAtLocalPosition(position, eCubeType::Water);
 			}
@@ -308,7 +308,7 @@ void Chunk::spawnTrees()
 		{
 			spawnPosition.y = y;
 			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Grass) &&
-				isCubeAtLocalPosition({ spawnPosition.x, spawnPosition.y + 1, spawnPosition.z }, eCubeType::Invalid))
+				isCubeAtLocalPosition({ spawnPosition.x, spawnPosition.y + 1, spawnPosition.z }, eCubeType::Air))
 			{
 				int treeHeight = getRandomNumber(Utilities::MIN_TREE_HEIGHT, Utilities::MAX_TREE_HEIGHT);
 				spawnLeaves(spawnPosition, treeHeight);
@@ -337,7 +337,7 @@ void Chunk::spawnCactus()
 		{
 			spawnPosition.y = y;
 			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Sand) &&
-				isCubeAtLocalPosition({ spawnPosition.x, y + 1, spawnPosition.z }, eCubeType::Invalid))
+				isCubeAtLocalPosition({ spawnPosition.x, y + 1, spawnPosition.z }, eCubeType::Air))
 			{
 				//Spawn Cactus
 				int cactusHeight = getRandomNumber(Utilities::CACTUS_MIN_HEIGHT, Utilities::CACTUS_MAX_HEIGHT);
@@ -375,7 +375,7 @@ void Chunk::spawnPlant(int maxQuantity, eCubeType baseCubeType, eCubeType plantC
 		for (int y = Utilities::CHUNK_HEIGHT - 5; y >= Utilities::WATER_MAX_HEIGHT; --y)
 		{
 			spawnPosition.y = y;
-			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Invalid) &&
+			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Air) &&
 				isCubeAtLocalPosition({ spawnPosition.x, y - 1, spawnPosition.z }, baseCubeType))
 			{
 				changeCubeAtLocalPosition(spawnPosition, plantCubeType);
@@ -398,7 +398,7 @@ void Chunk::spawnLeaves(const glm::ivec3& startingPosition, int treeHeight)
 			for (int x = startingPosition.x - distance; x <= startingPosition.x + distance; ++x)
 			{
 				glm::ivec3 position(x, y, z);
-				if (isCubeAtLocalPosition(position, eCubeType::Invalid))
+				if (isCubeAtLocalPosition(position, eCubeType::Air))
 				{
 					changeCubeAtLocalPosition(position, eCubeType::Leaves);
 				}

@@ -165,7 +165,7 @@ void generateOuterChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const 
 		for (int y = chunkStartingPosition.y; y < chunkEndingPosition.y; ++y)
 		{
 			eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck({ chunkStartingPosition.x, y, z }));
-			if (cubeType != eCubeType::Invalid)
+			if (cubeType != eCubeType::Air)
 			{
 				generateChunkOuterCubeMesh({ chunkStartingPosition.x, y, z }, chunk, neighbouringChunks, cubeType, vertexArray);
 			}
@@ -178,7 +178,7 @@ void generateOuterChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const 
 		{
 			eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck({ chunkEndingPosition.x - 1, y, z }));
 
-			if (cubeType != eCubeType::Invalid)
+			if (cubeType != eCubeType::Air)
 			{
 				generateChunkOuterCubeMesh({ chunkEndingPosition.x - 1, y, z }, chunk, neighbouringChunks, cubeType, vertexArray);
 			}
@@ -192,7 +192,7 @@ void generateOuterChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const 
 		{
 			eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck({ x, y, chunkStartingPosition.z }));
 
-			if (cubeType != eCubeType::Invalid)
+			if (cubeType != eCubeType::Air)
 			{
 				generateChunkOuterCubeMesh({ x, y, chunkStartingPosition.z }, chunk, neighbouringChunks, cubeType, vertexArray);
 			}
@@ -205,7 +205,7 @@ void generateOuterChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const 
 		{
 			eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck({ x, y, chunkEndingPosition.z - 1 }));
 
-			if (cubeType != eCubeType::Invalid)
+			if (cubeType != eCubeType::Air)
 			{
 				generateChunkOuterCubeMesh({ x, y, chunkEndingPosition.z - 1 }, chunk, neighbouringChunks, cubeType, vertexArray);
 			}
@@ -226,7 +226,7 @@ void generateInnerChunkMesh(VertexArray& vertexArray, const Chunk& chunk)
 			{
 				glm::ivec3 position(x, y, z);
 				eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(position));
-				if (cubeType != eCubeType::Invalid)
+				if (cubeType != eCubeType::Air)
 				{
 					generateChunkInnerCubeMesh(position, chunk, cubeType, vertexArray);
 				}
@@ -690,7 +690,7 @@ void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const g
 bool isFacingTransparentCube(const glm::ivec3& cubePosition, const Chunk& chunk)
 {
 	eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(cubePosition));
-	if (cubeType != eCubeType::Invalid)
+	if (cubeType != eCubeType::Air)
 	{
 		return Utilities::TRANSPARENT_CUBE_TYPES.isMatch({ cubeType });
 	}
@@ -703,7 +703,7 @@ bool isFacingTransparentCube(const glm::ivec3& cubePosition, const Chunk& chunk)
 bool isFacingOpaqueCube(const glm::ivec3& cubePosition, const Chunk& chunk)
 {
 	eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(cubePosition));
-	if (cubeType != eCubeType::Invalid)
+	if (cubeType != eCubeType::Air)
 	{
 		return Utilities::OPAQUE_CUBE_TYPES.isMatch({ cubeType });
 	}
