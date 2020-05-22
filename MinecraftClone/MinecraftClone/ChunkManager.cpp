@@ -134,7 +134,7 @@ void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& win
 		{
 			if (!m_deletedChunks.isEmpty())
 			{
-				const glm::ivec3& chunkStartingPosition = m_deletedChunks.front().position;
+				const glm::ivec3& chunkStartingPosition = m_deletedChunks.front().getPosition();
 
 				auto VAO = m_VAOs.find(chunkStartingPosition);
 				assert(VAO != m_VAOs.end());
@@ -148,7 +148,7 @@ void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& win
 
 			if (!m_generatedChunkMeshes.isEmpty())
 			{
-				const glm::ivec3& chunkStartingPosition = m_generatedChunkMeshes.front().position;
+				const glm::ivec3& chunkStartingPosition = m_generatedChunkMeshes.front().getPosition();
 
 				auto chunkMeshToGenerate = m_chunkMeshesToGenerate.find(chunkStartingPosition);
 				if (chunkMeshToGenerate != m_chunkMeshesToGenerate.end())

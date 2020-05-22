@@ -8,8 +8,11 @@
 #include "glm/gtx/hash.hpp"
 
 template <class Object>
-struct ObjectQueueNode : private NonCopyable
+class ObjectQueue;
+template <class Object>
+class ObjectQueueNode: private NonCopyable
 {
+	friend class ObjectQueue<Object>;
 public:
 	ObjectQueueNode(const glm::ivec3& position)
 		: position(position),
@@ -36,6 +39,12 @@ public:
 		return *this;
 	}
 
+	const glm::ivec3& getPosition() const
+	{
+		return position;
+	}
+
+private:
 	glm::ivec3 position;
 	Object* previous;
 	Object* next;
@@ -103,6 +112,12 @@ public:
 	bool isEmpty() const
 	{
 		return m_container.empty();
+	}
+
+	Object* next(Object& object)
+	{
+		assert(m_initialObjectAdded && m_recentObjectAdded && !m_container.empty());
+		return object.next;
 	}
 
 	Object& front()

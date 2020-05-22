@@ -1,6 +1,5 @@
 #pragma once
 
-
 struct ChunkMeshToGenerate;
 struct NeighbouringChunks;
 

@@ -31,7 +31,6 @@
 
 //https://www.reddit.com/r/proceduralgeneration/comments/4eixfr/how_are_randomly_placed_structures_generated_in_a/
 
-
 //https://github.com/gametutorials/tutorials/tree/master/OpenGL/Frustum%20Culling
 //http://www.lighthouse3d.com/tutorials/view-frustum-culling/
 //https://github.com/BSVino/MathForGameDevelopers/tree/frustum-culling
