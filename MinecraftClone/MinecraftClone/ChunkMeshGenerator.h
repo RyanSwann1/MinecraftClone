@@ -1,6 +1,7 @@
 #pragma once
 
-struct ChunkMeshToGenerate;
+class Chunk;
+struct VertexArray;
 struct NeighbouringChunks;
 
-void generateChunkMesh(ChunkMeshToGenerate& chunkMeshToGenerate, const NeighbouringChunks& neighbouringChunks);
+void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks);

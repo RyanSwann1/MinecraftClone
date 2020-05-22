@@ -114,10 +114,17 @@ public:
 		return m_container.empty();
 	}
 
-	Object* next(Object& object)
+	Object* next(Object* object)
 	{
 		assert(m_initialObjectAdded && m_recentObjectAdded && !m_container.empty());
-		return object.next;
+		if (object)
+		{
+			return object->next;
+		}
+		else
+		{
+			return nullptr;
+		}
 	}
 
 	Object& front()
@@ -154,7 +161,7 @@ public:
 		m_container.erase(iter);
 	}
 
-	void remove(const glm::ivec3& position)
+	Object* remove(const glm::ivec3& position)
 	{
 		auto iter = m_container.find(position);
 		if (iter != m_container.end())
@@ -191,7 +198,10 @@ public:
 			}
 
 			m_container.erase(iter);
+			return nextObject;
 		}
+		
+		return nullptr;
 	}
 
 private:

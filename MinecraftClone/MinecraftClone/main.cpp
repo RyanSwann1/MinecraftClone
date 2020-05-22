@@ -74,9 +74,49 @@ void keepMouseWithinWindow(const sf::Vector2u& windowSize, sf::Vector2i& mousePo
 	}
 }
 
+void printPositionQueue(ObjectQueue<PositionNode>& positionQueue)
+{
+	PositionNode* positionNode = &positionQueue.front();
+	while (positionNode)
+	{
+		std::cout << positionNode->getPosition().x << " " << positionNode->getPosition().y << " " << positionNode->getPosition().z << "\n";
+	
+		positionNode = positionQueue.next(positionNode);
+	}
+	std::cout << "\n";
+}
+
 //x + (y * width)
 int main()
 {
+	//ObjectQueue<PositionNode> positionQueue;
+	//for (int i = 0; i < 10; ++i)
+	//{
+	//	positionQueue.add({ i, i, i }, {glm::ivec3(i, i , i )});
+	//}
+
+	//printPositionQueue(positionQueue);
+	//
+	//PositionNode* positionNode = &positionQueue.front();
+	//while (positionNode)
+	//{
+	//	if (positionNode && positionNode->getPosition().x == 5)
+	//	{
+	//		positionNode = positionQueue.remove({ 5, 5, 5 });
+	//	}
+	//	else if (positionNode && positionNode->getPosition().x == 3)
+	//	{
+	//		positionNode = positionQueue.remove({ 3, 3, 3 });
+	//	}
+	//	else
+	//	{
+	//		positionNode = positionQueue.next(positionNode);
+	//	}
+	//}
+
+	//printPositionQueue(positionQueue);
+
+
 	sf::ContextSettings settings;
 	settings.depthBits = 24;
 	settings.stencilBits = 8;

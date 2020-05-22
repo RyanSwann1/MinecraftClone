@@ -125,13 +125,6 @@ namespace
 	constexpr std::array<glm::ivec3, 4> SECOND_DIAGONAL_FACE = { glm::ivec3(0, 0, 1), glm::ivec3(1, 0, 0), glm::ivec3(1, 1, 0), glm::ivec3(0, 1, 1) };
 }
 
-//CHUNK MESH GENERATOR
-//ChunkMeshGenerator::ChunkMeshGenerator()
-//{
-//
-//}
-//
-
 void generateOuterChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks);
 void generateInnerChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
 void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType, VertexArray& vertexArray);
@@ -145,11 +138,10 @@ void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const g
 bool isFacingTransparentCube(const glm::ivec3& cubePosition, const Chunk& chunk);
 bool isFacingOpaqueCube(const glm::ivec3& cubePosition, const Chunk& chunk);
 
-void generateChunkMesh(ChunkMeshToGenerate& chunkMeshToGenerate, const NeighbouringChunks& neighbouringChunks)
+void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks)
 {
-	auto& vertexArray = *chunkMeshToGenerate.vertexArrayFromPool.getObject();
-	generateInnerChunkMesh(vertexArray, *chunkMeshToGenerate.chunkFromPool.getObject());
-	generateOuterChunkMesh(vertexArray, *chunkMeshToGenerate.chunkFromPool.getObject(), neighbouringChunks);
+	generateInnerChunkMesh(vertexArray, chunk);
+	generateOuterChunkMesh(vertexArray, chunk, neighbouringChunks);
 
 	if (!vertexArray.m_opaqueVertexBuffer.indicies.empty())
 	{

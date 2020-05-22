@@ -59,6 +59,15 @@ struct ChunkMeshToGenerate : private NonCopyable, private NonMovable
 	const ObjectFromPool<Chunk>& chunkFromPool;
 };
 
+struct GeneratedChunkMesh : public ObjectQueueNode<GeneratedChunkMesh>
+{
+	GeneratedChunkMesh(const glm::ivec3& position, ObjectFromPool<VertexArray>&& vertexArrayFromPool);
+	GeneratedChunkMesh(GeneratedChunkMesh&&) noexcept;
+	GeneratedChunkMesh& operator=(GeneratedChunkMesh&&) noexcept;
+
+	ObjectFromPool<VertexArray> vertexArrayFromPool;
+};
+
 struct Frustum;
 class VertexArray;
 class ChunkManager : private NonCopyable, private NonMovable
@@ -76,9 +85,9 @@ private:
 	ObjectPool<VertexArray> m_vertexArrayPool;
 	std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>> m_chunks;
 	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_VAOs;
-	std::unordered_map<glm::ivec3, ChunkMeshToGenerate> m_chunkMeshesToGenerate;
-	ObjectQueue<PositionNode> m_deletedChunks;
-	ObjectQueue<PositionNode> m_generatedChunkMeshes;
+	ObjectQueue<PositionNode> m_chunkMeshesToGenerateQueue;
+	ObjectQueue<PositionNode> m_deletedChunksQueue;
+	ObjectQueue<GeneratedChunkMesh> m_generatedChunkMeshesQueue;
 
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);
