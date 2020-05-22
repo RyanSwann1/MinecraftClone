@@ -51,14 +51,6 @@ struct NeighbouringChunks : private NonCopyable, private NonMovable
 	const Chunk& backChunk;
 };
 
-struct ChunkMeshToGenerate : private NonCopyable, private NonMovable
-{
-	ChunkMeshToGenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool);
-
-	ObjectFromPool<VertexArray> vertexArrayFromPool;
-	const ObjectFromPool<Chunk>& chunkFromPool;
-};
-
 struct GeneratedChunkMesh : public ObjectQueueNode<GeneratedChunkMesh>
 {
 	GeneratedChunkMesh(const glm::ivec3& position, ObjectFromPool<VertexArray>&& vertexArrayFromPool);

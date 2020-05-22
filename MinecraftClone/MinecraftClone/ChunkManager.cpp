@@ -97,12 +97,6 @@ NeighbouringChunks::NeighbouringChunks(const Chunk& leftChunk, const Chunk& righ
 	backChunk(bottomChunk)
 {}
 
-//ChunkMeshToGenerate
-ChunkMeshToGenerate::ChunkMeshToGenerate(const ObjectFromPool<Chunk>& chunkFromPool, ObjectFromPool<VertexArray>&& vertexArrayFromPool)
-	: vertexArrayFromPool(std::move(vertexArrayFromPool)),
-	chunkFromPool(chunkFromPool)
-{}
-
 //GeneratedChunkMesh
 GeneratedChunkMesh::GeneratedChunkMesh(const glm::ivec3& position, ObjectFromPool<VertexArray>&& vertexArrayFromPool)
 	: ObjectQueueNode(position),
