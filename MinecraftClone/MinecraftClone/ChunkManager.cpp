@@ -268,28 +268,31 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 		}
 	}
 
-	std::sort(chunksToAdd.begin(), chunksToAdd.end(), [](const auto& a, const auto& b)
+	if (!chunksToAdd.empty())
 	{
-		return a.distanceFromCamera < b.distanceFromCamera;
-	});
-
-	for (const auto& chunkToAdd : chunksToAdd)
-	{
-		ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
-		if (!chunkFromPool.getObject())
+		std::sort(chunksToAdd.begin(), chunksToAdd.end(), [](const auto& a, const auto& b)
 		{
-			continue;
+			return a.distanceFromCamera < b.distanceFromCamera;
+		});
+
+		for (const auto& chunkToAdd : chunksToAdd)
+		{
+			ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
+			if (!chunkFromPool.getObject())
+			{
+				continue;
+			}
+
+			ObjectFromPool<Chunk>& addedChunk = m_chunks.emplace(std::piecewise_construct,
+				std::forward_as_tuple(chunkToAdd.startingPosition),
+				std::forward_as_tuple(std::move(chunkFromPool))).first->second;
+
+			addedChunk.getObject()->reuse(chunkToAdd.startingPosition);
+
+			m_deletedChunksQueue.remove(chunkToAdd.startingPosition);
+			m_generatedChunkMeshesQueue.remove(chunkToAdd.startingPosition);
+			m_chunkMeshesToGenerateQueue.add(chunkToAdd.startingPosition, { chunkToAdd.startingPosition });
 		}
-
-		ObjectFromPool<Chunk>& addedChunk = m_chunks.emplace(std::piecewise_construct,
-			std::forward_as_tuple(chunkToAdd.startingPosition),
-			std::forward_as_tuple(std::move(chunkFromPool))).first->second;
-
-		addedChunk.getObject()->reuse(chunkToAdd.startingPosition);
-
-		m_deletedChunksQueue.remove(chunkToAdd.startingPosition);
-		m_generatedChunkMeshesQueue.remove(chunkToAdd.startingPosition);
-		m_chunkMeshesToGenerateQueue.add(chunkToAdd.startingPosition, { chunkToAdd.startingPosition });
 	}
 }
 
