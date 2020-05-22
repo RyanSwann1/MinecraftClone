@@ -61,10 +61,7 @@ struct ChunkMeshToGenerate : private NonCopyable, private NonMovable
 };
 
 struct Frustum;
-enum class eDirection;
-enum class eCubeSide;
 class VertexArray;
-struct CubeDetails;
 class ChunkManager : private NonCopyable, private NonMovable
 {
 public:
