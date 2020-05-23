@@ -34,7 +34,7 @@ void Camera::mouse_callback(double xpos, double ypos)
 	lastX = xpos;
 	lastY = ypos;
 
-	float sensitivity = 0.1f; // change this value to your liking
+	float sensitivity = 0.3f; // change this value to your liking
 	xoffset *= sensitivity;
 	yoffset *= sensitivity;
 

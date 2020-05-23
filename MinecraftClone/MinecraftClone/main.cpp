@@ -53,27 +53,6 @@
 
 //http://ogldev.atspace.co.uk/index.html
 
-void keepMouseWithinWindow(const sf::Vector2u& windowSize, sf::Vector2i& mousePosition)
-{
-	if (mousePosition.x < 0)
-	{
-		mousePosition.x = 0;
-	}
-	else if (mousePosition.x > windowSize.x)
-	{
-		mousePosition.x = windowSize.x;
-	}
-
-	if (mousePosition.y < 0)
-	{
-		mousePosition.y = 0;
-	}
-	else if (mousePosition.y > windowSize.y)
-	{
-		mousePosition.y = windowSize.y;
-	}
-}
-
 //x + (y * width)
 int main()
 {
@@ -85,8 +64,10 @@ int main()
 	settings.minorVersion = 3;
 	settings.attributeFlags = sf::ContextSettings::Core;
 	sf::Vector2i windowSize(1980, 1080);
-	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft Clone", sf::Style::Default, settings);
+	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft Clone", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(60);
+	window.setMouseCursorVisible(false);
+	window.setMouseCursorGrabbed(true);
 	gladLoadGL();
 
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
@@ -156,10 +137,6 @@ int main()
 			lastTime += 1.0f;
 		}
 
-		sf::Vector2i mousePosition = sf::Mouse::getPosition();
-
-		camera.mouse_callback(mousePosition.x, mousePosition.y);
-
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))
 		{
@@ -167,12 +144,18 @@ int main()
 			{
 				window.close();
 			}
-			else if (currentSFMLEvent.KeyPressed)
+			if (currentSFMLEvent.KeyPressed)
 			{
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
 				{
 					resetGame = true;
 				}
+			}
+			if (currentSFMLEvent.MouseMoved)
+			{
+				sf::Vector2i mousePosition = sf::Mouse::getPosition();
+
+				camera.mouse_callback(mousePosition.x, mousePosition.y);
 			}
 		}
 
