@@ -150,6 +150,10 @@ int main()
 				{
 					resetGame = true;
 				}
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+				{
+					window.close();
+				}
 			}
 			if (currentSFMLEvent.MouseMoved)
 			{
