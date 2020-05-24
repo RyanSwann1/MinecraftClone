@@ -67,8 +67,9 @@ public:
 		m_container()
 	{}
 
-	void add(const glm::ivec3& position, Object&& newObject)
+	void add(Object&& newObject)
 	{
+		glm::ivec3 position = newObject.position;
 		if (m_container.empty())
 		{
 			assert(!m_initialObjectAdded && !m_recentObjectAdded);
