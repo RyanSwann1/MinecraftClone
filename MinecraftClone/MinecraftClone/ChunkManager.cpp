@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "Frustum.h"
 #include "ChunkMeshGenerator.h"
+#include "glad.h"
 #include <iostream>
 #include <deque>
 
@@ -129,11 +130,13 @@ ChunkManager::ChunkManager(const glm::ivec3& playerPosition)
 	addChunks(playerPosition);
 }
 
-void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
+void ChunkManager::update(const glm::vec3& cameraPosition, std::atomic<bool>& running, std::atomic<bool>& resetGame, 
 	std::mutex& cameraMutex, std::mutex& renderingMutex)	
 {
-	while (!resetGame && window.isOpen())
+	while (!resetGame && running)
 	{
+		//std::this_thread::sleep_for(std::chrono::milliseconds(250));
+
 		std::unique_lock<std::mutex> cameraLock(cameraMutex);
 		glm::ivec3 position = cameraPosition;
 		cameraLock.unlock();

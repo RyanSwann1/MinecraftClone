@@ -1,27 +1,28 @@
 #include "Camera.h"
+#include <GLFW/glfw3.h>
 
 Camera::Camera(glm::vec3 startPosition)
-	: m_speed(40.0f),
+	: m_speed(60.0f),
 	m_position(startPosition),
 	m_front(0.0f, 0.0f, -1.0f),
 	m_up(0.0f, 1.0f, 0.0f)
 {}
 
-void Camera::move(float deltaTime)
+void Camera::move(GLFWwindow* window, float deltaTime)
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		m_position -= glm::normalize(glm::cross(m_front, m_up)) * m_speed * deltaTime;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		m_position += glm::normalize(glm::cross(m_front, m_up)) * m_speed * deltaTime;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		m_position += m_speed * m_front * deltaTime;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
 		m_position -= m_speed * m_front * deltaTime;
 	}

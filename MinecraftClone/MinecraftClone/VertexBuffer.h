@@ -1,6 +1,6 @@
 #pragma once
 
-#include "glad.h"
+
 #include "glm/glm.hpp"
 #include "Utilities.h"
 #include "NonCopyable.h"

@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include "glm/glm.hpp"
 #include "CubeType.h"
 #include <string>
@@ -105,7 +106,7 @@ namespace Utilities
 		eCubeType::CactusTop}
 	};
 
-	constexpr int VISIBILITY_DISTANCE = 1024;
+	constexpr int VISIBILITY_DISTANCE = 800;
 	constexpr int MAP_SIZE = 8000;
 	const glm::vec3 PLAYER_STARTING_POSITION(0.0f, 100.f, 0.0f);
 	const std::string TEXTURE_DIRECTORY = "Textures/";

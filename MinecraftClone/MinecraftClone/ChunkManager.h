@@ -9,7 +9,6 @@
 #include <memory>
 #include <unordered_map>
 #include <mutex>
-#include <SFML/Graphics.hpp>
 #include <atomic>
 
 //Dyanmic Chunk Generation
@@ -67,7 +66,7 @@ class ChunkManager : private NonCopyable, private NonMovable
 public:
 	ChunkManager(const glm::ivec3& playerPosition);
 
-	void update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
+	void update(const glm::vec3& cameraPosition, std::atomic<bool>& running, std::atomic<bool>& resetGame, 
 		std::mutex& cameraMutex, std::mutex& renderingMutex);
 	void renderOpaque(const Frustum& frustum) const;
 	void renderTransparent(const Frustum& frustum) const;

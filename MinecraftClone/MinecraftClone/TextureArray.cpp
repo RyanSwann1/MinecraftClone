@@ -1,9 +1,9 @@
 #include "TextureArray.h"
 #include "glad.h"
-#include "CubeType.h"
-#include <SFML/Graphics.hpp>
 #include <iostream>
 #include "Utilities.h"
+#include "stb_image.h"
+
 #include <array>
 
 namespace
@@ -30,24 +30,48 @@ namespace
 
 	bool addTexture(const std::string& textureName, int textureCountIndex)
 	{
-		sf::Image image;
-		bool textureLoaded = image.loadFromFile(Utilities::TEXTURE_DIRECTORY + textureName);
-		assert(textureLoaded);
-		if (!textureLoaded)
+		stbi_set_flip_vertically_on_load(true);
+
+		int width, height, nrChannels;
+		unsigned char* data = stbi_load((Utilities::TEXTURE_DIRECTORY + textureName).c_str(), &width, &height, &nrChannels, 0);
+		assert(data);
+		if (data)
+		{		
+			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, textureCountIndex, TEXTURE_SIZE.x, TEXTURE_SIZE.y,
+				1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+			glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER,
+				GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_LOD_BIAS, -1);
+			stbi_image_free(data);
+
+			return true;
+		}
+		else
 		{
-			std::cout << textureName << " not loaded.\n";
 			return false;
 		}
-		image.flipVertically();
-		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, textureCountIndex, TEXTURE_SIZE.x, TEXTURE_SIZE.y,
-			1, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());
 
-		glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER,
-			GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_LOD_BIAS, -1);
+		
+		////sf::Image image;
+		//bool textureLoaded = image.loadFromFile(Utilities::TEXTURE_DIRECTORY + textureName);
+		//assert(textureLoaded);
+		//if (!textureLoaded)
+		//{
+		//	std::cout << textureName << " not loaded.\n";
+		//	return false;
+		//}
+		//image.flipVertically();
+		//glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, textureCountIndex, TEXTURE_SIZE.x, TEXTURE_SIZE.y,
+		//	1, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());
 
-		return true;
+		//glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+		//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER,
+		//	GL_LINEAR_MIPMAP_LINEAR);
+		//glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_LOD_BIAS, -1);
+
+		//return true;
 	}
 }
 

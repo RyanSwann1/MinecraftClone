@@ -1,5 +1,6 @@
 #include "VertexBuffer.h"
 #include "VertexArray.h"
+#include "glad.h"
 #include <iostream>
 
 VertexBuffer::VertexBuffer()

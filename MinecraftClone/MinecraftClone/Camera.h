@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
-#include "glad.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -10,11 +8,12 @@
 //LEARNOPENGL.COM CAMERA
 //
 
+struct GLFWwindow;
 struct Camera
 {
 	Camera(glm::vec3 startPosition);
 
-	void move(float deltaTime);
+	void move(GLFWwindow* window, float deltaTime);
 
 	void mouse_callback(double xpos, double ypos);
 
