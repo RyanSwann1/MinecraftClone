@@ -157,9 +157,7 @@ int main()
 			}
 			if (currentSFMLEvent.MouseMoved)
 			{
-				sf::Vector2i mousePosition = sf::Mouse::getPosition();
-
-				camera.mouse_callback(mousePosition.x, mousePosition.y);
+				camera.mouse_callback(window);
 			}
 		}
 

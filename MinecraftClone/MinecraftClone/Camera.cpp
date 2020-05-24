@@ -27,19 +27,22 @@ void Camera::move(float deltaTime)
 	}
 }
 
-void Camera::mouse_callback(double xpos, double ypos)
+void Camera::mouse_callback(sf::Window& window)
 {
-	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-	lastX = xpos;
-	lastY = ypos;
+	//float xoffset = xpos - lastX;
+	//float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+	//lastX = xpos;
+	//lastY = ypos;
 
-	float sensitivity = 0.3f; // change this value to your liking
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
+	//float sensitivity = 0.3f; // change this value to your liking
+	//xoffset *= sensitivity;
+	//yoffset *= sensitivity;
 
-	yaw += xoffset;
-	pitch += yoffset;
+	yaw += (sf::Mouse::getPosition(window).x - static_cast<int>(window.getSize().x / 2)) * 0.1f;
+	pitch += (static_cast<int>(window.getSize().y / 2) - sf::Mouse::getPosition(window).y) * 0.1f;
+	sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
+	//yaw += xoffset;
+	//pitch += yoffset;
 
 	// make sure that when pitch is out of bounds, screen doesn't get flipped
 	if (pitch > 89.0f)

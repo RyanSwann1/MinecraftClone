@@ -16,7 +16,7 @@ struct Camera
 
 	void move(float deltaTime);
 
-	void mouse_callback(double xpos, double ypos);
+	void mouse_callback(sf::Window& window);
 
 	float m_speed;
 	glm::vec3 m_position;
