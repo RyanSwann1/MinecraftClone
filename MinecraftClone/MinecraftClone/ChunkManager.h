@@ -60,12 +60,16 @@ struct GeneratedChunkMesh : public ObjectQueueNode<GeneratedChunkMesh>
 	ObjectFromPool<VertexArray> vertexArrayFromPool;
 };
 
+struct BoundingBox;
 struct Frustum;
 class VertexArray;
 class ChunkManager : private NonCopyable, private NonMovable
 {
 public:
 	ChunkManager(const glm::ivec3& playerPosition);
+
+	glm::vec3 resolveCollision(const glm::vec3& playerPosition) const;
+	bool isCubeAtPosition(const BoundingBox& playerAABB, const glm::ivec3& position) const;
 
 	void update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
 		std::mutex& cameraMutex, std::mutex& renderingMutex);

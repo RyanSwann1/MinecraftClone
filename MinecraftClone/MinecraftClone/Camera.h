@@ -1,5 +1,7 @@
 #pragma once
 
+#include "NonCopyable.h"
+#include "NonMovable.h"
 #include <SFML/Graphics.hpp>
 #include "glad.h"
 #include "glm/glm.hpp"

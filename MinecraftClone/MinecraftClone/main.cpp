@@ -19,6 +19,8 @@
 #include <unordered_map>
 #include <thread>
 
+#include "BoundingBox.h"
+
 #ifdef DEBUG_GL_ERRORS
 #define glCheck(expr) expr; if(!GLAD_GL_KHR_debug){ glCheckError(__FILE__, __LINE__, #expr) };
 #else
@@ -64,8 +66,9 @@ int main()
 	settings.minorVersion = 3;
 	settings.attributeFlags = sf::ContextSettings::Core;
 	sf::Vector2i windowSize(1980, 1080);
-	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft Clone", sf::Style::Fullscreen, settings);
+	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft Clone", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
+
 	window.setMouseCursorVisible(false);
 	window.setMouseCursorGrabbed(true);
 	gladLoadGL();
@@ -107,6 +110,7 @@ int main()
 	cameraPosition = camera.m_position;
 	bool movePlayer = false;
 	std::atomic<bool> resetGame = false;
+	std::mutex collisionDetectionMutex;
 	std::mutex renderingMutex;
 	std::mutex cameraMutex;
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>(camera.m_position);
@@ -158,7 +162,6 @@ int main()
 			if (currentSFMLEvent.MouseMoved)
 			{
 				sf::Vector2i mousePosition = sf::Mouse::getPosition();
-
 				camera.mouse_callback(mousePosition.x, mousePosition.y);
 			}
 		}
@@ -177,19 +180,68 @@ int main()
 					std::ref(cameraMutex), std::ref(renderingMutex)); }, &chunkManager };
 		}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) ||
-			sf::Keyboard::isKeyPressed(sf::Keyboard::S) ||
-			sf::Keyboard::isKeyPressed(sf::Keyboard::D) ||
-			sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 		{
-			camera.move(deltaTime);
-
-			if (cameraMutex.try_lock())
-			{
-				cameraPosition = camera.m_position;
-				cameraMutex.unlock();
-			}
+			glm::vec3 newPosition = camera.m_position + camera.m_speed * camera.m_front * deltaTime;
+			chunkManager->resolveCollision(newPosition);
 		}
+	
+		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		//{
+		//	glm::vec3 collisionPosition =
+		//		camera.m_position + camera.m_speed * camera.m_front * deltaTime;
+
+		//	BoundingBox playerAABB(collisionPosition, { 0.5f, 0.5f, 0.5f });
+		//	if (!chunkManager->isCubeAtPosition(playerAABB, collisionPosition))
+		//	{
+		//		camera.m_position = camera.m_position + camera.m_speed * camera.m_front * deltaTime;
+
+		//		if (cameraMutex.try_lock())
+		//		{
+		//			cameraPosition = camera.m_position + +camera.m_speed * camera.m_front * deltaTime;
+		//			cameraMutex.unlock();
+		//		}
+		//	}
+		//}
+		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+		//{
+		//	glm::vec3 collisionPosition =
+		//		camera.m_position - camera.m_speed * glm::vec3(camera.m_front.x, camera.m_front.y, camera.m_front.z - 7.5f) * deltaTime;
+		//	if (!chunkManager->isCubeAtPosition(collisionPosition))
+		//	{
+		//		camera.m_position = camera.m_position - camera.m_speed * camera.m_front * deltaTime;
+		//		
+		//		if (cameraMutex.try_lock())
+		//		{
+		//			cameraPosition = camera.m_position;
+		//			cameraMutex.unlock();
+		//		}
+		//	}
+		//}
+		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		//{
+		//	glm::ivec3 newPosition = camera.m_position - glm::normalize(glm::cross(camera.m_front, camera.m_up)) * camera.m_speed * deltaTime;
+		//	if (!chunkManager->isCubeAtPosition(newPosition))
+		//	{
+		//		if (cameraMutex.try_lock())
+		//		{
+		//			cameraPosition = camera.m_position;
+		//			cameraMutex.unlock();
+		//		}
+		//	}
+		//}
+		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+		//{
+		//	glm::ivec3 newPosition = camera.m_position + glm::normalize(glm::cross(camera.m_front, camera.m_up)) * camera.m_speed * deltaTime;
+		//	if (!chunkManager->isCubeAtPosition(newPosition))
+		//	{
+		//		if (cameraMutex.try_lock())
+		//		{
+		//			cameraPosition = camera.m_position;
+		//			cameraMutex.unlock();
+		//		}
+		//	}
+		//}
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "Frustum.h"
 #include "ChunkMeshGenerator.h"
+#include "BoundingBox.h"
 #include <iostream>
 #include <deque>
 
@@ -127,6 +128,45 @@ ChunkManager::ChunkManager(const glm::ivec3& playerPosition)
 	m_generatedChunkMeshesQueue()
 {
 	addChunks(playerPosition);
+}
+
+glm::vec3 ChunkManager::resolveCollision(const glm::vec3& playerPosition) const
+{
+	for (int z = playerPosition.z - 1; z < playerPosition.z + 1; z += 2)
+	for (int y = playerPosition.y - 1; y < playerPosition.y + 1; y += 2)
+	for (int x = playerPosition.x - 1; x < playerPosition.x + 1; x += 2)
+	{
+		glm::ivec3 position(x, y, z);
+		getClosestChunkStartingPosition(position);
+		auto chunk = m_chunks.find(position);
+		assert(chunk != m_chunks.cend());
+
+		if (chunk->second.getObject()->isPositionInBounds(position) &&
+			chunk->second.getObject()->getCubeDetailsWithoutBoundsCheck(position))
+		{
+
+		}
+	}
+}
+
+bool ChunkManager::isCubeAtPosition(const BoundingBox& playerAABB, const glm::ivec3& position) const
+{
+	glm::ivec3 closestChunkStartingPosition = position;
+	getClosestChunkStartingPosition(closestChunkStartingPosition);
+	auto chunk = m_chunks.find(glm::ivec3(closestChunkStartingPosition.x, 0, closestChunkStartingPosition.z));
+	assert(chunk != m_chunks.end());
+
+	BoundingBox voxelAABB(position, { 0.5f, 0.5f, 0.5f });
+	if (chunk->second.getObject()->isPositionInBounds(position) &&
+		chunk->second.getObject()->getCubeDetailsWithoutBoundsCheck(position) != static_cast<char>(eCubeType::Air) &&
+		voxelAABB.isIntersecting(playerAABB))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void ChunkManager::update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
