@@ -60,7 +60,6 @@ struct GeneratedChunkMesh : public ObjectQueueNode<GeneratedChunkMesh>
 	ObjectFromPool<VertexArray> vertexArrayFromPool;
 };
 
-class Player;
 struct BoundingBox;
 struct Frustum;
 class VertexArray;
@@ -72,7 +71,7 @@ public:
 	glm::vec3 resolveCollision(const glm::vec3& playerPosition) const;
 	bool isCubeAtPosition(const BoundingBox& playerAABB, const glm::ivec3& position) const;
 
-	void update(const Player& player, const sf::Window& window, std::atomic<bool>& resetGame, 
+	void update(const glm::vec3& playerPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
 		std::mutex& playerMutex, std::mutex& renderingMutex);
 	void renderOpaque(const Frustum& frustum) const;
 	void renderTransparent(const Frustum& frustum) const;

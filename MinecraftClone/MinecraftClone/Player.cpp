@@ -4,7 +4,7 @@
 namespace 
 {
 	constexpr glm::vec3 STARTING_PLAYER_POSITION{ 0.0f, 100.0f, 0.0f };
-	constexpr float WALKING_MOVEMENT_SPEED = 15.0f;
+	constexpr float WALKING_MOVEMENT_SPEED = 50.0f;
 }
 
 //Camera
@@ -62,9 +62,10 @@ const Camera& Player::getCamera() const
 	return m_camera;
 }
 
-void Player::reset()
+void Player::reset(glm::vec3& playerPositionOnChunkGeneration)
 {
 	m_position = STARTING_PLAYER_POSITION;
+	playerPositionOnChunkGeneration = m_position;
 }
 
 void Player::moveCamera(const sf::Window& window)
@@ -72,7 +73,7 @@ void Player::moveCamera(const sf::Window& window)
 	m_camera.move(window);
 }
 
-void Player::move(float deltaTime, std::mutex& playerMutex)
+void Player::move(float deltaTime, std::mutex& playerMutex, glm::vec3& playerPositionOnChunkGeneration)
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) ||
 		sf::Keyboard::isKeyPressed(sf::Keyboard::S) ||
@@ -96,6 +97,10 @@ void Player::move(float deltaTime, std::mutex& playerMutex)
 			m_position -= m_movementSpeed * m_camera.front * deltaTime;
 		}
 
-		playerMutex.unlock();
+		if (playerMutex.try_lock())
+		{
+			playerPositionOnChunkGeneration = m_position;
+			playerMutex.unlock();
+		}
 	}
 }

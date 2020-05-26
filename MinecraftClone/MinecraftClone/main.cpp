@@ -68,7 +68,6 @@ int main()
 	sf::Vector2i windowSize(1980, 1080);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft Clone", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
-
 	window.setMouseCursorVisible(false);
 	window.setMouseCursorGrabbed(true);
 	gladLoadGL();
@@ -106,13 +105,14 @@ int main()
 
 	Frustum frustum;
 	Player player;
+	glm::vec3 playerPositionOnChunkGeneration = player.getPosition();
 	std::atomic<bool> resetGame = false;
 	std::mutex renderingMutex;
 	std::mutex playerMutex;
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>(player.getPosition());
 
 	std::thread chunkGenerationThread([&](std::unique_ptr<ChunkManager>* chunkGenerator)
-		{chunkGenerator->get()->update(std::ref(player), std::ref(window), std::ref(resetGame), 
+		{chunkGenerator->get()->update(std::ref(playerPositionOnChunkGeneration), std::ref(window), std::ref(resetGame), 
 			std::ref(playerMutex), std::ref(renderingMutex)); }, &chunkManager );
 
 	std::cout << glGetError() << "\n";
@@ -150,18 +150,18 @@ int main()
 			}
 		}
 
-		player.move(deltaTime, playerMutex);
+		player.move(deltaTime, playerMutex, playerPositionOnChunkGeneration);
 
 		if (resetGame)
 		{
 			chunkGenerationThread.join();
 			resetGame = false;
-			player.reset();
+			player.reset(playerPositionOnChunkGeneration);
 			chunkManager.reset();
 			chunkManager = std::make_unique<ChunkManager>(player.getPosition());
 
 			chunkGenerationThread = std::thread{[&](std::unique_ptr<ChunkManager>* chunkManager)
-				{chunkManager->get()->update(std::ref(player), std::ref(window), std::ref(resetGame), 
+				{chunkManager->get()->update(std::ref(playerPositionOnChunkGeneration), std::ref(window), std::ref(resetGame), 
 					std::ref(playerMutex), std::ref(renderingMutex)); }, &chunkManager };
 		}
 

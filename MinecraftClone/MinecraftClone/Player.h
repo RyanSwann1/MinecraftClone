@@ -34,9 +34,9 @@ public:
 	const glm::vec3& getPosition() const;
 	const Camera& getCamera() const;
 
-	void reset();
+	void reset(glm::vec3& playerPositionOnChunkGeneration);
 	void moveCamera(const sf::Window& window);
-	void move(float deltaTime, std::mutex& playerMutex);
+	void move(float deltaTime, std::mutex& playerMutex, glm::vec3& playerPositionOnChunkGeneration);
 
 private:
 	Camera m_camera;
