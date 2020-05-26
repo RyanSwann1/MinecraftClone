@@ -22,8 +22,7 @@ struct Camera : private NonCopyable, private NonMovable
 	glm::vec3 front;
 	glm::vec3 right;
 	glm::vec3 up;
-	float yaw;
-	float pitch;
+	glm::vec2 rotation;
 };
 
 class Player : private NonCopyable, private NonMovable
@@ -41,5 +40,6 @@ public:
 private:
 	Camera m_camera;
 	glm::vec3 m_position;
+	glm::vec3 m_velocity;
 	float m_movementSpeed;
 };

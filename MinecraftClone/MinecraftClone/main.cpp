@@ -55,6 +55,13 @@
 
 //http://ogldev.atspace.co.uk/index.html
 
+
+
+//Good OpenGL Tutorials
+//https://ahbejarano.gitbook.io/lwjglgamedev/chapter12
+
+
+
 //x + (y * width)
 int main()
 {
