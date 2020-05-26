@@ -169,17 +169,17 @@ bool ChunkManager::isCubeAtPosition(const BoundingBox& playerAABB, const glm::iv
 	}
 }
 
-void ChunkManager::update(const glm::vec3& playerPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
+void ChunkManager::update(const Player& player, const sf::Window& window, std::atomic<bool>& resetGame, 
 	std::mutex& playerMutex, std::mutex& renderingMutex)	
 {
 	while (!resetGame && window.isOpen())
 	{
 		std::unique_lock<std::mutex> playerLock(playerMutex);
-		glm::ivec3 position = playerPosition;
+		glm::ivec3 playerPosition = player.getPosition();
 		playerLock.unlock();
 
-		deleteChunks(position, renderingMutex);
-		addChunks(position);
+		deleteChunks(playerPosition, renderingMutex);
+		addChunks(playerPosition);
 		generateChunkMeshes();
 		
 		std::lock_guard<std::mutex> renderingLock(renderingMutex);

@@ -4,7 +4,7 @@
 namespace 
 {
 	constexpr glm::vec3 STARTING_PLAYER_POSITION{ 0.0f, 100.0f, 0.0f };
-	constexpr float WALKING_MOVEMENT_SPEED = 5.0f;
+	constexpr float WALKING_MOVEMENT_SPEED = 0.75f;
 	constexpr glm::vec3 MAX_VELOCITY = { 50.f, 50.0f, 50.0 };
 	constexpr float VELOCITY_DROPOFF = 0.9f;
 }
@@ -65,10 +65,9 @@ const Camera& Player::getCamera() const
 	return m_camera;
 }
 
-void Player::reset(glm::vec3& playerPositionOnChunkGeneration)
+void Player::reset()
 {
 	m_position = STARTING_PLAYER_POSITION;
-	playerPositionOnChunkGeneration = m_position;
 }
 
 void Player::moveCamera(const sf::Window& window)
@@ -76,11 +75,17 @@ void Player::moveCamera(const sf::Window& window)
 	m_camera.move(window);
 }
 
-void Player::move(float deltaTime, std::mutex& playerMutex, glm::vec3& playerPositionOnChunkGeneration)
+void Player::update(float deltaTime, std::mutex& playerMutex)
 {
+	move(deltaTime);
+
+	std::lock_guard<std::mutex> playerLock(playerMutex);
 	m_position += m_velocity;
 	m_velocity *= VELOCITY_DROPOFF;
+}
 
+void Player::move(float deltaTime)
+{
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
 		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * m_movementSpeed * deltaTime;
@@ -99,8 +104,8 @@ void Player::move(float deltaTime, std::mutex& playerMutex, glm::vec3& playerPos
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		m_velocity.x -= glm::cos(glm::radians(m_camera.rotation.y + 90)) * m_movementSpeed * deltaTime;
-		m_velocity.z -= glm::sin(glm::radians(m_camera.rotation.y + 90)) * m_movementSpeed * deltaTime;
+		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y - 90)) * m_movementSpeed * deltaTime;
+		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y - 90)) * m_movementSpeed * deltaTime;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
@@ -110,11 +115,5 @@ void Player::move(float deltaTime, std::mutex& playerMutex, glm::vec3& playerPos
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
 	{
 		m_velocity.y -= m_movementSpeed * deltaTime;
-	}
-
-	if (playerMutex.try_lock())
-	{
-		playerPositionOnChunkGeneration = m_position;
-		playerMutex.unlock();
 	}
 }
