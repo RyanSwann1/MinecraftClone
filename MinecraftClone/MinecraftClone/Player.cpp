@@ -81,74 +81,40 @@ void Player::move(float deltaTime, std::mutex& playerMutex, glm::vec3& playerPos
 	m_position += m_velocity;
 	m_velocity *= VELOCITY_DROPOFF;
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) ||
-		sf::Keyboard::isKeyPressed(sf::Keyboard::S) ||
-		sf::Keyboard::isKeyPressed(sf::Keyboard::A) ||
-		sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		glm::vec3 v{ 0, 0, 0};
-		v.x -= sf::Keyboard::isKeyPressed(sf::Keyboard::A);
-		v.x += sf::Keyboard::isKeyPressed(sf::Keyboard::D);
-		v.z -= sf::Keyboard::isKeyPressed(sf::Keyboard::S);
-		v.z += sf::Keyboard::isKeyPressed(sf::Keyboard::W);
-		m_velocity += glm::normalize(v) * m_movementSpeed * m_camera.front * deltaTime;
-		/*if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) &&
-			sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-		{
-			glm::vec3 v;
-			v += m_velocity + m_movementSpeed * m_camera.front;
-			v += m_velocity + glm::normalize(glm::cross(m_camera.front, m_camera.up)) * m_movementSpeed;
-			m_velocity += glm::normalize(v) * m_movementSpeed * deltaTime;
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) &&
-			sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-		{
-			glm::vec3 v;
-			v += m_velocity + glm::normalize(glm::cross(m_camera.front, m_camera.up)) * m_movementSpeed;
-			v += m_velocity - m_movementSpeed * m_camera.front;
-			m_velocity += glm::normalize(v) * m_movementSpeed * deltaTime;
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) &&
-			sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-		{
-			glm::vec3 v;
-			v += m_velocity - m_movementSpeed * m_camera.front;
-			v += m_velocity - glm::normalize(glm::cross(m_camera.front, m_camera.up)) * m_movementSpeed;
-			m_velocity += glm::normalize(v) * m_movementSpeed * deltaTime;
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) &&
-			sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-		{
-			glm::vec3 v;
-			v += m_velocity - glm::normalize(glm::cross(m_camera.front, m_camera.up)) * m_movementSpeed;
-			v += m_velocity + m_movementSpeed * m_camera.front;
-			m_velocity += glm::normalize(v) * m_movementSpeed * deltaTime;
-		}
-		else
-		{
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-			{
-				m_velocity -= glm::normalize(glm::cross(m_camera.front, m_camera.up)) * m_movementSpeed * deltaTime;
-			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-			{
-				m_velocity += glm::normalize(glm::cross(m_camera.front, m_camera.up)) * m_movementSpeed * deltaTime;
-			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-			{
-				m_velocity += m_movementSpeed * m_camera.front * deltaTime;
-			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-			{
-				m_velocity -= m_movementSpeed * m_camera.front * deltaTime;
-			}
-		}*/
+		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * m_movementSpeed * deltaTime;
+		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * m_movementSpeed * deltaTime;
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+	{
+		m_velocity.x -= glm::cos(glm::radians(m_camera.rotation.y)) * m_movementSpeed * deltaTime;
+		m_velocity.z -= glm::sin(glm::radians(m_camera.rotation.y)) * m_movementSpeed * deltaTime;
+	}
 
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	{
+		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y + 90)) * m_movementSpeed * deltaTime;
+		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y + 90)) * m_movementSpeed * deltaTime;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+	{
+		m_velocity.x -= glm::cos(glm::radians(m_camera.rotation.y + 90)) * m_movementSpeed * deltaTime;
+		m_velocity.z -= glm::sin(glm::radians(m_camera.rotation.y + 90)) * m_movementSpeed * deltaTime;
+	}
 
-		if (playerMutex.try_lock())
-		{
-			playerPositionOnChunkGeneration = m_position;
-			playerMutex.unlock();
-		}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+	{
+		m_velocity.y += m_movementSpeed * deltaTime;
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+	{
+		m_velocity.y -= m_movementSpeed * deltaTime;
+	}
+
+	if (playerMutex.try_lock())
+	{
+		playerPositionOnChunkGeneration = m_position;
+		playerMutex.unlock();
 	}
 }
