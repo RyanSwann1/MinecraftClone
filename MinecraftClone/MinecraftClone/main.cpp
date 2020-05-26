@@ -1,5 +1,5 @@
 #include "TextureArray.h"
-#include "Camera.h"
+#include "Player.h"
 #include "Chunk.h"
 #include "ChunkManager.h"
 #include "VertexBuffer.h"
@@ -105,19 +105,15 @@ int main()
 	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", 0);
 
 	Frustum frustum;
-	Camera camera(Utilities::PLAYER_STARTING_POSITION);
-	glm::vec3 cameraPosition;
-	cameraPosition = camera.m_position;
-	bool movePlayer = false;
+	Player player;
 	std::atomic<bool> resetGame = false;
-	std::mutex collisionDetectionMutex;
 	std::mutex renderingMutex;
-	std::mutex cameraMutex;
-	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>(camera.m_position);
+	std::mutex playerMutex;
+	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>(player.getPosition());
 
 	std::thread chunkGenerationThread([&](std::unique_ptr<ChunkManager>* chunkGenerator)
-		{chunkGenerator->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), 
-			std::ref(cameraMutex), std::ref(renderingMutex)); }, &chunkManager );
+		{chunkGenerator->get()->update(std::ref(player), std::ref(window), std::ref(resetGame), 
+			std::ref(playerMutex), std::ref(renderingMutex)); }, &chunkManager );
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -161,30 +157,30 @@ int main()
 			}
 			if (currentSFMLEvent.MouseMoved)
 			{
-				sf::Vector2i mousePosition = sf::Mouse::getPosition();
-				camera.mouse_callback(mousePosition.x, mousePosition.y);
+				player.moveCamera(window);
 			}
 		}
+
+		player.move(deltaTime, playerMutex);
 
 		if (resetGame)
 		{
 			chunkGenerationThread.join();
 			resetGame = false;
-			camera.m_position = Utilities::PLAYER_STARTING_POSITION;
-			cameraPosition = camera.m_position;
+			player.reset();
 			chunkManager.reset();
-			chunkManager = std::make_unique<ChunkManager>(cameraPosition);
+			chunkManager = std::make_unique<ChunkManager>(player.getPosition());
 
-			chunkGenerationThread = std::thread{ [&](std::unique_ptr<ChunkManager>* chunkManager)
-				{chunkManager->get()->update(std::ref(cameraPosition), std::ref(window), std::ref(resetGame), 
-					std::ref(cameraMutex), std::ref(renderingMutex)); }, &chunkManager };
+			chunkGenerationThread = std::thread{[&](std::unique_ptr<ChunkManager>* chunkManager)
+				{chunkManager->get()->update(std::ref(player), std::ref(window), std::ref(resetGame), 
+					std::ref(playerMutex), std::ref(renderingMutex)); }, &chunkManager };
 		}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-		{
-			glm::vec3 newPosition = camera.m_position + camera.m_speed * camera.m_front * deltaTime;
-			chunkManager->resolveCollision(newPosition);
-		}
+		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		//{
+		//	glm::vec3 newPosition = camera.m_position + camera.m_speed * camera.m_front * deltaTime;
+		//	chunkManager->resolveCollision(newPosition);
+		//}
 	
 		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 		//{
@@ -245,10 +241,9 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::lookAt(camera.m_position, camera.m_position + camera.m_front, camera.m_up);
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
-			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), 0.1f, 1750.0f);
+		glm::mat4 view = glm::lookAt(player.getPosition(), player.getPosition() + player.getCamera().front, player.getCamera().up);
+		glm::mat4 projection = glm::perspective(glm::radians(player.getCamera().FOV),
+			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), player.getCamera().nearPlaneDistance, player.getCamera().farPlaneDistance);
 
 		frustum.update(projection * view);
 		
