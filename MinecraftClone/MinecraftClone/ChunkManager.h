@@ -60,6 +60,17 @@ struct GeneratedChunkMesh : public ObjectQueueNode<GeneratedChunkMesh>
 	ObjectFromPool<VertexArray> vertexArrayFromPool;
 };
 
+struct GeneratedChunk : public ObjectQueueNode<GeneratedChunk>
+{
+	GeneratedChunk(const glm::ivec3& position, ObjectFromPool<Chunk>&& chunkFromPool);
+	GeneratedChunk(GeneratedChunk&&) noexcept;
+	GeneratedChunk& operator=(GeneratedChunk&&) noexcept;
+
+	ObjectFromPool<Chunk> chunkFromPool;
+};
+
+class Player;
+struct BoundingBox;
 struct Frustum;
 class VertexArray;
 class ChunkManager : private NonCopyable, private NonMovable
@@ -67,8 +78,11 @@ class ChunkManager : private NonCopyable, private NonMovable
 public:
 	ChunkManager(const glm::ivec3& playerPosition);
 
-	void update(const glm::vec3& cameraPosition, const sf::Window& window, std::atomic<bool>& resetGame, 
-		std::mutex& cameraMutex, std::mutex& renderingMutex);
+	glm::vec3 resolveCollision(const glm::vec3& playerPosition) const;
+	bool isCubeAtPosition(const BoundingBox& playerAABB, const glm::ivec3& position) const;
+
+	void update(const Player& player, const sf::Window& window, std::atomic<bool>& resetGame, 
+		std::mutex& playerMutex, std::mutex& renderingMutex);
 	void renderOpaque(const Frustum& frustum) const;
 	void renderTransparent(const Frustum& frustum) const;
 
@@ -80,6 +94,7 @@ private:
 	ObjectQueue<PositionNode> m_chunkMeshesToGenerateQueue;
 	ObjectQueue<PositionNode> m_deletedChunksQueue;
 	ObjectQueue<GeneratedChunkMesh> m_generatedChunkMeshesQueue;
+	ObjectQueue<GeneratedChunk> m_generatedChunkQueue;
 
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);
