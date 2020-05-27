@@ -4,7 +4,7 @@
 namespace 
 {
 	constexpr glm::vec3 STARTING_PLAYER_POSITION{ 0.0f, 100.0f, 0.0f };
-	constexpr float WALKING_MOVEMENT_SPEED = 0.75f;
+	constexpr float WALKING_MOVEMENT_SPEED = 15.75f;
 	constexpr glm::vec3 MAX_VELOCITY = { 50.f, 50.0f, 50.0 };
 	constexpr float VELOCITY_DROPOFF = 0.9f;
 }
