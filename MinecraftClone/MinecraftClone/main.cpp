@@ -176,17 +176,14 @@ int main()
 		//	glm::vec3 newPosition = camera.m_position + camera.m_speed * camera.m_front * deltaTime;
 		//	chunkManager->resolveCollision(newPosition);
 		//}
-	
 		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 		//{
 		//	glm::vec3 collisionPosition =
 		//		camera.m_position + camera.m_speed * camera.m_front * deltaTime;
-
 		//	BoundingBox playerAABB(collisionPosition, { 0.5f, 0.5f, 0.5f });
 		//	if (!chunkManager->isCubeAtPosition(playerAABB, collisionPosition))
 		//	{
 		//		camera.m_position = camera.m_position + camera.m_speed * camera.m_front * deltaTime;
-
 		//		if (cameraMutex.try_lock())
 		//		{
 		//			cameraPosition = camera.m_position + +camera.m_speed * camera.m_front * deltaTime;

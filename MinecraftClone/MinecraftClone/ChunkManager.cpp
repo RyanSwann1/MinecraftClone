@@ -117,6 +117,25 @@ GeneratedChunkMesh& GeneratedChunkMesh::operator=(GeneratedChunkMesh&& orig) noe
 	return *this;
 }
 
+//GeneratedChunk
+GeneratedChunk::GeneratedChunk(const glm::ivec3& position, ObjectFromPool<Chunk>&& chunkFromPool)
+	: ObjectQueueNode(position),
+	chunkFromPool(std::move(chunkFromPool))
+{}
+
+GeneratedChunk::GeneratedChunk(GeneratedChunk&& orig) noexcept
+	: ObjectQueueNode(std::move(orig)),
+	chunkFromPool(std::move(orig.chunkFromPool))
+{}
+
+GeneratedChunk& GeneratedChunk::operator=(GeneratedChunk&& orig) noexcept
+{
+	ObjectQueueNode::operator=(std::move(orig));
+	chunkFromPool = std::move(orig.chunkFromPool);
+
+	return *this;
+}
+
 //ChunkGenerator
 ChunkManager::ChunkManager(const glm::ivec3& playerPosition)
 	: m_chunkPool(Utilities::VISIBILITY_DISTANCE, Utilities::CHUNK_WIDTH, Utilities::CHUNK_DEPTH),
@@ -125,7 +144,8 @@ ChunkManager::ChunkManager(const glm::ivec3& playerPosition)
 	m_VAOs(),
 	m_chunkMeshesToGenerateQueue(),
 	m_deletedChunksQueue(),
-	m_generatedChunkMeshesQueue()
+	m_generatedChunkMeshesQueue(),
+	m_generatedChunkQueue()
 {
 	addChunks(playerPosition);
 }
@@ -380,3 +400,4 @@ void ChunkManager::generateChunkMeshes()
 		}
 	}
 }
+

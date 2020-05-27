@@ -60,6 +60,15 @@ struct GeneratedChunkMesh : public ObjectQueueNode<GeneratedChunkMesh>
 	ObjectFromPool<VertexArray> vertexArrayFromPool;
 };
 
+struct GeneratedChunk : public ObjectQueueNode<GeneratedChunk>
+{
+	GeneratedChunk(const glm::ivec3& position, ObjectFromPool<Chunk>&& chunkFromPool);
+	GeneratedChunk(GeneratedChunk&&) noexcept;
+	GeneratedChunk& operator=(GeneratedChunk&&) noexcept;
+
+	ObjectFromPool<Chunk> chunkFromPool;
+};
+
 class Player;
 struct BoundingBox;
 struct Frustum;
@@ -85,6 +94,7 @@ private:
 	ObjectQueue<PositionNode> m_chunkMeshesToGenerateQueue;
 	ObjectQueue<PositionNode> m_deletedChunksQueue;
 	ObjectQueue<GeneratedChunkMesh> m_generatedChunkMeshesQueue;
+	ObjectQueue<GeneratedChunk> m_generatedChunkQueue;
 
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);
