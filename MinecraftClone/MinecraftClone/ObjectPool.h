@@ -101,17 +101,12 @@ template <class Object>
 class ObjectPool : private NonCopyable, private NonMovable
 {
 public:
-	ObjectPool(int visibilityDistance, int chunkWidth, int chunkDepth)
-		: m_objectPool()
+	ObjectPool(size_t size = 0)
+		: m_availableObjects(),
+		m_objectPool()
 	{
-		//Added a little bit more than neccessary due to how the inifinite map generates
-		int x = visibilityDistance / chunkWidth;
-		x += x += 1;
-		int z = visibilityDistance / chunkDepth;
-		z += z += 1;
-
-		m_objectPool.reserve(x * z);
-		for (int i = 0; i < x * z; ++i)
+		m_objectPool.reserve(size);
+		for (int i = 0; i < size; ++i)
 		{
 			m_objectPool.emplace_back(i);
 			m_availableObjects.push(i);
