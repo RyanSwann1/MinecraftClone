@@ -15,31 +15,25 @@ struct ObjectInPool : private NonCopyable
 {
 	ObjectInPool(int ID)
 		: object(),
-		inUse(false),
 		ID(ID)
 	{}
 	ObjectInPool(ObjectInPool&& orig) noexcept
 		: object(std::move(orig.object)),
-		inUse(orig.inUse),
 		ID(orig.ID)
 	{
 		orig.ID = INVALID_OBJECT_ID;
-		orig.inUse = false;
 	}
 	ObjectInPool& operator=(ObjectInPool&& orig) noexcept
 	{
 		object = std::move(orig.object);
-		inUse = orig.inUse;
 		ID = orig.ID;
 
 		orig.ID = INVALID_OBJECT_ID;
-		orig.inUse = false;
 		return *this;
 	}
 	~ObjectInPool() {}
 
 	Object object;
-	bool inUse;
 	int ID;
 };
 
@@ -52,19 +46,12 @@ struct ObjectFromPool : private NonCopyable
 	ObjectFromPool(ObjectInPool<Object>* objectInPool, std::function<void(int)> func)
 		: objectInPool(objectInPool),
 		m_func(func)
-	{
-		if (objectInPool)
-		{
-			objectInPool->inUse = true;
-		}
-	}
+	{}
 	~ObjectFromPool()
 	{
 		if (objectInPool)
 		{
 			objectInPool->object.reset();
-			objectInPool->inUse = false;
-
 			m_func(objectInPool->ID);
 		}
 	}
