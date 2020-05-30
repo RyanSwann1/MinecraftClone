@@ -15,6 +15,14 @@ namespace
 {
 	constexpr int THREAD_TRANSFER_PER_FRAME = 1;
 
+	int getObjectPoolSize()
+	{
+		int x = 2 * Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_WIDTH + 1;
+		int z = 2 * Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_DEPTH + 1;
+
+		return x * z;
+	}
+
 	void getClosestMiddlePosition(glm::ivec3& position)
 	{
 		if (position.x % (Utilities::CHUNK_WIDTH / 2) < 0)
@@ -117,57 +125,18 @@ GeneratedChunkMesh& GeneratedChunkMesh::operator=(GeneratedChunkMesh&& orig) noe
 	return *this;
 }
 
-//GeneratedChunk
-GeneratedChunk::GeneratedChunk(const glm::ivec3& position, ObjectFromPool<Chunk>&& chunkFromPool)
-	: ObjectQueueNode(position),
-	chunkFromPool(std::move(chunkFromPool))
-{}
-
-GeneratedChunk::GeneratedChunk(GeneratedChunk&& orig) noexcept
-	: ObjectQueueNode(std::move(orig)),
-	chunkFromPool(std::move(orig.chunkFromPool))
-{}
-
-GeneratedChunk& GeneratedChunk::operator=(GeneratedChunk&& orig) noexcept
-{
-	ObjectQueueNode::operator=(std::move(orig));
-	chunkFromPool = std::move(orig.chunkFromPool);
-
-	return *this;
-}
-
 //ChunkGenerator
 ChunkManager::ChunkManager(const glm::ivec3& playerPosition)
-	: m_chunkPool(Utilities::VISIBILITY_DISTANCE, Utilities::CHUNK_WIDTH, Utilities::CHUNK_DEPTH),
-	m_vertexArrayPool(Utilities::VISIBILITY_DISTANCE, Utilities::CHUNK_WIDTH, Utilities::CHUNK_DEPTH),
+	: m_chunkPool(getObjectPoolSize()),
+	m_vertexArrayPool(getObjectPoolSize()),
 	m_chunks(),
 	m_VAOs(),
 	m_chunkMeshesToGenerateQueue(),
 	m_deletedChunksQueue(),
-	m_generatedChunkMeshesQueue(),
-	m_generatedChunkQueue()
+	m_generatedChunkMeshesQueue()
 {
 	addChunks(playerPosition);
 }
-
-//glm::vec3 ChunkManager::resolveCollision(const glm::vec3& playerPosition) const
-//{
-//	for (int z = playerPosition.z - 1; z < playerPosition.z + 1; z += 2)
-//	for (int y = playerPosition.y - 1; y < playerPosition.y + 1; y += 2)
-//	for (int x = playerPosition.x - 1; x < playerPosition.x + 1; x += 2)
-//	{
-//		glm::ivec3 position(x, y, z);
-//		getClosestChunkStartingPosition(position);
-//		auto chunk = m_chunks.find(position);
-//		assert(chunk != m_chunks.cend());
-//
-//		if (chunk->second.getObject()->isPositionInBounds(position) &&
-//			chunk->second.getObject()->getCubeDetailsWithoutBoundsCheck(position))
-//		{
-//
-//		}
-//	}
-//}
 
 bool ChunkManager::isCubeAtPosition(const BoundingBox& playerAABB, const glm::ivec3& position) const
 {
@@ -201,9 +170,9 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 		deleteChunks(playerPosition, renderingMutex);
 		addChunks(playerPosition);
 		generateChunkMeshes();
-		
-		std::lock_guard<std::mutex> renderingLock(renderingMutex);
-		playerLock.lock();
+
+		playerLock.lock(); 
+		std::lock_guard<std::mutex> renderingLock(renderingMutex); 
 		for (int i = 0; i < THREAD_TRANSFER_PER_FRAME; ++i)
 		{
 			if (!m_deletedChunksQueue.isEmpty())

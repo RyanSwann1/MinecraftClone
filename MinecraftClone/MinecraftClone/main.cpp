@@ -171,66 +171,6 @@ int main()
 					std::ref(playerMutex), std::ref(renderingMutex)); }, &chunkManager };
 		}
 
-		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-		//{
-		//	glm::vec3 newPosition = camera.m_position + camera.m_speed * camera.m_front * deltaTime;
-		//	chunkManager->resolveCollision(newPosition);
-		//}
-		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-		//{
-		//	glm::vec3 collisionPosition =
-		//		camera.m_position + camera.m_speed * camera.m_front * deltaTime;
-		//	BoundingBox playerAABB(collisionPosition, { 0.5f, 0.5f, 0.5f });
-		//	if (!chunkManager->isCubeAtPosition(playerAABB, collisionPosition))
-		//	{
-		//		camera.m_position = camera.m_position + camera.m_speed * camera.m_front * deltaTime;
-		//		if (cameraMutex.try_lock())
-		//		{
-		//			cameraPosition = camera.m_position + +camera.m_speed * camera.m_front * deltaTime;
-		//			cameraMutex.unlock();
-		//		}
-		//	}
-		//}
-		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-		//{
-		//	glm::vec3 collisionPosition =
-		//		camera.m_position - camera.m_speed * glm::vec3(camera.m_front.x, camera.m_front.y, camera.m_front.z - 7.5f) * deltaTime;
-		//	if (!chunkManager->isCubeAtPosition(collisionPosition))
-		//	{
-		//		camera.m_position = camera.m_position - camera.m_speed * camera.m_front * deltaTime;
-		//		
-		//		if (cameraMutex.try_lock())
-		//		{
-		//			cameraPosition = camera.m_position;
-		//			cameraMutex.unlock();
-		//		}
-		//	}
-		//}
-		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-		//{
-		//	glm::ivec3 newPosition = camera.m_position - glm::normalize(glm::cross(camera.m_front, camera.m_up)) * camera.m_speed * deltaTime;
-		//	if (!chunkManager->isCubeAtPosition(newPosition))
-		//	{
-		//		if (cameraMutex.try_lock())
-		//		{
-		//			cameraPosition = camera.m_position;
-		//			cameraMutex.unlock();
-		//		}
-		//	}
-		//}
-		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-		//{
-		//	glm::ivec3 newPosition = camera.m_position + glm::normalize(glm::cross(camera.m_front, camera.m_up)) * camera.m_speed * deltaTime;
-		//	if (!chunkManager->isCubeAtPosition(newPosition))
-		//	{
-		//		if (cameraMutex.try_lock())
-		//		{
-		//			cameraPosition = camera.m_position;
-		//			cameraMutex.unlock();
-		//		}
-		//	}
-		//}
-
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 view = glm::lookAt(player.getPosition(), player.getPosition() + player.getCamera().front, player.getCamera().up);
