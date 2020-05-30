@@ -31,7 +31,6 @@ struct ObjectInPool : private NonCopyable
 		orig.ID = INVALID_OBJECT_ID;
 		return *this;
 	}
-	~ObjectInPool() {}
 
 	Object object;
 	int ID;
@@ -43,28 +42,29 @@ class ObjectPool;
 template <class Object>
 struct ObjectFromPool : private NonCopyable
 {
-	ObjectFromPool(ObjectInPool<Object>* objectInPool, std::function<void(int)> func)
+	ObjectFromPool(ObjectInPool<Object>* objectInPool = nullptr, std::function<void(int)> onDestroyFunction = nullptr)
 		: objectInPool(objectInPool),
-		m_func(func)
+		onDestroyFunction(onDestroyFunction)
 	{}
 	~ObjectFromPool()
 	{
 		if (objectInPool)
 		{
+			assert(onDestroyFunction);
 			objectInPool->object.reset();
-			m_func(objectInPool->ID);
+			onDestroyFunction(objectInPool->ID);
 		}
 	}
 	ObjectFromPool(ObjectFromPool&& orig) noexcept
 		: objectInPool(orig.objectInPool),
-		m_func(orig.m_func)
+		onDestroyFunction(orig.onDestroyFunction)
 	{
 		orig.objectInPool = nullptr;
 	}
 	ObjectFromPool& operator=(ObjectFromPool&& orig) noexcept
 	{
 		objectInPool = orig.objectInPool;
-		m_func = orig.m_func;
+		onDestroyFunction = orig.onDestroyFunction;
 
 		orig.objectInPool = nullptr;
 
@@ -78,7 +78,7 @@ struct ObjectFromPool : private NonCopyable
 
 private:
 	ObjectInPool<Object>* objectInPool;
-	std::function<void(int)> m_func;
+	std::function<void(int)> onDestroyFunction;
 };
 
 using std::placeholders::_1;
@@ -111,7 +111,7 @@ public:
 		}
 		else
 		{
-			return ObjectFromPool<Object>(nullptr, std::bind(&ObjectPool<Object>::releaseID, this, _1));
+			return ObjectFromPool<Object>();
 		}
 	}
 
