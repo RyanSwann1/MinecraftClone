@@ -42,7 +42,7 @@ class ObjectPool;
 template <class Object>
 struct ObjectFromPool : private NonCopyable
 {
-	ObjectFromPool(ObjectInPool<Object>* objectInPool = nullptr, std::function<void(int)> onDestroyFunction = nullptr)
+	ObjectFromPool(ObjectInPool<Object>* objectInPool = nullptr, std::function<void(const ObjectInPool<Object>&)> onDestroyFunction = nullptr)
 		: objectInPool(objectInPool),
 		onDestroyFunction(onDestroyFunction)
 	{}
@@ -52,7 +52,7 @@ struct ObjectFromPool : private NonCopyable
 		{
 			assert(onDestroyFunction);
 			objectInPool->object.reset();
-			onDestroyFunction(objectInPool->ID);
+			onDestroyFunction(*objectInPool);
 		}
 	}
 	ObjectFromPool(ObjectFromPool&& orig) noexcept
@@ -78,7 +78,7 @@ struct ObjectFromPool : private NonCopyable
 
 private:
 	ObjectInPool<Object>* objectInPool;
-	std::function<void(int)> onDestroyFunction;
+	std::function<void(const ObjectInPool<Object>&)> onDestroyFunction;
 };
 
 using std::placeholders::_1;
@@ -107,7 +107,7 @@ public:
 			int ID = m_availableObjects.top();
 			m_availableObjects.pop();
 			assert(ID < m_objectPool.size());
-			return ObjectFromPool<Object>(&m_objectPool[ID], std::bind(&ObjectPool<Object>::releaseID, this, _1));
+			return ObjectFromPool<Object>(&m_objectPool[ID], std::bind(&ObjectPool<Object>::releaseObject, this, _1));
 		}
 		else
 		{
@@ -119,9 +119,9 @@ private:
 	std::stack<int> m_availableObjects;
 	std::vector<ObjectInPool<Object>> m_objectPool;
 
-	void releaseID(int ID)
+	void releaseObject(const ObjectInPool<Object>& objectInPool)
 	{
-		assert(ID != INVALID_OBJECT_ID);
-		m_availableObjects.push(ID);
+		assert(objectInPool.ID != INVALID_OBJECT_ID);
+		m_availableObjects.push(objectInPool.ID);
 	}
 };
