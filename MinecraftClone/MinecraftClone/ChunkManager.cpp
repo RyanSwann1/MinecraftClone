@@ -15,24 +15,10 @@ namespace
 {
 	constexpr int THREAD_TRANSFER_PER_FRAME = 1;
 
-	int getInitialChunkPoolSize()
+	int getObjectPoolSize()
 	{
-		//Added a little bit more than neccessary due to how the inifinite map generates
-		int x = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_WIDTH;
-		x += x += 1;
-		int z = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_DEPTH;
-		z += z += 1;
-
-		return x * z;
-	}
-
-	int getInitialVAOPoolSize()
-	{
-		//Added a little bit more than neccessary due to how the inifinite map generates
-		int x = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_WIDTH;
-		x += x += 1;
-		int z = Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_DEPTH;
-		z += z += 1;
+		int x = 2 * Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_WIDTH + 1;
+		int z = 2 * Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_DEPTH + 1;
 
 		return x * z;
 	}
@@ -141,8 +127,8 @@ GeneratedChunkMesh& GeneratedChunkMesh::operator=(GeneratedChunkMesh&& orig) noe
 
 //ChunkGenerator
 ChunkManager::ChunkManager(const glm::ivec3& playerPosition)
-	: m_chunkPool(getInitialChunkPoolSize()),
-	m_vertexArrayPool(getInitialVAOPoolSize()),
+	: m_chunkPool(getObjectPoolSize()),
+	m_vertexArrayPool(getObjectPoolSize()),
 	m_chunks(),
 	m_VAOs(),
 	m_chunkMeshesToGenerateQueue(),
