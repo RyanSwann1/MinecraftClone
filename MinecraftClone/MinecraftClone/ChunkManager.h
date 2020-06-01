@@ -90,6 +90,7 @@ private:
 	ObjectQueue<PositionNode> m_chunkMeshesToGenerateQueue;
 	ObjectQueue<PositionNode> m_deletedChunksQueue;
 	ObjectQueue<GeneratedChunkMesh> m_generatedChunkMeshesQueue;
+	ObjectQueue<GeneratedChunk> m_generatedChunkQueue;
 
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);

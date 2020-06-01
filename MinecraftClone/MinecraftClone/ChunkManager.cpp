@@ -192,6 +192,18 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 				m_deletedChunksQueue.pop();
 			}
 
+			if (!m_generatedChunkQueue.isEmpty())
+			{
+				GeneratedChunk& generatedChunk = m_generatedChunkQueue.front();
+				assert(generatedChunk.chunkFromPool.getObject());
+
+				m_chunks.emplace(std::piecewise_construct,
+					std::forward_as_tuple(generatedChunk.getPosition()),
+					std::forward_as_tuple(std::move(generatedChunk.chunkFromPool)));
+
+				m_generatedChunkQueue.pop();
+			}
+
 			if (!m_generatedChunkMeshesQueue.isEmpty())
 			{
 				GeneratedChunkMesh& generatedChunkMesh = m_generatedChunkMeshesQueue.front();
@@ -303,11 +315,8 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 			ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
 			if (chunkFromPool.getObject())
 			{
-				ObjectFromPool<Chunk>& addedChunk = m_chunks.emplace(std::piecewise_construct,
-					std::forward_as_tuple(chunkToAdd.startingPosition),
-					std::forward_as_tuple(std::move(chunkFromPool))).first->second;
-
-				addedChunk.getObject()->reuse(chunkToAdd.startingPosition);
+				chunkFromPool.getObject()->reuse(chunkToAdd.startingPosition);
+				m_generatedChunkQueue.add({ chunkToAdd.startingPosition, std::move(chunkFromPool) });
 
 				m_chunkMeshesToGenerateQueue.add({ chunkToAdd.startingPosition });
 			}
@@ -330,18 +339,17 @@ void ChunkManager::generateChunkMeshes()
 		auto rightChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Right));
 		auto forwardChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward));
 		auto backChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back));
-			
+		auto chunk = m_chunks.find(chunkStartingPosition);
+
 		if (leftChunk != m_chunks.cend() &&
 			rightChunk != m_chunks.cend() &&
 			forwardChunk != m_chunks.cend() &&
-			backChunk != m_chunks.cend())
+			backChunk != m_chunks.cend() && 
+			chunk != m_chunks.cend())
 		{
 			ObjectFromPool<VertexArray> vertexArrayFromPool = m_vertexArrayPool.getNextAvailableObject();
 			if (vertexArrayFromPool.getObject())
 			{
-				auto chunk = m_chunks.find(chunkStartingPosition);
-				assert(chunk != m_chunks.end());
-
 				generateChunkMesh(*vertexArrayFromPool.getObject(), *chunk->second.getObject(),
 					{ *leftChunk->second.getObject(), *rightChunk->second.getObject(), *forwardChunk->second.getObject(), *backChunk->second.getObject() });
 
