@@ -168,6 +168,50 @@ public:
 		m_container.erase(iter);
 	}
 
+	Object* remove(const Object* object)
+	{
+		assert(object);
+		auto iter = m_container.find(object->getPosition());
+		if (iter != m_container.end())
+		{
+			assert(m_initialObjectAdded && m_recentObjectAdded);
+			Object* previousObject = iter->second.previous;
+			Object* nextObject = iter->second.next;
+
+			//Top
+			if (!nextObject && previousObject)
+			{
+				m_recentObjectAdded = previousObject;
+				m_recentObjectAdded->next = nullptr;
+				previousObject->next = nullptr;
+			}
+			//Bottom
+			else if (!previousObject && nextObject)
+			{
+				m_initialObjectAdded = nextObject;
+				m_initialObjectAdded->previous = nullptr;
+				nextObject->previous = nullptr;
+			}
+			//Inbetween
+			else if (previousObject && nextObject)
+			{
+				previousObject->next = nextObject;
+				nextObject->previous = previousObject;
+			}
+			else
+			{
+				assert(m_container.size() == 1);
+				m_initialObjectAdded = nullptr;
+				m_recentObjectAdded = nullptr;
+			}
+
+			m_container.erase(iter);
+			return nextObject;
+		}
+
+		return nullptr;
+	}
+
 	Object* remove(const glm::ivec3& position)
 	{
 		auto iter = m_container.find(position);

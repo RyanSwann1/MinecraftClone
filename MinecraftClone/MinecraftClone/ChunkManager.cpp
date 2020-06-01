@@ -327,7 +327,7 @@ void ChunkManager::generateChunkMeshes()
 					{ *leftChunk->second.getObject(), *rightChunk->second.getObject(), *forwardChunk->second.getObject(), *backChunk->second.getObject() });
 
 				m_generatedChunkMeshesQueue.add({ chunkStartingPosition, std::move(vertexArrayFromPool) });
-				chunkMeshToGenerate = m_chunkMeshesToGenerateQueue.remove(chunkStartingPosition);
+				chunkMeshToGenerate = m_chunkMeshesToGenerateQueue.remove(chunkMeshToGenerate);
 			}
 			else
 			{
@@ -356,7 +356,7 @@ void ChunkManager::clearQueues(const glm::ivec3& playerPosition)
 			Rectangle AABB(centrePosition, 16);
 			if (!visibilityRect.contains(AABB))
 			{
-				chunkMeshToGenerate = m_chunkMeshesToGenerateQueue.remove(chunkMeshToGenerate->getPosition());
+				chunkMeshToGenerate = m_chunkMeshesToGenerateQueue.remove(chunkMeshToGenerate);
 			}
 			else
 			{
@@ -374,7 +374,7 @@ void ChunkManager::clearQueues(const glm::ivec3& playerPosition)
 			Rectangle AABB(centrePosition, 16);
 			if (!visibilityRect.contains(AABB))
 			{
-				generatedChunkMesh = m_generatedChunkMeshesQueue.remove(generatedChunkMesh->getPosition());
+				generatedChunkMesh = m_generatedChunkMeshesQueue.remove(generatedChunkMesh);
 			}
 			else
 			{
@@ -382,6 +382,4 @@ void ChunkManager::clearQueues(const glm::ivec3& playerPosition)
 			}
 		}
 	}
-
-
 }
