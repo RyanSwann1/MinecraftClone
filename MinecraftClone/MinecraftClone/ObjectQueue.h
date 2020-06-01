@@ -70,38 +70,44 @@ public:
 	void add(Object&& newObject)
 	{
 		glm::ivec3 position = newObject.position;
-		if (m_container.empty())
-		{
-			assert(!m_initialObjectAdded && !m_recentObjectAdded);
-			Object& addedObject = m_container.emplace(std::piecewise_construct,
-				std::forward_as_tuple(position),
-				std::forward_as_tuple(std::move(newObject))).first->second;
 
-			addedObject.previous = nullptr;
-			m_initialObjectAdded = &addedObject;
-			m_recentObjectAdded = &addedObject;
-		}
-		else if (m_container.size() == 1)
+		auto iter = m_container.find(position);
+		assert(iter == m_container.cend());
+		if (iter == m_container.cend())
 		{
-			assert(m_initialObjectAdded && m_recentObjectAdded);
-			Object& addedObject = m_container.emplace(std::piecewise_construct,
-				std::forward_as_tuple(position),
-				std::forward_as_tuple(std::move(newObject))).first->second;
+			if (m_container.empty())
+			{
+				assert(!m_initialObjectAdded && !m_recentObjectAdded);
+				Object& addedObject = m_container.emplace(std::piecewise_construct,
+					std::forward_as_tuple(position),
+					std::forward_as_tuple(std::move(newObject))).first->second;
 
-			addedObject.previous = m_initialObjectAdded;
-			m_initialObjectAdded->next = &addedObject;
-			m_recentObjectAdded = &addedObject;
-		}
-		else if (m_container.size() > 1)
-		{
-			assert(m_initialObjectAdded && m_recentObjectAdded);
-			Object& addedObject = m_container.emplace(std::piecewise_construct,
-				std::forward_as_tuple(position),
-				std::forward_as_tuple(std::move(newObject))).first->second;
+				addedObject.previous = nullptr;
+				m_initialObjectAdded = &addedObject;
+				m_recentObjectAdded = &addedObject;
+			}
+			else if (m_container.size() == 1)
+			{
+				assert(m_initialObjectAdded && m_recentObjectAdded);
+				Object& addedObject = m_container.emplace(std::piecewise_construct,
+					std::forward_as_tuple(position),
+					std::forward_as_tuple(std::move(newObject))).first->second;
 
-			addedObject.previous = m_recentObjectAdded;
-			m_recentObjectAdded->next = &addedObject;
-			m_recentObjectAdded = &addedObject;
+				addedObject.previous = m_initialObjectAdded;
+				m_initialObjectAdded->next = &addedObject;
+				m_recentObjectAdded = &addedObject;
+			}
+			else if (m_container.size() > 1)
+			{
+				assert(m_initialObjectAdded && m_recentObjectAdded);
+				Object& addedObject = m_container.emplace(std::piecewise_construct,
+					std::forward_as_tuple(position),
+					std::forward_as_tuple(std::move(newObject))).first->second;
+
+				addedObject.previous = m_recentObjectAdded;
+				m_recentObjectAdded->next = &addedObject;
+				m_recentObjectAdded = &addedObject;
+			}
 		}
 	}
 
