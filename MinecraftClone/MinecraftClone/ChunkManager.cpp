@@ -125,6 +125,25 @@ GeneratedChunkMesh& GeneratedChunkMesh::operator=(GeneratedChunkMesh&& orig) noe
 	return *this;
 }
 
+//GeneratedChunk
+GeneratedChunk::GeneratedChunk(const glm::ivec3& position, ObjectFromPool<Chunk>&& chunkFromPool)
+	: ObjectQueueNode(position),
+	chunkFromPool(std::move(chunkFromPool))
+{}
+
+GeneratedChunk::GeneratedChunk(GeneratedChunk&& orig) noexcept
+	: ObjectQueueNode(std::move(orig)),
+	chunkFromPool(std::move(orig.chunkFromPool))
+{}
+
+GeneratedChunk& GeneratedChunk::operator=(GeneratedChunk&& orig) noexcept
+{
+	ObjectQueueNode::operator=(std::move(orig));
+	chunkFromPool = std::move(orig.chunkFromPool);
+
+	return *this;
+}
+
 //ChunkGenerator
 ChunkManager::ChunkManager(const glm::ivec3& playerPosition)
 	: m_chunkPool(getObjectPoolSize()),
@@ -152,7 +171,6 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 		generateChunkMeshes();
 		clearQueues(playerPosition);
 
-		//playerLock.lock(); 
 		std::lock_guard<std::mutex> renderingLock(renderingMutex); 
 		for (int i = 0; i < THREAD_TRANSFER_PER_FRAME; ++i)
 		{
@@ -163,6 +181,12 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 				if (VAO != m_VAOs.end())
 				{
 					m_VAOs.erase(VAO);
+				}
+
+				auto chunk = m_chunks.find(chunkStartingPosition);
+				if (chunk != m_chunks.end())
+				{
+					m_chunks.erase(chunk);
 				}
 
 				m_deletedChunksQueue.pop();
@@ -223,18 +247,13 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& re
 	getClosestMiddlePosition(startingPosition);
 	Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Utilities::VISIBILITY_DISTANCE);
 
-	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end();)
+	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end(); ++chunk)
 	{
 		const glm::ivec3& chunkStartingPosition = chunk->second.getObject()->getStartingPosition();
 		if (!m_deletedChunksQueue.contains(chunkStartingPosition) &&
 			!visibilityRect.contains(chunk->second.getObject()->getAABB()))
 		{
 			m_deletedChunksQueue.add({ chunkStartingPosition });
-			chunk = m_chunks.erase(chunk);
-		}
-		else
-		{
-			++chunk;
 		}
 	}
 }
@@ -343,6 +362,7 @@ void ChunkManager::generateChunkMeshes()
 
 void ChunkManager::clearQueues(const glm::ivec3& playerPosition)
 {
+	//Clears queues that are out of bounds of Player AABB
 	glm::ivec3 startingPosition(playerPosition);
 	getClosestMiddlePosition(startingPosition);
 	Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Utilities::VISIBILITY_DISTANCE);

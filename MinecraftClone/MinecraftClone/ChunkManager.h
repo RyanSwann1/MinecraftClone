@@ -60,8 +60,16 @@ struct GeneratedChunkMesh : public ObjectQueueNode<GeneratedChunkMesh>
 	ObjectFromPool<VertexArray> vertexArrayFromPool;
 };
 
+struct GeneratedChunk : public ObjectQueueNode<GeneratedChunk>
+{
+	GeneratedChunk(const glm::ivec3& position, ObjectFromPool<Chunk>&& chunkFromPool);
+	GeneratedChunk(GeneratedChunk&&) noexcept;
+	GeneratedChunk& operator=(GeneratedChunk&&) noexcept;
+
+	ObjectFromPool<Chunk> chunkFromPool;
+};
+
 class Player;
-struct BoundingBox;
 struct Frustum;
 class VertexArray;
 class ChunkManager : private NonCopyable, private NonMovable
