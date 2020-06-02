@@ -297,7 +297,8 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend() && 
 				m_chunkMeshes.find(chunkStartingPosition) == m_chunkMeshes.cend() && 
 				!m_chunkMeshesToGenerateQueue.contains(chunkStartingPosition) &&
-				!m_generatedChunkMeshesQueue.contains(chunkStartingPosition))
+				!m_generatedChunkMeshesQueue.contains(chunkStartingPosition) && 
+				!m_generatedChunkQueue.contains(chunkStartingPosition))
 			{
 				chunksToAdd.emplace_back(getSqrMagnitude(chunkStartingPosition, playerPosition), chunkStartingPosition);
 			}
