@@ -4,4 +4,4 @@ class Chunk;
 struct VertexArray;
 struct NeighbouringChunks;
 
-void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks);
+void generateChunkMesh(VertexArray& chunkMesh, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks);
