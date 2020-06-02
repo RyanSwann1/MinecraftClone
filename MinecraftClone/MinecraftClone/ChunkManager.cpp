@@ -107,20 +107,20 @@ NeighbouringChunks::NeighbouringChunks(const Chunk& leftChunk, const Chunk& righ
 {}
 
 //GeneratedChunkMesh
-GeneratedChunkMesh::GeneratedChunkMesh(const glm::ivec3& position, ObjectFromPool<VertexArray>&& vertexArrayFromPool)
+GeneratedChunkMesh::GeneratedChunkMesh(const glm::ivec3& position, ObjectFromPool<VertexArray>&& chunkMeshFromPool)
 	: ObjectQueueNode(position),
-	vertexArrayFromPool(std::move(vertexArrayFromPool))
+	chunkMeshFromPool(std::move(chunkMeshFromPool))
 {}
 
 GeneratedChunkMesh::GeneratedChunkMesh(GeneratedChunkMesh&& orig) noexcept
 	: ObjectQueueNode(std::move(orig)),
-	vertexArrayFromPool(std::move(orig.vertexArrayFromPool))
+	chunkMeshFromPool(std::move(orig.chunkMeshFromPool))
 {}
 
 GeneratedChunkMesh& GeneratedChunkMesh::operator=(GeneratedChunkMesh&& orig) noexcept
 {
 	ObjectQueueNode::operator=(std::move(orig));
-	vertexArrayFromPool = std::move(orig.vertexArrayFromPool);
+	chunkMeshFromPool = std::move(orig.chunkMeshFromPool);
 	
 	return *this;
 }
@@ -147,7 +147,7 @@ GeneratedChunk& GeneratedChunk::operator=(GeneratedChunk&& orig) noexcept
 //ChunkGenerator
 ChunkManager::ChunkManager(const glm::ivec3& playerPosition)
 	: m_chunkPool(getObjectPoolSize()),
-	m_vertexArrayPool(getObjectPoolSize()),
+	m_chunkMeshPool(getObjectPoolSize()),
 	m_chunks(),
 	m_chunkMeshes(),
 	m_chunkMeshesToGenerateQueue(),
@@ -208,11 +208,11 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 			if (!m_generatedChunkMeshesQueue.isEmpty())
 			{
 				GeneratedChunkMesh& generatedChunkMesh = m_generatedChunkMeshesQueue.front();
-				assert(generatedChunkMesh.vertexArrayFromPool.getObject());
+				assert(generatedChunkMesh.chunkMeshFromPool.getObject());
 
 				m_chunkMeshes.emplace(std::piecewise_construct,
 					std::forward_as_tuple(generatedChunkMesh.getPosition()),
-					std::forward_as_tuple(std::move(generatedChunkMesh.vertexArrayFromPool)));
+					std::forward_as_tuple(std::move(generatedChunkMesh.chunkMeshFromPool)));
 
 				m_generatedChunkMeshesQueue.pop();
 			}
@@ -348,13 +348,13 @@ void ChunkManager::generateChunkMeshes()
 			backChunk != m_chunks.cend() && 
 			chunk != m_chunks.cend())
 		{
-			ObjectFromPool<VertexArray> vertexArrayFromPool = m_vertexArrayPool.getNextAvailableObject();
-			if (vertexArrayFromPool.getObject())
+			ObjectFromPool<VertexArray> chunkMeshFromPool = m_chunkMeshPool.getNextAvailableObject();
+			if (chunkMeshFromPool.getObject())
 			{
-				generateChunkMesh(*vertexArrayFromPool.getObject(), *chunk->second.getObject(),
+				generateChunkMesh(*chunkMeshFromPool.getObject(), *chunk->second.getObject(),
 					{ *leftChunk->second.getObject(), *rightChunk->second.getObject(), *forwardChunk->second.getObject(), *backChunk->second.getObject() });
 
-				m_generatedChunkMeshesQueue.add({ chunkStartingPosition, std::move(vertexArrayFromPool) });
+				m_generatedChunkMeshesQueue.add({ chunkStartingPosition, std::move(chunkMeshFromPool) });
 				chunkMeshToGenerate = m_chunkMeshesToGenerateQueue.remove(chunkMeshToGenerate);
 			}
 			else
