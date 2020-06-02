@@ -125,11 +125,11 @@ namespace
 	constexpr std::array<glm::ivec3, 4> SECOND_DIAGONAL_FACE = { glm::ivec3(0, 0, 1), glm::ivec3(1, 0, 0), glm::ivec3(1, 1, 0), glm::ivec3(0, 1, 1) };
 }
 
-void generateOuterChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks);
-void generateInnerChunkMesh(VertexArray& vertexArray, const Chunk& chunk);
-void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType, VertexArray& vertexArray);
+void generateOuterChunkMesh(VertexArray& chunkMesh, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks);
+void generateInnerChunkMesh(VertexArray& chunkMesh, const Chunk& chunk);
+void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType, VertexArray& chunkMesh);
 void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks,
-	eCubeType cubeType, VertexArray& vertexArray);
+	eCubeType cubeType, VertexArray& chunkMesh);
 void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition,
 	bool transparent, bool shadow = false);
 void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const glm::ivec3& cubePosition,
@@ -138,23 +138,23 @@ void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const g
 bool isFacingTransparentCube(const glm::ivec3& cubePosition, const Chunk& chunk);
 bool isFacingOpaqueCube(const glm::ivec3& cubePosition, const Chunk& chunk);
 
-void generateChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks)
+void generateChunkMesh(VertexArray& chunkMesh, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks)
 {
-	generateInnerChunkMesh(vertexArray, chunk);
-	generateOuterChunkMesh(vertexArray, chunk, neighbouringChunks);
+	generateInnerChunkMesh(chunkMesh, chunk);
+	generateOuterChunkMesh(chunkMesh, chunk, neighbouringChunks);
 
-	if (!vertexArray.m_opaqueVertexBuffer.indicies.empty())
+	if (!chunkMesh.m_opaqueVertexBuffer.indicies.empty())
 	{
-		vertexArray.m_opaqueVertexBuffer.bindToVAO = true;
+		chunkMesh.m_opaqueVertexBuffer.bindToVAO = true;
 	}
 
-	if (!vertexArray.m_transparentVertexBuffer.indicies.empty())
+	if (!chunkMesh.m_transparentVertexBuffer.indicies.empty())
 	{
-		vertexArray.m_transparentVertexBuffer.bindToVAO = true;
+		chunkMesh.m_transparentVertexBuffer.bindToVAO = true;
 	}
 }
 
-void generateOuterChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks)
+void generateOuterChunkMesh(VertexArray& chunkMesh, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks)
 {
 	const glm::ivec3& chunkStartingPosition = chunk.getStartingPosition();
 	const glm::ivec3& chunkEndingPosition = chunk.getEndingPosition();
@@ -167,7 +167,7 @@ void generateOuterChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const 
 			eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck({ chunkStartingPosition.x, y, z }));
 			if (cubeType != eCubeType::Air)
 			{
-				generateChunkOuterCubeMesh({ chunkStartingPosition.x, y, z }, chunk, neighbouringChunks, cubeType, vertexArray);
+				generateChunkOuterCubeMesh({ chunkStartingPosition.x, y, z }, chunk, neighbouringChunks, cubeType, chunkMesh);
 			}
 		}
 	}
@@ -180,7 +180,7 @@ void generateOuterChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const 
 
 			if (cubeType != eCubeType::Air)
 			{
-				generateChunkOuterCubeMesh({ chunkEndingPosition.x - 1, y, z }, chunk, neighbouringChunks, cubeType, vertexArray);
+				generateChunkOuterCubeMesh({ chunkEndingPosition.x - 1, y, z }, chunk, neighbouringChunks, cubeType, chunkMesh);
 			}
 		}
 	}
@@ -194,7 +194,7 @@ void generateOuterChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const 
 
 			if (cubeType != eCubeType::Air)
 			{
-				generateChunkOuterCubeMesh({ x, y, chunkStartingPosition.z }, chunk, neighbouringChunks, cubeType, vertexArray);
+				generateChunkOuterCubeMesh({ x, y, chunkStartingPosition.z }, chunk, neighbouringChunks, cubeType, chunkMesh);
 			}
 		}
 	}
@@ -207,13 +207,13 @@ void generateOuterChunkMesh(VertexArray& vertexArray, const Chunk& chunk, const 
 
 			if (cubeType != eCubeType::Air)
 			{
-				generateChunkOuterCubeMesh({ x, y, chunkEndingPosition.z - 1 }, chunk, neighbouringChunks, cubeType, vertexArray);
+				generateChunkOuterCubeMesh({ x, y, chunkEndingPosition.z - 1 }, chunk, neighbouringChunks, cubeType, chunkMesh);
 			}
 		}
 	}
 }
 
-void generateInnerChunkMesh(VertexArray& vertexArray, const Chunk& chunk)
+void generateInnerChunkMesh(VertexArray& chunkMesh, const Chunk& chunk)
 {
 	const glm::ivec3& chunkStartingPosition = chunk.getStartingPosition();
 	const glm::ivec3& chunkEndingPosition = chunk.getEndingPosition();
@@ -228,54 +228,54 @@ void generateInnerChunkMesh(VertexArray& vertexArray, const Chunk& chunk)
 				eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(position));
 				if (cubeType != eCubeType::Air)
 				{
-					generateChunkInnerCubeMesh(position, chunk, cubeType, vertexArray);
+					generateChunkInnerCubeMesh(position, chunk, cubeType, chunkMesh);
 				}
 			}
 		}
 	}
 }
 
-void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType, VertexArray& vertexArray)
+void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType, VertexArray& chunkMesh)
 {
 	assert(chunk.isPositionInBounds(position));
 
 	switch (cubeType)
 	{
 	case eCubeType::Water:
-		addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
+		addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
 		break;
 	case eCubeType::Leaves:
 		if (isFacingOpaqueCube({ position.x - 1, position.y, position.z }, chunk))
 		{
-			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
+			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
 		}
 
 		if (isFacingOpaqueCube({ position.x + 1, position.y, position.z }, chunk))
 		{
-			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
+			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
 		}
 
 		if (isFacingOpaqueCube({ position.x, position.y, position.z + 1 }, chunk))
 		{
-			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
+			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
 		}
 
 		if (isFacingOpaqueCube({ position.x, position.y, position.z - 1 }, chunk))
 		{
-			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
+			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
 		}
 
 		//Top Face
 		if (position.y == Utilities::CHUNK_HEIGHT - 1 ||
 			isFacingOpaqueCube({ position.x, position.y + 1, position.z }, chunk))
 		{
-			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
+			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
 		}
 
 		//Bottom Face
 		if (isFacingOpaqueCube({ position.x, position.y - 1, position.z }, chunk))
 		{
-			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Bottom, position, true);
+			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Bottom, position, true);
 		}
 		break;
 	case eCubeType::TallGrass:
@@ -283,8 +283,8 @@ void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 	{
 		bool shadow = chunk.isCubeBelowCovering(position);
 
-		addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, FIRST_DIAGONAL_FACE, shadow);
-		addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, SECOND_DIAGONAL_FACE, shadow);
+		addDiagonalCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, position, FIRST_DIAGONAL_FACE, shadow);
+		addDiagonalCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, position, SECOND_DIAGONAL_FACE, shadow);
 	}
 
 		break;
@@ -294,48 +294,48 @@ void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 
 		if (isFacingTransparentCube({ position.x - 1, position.y, position.z }, chunk))
 		{
-			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false, shadow);
+			addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false, shadow);
 		}
 
 		if (isFacingTransparentCube({ position.x + 1, position.y, position.z }, chunk))
 		{
-			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, false, shadow);
+			addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, false, shadow);
 		}
 
 		if (isFacingTransparentCube({ position.x, position.y, position.z + 1 }, chunk))
 		{
-			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false, shadow);
+			addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false, shadow);
 		}
 
 		if (isFacingTransparentCube({ position.x, position.y, position.z - 1 }, chunk))
 		{
-			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
+			addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
 		}
 
 		if (cubeType == eCubeType::LogTop)
 		{
-			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
+			addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
 		}
 		else
 		{
 			if (position.y == Utilities::CHUNK_HEIGHT - 1 ||
 				isFacingTransparentCube({ position.x, position.y + 1, position.z }, chunk))
 			{
-				addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
+				addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
 			}
 		}
 	}
 	}
 }
 
-void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks, eCubeType cubeType, VertexArray& vertexArray)
+void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks, eCubeType cubeType, VertexArray& chunkMesh)
 {
 	assert(chunk.isPositionInBounds(position));
 
 	switch (cubeType)
 	{
 	case eCubeType::Water:
-		addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
+		addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
 		break;
 	case eCubeType::Leaves:
 	{
@@ -345,12 +345,12 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		{
 			if (isFacingOpaqueCube(leftPosition, chunk))
 			{
-				addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
+				addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
 			}
 		}
 		else if (isFacingOpaqueCube(leftPosition, neighbouringChunks.leftChunk))
 		{
-			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
+			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
 		}
 
 		//Right Face
@@ -359,12 +359,12 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		{
 			if (isFacingOpaqueCube(rightPosition, chunk))
 			{
-				addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
+				addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
 			}
 		}
 		else if (isFacingOpaqueCube(rightPosition, neighbouringChunks.rightChunk))
 		{
-			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
+			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
 		}
 
 		//Forward Face
@@ -373,12 +373,12 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		{
 			if (isFacingOpaqueCube(forwardPosition, chunk))
 			{
-				addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
+				addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
 			}
 		}
 		else if (isFacingOpaqueCube(forwardPosition, neighbouringChunks.forwardChunk))
 		{
-			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
+			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
 		}
 
 		//Back Face
@@ -387,12 +387,12 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		{
 			if (isFacingOpaqueCube(backPosition, chunk))
 			{
-				addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
+				addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
 			}
 		}
 		else if (isFacingOpaqueCube(backPosition, neighbouringChunks.backChunk))
 		{
-			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
+			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
 		}
 
 
@@ -400,13 +400,13 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		if (position.y == Utilities::CHUNK_HEIGHT - 1 ||
 			isFacingOpaqueCube({ position.x, position.y + 1, position.z }, chunk))
 		{
-			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
+			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
 		}
 
 		//Bottom Face
 		if (isFacingOpaqueCube({ position.x, position.y - 1, position.z }, chunk))
 		{
-			addCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, eCubeSide::Bottom, position, true);
+			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Bottom, position, true);
 		}
 	}
 		break;
@@ -415,8 +415,8 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 	{
 		bool shadow = chunk.isCubeBelowCovering(position);
 
-		addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, FIRST_DIAGONAL_FACE, shadow);
-		addDiagonalCubeFace(vertexArray.m_transparentVertexBuffer, cubeType, position, SECOND_DIAGONAL_FACE, shadow);
+		addDiagonalCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, position, FIRST_DIAGONAL_FACE, shadow);
+		addDiagonalCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, position, SECOND_DIAGONAL_FACE, shadow);
 	}
 
 		break;
@@ -430,12 +430,12 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		{
 			if (isFacingTransparentCube(leftPosition, chunk))
 			{
-				addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false, shadow);
+				addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false, shadow);
 			}
 		}
 		else if (isFacingTransparentCube(leftPosition, neighbouringChunks.leftChunk))
 		{
-			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false, shadow);
+			addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false, shadow);
 		}
 
 		//Right Face
@@ -444,12 +444,12 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		{
 			if (isFacingTransparentCube(rightPosition, chunk))
 			{
-				addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, false, shadow);
+				addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, false, shadow);
 			}
 		}
 		else if (isFacingTransparentCube(rightPosition, neighbouringChunks.rightChunk))
 		{
-			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, false, shadow);
+			addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, false, shadow);
 		}
 
 		//Forward Face
@@ -458,12 +458,12 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		{
 			if (isFacingTransparentCube(forwardPosition, chunk))
 			{
-				addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false, shadow);
+				addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false, shadow);
 			}
 		}
 		else if (isFacingTransparentCube(forwardPosition, neighbouringChunks.forwardChunk))
 		{
-			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false, shadow);
+			addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false, shadow);
 		}
 
 		//Back Face
@@ -472,17 +472,17 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		{
 			if (isFacingTransparentCube(backPosition, chunk))
 			{
-				addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
+				addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
 			}
 		}
 		else if (isFacingTransparentCube(backPosition, neighbouringChunks.backChunk))
 		{
-			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
+			addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
 		}
 
 		if (cubeType == eCubeType::LogTop)
 		{
-			addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
+			addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
 		}
 		else
 		{
@@ -490,7 +490,7 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 			if (position.y == Utilities::CHUNK_HEIGHT - 1 ||
 				isFacingTransparentCube({ position.x, position.y + 1, position.z }, chunk))
 			{
-				addCubeFace(vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
+				addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
 			}
 		}
 	}

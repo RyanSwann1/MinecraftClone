@@ -149,10 +149,11 @@ ChunkManager::ChunkManager(const glm::ivec3& playerPosition)
 	: m_chunkPool(getObjectPoolSize()),
 	m_vertexArrayPool(getObjectPoolSize()),
 	m_chunks(),
-	m_VAOs(),
+	m_chunkMeshes(),
 	m_chunkMeshesToGenerateQueue(),
 	m_deletedChunksQueue(),
-	m_generatedChunkMeshesQueue()
+	m_generatedChunkMeshesQueue(),
+	m_generatedChunkQueue()
 {
 	addChunks(playerPosition);
 }
@@ -177,10 +178,10 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 			if (!m_deletedChunksQueue.isEmpty())
 			{
 				const glm::ivec3& chunkStartingPosition = m_deletedChunksQueue.front().getPosition();
-				auto VAO = m_VAOs.find(chunkStartingPosition);
-				if (VAO != m_VAOs.end())
+				auto chunkMesh = m_chunkMeshes.find(chunkStartingPosition);
+				if (chunkMesh != m_chunkMeshes.end())
 				{
-					m_VAOs.erase(VAO);
+					m_chunkMeshes.erase(chunkMesh);
 				}
 
 				auto chunk = m_chunks.find(chunkStartingPosition);
@@ -209,7 +210,7 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 				GeneratedChunkMesh& generatedChunkMesh = m_generatedChunkMeshesQueue.front();
 				assert(generatedChunkMesh.vertexArrayFromPool.getObject());
 
-				m_VAOs.emplace(std::piecewise_construct,
+				m_chunkMeshes.emplace(std::piecewise_construct,
 					std::forward_as_tuple(generatedChunkMesh.getPosition()),
 					std::forward_as_tuple(std::move(generatedChunkMesh.vertexArrayFromPool)));
 
@@ -221,34 +222,34 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 
 void ChunkManager::renderOpaque(const Frustum& frustum) const
 {
-	for (const auto& VAO : m_VAOs)
+	for (const auto& chunkMesh : m_chunkMeshes)
 	{
-		if (VAO.second.getObject()->m_opaqueVertexBuffer.bindToVAO)
+		if (chunkMesh.second.getObject()->m_opaqueVertexBuffer.bindToVAO)
 		{
-			VAO.second.getObject()->attachOpaqueVBO();
+			chunkMesh.second.getObject()->attachOpaqueVBO();
 		}
 
-		if (VAO.second.getObject()->m_opaqueVertexBuffer.displayable && frustum.isChunkInFustrum(VAO.first))
+		if (chunkMesh.second.getObject()->m_opaqueVertexBuffer.displayable && frustum.isChunkInFustrum(chunkMesh.first))
 		{
-			VAO.second.getObject()->bindOpaqueVAO();
-			glDrawElements(GL_TRIANGLES, VAO.second.getObject()->m_opaqueVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+			chunkMesh.second.getObject()->bindOpaqueVAO();
+			glDrawElements(GL_TRIANGLES, chunkMesh.second.getObject()->m_opaqueVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 		}
 	}
 }
 
 void ChunkManager::renderTransparent(const Frustum& frustum) const
 {
-	for (const auto& VAO : m_VAOs)
+	for (const auto& chunkMesh : m_chunkMeshes)
 	{
-		if (VAO.second.getObject()->m_transparentVertexBuffer.bindToVAO)
+		if (chunkMesh.second.getObject()->m_transparentVertexBuffer.bindToVAO)
 		{
-			VAO.second.getObject()->attachTransparentVBO();
+			chunkMesh.second.getObject()->attachTransparentVBO();
 		}
 
-		if (VAO.second.getObject()->m_transparentVertexBuffer.displayable && frustum.isChunkInFustrum(VAO.first))
+		if (chunkMesh.second.getObject()->m_transparentVertexBuffer.displayable && frustum.isChunkInFustrum(chunkMesh.first))
 		{
-			VAO.second.getObject()->bindTransparentVAO();
-			glDrawElements(GL_TRIANGLES, VAO.second.getObject()->m_transparentVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
+			chunkMesh.second.getObject()->bindTransparentVAO();
+			glDrawElements(GL_TRIANGLES, chunkMesh.second.getObject()->m_transparentVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 		}
 	}
 }
@@ -294,7 +295,7 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 			getClosestChunkStartingPosition(chunkStartingPosition);
 
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend() && 
-				m_VAOs.find(chunkStartingPosition) == m_VAOs.cend() && 
+				m_chunkMeshes.find(chunkStartingPosition) == m_chunkMeshes.cend() && 
 				!m_chunkMeshesToGenerateQueue.contains(chunkStartingPosition) &&
 				!m_generatedChunkMeshesQueue.contains(chunkStartingPosition))
 			{

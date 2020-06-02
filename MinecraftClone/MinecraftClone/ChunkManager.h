@@ -53,11 +53,11 @@ struct NeighbouringChunks : private NonCopyable, private NonMovable
 
 struct GeneratedChunkMesh : public ObjectQueueNode<GeneratedChunkMesh>
 {
-	GeneratedChunkMesh(const glm::ivec3& position, ObjectFromPool<VertexArray>&& vertexArrayFromPool);
+	GeneratedChunkMesh(const glm::ivec3& position, ObjectFromPool<VertexArray>&& chunkMeshFromPool);
 	GeneratedChunkMesh(GeneratedChunkMesh&&) noexcept;
 	GeneratedChunkMesh& operator=(GeneratedChunkMesh&&) noexcept;
 
-	ObjectFromPool<VertexArray> vertexArrayFromPool;
+	ObjectFromPool<VertexArray> chunkMeshFromPool;
 };
 
 struct GeneratedChunk : public ObjectQueueNode<GeneratedChunk>
@@ -84,9 +84,9 @@ public:
 
 private:
 	ObjectPool<Chunk> m_chunkPool;
-	ObjectPool<VertexArray> m_vertexArrayPool;
+	ObjectPool<VertexArray> m_chunkMeshPool;
 	std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>> m_chunks;
-	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_VAOs;
+	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_chunkMeshes;
 	ObjectQueue<PositionNode> m_chunkMeshesToGenerateQueue;
 	ObjectQueue<PositionNode> m_deletedChunksQueue;
 	ObjectQueue<GeneratedChunkMesh> m_generatedChunkMeshesQueue;
