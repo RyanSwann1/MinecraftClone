@@ -46,7 +46,7 @@ namespace
 			middlePosition.z += Utilities::CHUNK_DEPTH / 2;
 		}
 
-		return middlePosition;
+		return { middlePosition.x, 0, middlePosition.z };
 	}
 
 	glm::ivec3 getClosestChunkStartingPosition(const glm::ivec3& position)
@@ -71,7 +71,7 @@ namespace
 			closestChunkStartingPosition.z -= std::abs(position.z % Utilities::CHUNK_DEPTH);
 		}
 
-		return closestChunkStartingPosition;
+		return { closestChunkStartingPosition.x, 0, closestChunkStartingPosition.z };
 	}
 
 	glm::ivec3 getNeighbouringChunkPosition(const glm::ivec3& chunkStartingPosition, eDirection direction)
@@ -163,7 +163,20 @@ ChunkManager::ChunkManager(const glm::ivec3& playerPosition)
 	addChunks(playerPosition);
 }
 
-void ChunkManager::update(const Player& player, const sf::Window& window, std::atomic<bool>& resetGame, 
+bool ChunkManager::isCubeAtPosition(const glm::ivec3& position) const
+{
+	glm::ivec3 closestChunkStartingPosition = getClosestChunkStartingPosition(position);
+	auto chunk = m_chunks.find(closestChunkStartingPosition);
+	assert(chunk != m_chunks.cend());
+	if (chunk != m_chunks.cend())
+	{
+		return chunk->second.getObject()->isCubeAtPosition(position);
+	}
+
+	return false;
+}
+
+void ChunkManager::update(const Player& player, const sf::Window& window, std::atomic<bool>& resetGame,
 	std::mutex& playerMutex, std::mutex& renderingMutex)	
 {
 	while (!resetGame && window.isOpen())

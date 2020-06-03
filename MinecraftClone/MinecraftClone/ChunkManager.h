@@ -78,7 +78,7 @@ public:
 	ChunkManager(const glm::ivec3& playerPosition);
 
 	/*glm::vec3 resolveCollision(const glm::vec3& playerPosition) const;*/
-	bool isCubeAtPosition(const BoundingBox& playerAABB, const glm::ivec3& position) const;
+	bool isCubeAtPosition(const glm::ivec3& position) const;
 
 	void update(const Player& player, const sf::Window& window, std::atomic<bool>& resetGame, 
 		std::mutex& playerMutex, std::mutex& renderingMutex);
