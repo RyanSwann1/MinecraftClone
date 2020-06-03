@@ -104,6 +104,8 @@ public:
 	{	
 		if (!m_availableObjects.empty())
 		{
+			assert(!m_objectPool.empty());
+			
 			int ID = m_availableObjects.top();
 			m_availableObjects.pop();
 			assert(ID < m_objectPool.size());
