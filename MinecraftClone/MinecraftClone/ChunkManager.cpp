@@ -8,12 +8,11 @@
 #include "Frustum.h"
 #include "ChunkMeshGenerator.h"
 #include "BoundingBox.h"
-#include <iostream>
 #include <deque>
 
 namespace
 {
-	constexpr int THREAD_TRANSFER_PER_FRAME = 1;
+	constexpr int THREAD_TRANSFER_PER_FRAME = 8;
 
 	int getObjectPoolSize()
 	{
@@ -50,26 +49,29 @@ namespace
 		return middlePosition;
 	}
 
-	void getClosestChunkStartingPosition(glm::ivec3& position)
+	glm::ivec3 getClosestChunkStartingPosition(const glm::ivec3& position)
 	{
+		glm::ivec3 closestChunkStartingPosition = position;
 		if (position.x % Utilities::CHUNK_WIDTH < 0)
 		{
-			position.x += std::abs(position.x % Utilities::CHUNK_WIDTH);
-			position.x -= Utilities::CHUNK_WIDTH;
+			closestChunkStartingPosition.x += std::abs(position.x % Utilities::CHUNK_WIDTH);
+			closestChunkStartingPosition.x -= Utilities::CHUNK_WIDTH;
 		}
 		else if (position.x % Utilities::CHUNK_WIDTH > 0)
 		{
-			position.x -= std::abs(position.x % Utilities::CHUNK_WIDTH);
+			closestChunkStartingPosition.x -= std::abs(position.x % Utilities::CHUNK_WIDTH);
 		}
 		if (position.z % Utilities::CHUNK_DEPTH < 0)
 		{
-			position.z += std::abs(position.z % Utilities::CHUNK_DEPTH);
-			position.z -= Utilities::CHUNK_DEPTH;
+			closestChunkStartingPosition.z += std::abs(position.z % Utilities::CHUNK_DEPTH);
+			closestChunkStartingPosition.z -= Utilities::CHUNK_DEPTH;
 		}
 		else if (position.z % Utilities::CHUNK_DEPTH > 0)
 		{
-			position.z -= std::abs(position.z % Utilities::CHUNK_DEPTH);
+			closestChunkStartingPosition.z -= std::abs(position.z % Utilities::CHUNK_DEPTH);
 		}
+
+		return closestChunkStartingPosition;
 	}
 
 	glm::ivec3 getNeighbouringChunkPosition(const glm::ivec3& chunkStartingPosition, eDirection direction)
@@ -287,13 +289,12 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 
 	std::vector<ChunkToAdd> chunksToAdd;
 	glm::ivec3 startPosition = getClosestMiddlePosition(playerPosition);
+	startPosition = getClosestChunkStartingPosition(startPosition);
 	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z <= startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
 	{
 		for (int x = startPosition.x - Utilities::VISIBILITY_DISTANCE; x <= startPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
 		{
 			glm::ivec3 chunkStartingPosition(x, 0, z);
-			getClosestChunkStartingPosition(chunkStartingPosition);
-
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend() && 
 				m_chunkMeshes.find(chunkStartingPosition) == m_chunkMeshes.cend() && 
 				!m_chunkMeshesToGenerateQueue.contains(chunkStartingPosition) &&
