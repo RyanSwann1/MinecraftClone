@@ -91,7 +91,7 @@ private:
 	std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>> m_chunks;
 	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_chunkMeshes;
 	ObjectQueue<PositionNode> m_chunkMeshesToGenerateQueue;
-	ObjectQueue<PositionNode> m_deletedChunksQueue;
+	ObjectQueue<PositionNode> m_deletionQueue;
 	ObjectQueue<GeneratedChunkMesh> m_generatedChunkMeshesQueue;
 	ObjectQueue<GeneratedChunk> m_generatedChunkQueue;
 
