@@ -43,7 +43,6 @@ private:
 	Camera m_camera;
 	glm::vec3 m_position;
 	glm::vec3 m_velocity;
-	float m_movementSpeed;
 	bool m_flying;
 	bool m_applyGravity;
 

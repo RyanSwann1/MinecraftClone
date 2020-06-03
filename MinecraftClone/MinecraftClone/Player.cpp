@@ -1,6 +1,7 @@
 #include "Player.h"
 #include <SFML/Graphics.hpp>
 #include "ChunkManager.h"
+#include <cmath>
 
 namespace 
 {
@@ -10,6 +11,7 @@ namespace
 	constexpr glm::vec3 MAX_VELOCITY = { 50.f, 50.0f, 50.0 };
 	constexpr float VELOCITY_DROPOFF = 0.9f;
 	constexpr float GRAVITY_AMOUNT = 0.025f;
+	constexpr float HEAD_HEIGHT = 1.5f;
 }
 
 //Camera
@@ -55,7 +57,6 @@ Player::Player()
 	: m_camera(),
 	m_position(STARTING_PLAYER_POSITION),
 	m_velocity(),
-	m_movementSpeed(WALKING_MOVEMENT_SPEED),
 	m_flying(false),
 	m_applyGravity(true)
 {}
@@ -89,9 +90,9 @@ void Player::moveCamera(const sf::Window& window)
 void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager)
 {
 	move(deltaTime);
-	handleCollisions(chunkManager);
-
+	
 	std::lock_guard<std::mutex> playerLock(playerMutex);
+	handleCollisions(chunkManager);
 	m_position += m_velocity;
 	m_velocity *= VELOCITY_DROPOFF;
 }
@@ -123,11 +124,11 @@ void Player::move(float deltaTime)
 		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y - 90)) * movementSpeed * deltaTime;
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && m_flying)
 	{
 		m_velocity.y += movementSpeed * deltaTime;
 	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) && m_flying)
 	{
 		m_velocity.y -= movementSpeed * deltaTime;
 	}
@@ -138,12 +139,20 @@ void Player::move(float deltaTime)
 	}
 }
 
+//https://sites.google.com/site/letsmakeavoxelengine/home/collision-detection
 void Player::handleCollisions(const ChunkManager& chunkManager)
 {
-	if (!m_flying)
+	if (m_flying)
 	{
-		glm::vec3 newPosition(glm::vec3(m_position.x, m_position.y - 1.5f, m_position.z) + glm::vec3(0, -GRAVITY_AMOUNT, 0));
-		if (chunkManager.isCubeAtPosition(newPosition))
+		if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT + m_velocity.y), std::floor(m_position.z) }) &&
+			!sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		{
+			m_velocity.y = 0;
+		}
+	}
+	else
+	{
+		if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT - GRAVITY_AMOUNT), std::floor(m_position.z) }))
 		{
 			m_applyGravity = false;
 			m_velocity.y = 0;
@@ -153,12 +162,30 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			m_applyGravity = true;
 		}
 	}
-	else
+
+	if (m_velocity.x > 0 &&
+		chunkManager.isCubeAtPosition({ std::floor(m_position.x + WALKING_MOVEMENT_SPEED), std::floor(m_position.y - 0.75f), std::floor(m_position.z) }))
 	{
-		glm::vec3 newPosition(glm::vec3(m_position.x, m_position.y - 1.5f, m_position.z) + m_velocity);
-		if (chunkManager.isCubeAtPosition(newPosition))
-		{
-			m_velocity.y = 0;
-		}
+		m_position.y += 2;
+		m_position.x += 0.5f;
+	}
+	else if (m_velocity.x < 0 &&
+		chunkManager.isCubeAtPosition({ std::floor(m_position.x - WALKING_MOVEMENT_SPEED), std::floor(m_position.y - 0.75f), std::floor(m_position.z) }))
+	{
+		m_position.y += 2;
+		m_position.x -= 0.5f;
+	}
+
+	if (m_velocity.z > 0 &&
+		chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 0.75f), std::floor(m_position.z + WALKING_MOVEMENT_SPEED) }))
+	{
+		m_position.y += 2;
+		m_position.z += 0.5f;
+	}
+	else if (m_velocity.z < 0 &&
+		chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 0.75f), std::floor(m_position.z - WALKING_MOVEMENT_SPEED) }))
+	{
+		m_position.y += 2;
+		m_position.z -= 0.5f;
 	}
 }
