@@ -35,6 +35,7 @@ public:
 	const glm::ivec3& getStartingPosition() const;
 	const glm::ivec3& getEndingPosition() const;
 	char getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const;
+	bool isCubeAtPosition(const glm::ivec3& position) const;
 	
 	void reset();
 	void reuse(const glm::ivec3& startingPosition);

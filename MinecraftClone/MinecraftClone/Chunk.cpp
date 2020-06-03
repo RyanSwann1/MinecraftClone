@@ -146,6 +146,17 @@ char Chunk::getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const
 	return m_chunk[converTo1D(positionOnGrid)];
 }
 
+bool Chunk::isCubeAtPosition(const glm::ivec3& position) const
+{
+	if (isPositionInBounds(position))
+	{
+		return m_chunk[converTo1D({ position.x - m_startingPosition.x, position.y - m_startingPosition.y,
+			position.z - m_startingPosition.z })] != static_cast<char>(eCubeType::Air);
+	}
+
+	return false;
+}
+
 void Chunk::changeCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType)
 {
 	assert(isPositionInLocalBounds(position));
