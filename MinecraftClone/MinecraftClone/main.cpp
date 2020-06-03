@@ -139,11 +139,15 @@ int main()
 			{
 				window.close();
 			}
-			if (currentSFMLEvent.KeyPressed)
+			if (currentSFMLEvent.type == sf::Event::KeyPressed)
 			{
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
 				{
 					resetGame = true;
+				}
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+				{
+					player.toggleFlying();
 				}
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 				{
@@ -156,7 +160,8 @@ int main()
 			}
 		}
 
-		player.update(deltaTime, playerMutex);
+		assert(chunkManager);
+		player.update(deltaTime, playerMutex, *chunkManager.get());
 
 		if (resetGame)
 		{

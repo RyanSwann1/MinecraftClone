@@ -1,17 +1,20 @@
 #include "Player.h"
 #include <SFML/Graphics.hpp>
+#include "ChunkManager.h"
 
 namespace 
 {
 	constexpr glm::vec3 STARTING_PLAYER_POSITION{ 0.0f, 100.0f, 0.0f };
-	constexpr float WALKING_MOVEMENT_SPEED = 15.75f;
+	constexpr float WALKING_MOVEMENT_SPEED = 0.75f;
+	constexpr float FLYING_MOVEMENT_SPEED = 5.0f;
 	constexpr glm::vec3 MAX_VELOCITY = { 50.f, 50.0f, 50.0 };
 	constexpr float VELOCITY_DROPOFF = 0.9f;
+	constexpr float GRAVITY_AMOUNT = 0.025f;
 }
 
 //Camera
 Camera::Camera()
-	: FOV(45.0f),
+	: FOV(50.0f),
 	sensitivity(0.1f),
 	nearPlaneDistance(0.1f),
 	farPlaneDistance(1750.f),
@@ -52,7 +55,9 @@ Player::Player()
 	: m_camera(),
 	m_position(STARTING_PLAYER_POSITION),
 	m_velocity(),
-	m_movementSpeed(WALKING_MOVEMENT_SPEED)
+	m_movementSpeed(WALKING_MOVEMENT_SPEED),
+	m_flying(false),
+	m_applyGravity(true)
 {}
 
 const glm::vec3& Player::getPosition() const
@@ -65,6 +70,12 @@ const Camera& Player::getCamera() const
 	return m_camera;
 }
 
+void Player::toggleFlying()
+{
+	m_flying = !m_flying;
+	m_applyGravity = !m_applyGravity;
+}
+
 void Player::reset()
 {
 	m_position = STARTING_PLAYER_POSITION;
@@ -75,9 +86,10 @@ void Player::moveCamera(const sf::Window& window)
 	m_camera.move(window);
 }
 
-void Player::update(float deltaTime, std::mutex& playerMutex)
+void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager)
 {
 	move(deltaTime);
+	handleCollisions(chunkManager);
 
 	std::lock_guard<std::mutex> playerLock(playerMutex);
 	m_position += m_velocity;
@@ -86,34 +98,67 @@ void Player::update(float deltaTime, std::mutex& playerMutex)
 
 void Player::move(float deltaTime)
 {
+	float movementSpeed = 0.0f;
+	(m_flying ? movementSpeed = FLYING_MOVEMENT_SPEED : movementSpeed = WALKING_MOVEMENT_SPEED);
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * m_movementSpeed * deltaTime;
-		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * m_movementSpeed * deltaTime;
+		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * movementSpeed * deltaTime;
+		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * movementSpeed * deltaTime;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
-		m_velocity.x -= glm::cos(glm::radians(m_camera.rotation.y)) * m_movementSpeed * deltaTime;
-		m_velocity.z -= glm::sin(glm::radians(m_camera.rotation.y)) * m_movementSpeed * deltaTime;
+		m_velocity.x -= glm::cos(glm::radians(m_camera.rotation.y)) * movementSpeed * deltaTime;
+		m_velocity.z -= glm::sin(glm::radians(m_camera.rotation.y)) * movementSpeed * deltaTime;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y + 90)) * m_movementSpeed * deltaTime;
-		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y + 90)) * m_movementSpeed * deltaTime;
+		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y + 90)) * movementSpeed * deltaTime;
+		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y + 90)) * movementSpeed * deltaTime;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y - 90)) * m_movementSpeed * deltaTime;
-		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y - 90)) * m_movementSpeed * deltaTime;
+		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y - 90)) * movementSpeed * deltaTime;
+		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y - 90)) * movementSpeed * deltaTime;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 	{
-		m_velocity.y += m_movementSpeed * deltaTime;
+		m_velocity.y += movementSpeed * deltaTime;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
 	{
-		m_velocity.y -= m_movementSpeed * deltaTime;
+		m_velocity.y -= movementSpeed * deltaTime;
+	}
+
+	if (m_applyGravity && !m_flying)
+	{
+		m_velocity.y -= GRAVITY_AMOUNT;
+	}
+}
+
+void Player::handleCollisions(const ChunkManager& chunkManager)
+{
+	if (!m_flying)
+	{
+		glm::vec3 newPosition(glm::vec3(m_position.x, m_position.y - 1.5f, m_position.z) + glm::vec3(0, -GRAVITY_AMOUNT, 0));
+		if (chunkManager.isCubeAtPosition(newPosition))
+		{
+			m_applyGravity = false;
+			m_velocity.y = 0;
+		}
+		else
+		{
+			m_applyGravity = true;
+		}
+	}
+	else
+	{
+		glm::vec3 newPosition(glm::vec3(m_position.x, m_position.y - 1.5f, m_position.z) + m_velocity);
+		if (chunkManager.isCubeAtPosition(newPosition))
+		{
+			m_velocity.y = 0;
+		}
 	}
 }
