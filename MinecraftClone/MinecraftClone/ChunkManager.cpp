@@ -23,28 +23,31 @@ namespace
 		return x * z;
 	}
 
-	void getClosestMiddlePosition(glm::ivec3& position)
+	glm::ivec3 getClosestMiddlePosition(const glm::ivec3& position)
 	{
+		glm::ivec3 middlePosition = position;
 		if (position.x % (Utilities::CHUNK_WIDTH / 2) < 0)
 		{
-			position.x += std::abs(position.x % Utilities::CHUNK_WIDTH / 2);
-			position.x -= Utilities::CHUNK_WIDTH / 2;
+			middlePosition.x += std::abs(position.x % Utilities::CHUNK_WIDTH / 2);
+			middlePosition.x -= Utilities::CHUNK_WIDTH / 2;
 		}
 		else if (position.x % (Utilities::CHUNK_WIDTH / 2) > 0)
 		{
-			position.x -= std::abs(position.x % Utilities::CHUNK_WIDTH / 2);
-			position.x += Utilities::CHUNK_WIDTH / 2;
+			middlePosition.x -= std::abs(position.x % Utilities::CHUNK_WIDTH / 2);
+			middlePosition.x += Utilities::CHUNK_WIDTH / 2;
 		}
 		if (position.z % (Utilities::CHUNK_DEPTH / 2) < 0)
 		{
-			position.z += std::abs(position.z % Utilities::CHUNK_DEPTH / 2);
-			position.z -= Utilities::CHUNK_DEPTH / 2;
+			middlePosition.z += std::abs(position.z % Utilities::CHUNK_DEPTH / 2);
+			middlePosition.z -= Utilities::CHUNK_DEPTH / 2;
 		}
 		else if (position.z % (Utilities::CHUNK_DEPTH / 2) > 0)
 		{
-			position.z -= std::abs(position.z % Utilities::CHUNK_DEPTH / 2);
-			position.z += Utilities::CHUNK_DEPTH / 2;
+			middlePosition.z -= std::abs(position.z % Utilities::CHUNK_DEPTH / 2);
+			middlePosition.z += Utilities::CHUNK_DEPTH / 2;
 		}
+
+		return middlePosition;
 	}
 
 	void getClosestChunkStartingPosition(glm::ivec3& position)
@@ -256,10 +259,8 @@ void ChunkManager::renderTransparent(const Frustum& frustum) const
 
 void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex)
 {
-	glm::ivec3 startingPosition(playerPosition);
-	getClosestMiddlePosition(startingPosition);
+	glm::ivec3 startingPosition = getClosestMiddlePosition(playerPosition);
 	Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Utilities::VISIBILITY_DISTANCE);
-
 	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end(); ++chunk)
 	{
 		const glm::ivec3& chunkStartingPosition = chunk->second.getObject()->getStartingPosition();
@@ -285,8 +286,7 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 	};
 
 	std::vector<ChunkToAdd> chunksToAdd;
-	glm::ivec3 startPosition(playerPosition);
-	getClosestMiddlePosition(startPosition);
+	glm::ivec3 startPosition = getClosestMiddlePosition(playerPosition);
 	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z <= startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
 	{
 		for (int x = startPosition.x - Utilities::VISIBILITY_DISTANCE; x <= startPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
@@ -373,8 +373,7 @@ void ChunkManager::generateChunkMeshes()
 void ChunkManager::clearQueues(const glm::ivec3& playerPosition)
 {
 	//Clears queues that are out of bounds of Player AABB
-	glm::ivec3 startingPosition(playerPosition);
-	getClosestMiddlePosition(startingPosition);
+	glm::ivec3 startingPosition = getClosestMiddlePosition(playerPosition);
 	Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Utilities::VISIBILITY_DISTANCE);
 
 	if (!m_chunkMeshesToGenerateQueue.isEmpty())
