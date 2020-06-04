@@ -176,6 +176,7 @@ bool ChunkManager::isCubeAtPosition(const glm::vec3& playerPosition) const
 	return false;
 }
 
+//Two threads acquire two locks in different order
 void ChunkManager::update(const Player& player, const sf::Window& window, std::atomic<bool>& resetGame,
 	std::mutex& playerMutex, std::mutex& renderingMutex)	
 {
@@ -190,6 +191,7 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 		generateChunkMeshes();
 		clearQueues(playerPosition);
 
+		playerLock.lock();
 		std::lock_guard<std::mutex> renderingLock(renderingMutex); 
 		for (int i = 0; i < THREAD_TRANSFER_PER_FRAME; ++i)
 		{
