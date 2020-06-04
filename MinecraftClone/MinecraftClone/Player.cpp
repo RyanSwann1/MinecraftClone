@@ -12,6 +12,13 @@ namespace
 	constexpr float VELOCITY_DROPOFF = 0.9f;
 	constexpr float GRAVITY_AMOUNT = 1.0f;
 	constexpr float HEAD_HEIGHT = 2.25f;
+
+	const CubeTypeComparison NON_COLLIDABLE_CUBE_TYPES =
+	{
+		{eCubeType::Water,
+		eCubeType::TallGrass,
+		eCubeType::Shrub}
+	};
 }
 
 //Camera
@@ -169,18 +176,20 @@ void Player::move(float deltaTime)
 //https://sites.google.com/site/letsmakeavoxelengine/home/collision-detection
 void Player::handleCollisions(const ChunkManager& chunkManager)
 {
+	eCubeType cubeType = eCubeType::Air;
 	if (m_flying)
 	{
 		if (!m_onGround && 
-			chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }) &&
-			!sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+			chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) &&
+			!sf::Keyboard::isKeyPressed(sf::Keyboard::Space) &&
+			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
 			m_velocity.y = 0;
 			m_position.y += std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT) + 1));
 			m_position.y = std::floor(m_position.y);
 			m_onGround = true;
 		}
-		else if(!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }))
+		else if(!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType))
 		{
 			m_onGround = false;
 		}
@@ -188,7 +197,8 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 	else
 	{
 		if (!m_onGround &&
-			chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }))
+			chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) &&
+			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
 			m_velocity.y = 0;
 			m_position.y += std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT) + 1));
@@ -196,10 +206,10 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			m_onGround = true;
 			m_jumping = false;
 		}
-		else if (!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }))
+		else if (!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) &&
+			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
-			m_onGround = false;
-			
+			m_onGround = false;		
 		}
 	}
 
@@ -208,26 +218,30 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 	if (!m_jumping)
 	{
 		if (m_velocity.x > 0 &&
-			chunkManager.isCubeAtPosition({ std::floor(m_position.x + WALKING_MOVEMENT_SPEED), std::floor(m_position.y - 2.0f), std::floor(m_position.z) }))
+			chunkManager.isCubeAtPosition({ std::floor(m_position.x + WALKING_MOVEMENT_SPEED), std::floor(m_position.y - 2.0f), std::floor(m_position.z) }, cubeType) &&
+			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
 			m_velocity.y += liftSpeed;
 			m_velocity.x -= brakeAmount;
 		}
 		else if (m_velocity.x < 0 &&
-			chunkManager.isCubeAtPosition({ std::floor(m_position.x - WALKING_MOVEMENT_SPEED), std::floor(m_position.y - 2.0f), std::floor(m_position.z) }))
+			chunkManager.isCubeAtPosition({ std::floor(m_position.x - WALKING_MOVEMENT_SPEED), std::floor(m_position.y - 2.0f), std::floor(m_position.z) }, cubeType) &&
+			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
 			m_velocity.y += liftSpeed;
 			m_velocity.x += brakeAmount;
 		}
 
-		if (m_velocity.z > 0 &&
-			chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 2.0f), std::floor(m_position.z + WALKING_MOVEMENT_SPEED) }))
+		else if (m_velocity.z > 0 &&
+			chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 2.0f), std::floor(m_position.z + WALKING_MOVEMENT_SPEED) }, cubeType) &&
+			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
 			m_velocity.y += liftSpeed;
 			m_velocity.z -= brakeAmount;
 		}
 		else if (m_velocity.z < 0 &&
-			chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 2.0f), std::floor(m_position.z - WALKING_MOVEMENT_SPEED) }))
+			chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 2.0f), std::floor(m_position.z - WALKING_MOVEMENT_SPEED) }, cubeType) &&
+			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
 			m_velocity.y += liftSpeed;
 			m_velocity.z += brakeAmount;
