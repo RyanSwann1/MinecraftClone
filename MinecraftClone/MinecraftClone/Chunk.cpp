@@ -290,10 +290,13 @@ void Chunk::spawnWater()
 	{
 		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
 		{
-			glm::ivec3 position(x, Utilities::WATER_MAX_HEIGHT, z);
-			if (isCubeAtLocalPosition(position, eCubeType::Air))
+			for (int y = 0; y <= Utilities::WATER_MAX_HEIGHT; ++y)
 			{
-				changeCubeAtLocalPosition(position, eCubeType::Water);
+				glm::ivec3 position(x, y, z);
+				if ((isCubeAtLocalPosition(position, eCubeType::Air)))
+				{
+					changeCubeAtLocalPosition(position, eCubeType::Water);
+				}
 			}
 		}
 	}
