@@ -61,7 +61,6 @@
 //https://ahbejarano.gitbook.io/lwjglgamedev/chapter12
 
 
-
 //x + (y * width)
 int main()
 {
@@ -110,16 +109,19 @@ int main()
 	shaderHandler->setUniform1i(eShaderType::Skybox, "uSkyboxTexture", 0);
 	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", 0);
 
+	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
+	
 	Frustum frustum;
 	Player player;
 	std::atomic<bool> resetGame = false;
 	std::mutex renderingMutex;
 	std::mutex playerMutex;
-	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>(player.getPosition());
 
 	std::thread chunkGenerationThread([&](std::unique_ptr<ChunkManager>* chunkGenerator)
 		{chunkGenerator->get()->update(std::ref(player), std::ref(window), std::ref(resetGame), 
 			std::ref(playerMutex), std::ref(renderingMutex)); }, &chunkManager );
+
+	player.spawn(*chunkManager, playerMutex);
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -145,7 +147,7 @@ int main()
 				{
 					resetGame = true;
 				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
 				{
 					player.toggleFlying();
 				}
@@ -167,13 +169,14 @@ int main()
 		{
 			chunkGenerationThread.join();
 			resetGame = false;
-			player.reset();
 			chunkManager.reset();
-			chunkManager = std::make_unique<ChunkManager>(player.getPosition());
+			chunkManager = std::make_unique<ChunkManager>();
 
 			chunkGenerationThread = std::thread{[&](std::unique_ptr<ChunkManager>* chunkManager)
 				{chunkManager->get()->update(std::ref(player), std::ref(window), std::ref(resetGame), 
 					std::ref(playerMutex), std::ref(renderingMutex)); }, &chunkManager };
+		
+			player.spawn(*chunkManager, playerMutex);
 		}
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
