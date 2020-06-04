@@ -45,12 +45,13 @@ struct ObjectFromPool : private NonCopyable
 	ObjectFromPool(ObjectInPool<Object>* objectInPool = nullptr, std::function<void(const ObjectInPool<Object>&)> onDestroyFunction = nullptr)
 		: objectInPool(objectInPool),
 		onDestroyFunction(onDestroyFunction)
-	{}
+	{
+		assert((objectInPool && onDestroyFunction) || (!objectInPool && !onDestroyFunction));
+	}
 	~ObjectFromPool()
 	{
 		if (objectInPool)
 		{
-			assert(onDestroyFunction);
 			objectInPool->object.reset();
 			onDestroyFunction(*objectInPool);
 		}
@@ -89,7 +90,8 @@ class ObjectPool : private NonCopyable, private NonMovable
 {
 public:
 	ObjectPool(size_t size = 0)
-		: m_availableObjects(),
+		: m_maxSize(size),
+		m_availableObjects(),
 		m_objectPool()
 	{
 		m_objectPool.reserve(size);
@@ -98,6 +100,10 @@ public:
 			m_objectPool.emplace_back(i);
 			m_availableObjects.push(i);
 		}
+	}
+	~ObjectPool()
+	{
+		assert(m_availableObjects.size() == m_maxSize);
 	}
 
 	ObjectFromPool<Object> getNextAvailableObject()
@@ -118,6 +124,7 @@ public:
 	}
 
 private:
+	const size_t m_maxSize;
 	std::stack<int> m_availableObjects;
 	std::vector<ObjectInPool<Object>> m_objectPool;
 
