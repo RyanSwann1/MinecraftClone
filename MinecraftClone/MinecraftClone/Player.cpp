@@ -189,7 +189,12 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			m_position.y = std::floor(m_position.y);
 			m_onGround = true;
 		}
-		else if(!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType))
+		else if(!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }))
+		{
+			m_onGround = false;
+		}
+		else if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) &&
+			NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
 			m_onGround = false;
 		}
@@ -206,10 +211,14 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			m_onGround = true;
 			m_jumping = false;
 		}
-		else if (!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) &&
-			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+		else if (!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }))
 		{
-			m_onGround = false;		
+			m_onGround = false;
+		}
+		else if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) &&
+			NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+		{
+			m_onGround = false;
 		}
 	}
 
