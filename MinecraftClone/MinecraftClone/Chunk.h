@@ -29,6 +29,7 @@ public:
 	Chunk(Chunk&&) noexcept;
 	Chunk& operator=(Chunk&&) noexcept;
 	
+	glm::ivec3 getHighestCubeAtPosition(const glm::ivec3& startingPosition) const;
 	bool isCubeBelowCovering(const glm::ivec3& startingPosition) const;
 	const Rectangle& getAABB() const;
 	bool isPositionInBounds(const glm::ivec3& position) const;

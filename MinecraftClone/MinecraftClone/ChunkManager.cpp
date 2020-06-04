@@ -150,7 +150,7 @@ GeneratedChunk& GeneratedChunk::operator=(GeneratedChunk&& orig) noexcept
 }
 
 //ChunkGenerator
-ChunkManager::ChunkManager(const glm::ivec3& playerPosition)
+ChunkManager::ChunkManager()
 	: m_chunkPool(getObjectPoolSize()),
 	m_chunkMeshPool(getObjectPoolSize()),
 	m_chunks(),
@@ -160,7 +160,16 @@ ChunkManager::ChunkManager(const glm::ivec3& playerPosition)
 	m_generatedChunkMeshesQueue(),
 	m_generatedChunkQueue()
 {
-	addChunks(playerPosition);
+	addChunks(Utilities::PLAYER_STARTING_POSITION);
+}
+
+glm::ivec3 ChunkManager::getHighestCubeAtPosition(const glm::vec3& playerPosition) const
+{
+	glm::ivec3 closestChunkStartingPosition = getClosestChunkStartingPosition(playerPosition);
+	auto chunk = m_chunks.find(closestChunkStartingPosition);
+	assert(chunk != m_chunks.cend());
+
+	return chunk->second.getObject()->getHighestCubeAtPosition(playerPosition);
 }
 
 bool ChunkManager::isCubeAtPosition(const glm::vec3& playerPosition) const
@@ -185,6 +194,14 @@ bool ChunkManager::isCubeAtPosition(const glm::vec3& playerPosition, eCubeType& 
 	}
 
 	return false;
+}
+
+bool ChunkManager::isChunkAtPosition(const glm::vec3& position) const
+{
+	glm::ivec3 closestChunkStartingPosition = getClosestChunkStartingPosition(position);
+	auto chunk = m_chunks.find(closestChunkStartingPosition);
+	
+	return chunk != m_chunks.cend();
 }
 
 //Two threads acquire two locks in different order

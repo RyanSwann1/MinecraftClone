@@ -99,6 +99,21 @@ Chunk& Chunk::operator=(Chunk&& orig) noexcept
 	return *this;
 }
 
+glm::ivec3 Chunk::getHighestCubeAtPosition(const glm::ivec3& startingPosition) const
+{
+	glm::ivec3 cubePosition(0, 0, 0);
+	for (int y = Utilities::CHUNK_HEIGHT - 1; y >= 0; --y)
+	{
+		if (!isCubeAtLocalPosition({ startingPosition.x, y, startingPosition.z }, eCubeType::Air))
+		{
+			cubePosition = { startingPosition.x, y, startingPosition.z };
+			break;
+		}
+	}
+
+	return cubePosition;
+}
+
 bool Chunk::isCubeBelowCovering(const glm::ivec3& startingPosition) const
 {
 	for (int y = startingPosition.y + 1; 
