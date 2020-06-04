@@ -242,7 +242,12 @@ void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 	switch (cubeType)
 	{
 	case eCubeType::Water:
-		addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
+
+		if(isFacingOpaqueCube({ position.x, position.y + 1, position.z }, chunk))
+		{
+			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
+		}
+
 		break;
 	case eCubeType::Leaves:
 		if (isFacingOpaqueCube({ position.x - 1, position.y, position.z }, chunk))
@@ -335,7 +340,10 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 	switch (cubeType)
 	{
 	case eCubeType::Water:
-		addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
+		if (isFacingOpaqueCube({ position.x, position.y + 1, position.z }, chunk))
+		{
+			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
+		}
 		break;
 	case eCubeType::Leaves:
 	{
