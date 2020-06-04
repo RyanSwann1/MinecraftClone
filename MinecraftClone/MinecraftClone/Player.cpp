@@ -6,11 +6,11 @@
 namespace 
 {
 	constexpr glm::vec3 STARTING_PLAYER_POSITION{ 0.0f, 100.0f, 0.0f };
-	constexpr float WALKING_MOVEMENT_SPEED = 0.75f;
+	constexpr float WALKING_MOVEMENT_SPEED = 0.55f;
 	constexpr float FLYING_MOVEMENT_SPEED = 5.0f;
 	constexpr glm::vec3 MAX_VELOCITY = { 50.f, 50.0f, 50.0 };
 	constexpr float VELOCITY_DROPOFF = 0.9f;
-	constexpr float GRAVITY_AMOUNT = 0.025f;
+	constexpr float GRAVITY_AMOUNT = 1.0f;
 	constexpr float HEAD_HEIGHT = 2.25f;
 }
 
@@ -58,7 +58,9 @@ Player::Player()
 	m_position(STARTING_PLAYER_POSITION),
 	m_velocity(),
 	m_flying(false),
-	m_applyGravity(true)
+	m_applyGravity(true),
+	m_onGround(false),
+	m_jumping(false)
 {}
 
 const glm::vec3& Player::getPosition() const
@@ -75,6 +77,12 @@ void Player::toggleFlying()
 {
 	m_flying = !m_flying;
 	m_applyGravity = !m_applyGravity;
+
+	if (m_flying)
+	{
+		m_onGround = false;
+		m_jumping = false;
+	}
 }
 
 void Player::reset()
@@ -93,50 +101,68 @@ void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager
 	
 	std::lock_guard<std::mutex> playerLock(playerMutex);
 	handleCollisions(chunkManager);
-	m_position += m_velocity;
-	m_velocity *= VELOCITY_DROPOFF;
+	
+	m_position += m_velocity * deltaTime;
+
+	if (m_flying)
+	{
+		m_velocity *= VELOCITY_DROPOFF;
+	}
+	else
+	{
+		m_velocity.x *= VELOCITY_DROPOFF;
+		m_velocity.z *= VELOCITY_DROPOFF;
+	}
 }
 
 void Player::move(float deltaTime)
 {
-	// movementSpeed = m_flying ? FLYING_MOVEMENT_SPEED : WALKING_MOVEMENT_SPEED;
-	float movementSpeed = 0.0f;
-	(m_flying ? movementSpeed = FLYING_MOVEMENT_SPEED : movementSpeed = WALKING_MOVEMENT_SPEED);
+	float movementSpeed = (m_flying ? FLYING_MOVEMENT_SPEED : WALKING_MOVEMENT_SPEED);
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * movementSpeed * deltaTime;
-		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * movementSpeed * deltaTime;
+		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * movementSpeed;
+		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * movementSpeed;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
-		m_velocity.x -= glm::cos(glm::radians(m_camera.rotation.y)) * movementSpeed * deltaTime;
-		m_velocity.z -= glm::sin(glm::radians(m_camera.rotation.y)) * movementSpeed * deltaTime;
+		m_velocity.x -= glm::cos(glm::radians(m_camera.rotation.y)) * movementSpeed;
+		m_velocity.z -= glm::sin(glm::radians(m_camera.rotation.y)) * movementSpeed;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y + 90)) * movementSpeed * deltaTime;
-		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y + 90)) * movementSpeed * deltaTime;
+		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y + 90)) * movementSpeed;
+		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y + 90)) * movementSpeed;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y - 90)) * movementSpeed * deltaTime;
-		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y - 90)) * movementSpeed * deltaTime;
+		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y - 90)) * movementSpeed;
+		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y - 90)) * movementSpeed;
 	}
+	if (m_flying)
+	{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && m_flying)
+		{
+			m_velocity.y += movementSpeed;
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) && m_flying && !m_onGround)
+		{
+			m_velocity.y -= movementSpeed;
+		}
+	}
+	else
+	{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && m_onGround)
+		{
+			m_velocity.y += 3.0f;
+			m_jumping = true;
+		}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && m_flying)
-	{
-		m_velocity.y += movementSpeed * deltaTime;
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) && m_flying)
-	{
-		m_velocity.y -= movementSpeed * deltaTime;
-	}
-
-	if (m_applyGravity && !m_flying)
-	{
-		m_velocity.y -= GRAVITY_AMOUNT;
+		if (m_applyGravity && !m_onGround)
+		{
+			m_velocity.y -= GRAVITY_AMOUNT;
+		}
 	}
 }
 
@@ -145,48 +171,66 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 {
 	if (m_flying)
 	{
-		if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT + m_velocity.y), std::floor(m_position.z) }) &&
+		if (!m_onGround && 
+			chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }) &&
 			!sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 		{
 			m_velocity.y = 0;
+			m_position.y += std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT) + 1));
+			m_position.y = std::floor(m_position.y);
+			m_onGround = true;
+		}
+		else if(!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }))
+		{
+			m_onGround = false;
 		}
 	}
 	else
 	{
-		if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT - GRAVITY_AMOUNT), std::floor(m_position.z) }))
+		if (!m_onGround &&
+			chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }))
 		{
-			m_applyGravity = false;
 			m_velocity.y = 0;
+			m_position.y += std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT) + 1));
+			m_position.y = std::floor(m_position.y);
+			m_onGround = true;
+			m_jumping = false;
 		}
-		else
+		else if (!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }))
 		{
-			m_applyGravity = true;
+			m_onGround = false;
+			
 		}
 	}
 
-	if (m_velocity.x > 0 &&
-		chunkManager.isCubeAtPosition({ std::floor(m_position.x + WALKING_MOVEMENT_SPEED), std::floor(m_position.y - 1.5f), std::floor(m_position.z) }))
+	float liftSpeed = 3.5f;
+	float brakeAmount = 2.5f;
+	if (!m_jumping)
 	{
-		m_position.y += 1;
-		m_position.x += 0.5f;
-	}
-	else if (m_velocity.x < 0 &&
-		chunkManager.isCubeAtPosition({ std::floor(m_position.x - WALKING_MOVEMENT_SPEED), std::floor(m_position.y - 1.5f), std::floor(m_position.z) }))
-	{
-		m_position.y += 1;
-		m_position.x -= 0.5f;
-	}
+		if (m_velocity.x > 0 &&
+			chunkManager.isCubeAtPosition({ std::floor(m_position.x + WALKING_MOVEMENT_SPEED), std::floor(m_position.y - 2.0f), std::floor(m_position.z) }))
+		{
+			m_velocity.y += liftSpeed;
+			m_velocity.x -= brakeAmount;
+		}
+		else if (m_velocity.x < 0 &&
+			chunkManager.isCubeAtPosition({ std::floor(m_position.x - WALKING_MOVEMENT_SPEED), std::floor(m_position.y - 2.0f), std::floor(m_position.z) }))
+		{
+			m_velocity.y += liftSpeed;
+			m_velocity.x += brakeAmount;
+		}
 
-	if (m_velocity.z > 0 &&
-		chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 1.5f), std::floor(m_position.z + WALKING_MOVEMENT_SPEED) }))
-	{
-		m_position.y += 1;
-		m_position.z += 0.5f;
-	}
-	else if (m_velocity.z < 0 &&
-		chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 1.5f), std::floor(m_position.z - WALKING_MOVEMENT_SPEED) }))
-	{
-		m_position.y += 1;
-		m_position.z -= 0.5f;
-	}
+		if (m_velocity.z > 0 &&
+			chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 2.0f), std::floor(m_position.z + WALKING_MOVEMENT_SPEED) }))
+		{
+			m_velocity.y += liftSpeed;
+			m_velocity.z -= brakeAmount;
+		}
+		else if (m_velocity.z < 0 &&
+			chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 2.0f), std::floor(m_position.z - WALKING_MOVEMENT_SPEED) }))
+		{
+			m_velocity.y += liftSpeed;
+			m_velocity.z += brakeAmount;
+		}
+	}	
 }

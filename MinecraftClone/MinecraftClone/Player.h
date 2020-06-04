@@ -45,6 +45,8 @@ private:
 	glm::vec3 m_velocity;
 	bool m_flying;
 	bool m_applyGravity;
+	bool m_onGround = false;
+	bool m_jumping = false;
 
 	void move(float deltaTime);
 	void handleCollisions(const ChunkManager& chunkManager);
