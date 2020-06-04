@@ -104,7 +104,7 @@ glm::ivec3 Chunk::getHighestCubeAtPosition(const glm::ivec3& startingPosition) c
 	glm::ivec3 cubePosition(0, 0, 0);
 	for (int y = Utilities::CHUNK_HEIGHT - 1; y >= 0; --y)
 	{
-		if (!isCubeAtLocalPosition({ startingPosition.x, y, startingPosition.z }, eCubeType::Air))
+		if (!isCubeAtLocalPosition({ startingPosition.x - m_startingPosition.x, y, startingPosition.z - m_startingPosition.z }, eCubeType::Air))
 		{
 			cubePosition = { startingPosition.x, y, startingPosition.z };
 			break;
