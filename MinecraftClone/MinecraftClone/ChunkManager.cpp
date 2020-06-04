@@ -163,14 +163,16 @@ ChunkManager::ChunkManager(const glm::ivec3& playerPosition)
 	addChunks(playerPosition);
 }
 
-bool ChunkManager::isCubeAtPosition(const glm::vec3& playerPosition) const
+bool ChunkManager::isCubeAtPosition(const glm::vec3& playerPosition, eCubeType& cubeType) const
 {
 	glm::ivec3 closestChunkStartingPosition = getClosestChunkStartingPosition(playerPosition);
 	auto chunk = m_chunks.find(closestChunkStartingPosition);
 	assert(chunk != m_chunks.cend());
-	if (chunk != m_chunks.cend())
+
+	if (chunk->second.getObject()->isCubeAtPosition(playerPosition))
 	{
-		return chunk->second.getObject()->isCubeAtPosition(playerPosition);
+		cubeType = static_cast<eCubeType>(chunk->second.getObject()->getCubeDetailsWithoutBoundsCheck(playerPosition));
+		return true;
 	}
 
 	return false;

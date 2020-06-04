@@ -77,7 +77,7 @@ class ChunkManager : private NonCopyable, private NonMovable
 public:
 	ChunkManager(const glm::ivec3& playerPosition);
 
-	bool isCubeAtPosition(const glm::vec3& playerPosition) const;
+	bool isCubeAtPosition(const glm::vec3& playerPosition, eCubeType& cubeType) const;
 
 	void update(const Player& player, const sf::Window& window, std::atomic<bool>& resetGame, 
 		std::mutex& playerMutex, std::mutex& renderingMutex);
