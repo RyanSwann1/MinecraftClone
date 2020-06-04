@@ -7,42 +7,10 @@
 #include <functional>
 #include <assert.h>
 
-constexpr int INVALID_OBJECT_ID = -1;
-
-//Internal Use - Object Pool
-template <class Object>
-struct ObjectInPool : private NonCopyable
-{
-	ObjectInPool(int ID)
-		: object(),
-		ID(ID)
-	{}
-	ObjectInPool(ObjectInPool&& orig) noexcept
-		: object(std::move(orig.object)),
-		ID(orig.ID)
-	{
-		orig.ID = INVALID_OBJECT_ID;
-	}
-	ObjectInPool& operator=(ObjectInPool&& orig) noexcept
-	{
-		object = std::move(orig.object);
-		ID = orig.ID;
-
-		orig.ID = INVALID_OBJECT_ID;
-		return *this;
-	}
-
-	Object object;
-	int ID;
-};
-
-//External Use - Object Pool
-template <class Object>
-class ObjectPool;
 template <class Object>
 struct ObjectFromPool : private NonCopyable
 {
-	ObjectFromPool(ObjectInPool<Object>* objectInPool = nullptr, std::function<void(const ObjectInPool<Object>&)> onDestroyFunction = nullptr)
+	ObjectFromPool(Object* objectInPool = nullptr, std::function<void(Object*)> onDestroyFunction = nullptr)
 		: objectInPool(objectInPool),
 		onDestroyFunction(onDestroyFunction)
 	{
@@ -52,8 +20,8 @@ struct ObjectFromPool : private NonCopyable
 	{
 		if (objectInPool)
 		{
-			objectInPool->object.reset();
-			onDestroyFunction(*objectInPool);
+			objectInPool->reset();
+			onDestroyFunction(objectInPool);
 		}
 	}
 	ObjectFromPool(ObjectFromPool&& orig) noexcept
@@ -74,12 +42,12 @@ struct ObjectFromPool : private NonCopyable
 
 	Object* getObject() const 
 	{
-		return (objectInPool ? &objectInPool->object : nullptr);
+		return (objectInPool ? objectInPool : nullptr);
 	}
 
 private:
-	ObjectInPool<Object>* objectInPool;
-	std::function<void(const ObjectInPool<Object>&)> onDestroyFunction;
+	Object* objectInPool;
+	std::function<void(Object*)> onDestroyFunction;
 };
 
 using std::placeholders::_1;
@@ -94,11 +62,10 @@ public:
 		m_availableObjects(),
 		m_objectPool()
 	{
-		m_objectPool.reserve(size);
-		for (int i = 0; i < size; ++i)
+		m_objectPool.resize(size);
+		for (auto& object : m_objectPool)
 		{
-			m_objectPool.emplace_back(i);
-			m_availableObjects.push(i);
+			m_availableObjects.push(&object);
 		}
 	}
 	~ObjectPool()
@@ -112,10 +79,10 @@ public:
 		{
 			assert(!m_objectPool.empty());
 			
-			int ID = m_availableObjects.top();
+			Object* objectInPool = m_availableObjects.top();
+			assert(objectInPool);
 			m_availableObjects.pop();
-			assert(ID < m_objectPool.size());
-			return ObjectFromPool<Object>(&m_objectPool[ID], std::bind(&ObjectPool<Object>::releaseObject, this, _1));
+			return ObjectFromPool<Object>(objectInPool, std::bind(&ObjectPool<Object>::releaseObject, this, _1));
 		}
 		else
 		{
@@ -125,12 +92,12 @@ public:
 
 private:
 	const size_t m_maxSize;
-	std::stack<int> m_availableObjects;
-	std::vector<ObjectInPool<Object>> m_objectPool;
+	std::stack<Object*> m_availableObjects;
+	std::vector<Object> m_objectPool;
 
-	void releaseObject(const ObjectInPool<Object>& objectInPool)
+	void releaseObject(Object* objectInPool)
 	{
-		assert(objectInPool.ID != INVALID_OBJECT_ID);
-		m_availableObjects.push(objectInPool.ID);
+		assert(objectInPool);
+		m_availableObjects.push(objectInPool);
 	}
 };
