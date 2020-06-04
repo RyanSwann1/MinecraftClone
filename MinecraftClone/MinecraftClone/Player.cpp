@@ -11,7 +11,7 @@ namespace
 	constexpr glm::vec3 MAX_VELOCITY = { 50.f, 50.0f, 50.0 };
 	constexpr float VELOCITY_DROPOFF = 0.9f;
 	constexpr float GRAVITY_AMOUNT = 0.025f;
-	constexpr float HEAD_HEIGHT = 1.5f;
+	constexpr float HEAD_HEIGHT = 2.25f;
 }
 
 //Camera
@@ -99,6 +99,7 @@ void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager
 
 void Player::move(float deltaTime)
 {
+	// movementSpeed = m_flying ? FLYING_MOVEMENT_SPEED : WALKING_MOVEMENT_SPEED;
 	float movementSpeed = 0.0f;
 	(m_flying ? movementSpeed = FLYING_MOVEMENT_SPEED : movementSpeed = WALKING_MOVEMENT_SPEED);
 
@@ -164,28 +165,28 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 	}
 
 	if (m_velocity.x > 0 &&
-		chunkManager.isCubeAtPosition({ std::floor(m_position.x + WALKING_MOVEMENT_SPEED), std::floor(m_position.y - 0.75f), std::floor(m_position.z) }))
+		chunkManager.isCubeAtPosition({ std::floor(m_position.x + WALKING_MOVEMENT_SPEED), std::floor(m_position.y - 1.5f), std::floor(m_position.z) }))
 	{
-		m_position.y += 2;
+		m_position.y += 1;
 		m_position.x += 0.5f;
 	}
 	else if (m_velocity.x < 0 &&
-		chunkManager.isCubeAtPosition({ std::floor(m_position.x - WALKING_MOVEMENT_SPEED), std::floor(m_position.y - 0.75f), std::floor(m_position.z) }))
+		chunkManager.isCubeAtPosition({ std::floor(m_position.x - WALKING_MOVEMENT_SPEED), std::floor(m_position.y - 1.5f), std::floor(m_position.z) }))
 	{
-		m_position.y += 2;
+		m_position.y += 1;
 		m_position.x -= 0.5f;
 	}
 
 	if (m_velocity.z > 0 &&
-		chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 0.75f), std::floor(m_position.z + WALKING_MOVEMENT_SPEED) }))
+		chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 1.5f), std::floor(m_position.z + WALKING_MOVEMENT_SPEED) }))
 	{
-		m_position.y += 2;
+		m_position.y += 1;
 		m_position.z += 0.5f;
 	}
 	else if (m_velocity.z < 0 &&
-		chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 0.75f), std::floor(m_position.z - WALKING_MOVEMENT_SPEED) }))
+		chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 1.5f), std::floor(m_position.z - WALKING_MOVEMENT_SPEED) }))
 	{
-		m_position.y += 2;
+		m_position.y += 1;
 		m_position.z -= 0.5f;
 	}
 }
