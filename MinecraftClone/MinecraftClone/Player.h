@@ -33,9 +33,9 @@ public:
 	
 	const glm::vec3& getPosition() const;
 	const Camera& getCamera() const;
-
+	
+	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
 	void toggleFlying();
-	void reset();
 	void moveCamera(const sf::Window& window);
 	void update(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager);
 

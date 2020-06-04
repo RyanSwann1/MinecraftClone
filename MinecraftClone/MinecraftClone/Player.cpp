@@ -5,13 +5,14 @@
 
 namespace 
 {
-	constexpr glm::vec3 STARTING_PLAYER_POSITION{ 0.0f, 100.0f, 0.0f };
 	constexpr float WALKING_MOVEMENT_SPEED = 0.55f;
 	constexpr float FLYING_MOVEMENT_SPEED = 5.0f;
 	constexpr glm::vec3 MAX_VELOCITY = { 50.f, 50.0f, 50.0 };
+	
 	constexpr float VELOCITY_DROPOFF = 0.9f;
 	constexpr float GRAVITY_AMOUNT = 1.0f;
 	constexpr float HEAD_HEIGHT = 2.25f;
+	constexpr int MS_BETWEEN_ATTEMPT_SPAWN = 250;
 
 	const CubeTypeComparison NON_COLLIDABLE_CUBE_TYPES =
 	{
@@ -62,7 +63,7 @@ void Camera::move(const sf::Window& window)
 //Player
 Player::Player()
 	: m_camera(),
-	m_position(STARTING_PLAYER_POSITION),
+	m_position(),
 	m_velocity(),
 	m_flying(false),
 	m_applyGravity(true),
@@ -80,6 +81,29 @@ const Camera& Player::getCamera() const
 	return m_camera;
 }
 
+void Player::spawn(const ChunkManager& chunkManager, std::mutex& playerMutex)
+{
+	bool spawned = false;
+	while (!spawned)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(MS_BETWEEN_ATTEMPT_SPAWN));
+
+		std::lock_guard<std::mutex> playerLock(playerMutex);
+		if (chunkManager.isChunkAtPosition(Utilities::PLAYER_STARTING_POSITION))
+		{
+			m_position = chunkManager.getHighestCubeAtPosition(Utilities::PLAYER_STARTING_POSITION);
+			m_position.y += HEAD_HEIGHT;
+			m_velocity = glm::vec3();
+			m_flying = false;
+			m_applyGravity = true;
+			m_onGround = false;
+			m_jumping = false;
+
+			spawned = true;
+		}
+	}
+}
+
 void Player::toggleFlying()
 {
 	m_flying = !m_flying;
@@ -90,11 +114,6 @@ void Player::toggleFlying()
 		m_onGround = false;
 		m_jumping = false;
 	}
-}
-
-void Player::reset()
-{
-	m_position = STARTING_PLAYER_POSITION;
 }
 
 void Player::moveCamera(const sf::Window& window)
@@ -147,6 +166,7 @@ void Player::move(float deltaTime)
 		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y - 90)) * movementSpeed;
 		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y - 90)) * movementSpeed;
 	}
+
 	if (m_flying)
 	{
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && m_flying)
