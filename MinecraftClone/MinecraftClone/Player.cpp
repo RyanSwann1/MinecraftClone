@@ -111,14 +111,26 @@ void Player::spawn(const ChunkManager& chunkManager, std::mutex& playerMutex)
 
 void Player::toggleFlying()
 {
-	m_flying = !m_flying;
-	m_applyGravity = !m_applyGravity;
-
-	if (m_flying)
+	if (!m_flying && !m_onGround)
 	{
-		m_onGround = false;
+		m_flying = true;
+		m_applyGravity = false;
 		m_jumping = false;
 	}
+	else if (m_flying && !m_onGround)
+	{
+		m_flying = false;
+		m_applyGravity = true;
+	}
+
+	//m_flying = !m_flying;
+	//m_applyGravity = !m_applyGravity;
+
+	//if (m_flying)
+	//{
+	//	m_onGround = false;
+	//	m_jumping = false;
+	//}
 }
 
 void Player::moveCamera(const sf::Window& window)
@@ -213,15 +225,11 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			m_position.y += std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT) + 1));
 			m_position.y = std::floor(m_position.y);
 			m_onGround = true;
-		}
-		else if(!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }))
-		{
-			m_onGround = false;
-		}
-		else if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) &&
-			NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-		{
-			m_onGround = false;
+			m_flying = false;
+			m_applyGravity = true;
+			m_velocity.z *= 0.25f;
+			m_velocity.x *= 0.25f;
+			m_jumping = false;
 		}
 	}
 	else
