@@ -25,6 +25,13 @@ struct Camera : private NonCopyable, private NonMovable
 	glm::vec2 rotation;
 };
 
+enum class ePlayerState
+{
+	Flying = 0,
+	InAir,
+	OnGround,
+};
+
 class ChunkManager;
 class Player : private NonCopyable, private NonMovable
 {
@@ -41,12 +48,9 @@ public:
 
 private:
 	Camera m_camera;
+	ePlayerState m_currentState;
 	glm::vec3 m_position;
 	glm::vec3 m_velocity;
-	bool m_flying;
-	bool m_applyGravity;
-	bool m_onGround;
-	bool m_jumping;
 
 	void move(float deltaTime);
 	void handleCollisions(const ChunkManager& chunkManager);

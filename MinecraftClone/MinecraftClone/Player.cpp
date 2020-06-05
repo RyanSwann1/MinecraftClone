@@ -8,14 +8,14 @@ namespace
 	constexpr float WALKING_MOVEMENT_SPEED = 0.55f;
 	constexpr float FLYING_MOVEMENT_SPEED = 5.0f;
 	constexpr glm::vec3 MAX_VELOCITY = { 50.f, 50.0f, 50.0 };
-	
+	constexpr float JUMP_SPEED = 12.0f;
+
 	constexpr float VELOCITY_DROPOFF = 0.9f;
 	constexpr float GRAVITY_AMOUNT = 1.0f;
 	constexpr float HEAD_HEIGHT = 2.25f;
 	constexpr int MS_BETWEEN_ATTEMPT_SPAWN = 250;
 	
 	constexpr float AUTO_JUMP_DISTANCE = WALKING_MOVEMENT_SPEED * 1.5f;
-	constexpr float AUTO_JUMP_SPEED = 12.5f;
 	constexpr float AUTO_JUMP_BREAK_SPEED = 3.5f;
 
 	const CubeTypeComparison NON_COLLIDABLE_CUBE_TYPES =
@@ -61,8 +61,6 @@ void Camera::move(const sf::Window& window)
 		glm::sin(glm::radians(rotation.x)),
 		glm::sin(glm::radians(rotation.y)) * glm::cos(glm::radians(rotation.x)) };
 	front = glm::normalize(v);
-
-
 }
 
 //Player
@@ -70,10 +68,7 @@ Player::Player()
 	: m_camera(),
 	m_position(),
 	m_velocity(),
-	m_flying(false),
-	m_applyGravity(true),
-	m_onGround(false),
-	m_jumping(false)
+	m_currentState(ePlayerState::InAir)
 {}
 
 const glm::vec3& Player::getPosition() const
@@ -99,10 +94,7 @@ void Player::spawn(const ChunkManager& chunkManager, std::mutex& playerMutex)
 			m_position = chunkManager.getHighestCubeAtPosition(Utilities::PLAYER_STARTING_POSITION);
 			m_position.y += HEAD_HEIGHT;
 			m_velocity = glm::vec3();
-			m_flying = false;
-			m_applyGravity = true;
-			m_onGround = false;
-			m_jumping = false;
+			m_currentState = ePlayerState::InAir;
 
 			spawned = true;
 		}
@@ -111,26 +103,14 @@ void Player::spawn(const ChunkManager& chunkManager, std::mutex& playerMutex)
 
 void Player::toggleFlying()
 {
-	if (!m_flying && !m_onGround)
+	if (m_currentState != ePlayerState::Flying && m_currentState == ePlayerState::InAir) 
 	{
-		m_flying = true;
-		m_applyGravity = false;
-		m_jumping = false;
+		m_currentState = ePlayerState::Flying;
 	}
-	else if (m_flying && !m_onGround)
+	else if (m_currentState == ePlayerState::Flying)
 	{
-		m_flying = false;
-		m_applyGravity = true;
+		m_currentState = ePlayerState::InAir;
 	}
-
-	//m_flying = !m_flying;
-	//m_applyGravity = !m_applyGravity;
-
-	//if (m_flying)
-	//{
-	//	m_onGround = false;
-	//	m_jumping = false;
-	//}
 }
 
 void Player::moveCamera(const sf::Window& window)
@@ -147,7 +127,7 @@ void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager
 	
 	m_position += m_velocity * deltaTime;
 
-	if (m_flying)
+	if (m_currentState == ePlayerState::Flying)
 	{
 		m_velocity *= VELOCITY_DROPOFF;
 	}
@@ -160,7 +140,7 @@ void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager
 
 void Player::move(float deltaTime)
 {
-	float movementSpeed = (m_flying ? FLYING_MOVEMENT_SPEED : WALKING_MOVEMENT_SPEED);
+	float movementSpeed = (m_currentState == ePlayerState::Flying ? FLYING_MOVEMENT_SPEED : WALKING_MOVEMENT_SPEED);
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
@@ -184,26 +164,25 @@ void Player::move(float deltaTime)
 		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y - 90)) * movementSpeed;
 	}
 
-	if (m_flying)
+	if (m_currentState == ePlayerState::Flying)
 	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && m_flying)
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 		{
 			m_velocity.y += movementSpeed;
 		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) && m_flying && !m_onGround)
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
 		{
 			m_velocity.y -= movementSpeed;
 		}
 	}
 	else
 	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && m_onGround)
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && m_currentState == ePlayerState::OnGround && 
+			m_velocity.y == 0)
 		{
-			m_velocity.y += 3.0f;
-			m_jumping = true;
+			m_velocity.y += JUMP_SPEED;
 		}
-
-		if (m_applyGravity && !m_onGround)
+		else if (m_currentState != ePlayerState::OnGround)// !m_onGround)
 		{
 			m_velocity.y -= GRAVITY_AMOUNT;
 		}
@@ -214,9 +193,9 @@ void Player::move(float deltaTime)
 void Player::handleCollisions(const ChunkManager& chunkManager)
 {
 	eCubeType cubeType = eCubeType::Air;
-	if (m_flying)
+	if (m_currentState == ePlayerState::Flying)
 	{
-		if (!m_onGround && 
+		if (m_currentState != ePlayerState::OnGround &&// m_onGround && 
 			chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) &&
 			!sf::Keyboard::isKeyPressed(sf::Keyboard::Space) &&
 			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
@@ -224,38 +203,35 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			m_velocity.y = 0;
 			m_position.y += std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT) + 1));
 			m_position.y = std::floor(m_position.y);
-			m_onGround = true;
-			m_flying = false;
-			m_applyGravity = true;
 			m_velocity.z *= 0.25f;
 			m_velocity.x *= 0.25f;
-			m_jumping = false;
+			m_currentState = ePlayerState::OnGround;
 		}
 	}
 	else
 	{
-		if (!m_onGround &&
+		if (m_currentState != ePlayerState::OnGround &&// !m_onGround &&
 			chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) &&
 			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
 			m_velocity.y = 0;
 			m_position.y += std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT) + 1));
 			m_position.y = std::floor(m_position.y);
-			m_onGround = true;
-			m_jumping = false;
+
+			m_currentState = ePlayerState::OnGround;
 		}
 		else if (!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }))
 		{
-			m_onGround = false;
+			m_currentState = ePlayerState::InAir;
 		}
 		else if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) &&
 			NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
-			m_onGround = false;
+			m_currentState = ePlayerState::InAir;
 		}
 	}
 
-	if (m_flying || !m_jumping)
+	if (m_currentState == ePlayerState::OnGround && m_velocity.y == 0) //m_flying || !m_jumping)
 	{
 		if (m_velocity.x > 0 &&
 			chunkManager.isCubeAtPosition({ std::floor(m_position.x + AUTO_JUMP_DISTANCE), std::floor(m_position.y - 2.0f), std::floor(m_position.z) }, cubeType) &&
@@ -265,10 +241,9 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			{
 				if (NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 				{
-					m_velocity.y += AUTO_JUMP_SPEED;
+					m_velocity.y += JUMP_SPEED;
 					m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
 					m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-					m_jumping = true;
 				}
 				else
 				{
@@ -277,10 +252,9 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			}
 			else
 			{
-				m_velocity.y += AUTO_JUMP_SPEED;
+				m_velocity.y += JUMP_SPEED;
 				m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
 				m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-				m_jumping = true;
 			}
 		}
 		else if (m_velocity.x < 0 &&
@@ -291,10 +265,9 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			{
 				if (NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 				{
-					m_velocity.y += AUTO_JUMP_SPEED;
+					m_velocity.y += JUMP_SPEED;
 					m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
 					m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-					m_jumping = true;
 				}
 				else
 				{
@@ -303,10 +276,9 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			}
 			else
 			{
-				m_velocity.y += AUTO_JUMP_SPEED;
+				m_velocity.y += JUMP_SPEED;
 				m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
 				m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-				m_jumping = true;
 			}
 		}
 
@@ -318,10 +290,9 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			{
 				if (NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 				{
-					m_velocity.y += AUTO_JUMP_SPEED;
+					m_velocity.y += JUMP_SPEED;
 					m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
 					m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-					m_jumping = true;
 				}
 				else
 				{
@@ -330,11 +301,9 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			}
 			else
 			{
-				m_velocity.y += AUTO_JUMP_SPEED;
+				m_velocity.y += JUMP_SPEED;
 				m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
 				m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-				m_jumping = true;
-
 			}
 		}
 		else if (m_velocity.z < 0 &&
@@ -345,10 +314,9 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			{
 				if (NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 				{
-					m_velocity.y += AUTO_JUMP_SPEED;
+					m_velocity.y += JUMP_SPEED;
 					m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
 					m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-					m_jumping = true;
 				}
 				else
 				{
@@ -357,10 +325,9 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			}
 			else
 			{
-				m_velocity.y += AUTO_JUMP_SPEED;
+				m_velocity.y += JUMP_SPEED;
 				m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
 				m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-				m_jumping = true;
 			}
 		}
 	}	
