@@ -18,6 +18,7 @@ namespace
 	
 	constexpr float AUTO_JUMP_DISTANCE = WALKING_MOVEMENT_SPEED * 1.5f;
 	constexpr float AUTO_JUMP_BREAK_SPEED = 7.0f;
+	constexpr float AUTO_JUMP_HEIGHT = 2.0f;
 
 	const CubeTypeComparison NON_COLLIDABLE_CUBE_TYPES =
 	{
@@ -232,7 +233,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			newPosition.x += m_position.x;
 			newPosition.z += m_position.z;
 
-			if (chunkManager.isCubeAtPosition({ std::floor(newPosition.x), std::floor(newPosition.y - 2.0f), std::floor(newPosition.z) }, cubeType) &&
+			if (chunkManager.isCubeAtPosition({ std::floor(newPosition.x), std::floor(newPosition.y - AUTO_JUMP_HEIGHT), std::floor(newPosition.z) }, cubeType) &&
 				!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 			{
 				m_velocity.y += JUMP_SPEED;
