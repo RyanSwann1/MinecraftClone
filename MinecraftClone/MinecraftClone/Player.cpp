@@ -17,7 +17,7 @@ namespace
 	constexpr int MS_BETWEEN_ATTEMPT_SPAWN = 250;
 	
 	constexpr float AUTO_JUMP_DISTANCE = WALKING_MOVEMENT_SPEED * 1.5f;
-	constexpr float AUTO_JUMP_BREAK_SPEED = 3.5f;
+	constexpr float AUTO_JUMP_BREAK_SPEED = 7.0f;
 
 	const CubeTypeComparison NON_COLLIDABLE_CUBE_TYPES =
 	{
