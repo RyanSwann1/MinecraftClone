@@ -67,9 +67,9 @@ void Camera::move(const sf::Window& window)
 //Player
 Player::Player()
 	: m_camera(),
+	m_currentState(ePlayerState::InAir),
 	m_position(),
-	m_velocity(),
-	m_currentState(ePlayerState::InAir)
+	m_velocity()
 {}
 
 const glm::vec3& Player::getPosition() const
@@ -96,7 +96,6 @@ void Player::spawn(const ChunkManager& chunkManager, std::mutex& playerMutex)
 			m_position.y += HEAD_HEIGHT;
 			m_velocity = glm::vec3();
 			m_currentState = ePlayerState::InAir;
-
 			spawned = true;
 		}
 	}
@@ -104,13 +103,18 @@ void Player::spawn(const ChunkManager& chunkManager, std::mutex& playerMutex)
 
 void Player::toggleFlying()
 {
-	if (m_currentState == ePlayerState::InAir) 
+	switch (m_currentState)
 	{
+	case ePlayerState::InAir:
 		m_currentState = ePlayerState::Flying;
-	}
-	else if (m_currentState == ePlayerState::Flying)
-	{
+		break;
+	case ePlayerState::Flying:
 		m_currentState = ePlayerState::InAir;
+		break;
+	case ePlayerState::OnGround:
+		break;
+	default:
+		assert(false);
 	}
 }
 
@@ -128,14 +132,18 @@ void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager
 	
 	m_position += m_velocity * deltaTime;
 
-	if (m_currentState == ePlayerState::Flying)
+	switch (m_currentState)
 	{
+	case ePlayerState::Flying:
 		m_velocity *= VELOCITY_DROPOFF;
-	}
-	else
-	{
+		break;
+	case ePlayerState::InAir:
+	case ePlayerState::OnGround:
 		m_velocity.x *= VELOCITY_DROPOFF;
 		m_velocity.z *= VELOCITY_DROPOFF;
+		break;
+	default:
+		assert(false);
 	}
 }
 
@@ -165,8 +173,9 @@ void Player::move(float deltaTime)
 		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y - 90)) * movementSpeed;
 	}
 
-	if (m_currentState == ePlayerState::Flying)
+	switch (m_currentState)
 	{
+	case ePlayerState::Flying:
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 		{
 			m_velocity.y += movementSpeed;
@@ -175,18 +184,18 @@ void Player::move(float deltaTime)
 		{
 			m_velocity.y -= movementSpeed;
 		}
-	}
-	else
-	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && m_currentState == ePlayerState::OnGround && 
-			m_velocity.y == 0)
+		break;
+	case ePlayerState::InAir :
+		m_velocity.y -= GRAVITY_AMOUNT;
+		break;
+	case ePlayerState::OnGround:
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && m_velocity.y == 0)
 		{
 			m_velocity.y += JUMP_SPEED;
 		}
-		else if (m_currentState != ePlayerState::OnGround)
-		{
-			m_velocity.y -= GRAVITY_AMOUNT;
-		}
+		break;
+	default:
+		assert(false);
 	}
 }
 
