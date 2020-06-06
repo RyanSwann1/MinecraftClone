@@ -105,6 +105,7 @@ namespace Utilities
 		eCubeType::CactusTop}
 	};
 
+	constexpr int CUBE_SIZE = 1;
 	constexpr int VISIBILITY_DISTANCE = 800;
 	constexpr int MAP_SIZE = 8000;
 	const std::string TEXTURE_DIRECTORY = "Textures/";

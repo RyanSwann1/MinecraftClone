@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "ChunkManager.h"
 #include <cmath>
+#include <iostream>
 
 namespace 
 {
@@ -213,97 +214,23 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 	//Handle Auto Jump 
 	if (m_currentState == ePlayerState::OnGround && m_velocity.y == 0)
 	{
-		if (chunkManager.isCubeAtPosition({ std::floor(m_position.x + AUTO_JUMP_DISTANCE), std::floor(m_position.y - 2.0f), std::floor(m_position.z) }, cubeType) &&
-			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+		for (int x = -Utilities::CUBE_SIZE; x <= Utilities::CUBE_SIZE; x += Utilities::CUBE_SIZE * 2)
 		{
-			if (chunkManager.isCubeAtPosition({ std::floor(m_position.x + AUTO_JUMP_DISTANCE), std::floor(m_position.y - 1.0f), std::floor(m_position.z) }, cubeType))
-			{
-				if (NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-				{
-					m_velocity.y += JUMP_SPEED;
-					m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-					m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-				}
-				else
-				{
-					m_velocity.x = 0;
-				}
-			}
-			else
-			{
-				m_velocity.y += JUMP_SPEED;
-				m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-				m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-			}
-		}
-		else if (chunkManager.isCubeAtPosition({ std::floor(m_position.x - AUTO_JUMP_DISTANCE), std::floor(m_position.y - 2.0f), std::floor(m_position.z) }, cubeType) &&
-			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-		{
-			if (chunkManager.isCubeAtPosition({ std::floor(m_position.x - AUTO_JUMP_DISTANCE), std::floor(m_position.y - 1.0f), std::floor(m_position.z) }, cubeType))
-			{
-				if (NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-				{
-					m_velocity.y += JUMP_SPEED;
-					m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-					m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-				}
-				else
-				{
-					m_velocity.x = 0;
-				}
-			}
-			else
-			{
-				m_velocity.y += JUMP_SPEED;
-				m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-				m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-			}
-		}
+			glm::vec3 newPosition(glm::cos(glm::radians(m_camera.rotation.y)) * (AUTO_JUMP_DISTANCE * x),
+				m_position.y,
+				glm::sin(glm::radians(m_camera.rotation.y)) * (AUTO_JUMP_DISTANCE));
 
-		else if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 2.0f), std::floor(m_position.z + AUTO_JUMP_DISTANCE) }, cubeType) &&
-			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-		{
-			if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 1.0f), std::floor(m_position.z + AUTO_JUMP_DISTANCE) }, cubeType))
-			{
-				if (NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-				{
-					m_velocity.y += JUMP_SPEED;
-					m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-					m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-				}
-				else
-				{
-					m_velocity.z = 0;
-				}
-			}
-			else
+			newPosition.x += m_position.x;
+			newPosition.z += m_position.z;
+
+			if (chunkManager.isCubeAtPosition({ std::floor(newPosition.x), std::floor(newPosition.y - 2.0f), std::floor(newPosition.z) }, cubeType) &&
+				!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 			{
 				m_velocity.y += JUMP_SPEED;
 				m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
 				m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-			}
-		}
-		else if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 2.0f), std::floor(m_position.z - AUTO_JUMP_DISTANCE) }, cubeType) &&
-			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-		{
-			if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - 1.0f), std::floor(m_position.z - AUTO_JUMP_DISTANCE) }, cubeType))
-			{
-				if (NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-				{
-					m_velocity.y += JUMP_SPEED;
-					m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-					m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-				}
-				else
-				{
-					m_velocity.z = 0;
-				}
-			}
-			else
-			{
-				m_velocity.y += JUMP_SPEED;
-				m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-				m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
+					
+				break;
 			}
 		}
 	}	
