@@ -224,23 +224,26 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 	//Handle Auto Jump 
 	if (m_currentState == ePlayerState::OnGround && m_velocity.y == 0)
 	{
-		for (int x = -Utilities::CUBE_SIZE; x <= Utilities::CUBE_SIZE; x += Utilities::CUBE_SIZE * 2)
+		for (int z = Utilities::CUBE_SIZE; z >= -Utilities::CUBE_SIZE; z -= Utilities::CUBE_SIZE * 2)
 		{
-			glm::vec3 newPosition(glm::cos(glm::radians(m_camera.rotation.y)) * (AUTO_JUMP_DISTANCE * x),
-				m_position.y,
-				glm::sin(glm::radians(m_camera.rotation.y)) * (AUTO_JUMP_DISTANCE));
-
-			newPosition.x += m_position.x;
-			newPosition.z += m_position.z;
-
-			if (chunkManager.isCubeAtPosition({ std::floor(newPosition.x), std::floor(newPosition.y - AUTO_JUMP_HEIGHT), std::floor(newPosition.z) }, cubeType) &&
-				!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+			for (int x = -Utilities::CUBE_SIZE; x <= Utilities::CUBE_SIZE; x += Utilities::CUBE_SIZE * 2)
 			{
-				m_velocity.y += JUMP_SPEED;
-				m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-				m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-					
-				break;
+				glm::vec3 newPosition(
+					glm::cos((glm::radians(m_camera.rotation.y)) * (AUTO_JUMP_DISTANCE * x)) + m_position.x,
+					m_position.y,
+					glm::sin((glm::radians(m_camera.rotation.y)) * (AUTO_JUMP_DISTANCE * z)) + m_position.z);
+
+				if (chunkManager.isCubeAtPosition({ std::floor(newPosition.x), std::floor(newPosition.y - AUTO_JUMP_HEIGHT), std::floor(newPosition.z) }, cubeType) &&
+					!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+				{
+					m_velocity.y += JUMP_SPEED;
+					std::cout << "x: " << m_position.x << "\n";
+					std::cout << "z: " << m_position.z << "\n\n";
+					m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
+					m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
+
+					return;
+				}
 			}
 		}
 	}	
