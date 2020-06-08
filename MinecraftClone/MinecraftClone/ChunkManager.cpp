@@ -149,6 +149,25 @@ GeneratedChunk& GeneratedChunk::operator=(GeneratedChunk&& orig) noexcept
 	return *this;
 }
 
+//ChunkMeshToRegenerate
+ChunkMeshToRegenerate::ChunkMeshToRegenerate(const glm::ivec3& position, VertexArray& chunkMeshToRegenerate)
+	: ObjectQueueNode(position),
+	chunkMeshToRegenerate(chunkMeshToRegenerate)
+{}
+
+ChunkMeshToRegenerate::ChunkMeshToRegenerate(ChunkMeshToRegenerate&& orig) noexcept
+	: ObjectQueueNode(std::move(orig)),
+	chunkMeshToRegenerate(orig.chunkMeshToRegenerate)
+{}
+
+ChunkMeshToRegenerate& ChunkMeshToRegenerate::operator=(ChunkMeshToRegenerate&& orig) noexcept
+{
+	ObjectQueueNode::operator=(std::move(orig));
+	chunkMeshToRegenerate = orig.chunkMeshToRegenerate;
+
+	return *this;
+}
+
 //ChunkGenerator
 ChunkManager::ChunkManager()
 	: m_chunkPool(getObjectPoolSize()),
@@ -217,35 +236,43 @@ bool ChunkManager::destroyCubeAtPosition(const glm::ivec3& blockToDestroy)
 
 		if (!m_chunkMeshRegenerationQueue.contains(chunkStartingPosition))
 		{
-			m_chunkMeshRegenerationQueue.add(chunkStartingPosition);
+			m_chunkMeshRegenerationQueue.add({ chunkStartingPosition, *chunkMesh->second.getObject() });
 		}
 
 		//Left
 		glm::ivec3 leftChunkStartingPosition = getClosestChunkStartingPosition({ blockToDestroy.x - 1, blockToDestroy.y, blockToDestroy.z });
 		if (leftChunkStartingPosition != chunkStartingPosition && !m_chunkMeshRegenerationQueue.contains(leftChunkStartingPosition))
 		{
-			m_chunkMeshRegenerationQueue.add(leftChunkStartingPosition);
+			auto leftChunkMesh = m_chunkMeshes.find(leftChunkStartingPosition);
+			assert(leftChunkMesh != m_chunkMeshes.end());
+			m_chunkMeshRegenerationQueue.add({ leftChunkStartingPosition, *leftChunkMesh->second.getObject() });
 		}
 		
 		//Right
 		glm::ivec3 rightChunkStartingPosition = getClosestChunkStartingPosition({ blockToDestroy.x + 1, blockToDestroy.y, blockToDestroy.z });
 		if (rightChunkStartingPosition != chunkStartingPosition && !m_chunkMeshRegenerationQueue.contains(rightChunkStartingPosition))
 		{
-			m_chunkMeshRegenerationQueue.add(rightChunkStartingPosition);
+			auto rightChunkMesh = m_chunkMeshes.find(rightChunkStartingPosition);
+			assert(rightChunkMesh != m_chunkMeshes.end());
+			m_chunkMeshRegenerationQueue.add({ rightChunkStartingPosition, *rightChunkMesh->second.getObject() });
 		}
 		
 		//Forward
 		glm::ivec3 forwardChunkStartingPosition = getClosestChunkStartingPosition({ blockToDestroy.x, blockToDestroy.y, blockToDestroy.z + 1 });
 		if (forwardChunkStartingPosition != chunkStartingPosition && !m_chunkMeshRegenerationQueue.contains(forwardChunkStartingPosition))
 		{
-			m_chunkMeshRegenerationQueue.add(forwardChunkStartingPosition);
+			auto forwardChunkMesh = m_chunkMeshes.find(forwardChunkStartingPosition);
+			assert(forwardChunkMesh != m_chunkMeshes.end());
+			m_chunkMeshRegenerationQueue.add({ forwardChunkStartingPosition, *forwardChunkMesh->second.getObject() });
 		}
 		
 		//Back		
 		glm::ivec3 backChunkStartingPosition = getClosestChunkStartingPosition({ blockToDestroy.x, blockToDestroy.y, blockToDestroy.z - 1});
 		if (backChunkStartingPosition != chunkStartingPosition && !m_chunkMeshRegenerationQueue.contains(backChunkStartingPosition))
 		{
-			m_chunkMeshRegenerationQueue.add(backChunkStartingPosition);
+			auto backChunkMesh = m_chunkMeshes.find(backChunkStartingPosition);
+			assert(backChunkMesh != m_chunkMeshes.end());
+			m_chunkMeshRegenerationQueue.add({ backChunkStartingPosition, *backChunkMesh->second.getObject() });
 		}
 		
 		return true;
@@ -465,16 +492,6 @@ void ChunkManager::generateChunkMeshes()
 	}
 }
 
-void ChunkManager::regenerateChunkMeshes()
-{
-	if (m_chunkMeshRegenerationQueue.isEmpty())
-	{
-		return;
-	}
-
-	
-}
-
 void ChunkManager::clearQueues(const glm::ivec3& playerPosition)
 {
 	//Clears queues that are out of bounds of Player AABB
@@ -540,7 +557,7 @@ void ChunkManager::handleChunkMeshRegeneration()
 {
 	if (!m_chunkMeshRegenerationQueue.isEmpty())
 	{
-		PositionNode* regenNode = &m_chunkMeshRegenerationQueue.front();
+		ChunkMeshToRegenerate* regenNode = &m_chunkMeshRegenerationQueue.front();
 		while (regenNode)
 		{
 			const glm::ivec3& chunkStartingPosition = regenNode->getPosition();
@@ -550,19 +567,18 @@ void ChunkManager::handleChunkMeshRegeneration()
 			auto backChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back));
 			auto chunk = m_chunks.find(chunkStartingPosition);
 
-			assert(leftChunk != m_chunks.cend() &&
+			if (leftChunk != m_chunks.cend() &&
 				rightChunk != m_chunks.cend() &&
 				forwardChunk != m_chunks.cend() &&
 				backChunk != m_chunks.cend() &&
-				chunk != m_chunks.cend());
+				chunk != m_chunks.cend()) 
+			{
+				regenNode->chunkMeshToRegenerate.get().reset();
 
-			auto chunkMesh = m_chunkMeshes.find(chunkStartingPosition);
-			assert(chunkMesh != m_chunkMeshes.end());
+				generateChunkMesh(regenNode->chunkMeshToRegenerate.get(), *chunk->second.getObject(),
+					{ *leftChunk->second.getObject(), *rightChunk->second.getObject(), *forwardChunk->second.getObject(), *backChunk->second.getObject() });	
+			}
 
-			chunkMesh->second.getObject()->reset();
-			generateChunkMesh(*chunkMesh->second.getObject(), *chunk->second.getObject(),
-				{ *leftChunk->second.getObject(), * rightChunk->second.getObject(), * forwardChunk->second.getObject(), * backChunk->second.getObject() });
-			
 			regenNode = m_chunkMeshRegenerationQueue.remove(regenNode);
 		}
 	}

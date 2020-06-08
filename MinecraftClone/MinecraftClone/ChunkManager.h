@@ -69,6 +69,15 @@ struct GeneratedChunk : public ObjectQueueNode<GeneratedChunk>
 	ObjectFromPool<Chunk> chunkFromPool;
 };
 
+struct ChunkMeshToRegenerate : public ObjectQueueNode<ChunkMeshToRegenerate>
+{
+	ChunkMeshToRegenerate(const glm::ivec3& position, VertexArray& chunkMeshToRegenerate);
+	ChunkMeshToRegenerate(ChunkMeshToRegenerate&&) noexcept;
+	ChunkMeshToRegenerate& operator=(ChunkMeshToRegenerate&&) noexcept;
+
+	std::reference_wrapper<VertexArray> chunkMeshToRegenerate;
+};
+
 class Player;
 struct Frustum;
 class VertexArray;
@@ -98,13 +107,11 @@ private:
 	ObjectQueue<PositionNode> m_deletionQueue;
 	ObjectQueue<GeneratedChunkMesh> m_generatedChunkMeshesQueue;
 	ObjectQueue<GeneratedChunk> m_generatedChunkQueue;
-
-	ObjectQueue<PositionNode> m_chunkMeshRegenerationQueue;
+	ObjectQueue<ChunkMeshToRegenerate> m_chunkMeshRegenerationQueue;
 
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);
 	void generateChunkMeshes();
-	void regenerateChunkMeshes();
 	void clearQueues(const glm::ivec3& playerPosition);
 
 	void handleChunkMeshRegeneration();
