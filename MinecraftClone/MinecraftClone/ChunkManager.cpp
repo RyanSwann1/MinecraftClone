@@ -177,7 +177,8 @@ ChunkManager::ChunkManager()
 	m_chunkMeshesToGenerateQueue(),
 	m_deletionQueue(),
 	m_generatedChunkMeshesQueue(),
-	m_generatedChunkQueue()
+	m_generatedChunkQueue(),
+	m_chunkMeshRegenerationQueue()
 {
 	addChunks(Utilities::PLAYER_STARTING_POSITION);
 }
