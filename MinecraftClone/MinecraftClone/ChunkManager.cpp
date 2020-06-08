@@ -206,20 +206,48 @@ bool ChunkManager::isChunkAtPosition(const glm::vec3& position) const
 
 bool ChunkManager::destroyCubeAtPosition(const glm::ivec3& blockToDestroy)
 {
-	glm::ivec3 closestChunkStartingPosition = getClosestChunkStartingPosition(blockToDestroy);
-	auto chunk = m_chunks.find(closestChunkStartingPosition);
+	glm::ivec3 chunkStartingPosition = getClosestChunkStartingPosition(blockToDestroy);
+	auto chunk = m_chunks.find(chunkStartingPosition);
 	assert(chunk != m_chunks.end());
 	
 	if (chunk->second.getObject()->destroyCubeAtPosition(blockToDestroy))
 	{
-		auto chunkMesh = m_chunkMeshes.find(closestChunkStartingPosition);
+		auto chunkMesh = m_chunkMeshes.find(chunkStartingPosition);
 		assert(chunkMesh != m_chunkMeshes.end());
 
-		if (!m_chunkMeshRegenerationQueue.contains(chunk->second.getObject()->getStartingPosition()))
+		if (!m_chunkMeshRegenerationQueue.contains(chunkStartingPosition))
 		{
-			m_chunkMeshRegenerationQueue.add(chunk->second.getObject()->getStartingPosition());
+			m_chunkMeshRegenerationQueue.add(chunkStartingPosition);
 		}
 
+		//Left
+		glm::ivec3 leftChunkStartingPosition = getClosestChunkStartingPosition({ blockToDestroy.x - 1, blockToDestroy.y, blockToDestroy.z });
+		if (leftChunkStartingPosition != chunkStartingPosition && !m_chunkMeshRegenerationQueue.contains(leftChunkStartingPosition))
+		{
+			m_chunkMeshRegenerationQueue.add(leftChunkStartingPosition);
+		}
+		
+		//Right
+		glm::ivec3 rightChunkStartingPosition = getClosestChunkStartingPosition({ blockToDestroy.x + 1, blockToDestroy.y, blockToDestroy.z });
+		if (rightChunkStartingPosition != chunkStartingPosition && !m_chunkMeshRegenerationQueue.contains(rightChunkStartingPosition))
+		{
+			m_chunkMeshRegenerationQueue.add(rightChunkStartingPosition);
+		}
+		
+		//Forward
+		glm::ivec3 forwardChunkStartingPosition = getClosestChunkStartingPosition({ blockToDestroy.x, blockToDestroy.y, blockToDestroy.z + 1 });
+		if (forwardChunkStartingPosition != chunkStartingPosition && !m_chunkMeshRegenerationQueue.contains(forwardChunkStartingPosition))
+		{
+			m_chunkMeshRegenerationQueue.add(forwardChunkStartingPosition);
+		}
+		
+		//Back		
+		glm::ivec3 backChunkStartingPosition = getClosestChunkStartingPosition({ blockToDestroy.x, blockToDestroy.y, blockToDestroy.z - 1});
+		if (backChunkStartingPosition != chunkStartingPosition && !m_chunkMeshRegenerationQueue.contains(backChunkStartingPosition))
+		{
+			m_chunkMeshRegenerationQueue.add(backChunkStartingPosition);
+		}
+		
 		return true;
 	}
 
