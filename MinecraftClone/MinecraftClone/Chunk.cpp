@@ -194,7 +194,7 @@ bool Chunk::addCubeAtPosition(const glm::ivec3& position)
 bool Chunk::destroyCubeAtPosition(const glm::ivec3& position)
 {
 	glm::ivec3 localPosition(position.x - m_startingPosition.x, position.y - m_startingPosition.y, position.z - m_startingPosition.z);
-	if (!isCubeAtLocalPosition(localPosition, eCubeType::Air))
+	if (!isCubeAtLocalPosition(localPosition, eCubeType::Water) && !isCubeAtLocalPosition(localPosition, eCubeType::Air))
 	{
 		changeCubeAtLocalPosition(localPosition, eCubeType::Air);
 
