@@ -184,6 +184,14 @@ bool Chunk::destroyCubeAtPosition(const glm::ivec3& position)
 	if (!isCubeAtLocalPosition(localPosition, eCubeType::Air))
 	{
 		changeCubeAtLocalPosition(localPosition, eCubeType::Air);
+
+		if (localPosition.y < Utilities::CHUNK_HEIGHT - 1 &&
+			isCubeAtLocalPosition({ localPosition.x, localPosition.y + 1, localPosition.z }, eCubeType::TallGrass) ||
+			isCubeAtLocalPosition({ localPosition.x, localPosition.y + 1, localPosition.z }, eCubeType::Shrub))
+		{
+			changeCubeAtLocalPosition({ localPosition.x, localPosition.y + 1, localPosition.z }, eCubeType::Air);
+		}
+		
 		return true;
 	}
 
