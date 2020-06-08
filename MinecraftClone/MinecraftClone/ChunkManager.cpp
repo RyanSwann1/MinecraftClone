@@ -204,6 +204,23 @@ bool ChunkManager::isChunkAtPosition(const glm::vec3& position) const
 	return chunk != m_chunks.cend();
 }
 
+void ChunkManager::destroyCubeAtPosition(const glm::ivec3& blockToDestroy)
+{
+	glm::ivec3 closestChunkStartingPosition = getClosestChunkStartingPosition(blockToDestroy);
+	auto chunk = m_chunks.find(closestChunkStartingPosition);
+	assert(chunk != m_chunks.end());
+	
+	chunk->second.getObject()->destroyCubeAtPosition(blockToDestroy);
+
+	auto chunkMesh = m_chunkMeshes.find(closestChunkStartingPosition);
+	assert(chunkMesh != m_chunkMeshes.end());
+	
+	if (!m_chunkMeshRegenerationQueue.contains(chunk->second.getObject()->getStartingPosition()))
+	{
+		m_chunkMeshRegenerationQueue.add(chunk->second.getObject()->getStartingPosition());
+	}
+}
+
 //Two threads acquire two locks in different order
 void ChunkManager::update(const Player& player, const sf::Window& window, std::atomic<bool>& resetGame,
 	std::mutex& playerMutex, std::mutex& renderingMutex)	
@@ -221,6 +238,7 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 
 		playerLock.lock();
 		std::lock_guard<std::mutex> renderingLock(renderingMutex); 
+		handleChunkMeshRegeneration();
 		for (int i = 0; i < THREAD_TRANSFER_PER_FRAME; ++i)
 		{
 			if (!m_deletionQueue.isEmpty())
@@ -414,6 +432,16 @@ void ChunkManager::generateChunkMeshes()
 	}
 }
 
+void ChunkManager::regenerateChunkMeshes()
+{
+	if (m_chunkMeshRegenerationQueue.isEmpty())
+	{
+		return;
+	}
+
+	
+}
+
 void ChunkManager::clearQueues(const glm::ivec3& playerPosition)
 {
 	//Clears queues that are out of bounds of Player AABB
@@ -471,6 +499,38 @@ void ChunkManager::clearQueues(const glm::ivec3& playerPosition)
 			{
 				generatedChunkNode = m_generatedChunkQueue.next(generatedChunkNode);
 			}
+		}
+	}
+}
+
+void ChunkManager::handleChunkMeshRegeneration()
+{
+	if (!m_chunkMeshRegenerationQueue.isEmpty())
+	{
+		PositionNode* regenNode = &m_chunkMeshRegenerationQueue.front();
+		while (regenNode)
+		{
+			const glm::ivec3& chunkStartingPosition = regenNode->getPosition();
+			auto leftChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left));
+			auto rightChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Right));
+			auto forwardChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward));
+			auto backChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back));
+			auto chunk = m_chunks.find(chunkStartingPosition);
+
+			assert(leftChunk != m_chunks.cend() &&
+				rightChunk != m_chunks.cend() &&
+				forwardChunk != m_chunks.cend() &&
+				backChunk != m_chunks.cend() &&
+				chunk != m_chunks.cend());
+
+			auto chunkMesh = m_chunkMeshes.find(chunkStartingPosition);
+			assert(chunkMesh != m_chunkMeshes.end());
+
+			chunkMesh->second.getObject()->reset();
+			generateChunkMesh(*chunkMesh->second.getObject(), *chunk->second.getObject(),
+				{ *leftChunk->second.getObject(), * rightChunk->second.getObject(), * forwardChunk->second.getObject(), * backChunk->second.getObject() });
+			
+			regenNode = m_chunkMeshRegenerationQueue.remove(regenNode);
 		}
 	}
 }

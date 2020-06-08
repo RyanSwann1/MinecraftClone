@@ -82,6 +82,8 @@ public:
 	bool isCubeAtPosition(const glm::vec3& playerPosition, eCubeType& cubeType) const;
 	bool isChunkAtPosition(const glm::vec3& position) const;
 
+	void destroyCubeAtPosition(const glm::ivec3& blockToDestroy);
+
 	void update(const Player& player, const sf::Window& window, std::atomic<bool>& resetGame, 
 		std::mutex& playerMutex, std::mutex& renderingMutex);
 	void renderOpaque(const Frustum& frustum) const;
@@ -97,8 +99,13 @@ private:
 	ObjectQueue<GeneratedChunkMesh> m_generatedChunkMeshesQueue;
 	ObjectQueue<GeneratedChunk> m_generatedChunkQueue;
 
+	ObjectQueue<PositionNode> m_chunkMeshRegenerationQueue;
+
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);
 	void generateChunkMeshes();
+	void regenerateChunkMeshes();
 	void clearQueues(const glm::ivec3& playerPosition);
+
+	void handleChunkMeshRegeneration();
 };

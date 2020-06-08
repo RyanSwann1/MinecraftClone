@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "ChunkManager.h"
 #include <cmath>
+#include <iostream>
 
 namespace 
 {
@@ -17,6 +18,8 @@ namespace
 	
 	constexpr float AUTO_JUMP_DISTANCE = WALKING_MOVEMENT_SPEED * 1.5f;
 	constexpr float AUTO_JUMP_BREAK_SPEED = 3.5f;
+
+	constexpr float DESTROY_BLOCK_RANGE = 7.5f;
 
 	const CubeTypeComparison NON_COLLIDABLE_CUBE_TYPES =
 	{
@@ -79,6 +82,16 @@ const glm::vec3& Player::getPosition() const
 const Camera& Player::getCamera() const
 {
 	return m_camera;
+}
+
+void Player::destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
+{
+	std::lock_guard<std::mutex> playerLock(playerMutex);
+	for (float i = 0; i <= DESTROY_BLOCK_RANGE; i += 0.5f)
+	{
+		glm::vec3 rayPosition = m_camera.front * i + m_position;
+		chunkManager.destroyCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) });
+	}
 }
 
 void Player::spawn(const ChunkManager& chunkManager, std::mutex& playerMutex)
@@ -209,6 +222,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 	{
 		m_currentState = (m_currentState != ePlayerState::Flying ? ePlayerState::InAir : m_currentState);
 	}
+
 
 	//Handle Auto Jump 
 	if (m_currentState == ePlayerState::OnGround && m_velocity.y == 0)

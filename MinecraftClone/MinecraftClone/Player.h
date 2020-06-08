@@ -41,6 +41,7 @@ public:
 	const glm::vec3& getPosition() const;
 	const Camera& getCamera() const;
 	
+	void destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex);
 	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
 	void toggleFlying();
 	void moveCamera(const sf::Window& window);

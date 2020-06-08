@@ -156,6 +156,13 @@ int main()
 					window.close();
 				}
 			}
+			else if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
+			{
+				if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+				{
+					player.destroyFacingBlock(*chunkManager, playerMutex);
+				}
+			}
 			if (currentSFMLEvent.MouseMoved)
 			{
 				player.moveCamera(window);
