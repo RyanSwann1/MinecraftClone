@@ -18,7 +18,7 @@ namespace
 	
 	constexpr float AUTO_JUMP_DISTANCE = WALKING_MOVEMENT_SPEED * 1.5f;
 	constexpr float AUTO_JUMP_HEIGHT = 2.0f;
-	constexpr float AUTO_JUMP_BREAK_SCALAR;
+	constexpr float AUTO_JUMP_BREAK_SCALAR = 0.2f;
 
 	const CubeTypeComparison NON_COLLIDABLE_CUBE_TYPES =
 	{
@@ -246,4 +246,3 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 		}
 	}	
 }
-
