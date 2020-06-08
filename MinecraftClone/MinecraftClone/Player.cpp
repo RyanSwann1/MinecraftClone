@@ -17,8 +17,8 @@ namespace
 	constexpr int MS_BETWEEN_ATTEMPT_SPAWN = 250;
 	
 	constexpr float AUTO_JUMP_DISTANCE = WALKING_MOVEMENT_SPEED * 1.5f;
-	constexpr float AUTO_JUMP_BREAK_SPEED = 7.0f;
 	constexpr float AUTO_JUMP_HEIGHT = 2.0f;
+	constexpr float AUTO_JUMP_BREAK_SCALAR;
 
 	const CubeTypeComparison NON_COLLIDABLE_CUBE_TYPES =
 	{
@@ -228,19 +228,17 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 		{
 			for (int x = -Utilities::CUBE_SIZE; x <= Utilities::CUBE_SIZE; x += Utilities::CUBE_SIZE * 2)
 			{
-				glm::vec3 newPosition(
-					glm::cos((glm::radians(m_camera.rotation.y)) * (AUTO_JUMP_DISTANCE * x)) + m_position.x,
+				glm::vec3 collisionPosition(
+					m_position.x + glm::cos((glm::radians(m_camera.rotation.y)) * (AUTO_JUMP_DISTANCE * x)),
 					m_position.y,
-					glm::sin((glm::radians(m_camera.rotation.y)) * (AUTO_JUMP_DISTANCE * z)) + m_position.z);
+					m_position.z + glm::sin((glm::radians(m_camera.rotation.y)) * (AUTO_JUMP_DISTANCE * z)));
 
-				if (chunkManager.isCubeAtPosition({ std::floor(newPosition.x), std::floor(newPosition.y - AUTO_JUMP_HEIGHT), std::floor(newPosition.z) }, cubeType) &&
+				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT), std::floor(collisionPosition.z) }, cubeType) &&
 					!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 				{
 					m_velocity.y += JUMP_SPEED;
-					std::cout << "x: " << m_position.x << "\n";
-					std::cout << "z: " << m_position.z << "\n\n";
-					m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
-					m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * -AUTO_JUMP_BREAK_SPEED;
+					m_velocity.x *= AUTO_JUMP_BREAK_SCALAR;
+					m_velocity.z *= AUTO_JUMP_BREAK_SCALAR;
 
 					return;
 				}
@@ -248,3 +246,4 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 		}
 	}	
 }
+
