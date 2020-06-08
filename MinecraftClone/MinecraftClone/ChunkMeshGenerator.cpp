@@ -356,7 +356,7 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 				addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
 			}
 		}
-		else if (isFacingOpaqueCube(leftPosition, neighbouringChunks.leftChunk))
+		else if (isFacingOpaqueCube(leftPosition, neighbouringChunks.chunks[static_cast<int>(eDirection::Left)]))
 		{
 			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Left, position, true);
 		}
@@ -370,7 +370,7 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 				addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
 			}
 		}
-		else if (isFacingOpaqueCube(rightPosition, neighbouringChunks.rightChunk))
+		else if (isFacingOpaqueCube(rightPosition, neighbouringChunks.chunks[static_cast<int>(eDirection::Right)]))
 		{
 			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Right, position, true);
 		}
@@ -384,7 +384,7 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 				addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
 			}
 		}
-		else if (isFacingOpaqueCube(forwardPosition, neighbouringChunks.forwardChunk))
+		else if (isFacingOpaqueCube(forwardPosition, neighbouringChunks.chunks[static_cast<int>(eDirection::Forward)]))
 		{
 			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Front, position, true);
 		}
@@ -398,7 +398,7 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 				addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
 			}
 		}
-		else if (isFacingOpaqueCube(backPosition, neighbouringChunks.backChunk))
+		else if (isFacingOpaqueCube(backPosition, neighbouringChunks.chunks[static_cast<int>(eDirection::Back)]))
 		{
 			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Back, position, true);
 		}
@@ -441,7 +441,7 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 				addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false, shadow);
 			}
 		}
-		else if (isFacingTransparentCube(leftPosition, neighbouringChunks.leftChunk))
+		else if (isFacingTransparentCube(leftPosition, neighbouringChunks.chunks[static_cast<int>(eDirection::Left)]))
 		{
 			addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, position, false, shadow);
 		}
@@ -455,7 +455,7 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 				addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, false, shadow);
 			}
 		}
-		else if (isFacingTransparentCube(rightPosition, neighbouringChunks.rightChunk))
+		else if (isFacingTransparentCube(rightPosition, neighbouringChunks.chunks[static_cast<int>(eDirection::Right)]))
 		{
 			addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, position, false, shadow);
 		}
@@ -469,7 +469,7 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 				addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false, shadow);
 			}
 		}
-		else if (isFacingTransparentCube(forwardPosition, neighbouringChunks.forwardChunk))
+		else if (isFacingTransparentCube(forwardPosition, neighbouringChunks.chunks[static_cast<int>(eDirection::Forward)]))
 		{
 			addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Front, position, false, shadow);
 		}
@@ -483,7 +483,7 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 				addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
 			}
 		}
-		else if (isFacingTransparentCube(backPosition, neighbouringChunks.backChunk))
+		else if (isFacingTransparentCube(backPosition, neighbouringChunks.chunks[static_cast<int>(eDirection::Back)]))
 		{
 			addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Back, position, false, shadow);
 		}

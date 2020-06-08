@@ -43,12 +43,10 @@
 struct NeighbouringChunks : private NonCopyable, private NonMovable
 {
 	NeighbouringChunks(const Chunk& leftChunk, const Chunk& rightChunk,
-		const Chunk& topChunk, const Chunk& bottomChunk);
+		const Chunk& forwardChunk, const Chunk& backChunk);
 
-	const Chunk& leftChunk;
-	const Chunk& rightChunk;
-	const Chunk& forwardChunk;
-	const Chunk& backChunk;
+	const std::array<std::reference_wrapper<const Chunk>, 
+		static_cast<size_t>(eDirection::Max) + 1> chunks;
 };
 
 struct GeneratedChunkMesh : public ObjectQueueNode<GeneratedChunkMesh>

@@ -104,11 +104,8 @@ namespace
 }
 
 //NeighbouringChunks
-NeighbouringChunks::NeighbouringChunks(const Chunk& leftChunk, const Chunk& rightChunk, const Chunk& topChunk, const Chunk& bottomChunk)
-	: leftChunk(leftChunk),
-	rightChunk(rightChunk),
-	forwardChunk(topChunk),
-	backChunk(bottomChunk)
+NeighbouringChunks::NeighbouringChunks(const Chunk& leftChunk, const Chunk& rightChunk, const Chunk& forwardChunk, const Chunk& backChunk)
+	: chunks{ leftChunk, rightChunk, forwardChunk, backChunk }
 {}
 
 //GeneratedChunkMesh
