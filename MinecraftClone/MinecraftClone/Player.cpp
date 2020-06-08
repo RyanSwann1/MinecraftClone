@@ -20,7 +20,7 @@ namespace
 	constexpr float AUTO_JUMP_HEIGHT = 2.0f;
 	constexpr float AUTO_JUMP_BREAK_SCALAR = 0.2f;
 
-	constexpr float DESTROY_BLOCK_RANGE = 7.5f;
+	constexpr float DESTROY_BLOCK_RANGE = 5.0f;
 
 	const CubeTypeComparison NON_COLLIDABLE_CUBE_TYPES =
 	{
@@ -91,7 +91,10 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMu
 	for (float i = 0; i <= DESTROY_BLOCK_RANGE; i += 0.5f)
 	{
 		glm::vec3 rayPosition = m_camera.front * i + m_position;
-		chunkManager.destroyCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) });
+		if (chunkManager.destroyCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }))
+		{
+			break;
+		}
 	}
 }
 

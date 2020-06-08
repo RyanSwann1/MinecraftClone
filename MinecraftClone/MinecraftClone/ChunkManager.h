@@ -82,7 +82,7 @@ public:
 	bool isCubeAtPosition(const glm::vec3& playerPosition, eCubeType& cubeType) const;
 	bool isChunkAtPosition(const glm::vec3& position) const;
 
-	void destroyCubeAtPosition(const glm::ivec3& blockToDestroy);
+	bool destroyCubeAtPosition(const glm::ivec3& blockToDestroy);
 
 	void update(const Player& player, const sf::Window& window, std::atomic<bool>& resetGame, 
 		std::mutex& playerMutex, std::mutex& renderingMutex);

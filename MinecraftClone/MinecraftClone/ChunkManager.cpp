@@ -204,21 +204,26 @@ bool ChunkManager::isChunkAtPosition(const glm::vec3& position) const
 	return chunk != m_chunks.cend();
 }
 
-void ChunkManager::destroyCubeAtPosition(const glm::ivec3& blockToDestroy)
+bool ChunkManager::destroyCubeAtPosition(const glm::ivec3& blockToDestroy)
 {
 	glm::ivec3 closestChunkStartingPosition = getClosestChunkStartingPosition(blockToDestroy);
 	auto chunk = m_chunks.find(closestChunkStartingPosition);
 	assert(chunk != m_chunks.end());
 	
-	chunk->second.getObject()->destroyCubeAtPosition(blockToDestroy);
-
-	auto chunkMesh = m_chunkMeshes.find(closestChunkStartingPosition);
-	assert(chunkMesh != m_chunkMeshes.end());
-	
-	if (!m_chunkMeshRegenerationQueue.contains(chunk->second.getObject()->getStartingPosition()))
+	if (chunk->second.getObject()->destroyCubeAtPosition(blockToDestroy))
 	{
-		m_chunkMeshRegenerationQueue.add(chunk->second.getObject()->getStartingPosition());
+		auto chunkMesh = m_chunkMeshes.find(closestChunkStartingPosition);
+		assert(chunkMesh != m_chunkMeshes.end());
+
+		if (!m_chunkMeshRegenerationQueue.contains(chunk->second.getObject()->getStartingPosition()))
+		{
+			m_chunkMeshRegenerationQueue.add(chunk->second.getObject()->getStartingPosition());
+		}
+
+		return true;
 	}
+
+	return false;
 }
 
 //Two threads acquire two locks in different order
