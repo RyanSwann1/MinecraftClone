@@ -178,6 +178,19 @@ void Chunk::changeCubeAtLocalPosition(const glm::ivec3& position, eCubeType cube
 	m_chunk[converTo1D(position)] = static_cast<char>(cubeType);
 }
 
+bool Chunk::addCubeAtPosition(const glm::ivec3& position)
+{
+	glm::ivec3 localPosition(position.x - m_startingPosition.x, position.y - m_startingPosition.y, position.z - m_startingPosition.z);
+	if (localPosition.y < Utilities::CHUNK_HEIGHT && !isCubeAtLocalPosition({ localPosition.x, localPosition.y - 1, localPosition.z }, eCubeType::Air) &&
+		isCubeAtLocalPosition(localPosition, eCubeType::Air))
+	{
+		changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
+		return true;
+	}
+
+	return false;
+}
+
 bool Chunk::destroyCubeAtPosition(const glm::ivec3& position)
 {
 	glm::ivec3 localPosition(position.x - m_startingPosition.x, position.y - m_startingPosition.y, position.z - m_startingPosition.z);

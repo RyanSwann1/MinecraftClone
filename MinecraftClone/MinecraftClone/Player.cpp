@@ -22,6 +22,8 @@ namespace
 
 	constexpr float DESTROY_BLOCK_RANGE = 5.0f;
 	constexpr float DESTROY_BLOCK_INCREMENT = 0.5f;
+	constexpr float PLACE_BLOCK_RANGE = 5.0f;
+	constexpr float PLACE_BLOCK_INCREMENT = 0.5f;
 
 	const CubeTypeComparison NON_COLLIDABLE_CUBE_TYPES =
 	{
@@ -84,6 +86,19 @@ const glm::vec3& Player::getPosition() const
 const Camera& Player::getCamera() const
 {
 	return m_camera;
+}
+
+void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
+{
+	std::lock_guard<std::mutex> playerLock(playerMutex);
+	for (float i = PLACE_BLOCK_RANGE; i >= 0; i -= PLACE_BLOCK_INCREMENT)
+	{
+		glm::vec3 rayPosition = m_camera.front * i + m_position;
+		if (chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }))
+		{
+			break;
+		}
+	}
 }
 
 void Player::destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex)

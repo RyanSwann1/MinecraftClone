@@ -162,6 +162,10 @@ int main()
 				{
 					player.destroyFacingBlock(*chunkManager, playerMutex);
 				}
+				else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
+				{
+					player.placeBlock(*chunkManager, playerMutex);
+				}
 			}
 			if (currentSFMLEvent.MouseMoved)
 			{

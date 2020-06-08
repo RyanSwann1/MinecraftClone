@@ -224,6 +224,28 @@ bool ChunkManager::isChunkAtPosition(const glm::vec3& position) const
 	return chunk != m_chunks.cend();
 }
 
+bool ChunkManager::placeCubeAtPosition(const glm::ivec3& placementPosition)
+{
+	glm::ivec3 chunkStartingPosition = getClosestChunkStartingPosition(placementPosition);
+	auto chunk = m_chunks.find(chunkStartingPosition);
+	assert(chunk != m_chunks.end());
+
+	if (chunk->second.getObject()->addCubeAtPosition(placementPosition))
+	{
+		auto chunkMesh = m_chunkMeshes.find(chunkStartingPosition);
+		assert(chunkMesh != m_chunkMeshes.end());
+
+		if (!m_chunkMeshRegenerationQueue.contains(chunkStartingPosition))
+		{
+			m_chunkMeshRegenerationQueue.add({ chunkStartingPosition, *chunkMesh->second.getObject() });
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
 bool ChunkManager::destroyCubeAtPosition(const glm::ivec3& blockToDestroy)
 {
 	glm::ivec3 chunkStartingPosition = getClosestChunkStartingPosition(blockToDestroy);

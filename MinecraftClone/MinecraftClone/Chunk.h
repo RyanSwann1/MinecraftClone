@@ -38,6 +38,7 @@ public:
 	char getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const;
 	bool isCubeAtPosition(const glm::ivec3& position) const;
 	
+	bool addCubeAtPosition(const glm::ivec3& position);
 	bool destroyCubeAtPosition(const glm::ivec3& position);
 	
 	void reset();
