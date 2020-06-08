@@ -39,10 +39,9 @@ enum class eDirection
 {
 	Left,
 	Right,
-	Up,
-	Down,
 	Forward,
-	Back
+	Back,
+	Max = Back
 };
 
 //https://stackoverflow.com/questions/4422507/superiority-of-unnamed-namespace-over-static
