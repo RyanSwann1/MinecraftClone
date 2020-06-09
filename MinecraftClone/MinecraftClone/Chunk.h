@@ -21,6 +21,7 @@ enum class eBiomeType
 };
 
 //position.y * (CHUNK_AREA) + position.z * CHUNK_SIZE + position.x;
+struct NeighbouringChunks;
 class Chunk : private NonCopyable
 {
 public:
@@ -37,10 +38,10 @@ public:
 	const glm::ivec3& getEndingPosition() const;
 	char getCubeDetailsWithoutBoundsCheck(const glm::ivec3& position) const;
 	bool isCubeAtPosition(const glm::ivec3& position) const;
+	bool isCubeAtPosition(const glm::ivec3& position, eCubeType cubeType) const;
 	
 	bool addCubeAtPosition(const glm::ivec3& position);
 	bool destroyCubeAtPosition(const glm::ivec3& position);
-	
 	void reset();
 	void reuse(const glm::ivec3& startingPosition);
 

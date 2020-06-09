@@ -1,6 +1,7 @@
 #include "Chunk.h"
 #include "VertexBuffer.h"
 #include "VertexBuffer.h"
+#include "ChunkManager.h"
 #include "glm/gtc/noise.hpp"
 #include <iostream>
 #include <algorithm>
@@ -172,6 +173,17 @@ bool Chunk::isCubeAtPosition(const glm::ivec3& position) const
 	return false;
 }
 
+bool Chunk::isCubeAtPosition(const glm::ivec3& position, eCubeType cubeType) const
+{
+	if (isPositionInBounds(position))
+	{
+		return m_chunk[converTo1D({ position.x - m_startingPosition.x, position.y - m_startingPosition.y,
+			position.z - m_startingPosition.z })] == static_cast<char>(cubeType);
+	}
+
+	return false;
+}
+
 void Chunk::changeCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType)
 {
 	assert(isPositionInLocalBounds(position));
@@ -191,20 +203,20 @@ bool Chunk::addCubeAtPosition(const glm::ivec3& position)
 	return false;
 }
 
-bool Chunk::destroyCubeAtPosition(const glm::ivec3& position)
+bool Chunk::destroyCubeAtPosition(const glm::ivec3& destroyPosition)
 {
-	glm::ivec3 localPosition(position.x - m_startingPosition.x, position.y - m_startingPosition.y, position.z - m_startingPosition.z);
+	glm::ivec3 localPosition(destroyPosition.x - m_startingPosition.x, destroyPosition.y - m_startingPosition.y, destroyPosition.z - m_startingPosition.z);
 	if (!isCubeAtLocalPosition(localPosition, eCubeType::Water) && !isCubeAtLocalPosition(localPosition, eCubeType::Air))
 	{
-		changeCubeAtLocalPosition(localPosition, eCubeType::Air);
-
+		//Destroy specific Cubes on top
 		if (localPosition.y < Utilities::CHUNK_HEIGHT - 1 &&
 			isCubeAtLocalPosition({ localPosition.x, localPosition.y + 1, localPosition.z }, eCubeType::TallGrass) ||
 			isCubeAtLocalPosition({ localPosition.x, localPosition.y + 1, localPosition.z }, eCubeType::Shrub))
 		{
 			changeCubeAtLocalPosition({ localPosition.x, localPosition.y + 1, localPosition.z }, eCubeType::Air);
 		}
-		
+
+		changeCubeAtLocalPosition(localPosition, eCubeType::Air);
 		return true;
 	}
 
