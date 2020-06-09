@@ -101,12 +101,53 @@ namespace
 			glm::pow(positionA.y - positionB.y, 2) +
 			glm::pow(positionA.z - positionB.z, 2);
 	}
+
+	bool isAllNeighbouringChunksAvailable(const std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>>& chunks,
+		const glm::ivec3& middleChunkStartingPosition)
+	{
+		auto leftChunk = chunks.find(getNeighbouringChunkPosition(middleChunkStartingPosition, eDirection::Left));
+		auto rightChunk = chunks.find(getNeighbouringChunkPosition(middleChunkStartingPosition, eDirection::Right));
+		auto forwardChunk = chunks.find(getNeighbouringChunkPosition(middleChunkStartingPosition, eDirection::Forward));
+		auto backChunk = chunks.find(getNeighbouringChunkPosition(middleChunkStartingPosition, eDirection::Back));
+
+		return (leftChunk != chunks.cend() &&
+			rightChunk != chunks.cend() &&
+			forwardChunk != chunks.cend() &&
+			backChunk != chunks.cend());
+	}
+
+	NeighbouringChunks getAllNeighbouringChunks(const std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>>& chunks,
+		const glm::ivec3& middleChunkStartingPosition)
+	{
+		auto leftChunk = chunks.find(getNeighbouringChunkPosition(middleChunkStartingPosition, eDirection::Left));
+		auto rightChunk = chunks.find(getNeighbouringChunkPosition(middleChunkStartingPosition, eDirection::Right));
+		auto forwardChunk = chunks.find(getNeighbouringChunkPosition(middleChunkStartingPosition, eDirection::Forward));
+		auto backChunk = chunks.find(getNeighbouringChunkPosition(middleChunkStartingPosition, eDirection::Back));
+
+		assert(leftChunk != chunks.cend() &&
+			rightChunk != chunks.cend() &&
+			forwardChunk != chunks.cend() &&
+			backChunk != chunks.cend());
+
+		return NeighbouringChunks(*leftChunk->second.getObject(), *rightChunk->second.getObject(),
+			*forwardChunk->second.getObject(), *backChunk->second.getObject());
+	}
 }
 
 //NeighbouringChunks
 NeighbouringChunks::NeighbouringChunks(const Chunk& leftChunk, const Chunk& rightChunk, const Chunk& forwardChunk, const Chunk& backChunk)
 	: chunks{ leftChunk, rightChunk, forwardChunk, backChunk }
 {}
+
+NeighbouringChunks::NeighbouringChunks(NeighbouringChunks&& orig) noexcept
+	: chunks(std::move(orig.chunks))
+{}
+
+NeighbouringChunks& NeighbouringChunks::operator=(NeighbouringChunks&& orig) noexcept
+{
+	chunks = std::move(orig.chunks);
+	return *this;
+}
 
 //GeneratedChunkMesh
 GeneratedChunkMesh::GeneratedChunkMesh(const glm::ivec3& position, ObjectFromPool<VertexArray>&& chunkMeshFromPool)
@@ -479,23 +520,21 @@ void ChunkManager::generateChunkMeshes()
 	while (chunkMeshToGenerate)
 	{
 		const glm::ivec3& chunkStartingPosition = chunkMeshToGenerate->getPosition();
-		auto leftChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left));
-		auto rightChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Right));
-		auto forwardChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward));
-		auto backChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back));
-		auto chunk = m_chunks.find(chunkStartingPosition);
-
-		if (leftChunk != m_chunks.cend() &&
-			rightChunk != m_chunks.cend() &&
-			forwardChunk != m_chunks.cend() &&
-			backChunk != m_chunks.cend() && 
-			chunk != m_chunks.cend())
+		if (isAllNeighbouringChunksAvailable(m_chunks, chunkStartingPosition))
 		{
 			ObjectFromPool<VertexArray> chunkMeshFromPool = m_chunkMeshPool.getNextAvailableObject();
 			if (chunkMeshFromPool.getObject())
 			{
+				auto chunk = m_chunks.find(chunkStartingPosition);
+				assert(chunk != m_chunks.cend());
+
+				NeighbouringChunks neighbouringChunks = getAllNeighbouringChunks(m_chunks, chunkStartingPosition);
+
 				generateChunkMesh(*chunkMeshFromPool.getObject(), *chunk->second.getObject(),
-					{ *leftChunk->second.getObject(), *rightChunk->second.getObject(), *forwardChunk->second.getObject(), *backChunk->second.getObject() });
+					{ neighbouringChunks.chunks[static_cast<int>(eDirection::Left)].get(),
+					neighbouringChunks.chunks[static_cast<int>(eDirection::Right)].get(),
+					neighbouringChunks.chunks[static_cast<int>(eDirection::Forward)].get(),
+					neighbouringChunks.chunks[static_cast<int>(eDirection::Back)].get() });
 
 				m_generatedChunkMeshesQueue.add({ chunkStartingPosition, std::move(chunkMeshFromPool) });
 				chunkMeshToGenerate = m_chunkMeshesToGenerateQueue.remove(chunkMeshToGenerate);
@@ -580,24 +619,19 @@ void ChunkManager::handleChunkMeshRegeneration()
 		ChunkMeshToRegenerate* regenNode = &m_chunkMeshRegenerationQueue.front();
 		while (regenNode)
 		{
+			regenNode->chunkMeshToRegenerate.get().reset();
+
 			const glm::ivec3& chunkStartingPosition = regenNode->getPosition();
-			auto leftChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Left));
-			auto rightChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Right));
-			auto forwardChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Forward));
-			auto backChunk = m_chunks.find(getNeighbouringChunkPosition(chunkStartingPosition, eDirection::Back));
+			NeighbouringChunks neighbouringChunks = getAllNeighbouringChunks(m_chunks, chunkStartingPosition);
+			
 			auto chunk = m_chunks.find(chunkStartingPosition);
+			assert(chunk != m_chunks.cend());
 
-			if (leftChunk != m_chunks.cend() &&
-				rightChunk != m_chunks.cend() &&
-				forwardChunk != m_chunks.cend() &&
-				backChunk != m_chunks.cend() &&
-				chunk != m_chunks.cend()) 
-			{
-				regenNode->chunkMeshToRegenerate.get().reset();
-
-				generateChunkMesh(regenNode->chunkMeshToRegenerate.get(), *chunk->second.getObject(),
-					{ *leftChunk->second.getObject(), *rightChunk->second.getObject(), *forwardChunk->second.getObject(), *backChunk->second.getObject() });	
-			}
+			generateChunkMesh(regenNode->chunkMeshToRegenerate.get(), *chunk->second.getObject(),
+				{ neighbouringChunks.chunks[static_cast<int>(eDirection::Left)].get(),
+				neighbouringChunks.chunks[static_cast<int>(eDirection::Right)].get(),
+				neighbouringChunks.chunks[static_cast<int>(eDirection::Forward)].get(),
+				neighbouringChunks.chunks[static_cast<int>(eDirection::Back)].get() });
 
 			regenNode = m_chunkMeshRegenerationQueue.remove(regenNode);
 		}

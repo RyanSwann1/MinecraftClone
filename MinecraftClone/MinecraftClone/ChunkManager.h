@@ -40,12 +40,14 @@
 
 //http://www.lighthouse3d.com/tutorials/maths/
 
-struct NeighbouringChunks : private NonCopyable, private NonMovable
+struct NeighbouringChunks : private NonCopyable
 {
 	NeighbouringChunks(const Chunk& leftChunk, const Chunk& rightChunk,
 		const Chunk& forwardChunk, const Chunk& backChunk);
+	NeighbouringChunks(NeighbouringChunks&&) noexcept;
+	NeighbouringChunks& operator=(NeighbouringChunks&&) noexcept;
 
-	const std::array<std::reference_wrapper<const Chunk>, 
+	std::array<std::reference_wrapper<const Chunk>, 
 		static_cast<size_t>(eDirection::Max) + 1> chunks;
 };
 
@@ -112,6 +114,5 @@ private:
 	void addChunks(const glm::ivec3& playerPosition);
 	void generateChunkMeshes();
 	void clearQueues(const glm::ivec3& playerPosition);
-
 	void handleChunkMeshRegeneration();
 };
