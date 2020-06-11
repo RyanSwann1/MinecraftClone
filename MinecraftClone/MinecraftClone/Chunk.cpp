@@ -3,7 +3,6 @@
 #include "VertexBuffer.h"
 #include "ChunkManager.h"
 #include "glm/gtc/noise.hpp"
-#include <iostream>
 #include <algorithm>
 #include <limits>
 #include <random>
@@ -205,72 +204,59 @@ bool Chunk::addCubeAtPosition(const glm::ivec3& placementPosition, const Neighbo
 	glm::ivec3 localPosition = convertToLocalPosition(placementPosition, m_startingPosition);
 	assert(isPositionInLocalBounds(localPosition));
 
-	//Search current Chunk
-	if (localPosition.y < Utilities::CHUNK_HEIGHT && isCubeAtLocalPosition({ localPosition.x, localPosition.y - 1, localPosition.z }) &&
-		!isCubeAtLocalPosition(localPosition))
+	if (localPosition.y < Utilities::CHUNK_HEIGHT && !isCubeAtLocalPosition(localPosition))
 	{
-		changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
-		return true;
+		if (isCubeAtLocalPosition({ localPosition.x, localPosition.y - 1, localPosition.z }))
+		{
+			changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
+			return true;
+		}
+		else
+		{
+			//Search local bounds
+			for (int z = localPosition.z - 1; z <= localPosition.z + 1; z += 2)
+			{
+				if (isPositionInLocalBounds({ localPosition.x, localPosition.y, z }) && isCubeAtLocalPosition({ localPosition.x, localPosition.y, z }))
+				{
+					changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
+					return true;
+				}
+			}
+
+			for (int x = localPosition.x - 1; x <= localPosition.x + 1; x += 2)
+			{
+				if (isPositionInLocalBounds({ x, localPosition.y, localPosition.z }) && isCubeAtLocalPosition({ x, localPosition.y, localPosition.z }))
+				{
+					changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
+					return true;
+				}
+			}
+
+			//Search Neighbouring Chunks
+			for (const auto& neighbouringChunk : neighbouringChunks.chunks)
+			{
+				for (int z = placementPosition.z - 1; z <= placementPosition.z + 1; z += 2)
+				{
+					if (neighbouringChunk.get().isPositionInBounds({ placementPosition.x, placementPosition.y, z }) &&
+						neighbouringChunk.get().isCubeAtPosition({ placementPosition.x, placementPosition.y, z }))
+					{
+						changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
+						return true;
+					}
+				}
+
+				for (int x = placementPosition.x - 1; x <= placementPosition.x + 1; x += 2)
+				{
+					if (neighbouringChunk.get().isPositionInBounds({ x, placementPosition.y, placementPosition.z }) &&
+						neighbouringChunk.get().isCubeAtPosition({ x, placementPosition.y, placementPosition.z }))
+					{
+						changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
+						return true;
+					}
+				}
+			}
+		}
 	}
-
-	//else if(localPosition.y < Utilities::CHUNK_HEIGHT && !isCubeAtLocalPosition(localPosition))
-	//{
-	//	for (int z = localPosition.z - 1; z <= localPosition.z + 1; z += 2)
-	//	{
-	//		if (isPositionInLocalBounds({ localPosition.x, localPosition.y, z }) && !isCubeAtLocalPosition({ localPosition.x, localPosition.y, z }))
-	//		{
-	//			if (z < 0 && isPositionInLocalBounds({ localPosition.x, localPosition.y, z - 1 }) &&
-	//				isCubeAtLocalPosition({ localPosition.x, localPosition.y, z - 1 }))
-	//			{
-	//				changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
-	//				return true;
-	//			}
-	//			else if (z > 0 && isPositionInLocalBounds({ localPosition.x, localPosition.y, z + 1 }) &&
-	//				isCubeAtLocalPosition({ localPosition.x, localPosition.y, z + 1 }))
-	//			{
-	//				changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
-	//				return true;
-	//			}
-	//		}
-	//	}
-
-	//	//for (int x = localPosition.x - 1; x <= localPosition.x + 1; x += 2)
-	//	//{
-	//	//	if (isPositionInLocalBounds({ x, localPosition.y, localPosition.z }) && !isCubeAtLocalPosition({ x, localPosition.y, localPosition.z }))
-	//	//	{
-	//	//		changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
-	//	//		return true;
-	//	//	}
-	//	//}
-
-
-	//	//for (int z = localPosition.z - 1; z <= localPosition.z + 1; z += 2)
-	//	//{
-	//	//	for (int x = localPosition.x - 1; x <= localPosition.x + 1; x += 2)
-	//	//	{
-	//	//		if (isPositionInLocalBounds({ x, localPosition.y, z }) && !isCubeAtLocalPosition({ x, localPosition.y, z }))
-	//	//		{
-	//	//			changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
-	//	//			return true;
-	//	//		}
-	//	//	}
-	//	//}
-
-	//	//for (const auto& neighbouringChunk : neighbouringChunks.chunks)
-	//	//{
-	//	//	for (int z = placementPosition.z - 1; z <= placementPosition.z + 1; z += 2)
-	//	//	{
-	//	//		for (int x = placementPosition.x - 1; x <= placementPosition.x + 1; x += 2)
-	//	//		{
-	//	//			if (neighbouringChunk.get().isCubeAtPosition({ x, placementPosition.y, z }))
-	//	//			{
-	//	//				changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
-	//	//				return true;
-	//	//			}
-	//	//		}
-	//	//	}
-	//	//}
-	//}
 
 	return false;
 }
