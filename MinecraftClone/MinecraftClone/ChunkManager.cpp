@@ -268,7 +268,7 @@ bool ChunkManager::placeCubeAtPosition(const glm::ivec3& placementPosition)
 	auto chunk = m_chunks.find(chunkStartingPosition);
 	assert(chunk != m_chunks.end());
 
-	if (chunk->second.getObject()->addCubeAtPosition(placementPosition))
+	if (chunk->second.getObject()->addCubeAtPosition(placementPosition, getAllNeighbouringChunks(m_chunks, chunkStartingPosition)))
 	{
 		auto chunkMesh = m_chunkMeshes.find(chunkStartingPosition);
 		assert(chunkMesh != m_chunkMeshes.end());

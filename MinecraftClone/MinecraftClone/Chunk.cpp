@@ -54,6 +54,11 @@ namespace
 		return position;
 	}
 
+	glm::ivec3 convertToLocalPosition(const glm::ivec3& worldPosition, const glm::ivec3& chunkStartingPosition)
+	{
+		return { worldPosition.x - chunkStartingPosition.x, worldPosition.y - chunkStartingPosition.y, worldPosition.z - chunkStartingPosition.z };
+	}
+
 	int getRandomNumber(int min, int max)
 	{
 		static std::random_device rd;  //Will be used to obtain a seed for the random number engine
@@ -100,19 +105,18 @@ Chunk& Chunk::operator=(Chunk&& orig) noexcept
 	return *this;
 }
 
-glm::ivec3 Chunk::getHighestCubeAtPosition(const glm::ivec3& startingPosition) const
+glm::ivec3 Chunk::getHighestCubeAtPosition(const glm::ivec3& position) const
 {
-	glm::ivec3 cubePosition(0, 0, 0);
 	for (int y = Utilities::CHUNK_HEIGHT - 1; y >= 0; --y)
 	{
-		if (!isCubeAtLocalPosition({ startingPosition.x - m_startingPosition.x, y, startingPosition.z - m_startingPosition.z }, eCubeType::Air))
+		if (isCubeAtLocalPosition(convertToLocalPosition({ position.x, y, position.z }, m_startingPosition)))
 		{
-			cubePosition = { startingPosition.x, y, startingPosition.z };
-			break;
+			return { position.x, y + 1, position.z };
 		}
 	}
 
-	return cubePosition;
+	assert(false);
+	return glm::ivec3(position.x, Utilities::CHUNK_HEIGHT - 1, position.z);
 }
 
 bool Chunk::isCubeBelowCovering(const glm::ivec3& startingPosition) const
@@ -184,28 +188,67 @@ bool Chunk::isCubeAtPosition(const glm::ivec3& position, eCubeType cubeType) con
 	return false;
 }
 
+bool Chunk::isCubeAtLocalPosition(const glm::ivec3& localPosition) const
+{
+	assert(isPositionInLocalBounds(localPosition));
+	return m_chunk[converTo1D(localPosition)] != static_cast<char>(eCubeType::Air);
+}
+
 void Chunk::changeCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType)
 {
 	assert(isPositionInLocalBounds(position));
 	m_chunk[converTo1D(position)] = static_cast<char>(cubeType);
 }
 
-bool Chunk::addCubeAtPosition(const glm::ivec3& position)
+bool Chunk::addCubeAtPosition(const glm::ivec3& placementPosition, const NeighbouringChunks& neighbouringChunks)
 {
-	glm::ivec3 localPosition(position.x - m_startingPosition.x, position.y - m_startingPosition.y, position.z - m_startingPosition.z);
-	if (localPosition.y < Utilities::CHUNK_HEIGHT && !isCubeAtLocalPosition({ localPosition.x, localPosition.y - 1, localPosition.z }, eCubeType::Air) &&
-		isCubeAtLocalPosition(localPosition, eCubeType::Air))
+	glm::ivec3 localPosition = convertToLocalPosition(placementPosition, m_startingPosition);
+	assert(isPositionInLocalBounds(localPosition));
+
+	//Search current Chunk
+	if (localPosition.y < Utilities::CHUNK_HEIGHT && isCubeAtLocalPosition({ localPosition.x, localPosition.y - 1, localPosition.z }) &&
+		!isCubeAtLocalPosition(localPosition))
 	{
 		changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
 		return true;
 	}
+
+	//else if(localPosition.y < Utilities::CHUNK_HEIGHT && !isCubeAtLocalPosition(localPosition))
+	//{
+	//	for (int z = localPosition.z - 1; z <= localPosition.z + 1; z += 2)
+	//	{
+	//		for (int x = localPosition.x - 1; x <= localPosition.x + 1; x += 2)
+	//		{
+	//			if (isPositionInLocalBounds({ x, localPosition.y, z }) && !isCubeAtLocalPosition({ x, localPosition.y, z }))
+	//			{
+	//				changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
+	//				return true;
+	//			}
+	//		}
+	//	}
+
+	//	for (const auto& neighbouringChunk : neighbouringChunks.chunks)
+	//	{
+	//		for (int z = placementPosition.z - 1; z <= placementPosition.z + 1; z += 2)
+	//		{
+	//			for (int x = placementPosition.x - 1; x <= placementPosition.x + 1; x += 2)
+	//			{
+	//				if (neighbouringChunk.get().isCubeAtPosition({ x, placementPosition.y, z }))
+	//				{
+	//					changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
+	//					return true;
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 
 	return false;
 }
 
 bool Chunk::destroyCubeAtPosition(const glm::ivec3& destroyPosition)
 {
-	glm::ivec3 localPosition(destroyPosition.x - m_startingPosition.x, destroyPosition.y - m_startingPosition.y, destroyPosition.z - m_startingPosition.z);
+	glm::ivec3 localPosition = convertToLocalPosition(destroyPosition, m_startingPosition);
 	if (!isCubeAtLocalPosition(localPosition, eCubeType::Water) && !isCubeAtLocalPosition(localPosition, eCubeType::Air))
 	{
 		//Destroy specific Cubes on top
@@ -506,10 +549,10 @@ bool Chunk::isPositionInLocalBounds(const glm::ivec3& position) const
 		position.z < Utilities::CHUNK_DEPTH);
 }
 
-bool Chunk::isCubeAtLocalPosition(const glm::ivec3& position, eCubeType cubeType) const
+bool Chunk::isCubeAtLocalPosition(const glm::ivec3& localPosition, eCubeType cubeType) const
 {
-	assert(isPositionInLocalBounds(position));
-	return m_chunk[converTo1D(position)] == static_cast<char>(cubeType);
+	assert(isPositionInLocalBounds(localPosition));
+	return m_chunk[converTo1D(localPosition)] == static_cast<char>(cubeType);
 }
 
 int Chunk::getElevationAtPosition(int x, int z) const

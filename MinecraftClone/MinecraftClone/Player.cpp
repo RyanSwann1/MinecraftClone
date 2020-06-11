@@ -23,7 +23,7 @@ namespace
 	constexpr float DESTROY_BLOCK_RANGE = 5.0f;
 	constexpr float DESTROY_BLOCK_INCREMENT = 0.5f;
 	constexpr float PLACE_BLOCK_RANGE = 5.0f;
-	constexpr float PLACE_BLOCK_INCREMENT = 0.5f;
+	constexpr float PLACE_BLOCK_INCREMENT = 0.25f;
 
 	const CubeTypeComparison NON_COLLIDABLE_CUBE_TYPES =
 	{
