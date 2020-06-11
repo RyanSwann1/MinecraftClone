@@ -52,6 +52,10 @@ namespace
 				break;
 			case eCubeSide::Top:
 				textureLayer = eTextureLayer::Grass;
+				break;
+			case eCubeSide::Bottom:
+				textureLayer = eTextureLayer::Dirt;
+				break;
 			}
 			break;
 		case eCubeType::Log:
