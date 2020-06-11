@@ -3,6 +3,7 @@
 #include "ChunkManager.h"
 #include <cmath>
 #include <iostream>
+#include "BoundingBox.h"
 
 namespace 
 {
@@ -92,6 +93,8 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 {
 	std::lock_guard<std::mutex> playerLock(playerMutex);
 
+	//BoundingBox(float minX, float maxX, float minY, float maxY, float minZ, float maxZ)
+	//BoundingBox playerAABB
 	bool blockPlaced = false;
 	for (float i = 0; i <= PLACE_BLOCK_RANGE; i += PLACE_BLOCK_INCREMENT)
 	{
@@ -104,6 +107,18 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 				if (!chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }))
 				{
 					chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) });
+					
+
+					std::cout << "Ray Position\n";
+					std::cout << std::floor(rayPosition.x) << "\n";
+					std::cout << rayPosition.y << "\n";
+					std::cout << std::floor(rayPosition.z) << "\n\n";
+
+					std::cout << "Player Position\n";
+					std::cout << std::floor(m_position.x) << "\n";
+					std::cout << m_position.y << "\n";
+					std::cout << std::floor(m_position.z) << "\n\n\n";
+					
 					blockPlaced = true;
 					break;
 				}
@@ -281,25 +296,19 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 	//Handle Auto Jump 
 	if (m_currentState == ePlayerState::OnGround && m_velocity.y == 0)
 	{
-		for (int z = Utilities::CUBE_SIZE; z >= -Utilities::CUBE_SIZE; z -= Utilities::CUBE_SIZE * 2)
+		glm::vec3 collisionPosition(
+			m_position.x + m_velocity.x * 0.2f,
+			m_position.y,
+			m_position.z + m_velocity.z * 0.2f);
+
+		if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT), std::floor(collisionPosition.z) }, cubeType) &&
+			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
-			for (int x = -Utilities::CUBE_SIZE; x <= Utilities::CUBE_SIZE; x += Utilities::CUBE_SIZE * 2)
-			{
-				glm::vec3 collisionPosition(
-					m_position.x + glm::cos((glm::radians(m_camera.rotation.y)) * (AUTO_JUMP_DISTANCE * x)),
-					m_position.y,
-					m_position.z + glm::sin((glm::radians(m_camera.rotation.y)) * (AUTO_JUMP_DISTANCE * z)));
+			m_velocity.y += JUMP_SPEED;
+			m_velocity.x *= AUTO_JUMP_BREAK_SCALAR;
+			m_velocity.z *= AUTO_JUMP_BREAK_SCALAR;
 
-				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT), std::floor(collisionPosition.z) }, cubeType) &&
-					!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-				{
-					m_velocity.y += JUMP_SPEED;
-					m_velocity.x *= AUTO_JUMP_BREAK_SCALAR;
-					m_velocity.z *= AUTO_JUMP_BREAK_SCALAR;
-
-					return;
-				}
-			}
+			return;
 		}
 	}	
 }
