@@ -23,7 +23,7 @@ namespace
 	constexpr float DESTROY_BLOCK_RANGE = 5.0f;
 	constexpr float DESTROY_BLOCK_INCREMENT = 0.5f;
 	constexpr float PLACE_BLOCK_RANGE = 5.0f;
-	constexpr float PLACE_BLOCK_INCREMENT = 0.25f;
+	constexpr float PLACE_BLOCK_INCREMENT = 0.1f;
 
 	const CubeTypeComparison NON_COLLIDABLE_CUBE_TYPES =
 	{
@@ -91,12 +91,37 @@ const Camera& Player::getCamera() const
 void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 {
 	std::lock_guard<std::mutex> playerLock(playerMutex);
-	for (float i = PLACE_BLOCK_RANGE; i >= 0; i -= PLACE_BLOCK_INCREMENT)
+
+	bool blockPlaced = false;
+	for (float i = 0; i <= PLACE_BLOCK_RANGE; i += PLACE_BLOCK_INCREMENT)
 	{
 		glm::vec3 rayPosition = m_camera.front * i + m_position;
-		if (chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }))
+		if (chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }))
 		{
+			for (float j = i - PLACE_BLOCK_INCREMENT; j >= 0; j -= PLACE_BLOCK_INCREMENT)
+			{
+				rayPosition = m_camera.front * j + m_position;
+				if (!chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }))
+				{
+					chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) });
+					blockPlaced = true;
+					break;
+				}
+			}
+
 			break;
+		}
+	}
+
+	if (!blockPlaced)
+	{
+		for (float i = PLACE_BLOCK_RANGE; i >= 0; i -= PLACE_BLOCK_INCREMENT)
+		{
+			glm::vec3 rayPosition = m_camera.front * i + m_position;
+			if (chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }))
+			{
+				break;
+			}
 		}
 	}
 }
