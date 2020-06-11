@@ -33,14 +33,18 @@ public:
 			bitset.set(static_cast<int>(cubeType));
 		}
 	}
-	CubeTypeComparison(eCubeType cubeType)
-	{
-		bitset.set(static_cast<int>(cubeType));
-	}
 
 	const std::bitset<static_cast<int>(eCubeType::Max) + 1>& getBitSet() const
 	{
 		return bitset;
+	}
+
+	bool isMatch(eCubeType cubeType) const
+	{
+		std::bitset<static_cast<int>(eCubeType::Max) + 1> otherBitSet;
+		otherBitSet.set(static_cast<int>(cubeType));
+
+		return (bitset & otherBitSet).any();
 	}
 
 	bool isMatch(const CubeTypeComparison& other) const

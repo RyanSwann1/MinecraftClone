@@ -715,7 +715,7 @@ bool isFacingTransparentCube(const glm::ivec3& cubePosition, const Chunk& chunk)
 	eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(cubePosition));
 	if (cubeType != eCubeType::Air)
 	{
-		return Utilities::TRANSPARENT_CUBE_TYPES.isMatch({ cubeType });
+		return Utilities::TRANSPARENT_CUBE_TYPES.isMatch(cubeType);
 	}
 	else
 	{
@@ -728,7 +728,7 @@ bool isFacingOpaqueCube(const glm::ivec3& cubePosition, const Chunk& chunk)
 	eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(cubePosition));
 	if (cubeType != eCubeType::Air)
 	{
-		return Utilities::OPAQUE_CUBE_TYPES.isMatch({ cubeType });
+		return Utilities::OPAQUE_CUBE_TYPES.isMatch(cubeType);
 	}
 	else
 	{
