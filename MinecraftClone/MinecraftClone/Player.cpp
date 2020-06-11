@@ -19,7 +19,7 @@ namespace
 	
 	constexpr float AUTO_JUMP_DISTANCE = WALKING_MOVEMENT_SPEED * 1.5f;
 	constexpr float AUTO_JUMP_HEIGHT = 2.0f;
-	constexpr float AUTO_JUMP_BREAK_SCALAR = 0.2f;
+	constexpr float AUTO_JUMP_BREAK_SCALAR = 0.01f;
 
 	constexpr float DESTROY_BLOCK_RANGE = 5.0f;
 	constexpr float DESTROY_BLOCK_INCREMENT = 0.5f;
