@@ -528,13 +528,8 @@ void ChunkManager::generateChunkMeshes()
 				auto chunk = m_chunks.find(chunkStartingPosition);
 				assert(chunk != m_chunks.cend());
 
-				NeighbouringChunks neighbouringChunks = getAllNeighbouringChunks(m_chunks, chunkStartingPosition);
-
-				generateChunkMesh(*chunkMeshFromPool.getObject(), *chunk->second.getObject(),
-					{ neighbouringChunks.chunks[static_cast<int>(eDirection::Left)].get(),
-					neighbouringChunks.chunks[static_cast<int>(eDirection::Right)].get(),
-					neighbouringChunks.chunks[static_cast<int>(eDirection::Forward)].get(),
-					neighbouringChunks.chunks[static_cast<int>(eDirection::Back)].get() });
+				generateChunkMesh(*chunkMeshFromPool.getObject(), *chunk->second.getObject(), 
+					getAllNeighbouringChunks(m_chunks, chunkStartingPosition));
 
 				m_generatedChunkMeshesQueue.add({ chunkStartingPosition, std::move(chunkMeshFromPool) });
 				chunkMeshToGenerate = m_chunkMeshesToGenerateQueue.remove(chunkMeshToGenerate);
@@ -622,16 +617,12 @@ void ChunkManager::handleChunkMeshRegeneration()
 			regenNode->chunkMeshToRegenerate.get().reset();
 
 			const glm::ivec3& chunkStartingPosition = regenNode->getPosition();
-			NeighbouringChunks neighbouringChunks = getAllNeighbouringChunks(m_chunks, chunkStartingPosition);
-			
+
 			auto chunk = m_chunks.find(chunkStartingPosition);
 			assert(chunk != m_chunks.cend());
 
-			generateChunkMesh(regenNode->chunkMeshToRegenerate.get(), *chunk->second.getObject(),
-				{ neighbouringChunks.chunks[static_cast<int>(eDirection::Left)].get(),
-				neighbouringChunks.chunks[static_cast<int>(eDirection::Right)].get(),
-				neighbouringChunks.chunks[static_cast<int>(eDirection::Forward)].get(),
-				neighbouringChunks.chunks[static_cast<int>(eDirection::Back)].get() });
+			generateChunkMesh(regenNode->chunkMeshToRegenerate.get(), *chunk->second.getObject(), 
+				getAllNeighbouringChunks(m_chunks, chunkStartingPosition));
 
 			regenNode = m_chunkMeshRegenerationQueue.remove(regenNode);
 		}
