@@ -10,14 +10,13 @@ namespace
 	constexpr float WALKING_MOVEMENT_SPEED = 0.55f;
 	constexpr float FLYING_MOVEMENT_SPEED = 5.0f;
 	constexpr glm::vec3 MAX_VELOCITY = { 50.f, 50.0f, 50.0 };
-	constexpr float JUMP_SPEED = 12.0f;
+	constexpr float JUMP_SPEED = 11.0f;
 
 	constexpr float VELOCITY_DROPOFF = 0.9f;
 	constexpr float GRAVITY_AMOUNT = 1.0f;
 	constexpr float HEAD_HEIGHT = 2.25f;
 	constexpr int MS_BETWEEN_ATTEMPT_SPAWN = 250;
 	
-	constexpr float AUTO_JUMP_DISTANCE = WALKING_MOVEMENT_SPEED * 1.5f;
 	constexpr float AUTO_JUMP_HEIGHT = 2.0f;
 	constexpr float AUTO_JUMP_BREAK_SCALAR = 0.01f;
 
@@ -292,14 +291,13 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 		m_currentState = (m_currentState != ePlayerState::Flying ? ePlayerState::InAir : m_currentState);
 	}
 
-
-	//Handle Auto Jump 
-	if (m_currentState == ePlayerState::OnGround && m_velocity.y == 0)
+	if (m_currentState == ePlayerState::OnGround && m_velocity.y == 0 && glm::distance((m_velocity + m_position), m_position) > 1.0f)
 	{
+		glm::vec2 n = glm::normalize(glm::vec2(m_velocity.x, m_velocity.z));
 		glm::vec3 collisionPosition(
-			m_position.x + m_velocity.x * 0.2f,
-			m_position.y,
-			m_position.z + m_velocity.z * 0.2f);
+				m_position.x + n.x,
+				m_position.y,
+				m_position.z + n.y);
 
 		if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT), std::floor(collisionPosition.z) }, cubeType) &&
 			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
