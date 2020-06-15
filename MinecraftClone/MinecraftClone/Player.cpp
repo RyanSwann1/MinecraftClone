@@ -273,47 +273,55 @@ void Player::move(float deltaTime)
 //https://sites.google.com/site/letsmakeavoxelengine/home/collision-detection
 void Player::handleCollisions(const ChunkManager& chunkManager)
 {
-	//Handle vertical collisions
-	eCubeType cubeType = eCubeType::Air;
-	if (m_currentState != ePlayerState::OnGround &&
-		chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) &&
-		!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+	eCubeType cubeType;
+	switch (m_currentState)
 	{
-		m_velocity.y = 0;
-		m_position.y += std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT) + 1));
-		m_position.y = std::floor(m_position.y);
+	case ePlayerState::Flying:
+	case ePlayerState::InAir:
+		if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) &&
+			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+		{
+			m_velocity.y = 0;
+			m_position.y += std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT) + 1));
+			m_position.y = std::floor(m_position.y);
 
-		m_currentState = ePlayerState::OnGround;
-	}
-	else if (!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) ||
-		NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-	{
-		m_currentState = (m_currentState != ePlayerState::Flying ? ePlayerState::InAir : m_currentState);
-	}
-
-	if (m_currentState == ePlayerState::OnGround && m_velocity.y == 0 && glm::distance((m_velocity + m_position), m_position) > 1.0f)
-	{
-		glm::vec2 n = glm::normalize(glm::vec2(m_velocity.x, m_velocity.z));
-		glm::vec3 collisionPosition(
+			m_currentState = ePlayerState::OnGround;
+		}
+		break;
+	case ePlayerState::OnGround:
+		if (m_velocity.y == 0 && glm::distance((m_velocity + m_position), m_position) > 1.0f)
+		{
+			glm::vec2 n = glm::normalize(glm::vec2(m_velocity.x, m_velocity.z));
+			glm::vec3 collisionPosition(
 				m_position.x + n.x,
 				m_position.y,
 				m_position.z + n.y);
 
-		if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT), std::floor(collisionPosition.z) }, cubeType) &&
-			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-		{
-			if (!chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT) + 1, std::floor(collisionPosition.z) }, cubeType) &&
+			if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT), std::floor(collisionPosition.z) }, cubeType) &&
 				!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 			{
-				m_velocity.y += JUMP_SPEED;
-				m_velocity.x *= AUTO_JUMP_BREAK_SCALAR;
-				m_velocity.z *= AUTO_JUMP_BREAK_SCALAR;
-			}
-			else
-			{
-				m_velocity.x = -m_velocity.x;
-				m_velocity.z = -m_velocity.z;
+				if (!chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT) + 1, std::floor(collisionPosition.z) }, cubeType) &&
+					!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+				{
+					m_velocity.y += JUMP_SPEED;
+					m_velocity.x *= AUTO_JUMP_BREAK_SCALAR;
+					m_velocity.z *= AUTO_JUMP_BREAK_SCALAR;
+				}
+				else
+				{
+					m_velocity.x = -m_velocity.x;
+					m_velocity.z = -m_velocity.z;
+				}
 			}
 		}
-	}	
+
+		if (!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) ||
+			NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+		{
+			m_currentState = (m_currentState == ePlayerState::Flying ? m_currentState : ePlayerState::InAir);
+		}
+		break;
+	default:
+		assert(false);
+	}
 }
