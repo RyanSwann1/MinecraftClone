@@ -3,7 +3,6 @@
 #include "ObjectPool.h"
 #include "Chunk.h"
 #include "VertexArray.h"
-#include "glm/gtx/hash.hpp"
 #include "ObjectQueue.h"
 #include <vector>
 #include <memory>
@@ -39,17 +38,6 @@
 //https://github.com/Hopson97/MineCraft-One-Week-Challenge/blob/master/Source/Maths/Frustum.cpp
 
 //http://www.lighthouse3d.com/tutorials/maths/
-
-struct NeighbouringChunks : private NonCopyable
-{
-	NeighbouringChunks(const Chunk& leftChunk, const Chunk& rightChunk,
-		const Chunk& forwardChunk, const Chunk& backChunk);
-	NeighbouringChunks(NeighbouringChunks&&) noexcept;
-	NeighbouringChunks& operator=(NeighbouringChunks&&) noexcept;
-
-	std::array<std::reference_wrapper<const Chunk>, 
-		static_cast<size_t>(eDirection::Max) + 1> chunks;
-};
 
 struct GeneratedChunkMesh : public ObjectQueueNode<GeneratedChunkMesh>
 {

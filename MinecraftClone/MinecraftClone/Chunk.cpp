@@ -2,6 +2,7 @@
 #include "VertexBuffer.h"
 #include "VertexBuffer.h"
 #include "ChunkManager.h"
+#include "NeighbouringChunks.h"
 #include "glm/gtc/noise.hpp"
 #include <algorithm>
 #include <limits>

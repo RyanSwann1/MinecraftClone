@@ -1,5 +1,6 @@
 #include "ChunkMeshGenerator.h"
 #include "ChunkManager.h"
+#include "NeighbouringChunks.h"
 
 namespace
 {
