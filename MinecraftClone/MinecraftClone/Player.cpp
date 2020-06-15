@@ -300,8 +300,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT), std::floor(collisionPosition.z) }, cubeType) &&
 				!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 			{
-				if (!chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT) + 1, std::floor(collisionPosition.z) }, cubeType) &&
-					!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+				if (!chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT) + 1, std::floor(collisionPosition.z) }, cubeType))
 				{
 					m_velocity.y += JUMP_SPEED;
 					m_velocity.x *= AUTO_JUMP_BREAK_SCALAR;
@@ -309,8 +308,17 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 				}
 				else
 				{
-					m_velocity.x = -m_velocity.x;
-					m_velocity.z = -m_velocity.z;
+					if (NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+					{
+						m_velocity.y += JUMP_SPEED;
+						m_velocity.x *= AUTO_JUMP_BREAK_SCALAR;
+						m_velocity.z *= AUTO_JUMP_BREAK_SCALAR;
+					}
+					else
+					{
+						m_velocity.x = -m_velocity.x;
+						m_velocity.z = -m_velocity.z;
+					}
 				}
 			}
 		}
