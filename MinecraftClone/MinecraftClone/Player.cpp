@@ -92,8 +92,6 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 {
 	std::lock_guard<std::mutex> playerLock(playerMutex);
 
-	//BoundingBox(float minX, float maxX, float minY, float maxY, float minZ, float maxZ)
-	//BoundingBox playerAABB
 	bool blockPlaced = false;
 	for (float i = 0; i <= PLACE_BLOCK_RANGE; i += PLACE_BLOCK_INCREMENT)
 	{
@@ -106,17 +104,14 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 				if (!chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }))
 				{
 					chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) });
-					
-
-					std::cout << "Ray Position\n";
-					std::cout << std::floor(rayPosition.x) << "\n";
-					std::cout << rayPosition.y << "\n";
-					std::cout << std::floor(rayPosition.z) << "\n\n";
-
-					std::cout << "Player Position\n";
-					std::cout << std::floor(m_position.x) << "\n";
-					std::cout << m_position.y << "\n";
-					std::cout << std::floor(m_position.z) << "\n\n\n";
+					//std::cout << "Ray Position\n";
+					//std::cout << std::floor(rayPosition.x) << "\n";
+					//std::cout << rayPosition.y << "\n";
+					//std::cout << std::floor(rayPosition.z) << "\n\n";
+					//std::cout << "Player Position\n";
+					//std::cout << std::floor(m_position.x) << "\n";
+					//std::cout << m_position.y << "\n";
+					//std::cout << std::floor(m_position.z) << "\n\n\n";
 					
 					blockPlaced = true;
 					break;

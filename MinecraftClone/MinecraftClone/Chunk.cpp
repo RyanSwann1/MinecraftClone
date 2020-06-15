@@ -66,6 +66,13 @@ namespace
 
 		return dis(gen);
 	}
+
+	const CubeTypeComparison NON_STACKABLE_CUBE_TYPES =
+	{
+		{eCubeType::Water,
+		eCubeType::Shrub,
+		eCubeType::TallGrass}
+	};
 }
 
 Chunk::Chunk()
@@ -206,7 +213,8 @@ bool Chunk::addCubeAtPosition(const glm::ivec3& placementPosition, const Neighbo
 
 	if (localPosition.y < Utilities::CHUNK_HEIGHT && !isCubeAtLocalPosition(localPosition))
 	{
-		if (isCubeAtLocalPosition({ localPosition.x, localPosition.y - 1, localPosition.z }))
+		if (isCubeAtLocalPosition({ localPosition.x, localPosition.y - 1, localPosition.z }) &&
+			!NON_STACKABLE_CUBE_TYPES.isMatch(getCubeTypeByLocalPosition({ localPosition.x, localPosition.y - 1, localPosition.z })))
 		{
 			changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
 			return true;
@@ -552,6 +560,12 @@ void Chunk::spawnTreeStump(const glm::ivec3& startingPosition, int treeHeight)
 			changeCubeAtLocalPosition({ startingPosition.x, y, startingPosition.z }, eCubeType::Log);
 		}
 	}
+}
+
+eCubeType Chunk::getCubeTypeByLocalPosition(const glm::ivec3& localPosition) const
+{
+	assert(isPositionInLocalBounds(localPosition));
+	return static_cast<eCubeType>(m_chunk[converTo1D(localPosition)]);
 }
 
 bool Chunk::isPositionInLocalBounds(const glm::ivec3& position) const
