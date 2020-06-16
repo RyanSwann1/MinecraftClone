@@ -83,25 +83,6 @@ namespace
 	}
 }
 
-//GeneratedChunk
-GeneratedChunk::GeneratedChunk(const glm::ivec3& position, ObjectFromPool<Chunk>&& chunkFromPool)
-	: ObjectQueueNode(position),
-	chunkFromPool(std::move(chunkFromPool))
-{}
-
-GeneratedChunk::GeneratedChunk(GeneratedChunk&& orig) noexcept
-	: ObjectQueueNode(std::move(orig)),
-	chunkFromPool(std::move(orig.chunkFromPool))
-{}
-
-GeneratedChunk& GeneratedChunk::operator=(GeneratedChunk&& orig) noexcept
-{
-	ObjectQueueNode::operator=(std::move(orig));
-	chunkFromPool = std::move(orig.chunkFromPool);
-
-	return *this;
-}
-
 //ChunkGenerator
 ChunkManager::ChunkManager()
 	: m_chunkPool(getObjectPoolSize()),
@@ -312,18 +293,7 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 				m_deletionQueue.pop();
 			}
 
-			if (!m_generatedChunkQueue.isEmpty())
-			{
-				GeneratedChunk& generatedChunk = m_generatedChunkQueue.front();
-				assert(generatedChunk.chunkFromPool.getObject());
-
-				m_chunks.emplace(std::piecewise_construct,
-					std::forward_as_tuple(generatedChunk.getPosition()),
-					std::forward_as_tuple(std::move(generatedChunk.chunkFromPool)));
-
-				m_generatedChunkQueue.pop();
-			}
-
+			m_generatedChunkQueue.update(m_chunks);
 			m_generatedChunkMeshesQueue.update(m_chunkMeshes);
 		}
 	}

@@ -6,6 +6,7 @@
 #include "ObjectQueue.h"
 #include "ChunkMeshRegenerationQueue.h"
 #include "GeneratedChunkMeshQueue.h"
+#include "GeneratedChunkQueue.h"
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -41,15 +42,6 @@
 
 //http://www.lighthouse3d.com/tutorials/maths/
 
-struct GeneratedChunk : public ObjectQueueNode<GeneratedChunk>
-{
-	GeneratedChunk(const glm::ivec3& position, ObjectFromPool<Chunk>&& chunkFromPool);
-	GeneratedChunk(GeneratedChunk&&) noexcept;
-	GeneratedChunk& operator=(GeneratedChunk&&) noexcept;
-
-	ObjectFromPool<Chunk> chunkFromPool;
-};
-
 class Player;
 struct Frustum;
 class VertexArray;
@@ -79,7 +71,8 @@ private:
 	ObjectQueue<PositionNode> m_chunkMeshesToGenerateQueue;
 	ObjectQueue<PositionNode> m_deletionQueue;
 	GeneratedChunkMeshQueue m_generatedChunkMeshesQueue;
-	ObjectQueue<GeneratedChunk> m_generatedChunkQueue;
+	GeneratedChunkQueue m_generatedChunkQueue;
+	//ObjectQueue<GeneratedChunk> 
 	ChunkMeshRegenerationQueue m_chunkMeshRegenerationQueue;
 
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
