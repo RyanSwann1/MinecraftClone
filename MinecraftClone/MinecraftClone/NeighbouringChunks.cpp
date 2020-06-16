@@ -50,3 +50,18 @@ NeighbouringChunks getAllNeighbouringChunks(const std::unordered_map<glm::ivec3,
 	return NeighbouringChunks(*leftChunk->second.getObject(), *rightChunk->second.getObject(),
 		*forwardChunk->second.getObject(), *backChunk->second.getObject());
 }
+
+//NeighbouringChunks
+NeighbouringChunks::NeighbouringChunks(const Chunk& leftChunk, const Chunk& rightChunk, const Chunk& forwardChunk, const Chunk& backChunk)
+	: chunks{ leftChunk, rightChunk, forwardChunk, backChunk }
+{}
+
+NeighbouringChunks::NeighbouringChunks(NeighbouringChunks&& orig) noexcept
+	: chunks(std::move(orig.chunks))
+{}
+
+NeighbouringChunks& NeighbouringChunks::operator=(NeighbouringChunks&& orig) noexcept
+{
+	chunks = std::move(orig.chunks);
+	return *this;
+}

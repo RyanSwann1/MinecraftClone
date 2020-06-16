@@ -83,21 +83,6 @@ namespace
 	}
 }
 
-//NeighbouringChunks
-NeighbouringChunks::NeighbouringChunks(const Chunk& leftChunk, const Chunk& rightChunk, const Chunk& forwardChunk, const Chunk& backChunk)
-	: chunks{ leftChunk, rightChunk, forwardChunk, backChunk }
-{}
-
-NeighbouringChunks::NeighbouringChunks(NeighbouringChunks&& orig) noexcept
-	: chunks(std::move(orig.chunks))
-{}
-
-NeighbouringChunks& NeighbouringChunks::operator=(NeighbouringChunks&& orig) noexcept
-{
-	chunks = std::move(orig.chunks);
-	return *this;
-}
-
 //GeneratedChunkMesh
 GeneratedChunkMesh::GeneratedChunkMesh(const glm::ivec3& position, ObjectFromPool<VertexArray>&& chunkMeshFromPool)
 	: ObjectQueueNode(position),
