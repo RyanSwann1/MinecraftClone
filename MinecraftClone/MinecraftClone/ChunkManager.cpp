@@ -83,25 +83,6 @@ namespace
 	}
 }
 
-//GeneratedChunkMesh
-GeneratedChunkMesh::GeneratedChunkMesh(const glm::ivec3& position, ObjectFromPool<VertexArray>&& chunkMeshFromPool)
-	: ObjectQueueNode(position),
-	chunkMeshFromPool(std::move(chunkMeshFromPool))
-{}
-
-GeneratedChunkMesh::GeneratedChunkMesh(GeneratedChunkMesh&& orig) noexcept
-	: ObjectQueueNode(std::move(orig)),
-	chunkMeshFromPool(std::move(orig.chunkMeshFromPool))
-{}
-
-GeneratedChunkMesh& GeneratedChunkMesh::operator=(GeneratedChunkMesh&& orig) noexcept
-{
-	ObjectQueueNode::operator=(std::move(orig));
-	chunkMeshFromPool = std::move(orig.chunkMeshFromPool);
-	
-	return *this;
-}
-
 //GeneratedChunk
 GeneratedChunk::GeneratedChunk(const glm::ivec3& position, ObjectFromPool<Chunk>&& chunkFromPool)
 	: ObjectQueueNode(position),
@@ -343,17 +324,7 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 				m_generatedChunkQueue.pop();
 			}
 
-			if (!m_generatedChunkMeshesQueue.isEmpty())
-			{
-				GeneratedChunkMesh& generatedChunkMesh = m_generatedChunkMeshesQueue.front();
-				assert(generatedChunkMesh.chunkMeshFromPool.getObject());
-
-				m_chunkMeshes.emplace(std::piecewise_construct,
-					std::forward_as_tuple(generatedChunkMesh.getPosition()),
-					std::forward_as_tuple(std::move(generatedChunkMesh.chunkMeshFromPool)));
-
-				m_generatedChunkMeshesQueue.pop();
-			}
+			m_generatedChunkMeshesQueue.update(m_chunkMeshes);
 		}
 	}
 }

@@ -5,6 +5,7 @@
 #include "VertexArray.h"
 #include "ObjectQueue.h"
 #include "ChunkMeshRegenerationQueue.h"
+#include "GeneratedChunkMeshQueue.h"
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -39,15 +40,6 @@
 //https://github.com/Hopson97/MineCraft-One-Week-Challenge/blob/master/Source/Maths/Frustum.cpp
 
 //http://www.lighthouse3d.com/tutorials/maths/
-
-struct GeneratedChunkMesh : public ObjectQueueNode<GeneratedChunkMesh>
-{
-	GeneratedChunkMesh(const glm::ivec3& position, ObjectFromPool<VertexArray>&& chunkMeshFromPool);
-	GeneratedChunkMesh(GeneratedChunkMesh&&) noexcept;
-	GeneratedChunkMesh& operator=(GeneratedChunkMesh&&) noexcept;
-
-	ObjectFromPool<VertexArray> chunkMeshFromPool;
-};
 
 struct GeneratedChunk : public ObjectQueueNode<GeneratedChunk>
 {
@@ -86,7 +78,7 @@ private:
 	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_chunkMeshes;
 	ObjectQueue<PositionNode> m_chunkMeshesToGenerateQueue;
 	ObjectQueue<PositionNode> m_deletionQueue;
-	ObjectQueue<GeneratedChunkMesh> m_generatedChunkMeshesQueue;
+	GeneratedChunkMeshQueue m_generatedChunkMeshesQueue;
 	ObjectQueue<GeneratedChunk> m_generatedChunkQueue;
 	ChunkMeshRegenerationQueue m_chunkMeshRegenerationQueue;
 
