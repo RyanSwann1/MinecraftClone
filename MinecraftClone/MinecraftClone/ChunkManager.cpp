@@ -265,10 +265,13 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 		glm::ivec3 playerPosition = player.getPosition();
 		playerLock.unlock();
 
-		deleteChunks(playerPosition, renderingMutex);
+		glm::ivec3 startingPosition = getClosestMiddlePosition(playerPosition);
+		Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Utilities::VISIBILITY_DISTANCE);
+
+		deleteChunks(playerPosition, renderingMutex, visibilityRect);
 		addChunks(playerPosition);
 		generateChunkMeshes();
-		clearQueues(playerPosition);
+		clearQueues(playerPosition, visibilityRect);
 
 		playerLock.lock();
 		std::lock_guard<std::mutex> renderingLock(renderingMutex); 
@@ -333,10 +336,8 @@ void ChunkManager::renderTransparent(const Frustum& frustum) const
 	}
 }
 
-void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex)
+void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex, const Rectangle& visibilityRect)
 {
-	glm::ivec3 startingPosition = getClosestMiddlePosition(playerPosition);
-	Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Utilities::VISIBILITY_DISTANCE);
 	for (auto chunk = m_chunks.begin(); chunk != m_chunks.end(); ++chunk)
 	{
 		const glm::ivec3& chunkStartingPosition = chunk->second.getObject()->getStartingPosition();
@@ -438,11 +439,8 @@ void ChunkManager::generateChunkMeshes()
 	}
 }
 
-void ChunkManager::clearQueues(const glm::ivec3& playerPosition)
+void ChunkManager::clearQueues(const glm::ivec3& playerPosition, const Rectangle& visibilityRect)
 {
-	glm::ivec3 startingPosition = getClosestMiddlePosition(playerPosition);
-	Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Utilities::VISIBILITY_DISTANCE);
-
 	m_chunkMeshesToGenerateQueue.removeOutOfBoundsElements(visibilityRect);
 	m_generatedChunkMeshesQueue.removeOutOfBoundsElements(visibilityRect);
 	m_generatedChunkQueue.removeOutOfBoundsElements(visibilityRect);

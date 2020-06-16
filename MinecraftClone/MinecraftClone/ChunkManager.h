@@ -42,6 +42,7 @@
 
 //http://www.lighthouse3d.com/tutorials/maths/
 
+struct Rectangle;
 class Player;
 struct Frustum;
 class VertexArray;
@@ -72,11 +73,10 @@ private:
 	ObjectQueue<PositionNode> m_deletionQueue;
 	GeneratedChunkMeshQueue m_generatedChunkMeshesQueue;
 	GeneratedChunkQueue m_generatedChunkQueue;
-	//ObjectQueue<GeneratedChunk> 
 	ChunkMeshRegenerationQueue m_chunkMeshRegenerationQueue;
 
-	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
+	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex, const Rectangle& visibilityRect);
 	void addChunks(const glm::ivec3& playerPosition);
 	void generateChunkMeshes();
-	void clearQueues(const glm::ivec3& playerPosition);
+	void clearQueues(const glm::ivec3& playerPosition, const Rectangle& visibilityRect);
 };
