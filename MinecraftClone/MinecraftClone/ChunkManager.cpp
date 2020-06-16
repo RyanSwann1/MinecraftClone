@@ -136,25 +136,6 @@ GeneratedChunk& GeneratedChunk::operator=(GeneratedChunk&& orig) noexcept
 	return *this;
 }
 
-//ChunkMeshToRegenerate
-ChunkMeshToRegenerate::ChunkMeshToRegenerate(const glm::ivec3& position, VertexArray& chunkMeshToRegenerate)
-	: ObjectQueueNode(position),
-	chunkMeshToRegenerate(chunkMeshToRegenerate)
-{}
-
-ChunkMeshToRegenerate::ChunkMeshToRegenerate(ChunkMeshToRegenerate&& orig) noexcept
-	: ObjectQueueNode(std::move(orig)),
-	chunkMeshToRegenerate(orig.chunkMeshToRegenerate)
-{}
-
-ChunkMeshToRegenerate& ChunkMeshToRegenerate::operator=(ChunkMeshToRegenerate&& orig) noexcept
-{
-	ObjectQueueNode::operator=(std::move(orig));
-	chunkMeshToRegenerate = orig.chunkMeshToRegenerate;
-
-	return *this;
-}
-
 //ChunkGenerator
 ChunkManager::ChunkManager()
 	: m_chunkPool(getObjectPoolSize()),
@@ -344,7 +325,7 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 
 		playerLock.lock();
 		std::lock_guard<std::mutex> renderingLock(renderingMutex); 
-		handleChunkMeshRegeneration();
+		m_chunkMeshRegenerationQueue.update(m_chunks);
 		for (int i = 0; i < THREAD_TRANSFER_PER_FRAME; ++i)
 		{
 			if (!m_deletionQueue.isEmpty())
@@ -533,83 +514,10 @@ void ChunkManager::generateChunkMeshes()
 
 void ChunkManager::clearQueues(const glm::ivec3& playerPosition)
 {
-	//Clears queues that are out of bounds of Player AABB
 	glm::ivec3 startingPosition = getClosestMiddlePosition(playerPosition);
 	Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Utilities::VISIBILITY_DISTANCE);
 
-	if (!m_chunkMeshesToGenerateQueue.isEmpty())
-	{
-		PositionNode* chunkMeshToGenerate = &m_chunkMeshesToGenerateQueue.front();
-		while (chunkMeshToGenerate)
-		{
-			glm::ivec2 centrePosition(chunkMeshToGenerate->getPosition().x + 16, chunkMeshToGenerate->getPosition().z + 16);
-			Rectangle AABB(centrePosition, 16);
-			if (!visibilityRect.contains(AABB))
-			{
-				chunkMeshToGenerate = m_chunkMeshesToGenerateQueue.remove(chunkMeshToGenerate);
-			}
-			else
-			{
-				chunkMeshToGenerate = m_chunkMeshesToGenerateQueue.next(chunkMeshToGenerate);
-			}
-		}
-	}
-
-	if (!m_generatedChunkMeshesQueue.isEmpty())
-	{
-		GeneratedChunkMesh* generatedChunkMesh = &m_generatedChunkMeshesQueue.front();
-		while (generatedChunkMesh)
-		{
-			glm::ivec2 centrePosition(generatedChunkMesh->getPosition().x + 16, generatedChunkMesh->getPosition().z + 16);
-			Rectangle AABB(centrePosition, 16);
-			if (!visibilityRect.contains(AABB))
-			{
-				generatedChunkMesh = m_generatedChunkMeshesQueue.remove(generatedChunkMesh);
-			}
-			else
-			{
-				generatedChunkMesh = m_generatedChunkMeshesQueue.next(generatedChunkMesh);
-			}
-		}
-	}
-
-	if (!m_generatedChunkQueue.isEmpty())
-	{
-		GeneratedChunk* generatedChunkNode = &m_generatedChunkQueue.front();
-		while (generatedChunkNode)
-		{
-			glm::ivec2 centrePosition(generatedChunkNode->getPosition().x + 16, generatedChunkNode->getPosition().z + 16);
-			Rectangle AABB(centrePosition, 16);
-			if (!visibilityRect.contains(AABB))
-			{
-				generatedChunkNode = m_generatedChunkQueue.remove(generatedChunkNode);
-			}
-			else
-			{
-				generatedChunkNode = m_generatedChunkQueue.next(generatedChunkNode);
-			}
-		}
-	}
-}
-
-void ChunkManager::handleChunkMeshRegeneration()
-{
-	if (!m_chunkMeshRegenerationQueue.isEmpty())
-	{
-		ChunkMeshToRegenerate* regenNode = &m_chunkMeshRegenerationQueue.front();
-		while (regenNode)
-		{
-			regenNode->chunkMeshToRegenerate.get().reset();
-
-			const glm::ivec3& chunkStartingPosition = regenNode->getPosition();
-
-			auto chunk = m_chunks.find(chunkStartingPosition);
-			assert(chunk != m_chunks.cend());
-
-			generateChunkMesh(regenNode->chunkMeshToRegenerate.get(), *chunk->second.getObject(), 
-				getAllNeighbouringChunks(m_chunks, chunkStartingPosition));
-
-			regenNode = m_chunkMeshRegenerationQueue.remove(regenNode);
-		}
-	}
+	m_chunkMeshesToGenerateQueue.removeOutOfBoundsElements(visibilityRect);
+	m_generatedChunkMeshesQueue.removeOutOfBoundsElements(visibilityRect);
+	m_generatedChunkQueue.removeOutOfBoundsElements(visibilityRect);
 }

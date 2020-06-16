@@ -4,6 +4,7 @@
 #include "Chunk.h"
 #include "VertexArray.h"
 #include "ObjectQueue.h"
+#include "ChunkMeshRegenerationQueue.h"
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -57,15 +58,6 @@ struct GeneratedChunk : public ObjectQueueNode<GeneratedChunk>
 	ObjectFromPool<Chunk> chunkFromPool;
 };
 
-struct ChunkMeshToRegenerate : public ObjectQueueNode<ChunkMeshToRegenerate>
-{
-	ChunkMeshToRegenerate(const glm::ivec3& position, VertexArray& chunkMeshToRegenerate);
-	ChunkMeshToRegenerate(ChunkMeshToRegenerate&&) noexcept;
-	ChunkMeshToRegenerate& operator=(ChunkMeshToRegenerate&&) noexcept;
-
-	std::reference_wrapper<VertexArray> chunkMeshToRegenerate;
-};
-
 class Player;
 struct Frustum;
 class VertexArray;
@@ -96,11 +88,10 @@ private:
 	ObjectQueue<PositionNode> m_deletionQueue;
 	ObjectQueue<GeneratedChunkMesh> m_generatedChunkMeshesQueue;
 	ObjectQueue<GeneratedChunk> m_generatedChunkQueue;
-	ObjectQueue<ChunkMeshToRegenerate> m_chunkMeshRegenerationQueue;
+	ChunkMeshRegenerationQueue m_chunkMeshRegenerationQueue;
 
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex);
 	void addChunks(const glm::ivec3& playerPosition);
 	void generateChunkMeshes();
 	void clearQueues(const glm::ivec3& playerPosition);
-	void handleChunkMeshRegeneration();
 };
