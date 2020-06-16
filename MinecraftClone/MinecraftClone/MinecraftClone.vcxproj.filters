@@ -60,6 +60,9 @@
     <ClCompile Include="ChunkMeshRegenerationQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedChunkMeshQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glad.h">
@@ -198,6 +201,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ChunkMeshRegenerationQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedChunkMeshQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
