@@ -3,6 +3,7 @@
 #include "NonCopyable.h"
 #include "NonMovable.h"
 #include "glm/glm.hpp"
+#include "Rectangle.h"
 #include <assert.h>
 #include <unordered_map>
 #include "glm/gtx/hash.hpp"
@@ -166,6 +167,27 @@ public:
 		}
 
 		m_container.erase(iter);
+	}
+
+	void removeOutOfBoundsElements(const Rectangle& visibilityAABB)
+	{
+		if (!isEmpty())
+		{
+			Object* object = &front();
+			while (object)
+			{
+				glm::ivec2 centrePosition(object->getPosition().x + 16, object->getPosition().z + 16);
+				Rectangle objectAABB(centrePosition, 16);
+				if (!visibilityAABB.contains(objectAABB))
+				{
+					object = remove(object);
+				}
+				else
+				{
+					object = next(object);
+				}
+			}
+		}
 	}
 
 	Object* remove(const Object* object)
