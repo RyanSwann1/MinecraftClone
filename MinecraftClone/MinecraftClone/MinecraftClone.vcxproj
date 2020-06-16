@@ -129,6 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ChunkMeshesToGenerateQueue.cpp" />
     <ClCompile Include="ChunkMeshRegenerationQueue.cpp" />
     <ClCompile Include="GeneratedChunkMeshQueue.cpp" />
     <ClCompile Include="GeneratedChunkQueue.cpp" />
@@ -149,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoundingBox.h" />
+    <ClInclude Include="ChunkMeshesToGenerateQueue.h" />
     <ClInclude Include="ChunkMeshRegenerationQueue.h" />
     <ClInclude Include="GeneratedChunkMeshQueue.h" />
     <ClInclude Include="GeneratedChunkQueue.h" />
