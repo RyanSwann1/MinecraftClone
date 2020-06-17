@@ -354,38 +354,49 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 		//Collide into faces - walking - X
 		if (!m_autoJump)
 		{
-			glm::vec3 velocity = m_velocity * deltaTime;
+			glm::vec3 velocity = (m_velocity) * deltaTime;
 
 			if (m_velocity.x != 0)
 			{
-				glm::vec3 collisionPosition(
-					m_position.x + velocity.x,
-					m_position.y,
-					m_position.z);
-
-				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
-					std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT),
-					std::floor(collisionPosition.z) }, cubeType) &&
-					!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+				for (int y = -AUTO_JUMP_HEIGHT; y <= 0; y++)
 				{
-					m_velocity.x = 0.0f;
+					glm::vec3 collisionPosition(
+						m_position.x + velocity.x,
+						m_position.y,
+						m_position.z);
+
+					if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
+						std::floor(collisionPosition.y + y),
+						std::floor(collisionPosition.z) }, cubeType) &&
+						!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+					{
+						m_velocity.x = 0.0f;
+						//Handle when getting stuck
+						break;
+					}
 				}
+
 			}
 
 			//Collide into faces - walking - Z
 			if (m_velocity.z != 0)
 			{
-				glm::vec3 collisionPosition(
-					m_position.x,
-					m_position.y,
-					m_position.z + velocity.z);
-
-				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
-					std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT),
-					std::floor(collisionPosition.z) }, cubeType) &&
-					!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+				for (int y = -AUTO_JUMP_HEIGHT; y <= 0; y++)
 				{
-					m_velocity.z = 0.0f;
+					glm::vec3 collisionPosition(
+						m_position.x,
+						m_position.y,
+						m_position.z + velocity.z);
+
+					if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
+						std::floor(collisionPosition.y + y),
+						std::floor(collisionPosition.z) }, cubeType) &&
+						!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+					{
+						m_velocity.z = 0.0f;
+						//Handle when getting stuck
+						break;
+					}
 				}
 			}
 		}
