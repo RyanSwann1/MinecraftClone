@@ -45,6 +45,7 @@ public:
 	void destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex);
 	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
 	void toggleFlying();
+	void toggleAutoJump();
 	void moveCamera(const sf::Window& window);
 	void update(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager);
 
@@ -53,6 +54,7 @@ private:
 	ePlayerState m_currentState;
 	glm::vec3 m_position;
 	glm::vec3 m_velocity;
+	bool m_autoJump;
 
 	void move(float deltaTime);
 	void applyDrag();

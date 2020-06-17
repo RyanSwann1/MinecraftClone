@@ -151,7 +151,11 @@ int main()
 				{
 					player.toggleFlying();
 				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::T))
+				{
+					player.toggleAutoJump();
+				}
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 				{
 					window.close();
 				}
