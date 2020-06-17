@@ -12,7 +12,7 @@ namespace
 	constexpr glm::vec3 MAX_VELOCITY = { 50.f, 50.0f, 50.0 };
 	constexpr float JUMP_SPEED = 11.0f;
 
-	constexpr float VELOCITY_DROPOFF = 0.9f;
+	constexpr float DRAG_AMOUNT = 0.9f;
 	constexpr float GRAVITY_AMOUNT = 1.0f;
 	constexpr float HEAD_HEIGHT = 2.25f;
 	constexpr int MS_BETWEEN_ATTEMPT_SPAWN = 250;
@@ -194,23 +194,10 @@ void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager
 	move(deltaTime);
 	
 	std::lock_guard<std::mutex> playerLock(playerMutex);
-	handleCollisions(chunkManager);
+	handleCollisions(chunkManager, deltaTime);
 	
 	m_position += m_velocity * deltaTime;
-
-	switch (m_currentState)
-	{
-	case ePlayerState::Flying:
-		m_velocity *= VELOCITY_DROPOFF;
-		break;
-	case ePlayerState::InAir:
-	case ePlayerState::OnGround:
-		m_velocity.x *= VELOCITY_DROPOFF;
-		m_velocity.z *= VELOCITY_DROPOFF;
-		break;
-	default:
-		assert(false);
-	}
+	applyDrag();
 }
 
 void Player::move(float deltaTime)
@@ -265,8 +252,47 @@ void Player::move(float deltaTime)
 	}
 }
 
+void Player::applyDrag()
+{
+	switch (m_currentState)
+	{
+	case ePlayerState::Flying:
+
+		m_velocity *= DRAG_AMOUNT;
+		if (glm::abs(m_velocity.x) <= 0.02f)
+		{
+			m_velocity.x = 0.0f;
+		}
+		if (glm::abs(m_velocity.y) <= 0.02f)
+		{
+			m_velocity.y = 0.0f;
+		}
+		if (glm::abs(m_velocity.z) <= 0.02f)
+		{
+			m_velocity.z = 0.0f;
+		}
+		break;
+	case ePlayerState::InAir:
+	case ePlayerState::OnGround:
+		m_velocity.x *= DRAG_AMOUNT;
+		m_velocity.z *= DRAG_AMOUNT;
+
+		if (glm::abs(m_velocity.x) <= 0.02f)
+		{
+			m_velocity.x = 0.0f;
+		}
+		if (glm::abs(m_velocity.z) <= 0.02f)
+		{
+			m_velocity.z = 0.0f;
+		}
+		break;
+	default:
+		assert(false);
+	}
+}
+
 //https://sites.google.com/site/letsmakeavoxelengine/home/collision-detection
-void Player::handleCollisions(const ChunkManager& chunkManager)
+void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 {
 	eCubeType cubeType;
 	switch (m_currentState)
@@ -284,6 +310,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 		}
 		break;
 	case ePlayerState::OnGround:
+		//Auto Jump
 		if (m_velocity.y == 0 && glm::distance((m_velocity + m_position), m_position) > 1.0f)
 		{
 			glm::vec2 n = glm::normalize(glm::vec2(m_velocity.x, m_velocity.z));
@@ -315,6 +342,43 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 						m_velocity.z = -m_velocity.z;
 					}
 				}
+			}
+		}
+
+		//Collide into faces - walking - X
+
+		glm::vec3 velocity = m_velocity * deltaTime;
+
+		if (m_velocity.x != 0)
+		{
+			glm::vec3 collisionPosition(
+				m_position.x + velocity.x,
+				m_position.y,
+				m_position.z);
+			
+			if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), 
+				std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT), 
+				std::floor(collisionPosition.z) }, cubeType) &&
+				!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+			{
+				m_velocity.x = 0.0f;
+			}
+		}
+
+		//Collide into faces - walking - Z
+		if (m_velocity.z != 0)
+		{
+			glm::vec3 collisionPosition(
+				m_position.x,
+				m_position.y,
+				m_position.z + velocity.z);
+
+			if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
+				std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT),
+				std::floor(collisionPosition.z) }, cubeType) &&
+				!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+			{
+				m_velocity.z = 0.0f;
 			}
 		}
 

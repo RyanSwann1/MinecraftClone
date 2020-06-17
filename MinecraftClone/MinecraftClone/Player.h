@@ -55,5 +55,6 @@ private:
 	glm::vec3 m_velocity;
 
 	void move(float deltaTime);
-	void handleCollisions(const ChunkManager& chunkManager);
+	void applyDrag();
+	void handleCollisions(const ChunkManager& chunkManager, float deltaTime);
 };
