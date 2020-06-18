@@ -328,12 +328,12 @@ void Player::applyDrag()
 //https://sites.google.com/site/letsmakeavoxelengine/home/collision-detection
 void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 {
-	eCubeType cubeType;
+	eCubeType cubeType = eCubeType::Air;
 	switch (m_currentState)
 	{
 	case ePlayerState::Flying:
 	case ePlayerState::InAir:
-		if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y), std::floor(m_position.z) }, cubeType) &&
+		if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y + COLLISION_OFFSET), std::floor(m_position.z) }, cubeType) &&
 			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
 			m_velocity.y = 0;
@@ -420,23 +420,32 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 		break;
 	case ePlayerState::OnGround:
 		//Auto Jump
-		if (m_autoJump && m_velocity.y == 0 && glm::distance((m_velocity + m_position), m_position) > 0.50f)
+		if(m_autoJump && m_velocity.y == 0 && glm::distance(m_position + m_velocity, m_position) >= 0.5f)
 		{
-			glm::vec2 n = glm::normalize(glm::vec2(m_velocity.x, m_velocity.z));
 			glm::vec3 collisionPosition(
-				m_position.x + n.x,
+				m_position.x + glm::normalize(glm::vec2(m_velocity.x, m_velocity.z)).x,
 				m_position.y,
-				m_position.z + n.y);
+				m_position.z + glm::normalize(glm::vec2(m_velocity.x, m_velocity.z)).y);
 
-			if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), 
-				std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT), 
+			if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
+				std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT),
 				std::floor(collisionPosition.z) }, cubeType) &&
 				!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 			{
-				if (NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType) ||
-					!chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), 
-						std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT + 1), 
-						std::floor(collisionPosition.z) }, cubeType))
+				bool autoJumpAllowed = true;
+				for (int y = -AUTO_JUMP_HEIGHT + 1; y <= 1; y++)
+				{
+					if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
+						std::floor(collisionPosition.y + y),
+						std::floor(collisionPosition.z) }, cubeType) &&
+						!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+					{
+						autoJumpAllowed = false;
+						break;
+					}
+				}
+
+				if (autoJumpAllowed)
 				{
 					m_velocity.y += JUMP_SPEED;
 					m_velocity.x *= JUMP_BREAK;
@@ -447,7 +456,6 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 
 
 		//Collide into faces - walking - X
-
 		if (m_velocity.x != 0)
 		{
 			for (int y = -AUTO_JUMP_HEIGHT; y <= 0; y++)
