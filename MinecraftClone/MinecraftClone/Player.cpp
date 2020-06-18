@@ -18,7 +18,7 @@ namespace
 	constexpr int MS_BETWEEN_ATTEMPT_SPAWN = 250;
 	
 	constexpr float AUTO_JUMP_HEIGHT = 2.0f;
-	constexpr float JUMP_BREAK = 0.35f;
+	constexpr float JUMP_BREAK = 1.0f;
 
 	constexpr float DESTROY_BLOCK_RANGE = 5.0f;
 	constexpr float DESTROY_BLOCK_INCREMENT = 0.5f;
@@ -521,8 +521,6 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 			}
 		}
 		
-
-
 		if (!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) ||
 			NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
