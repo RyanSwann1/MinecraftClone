@@ -106,15 +106,21 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 				rayPosition = m_camera.front * j + m_position;
 				if (!chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }))
 				{
-					chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) });
-					//std::cout << "Ray Position\n";
-					//std::cout << std::floor(rayPosition.x) << "\n";
-					//std::cout << rayPosition.y << "\n";
-					//std::cout << std::floor(rayPosition.z) << "\n\n";
-					//std::cout << "Player Position\n";
-					//std::cout << std::floor(m_position.x) << "\n";
-					//std::cout << m_position.y << "\n";
-					//std::cout << std::floor(m_position.z) << "\n\n\n";
+					bool availablePostion = true;
+					for (float y = -AUTO_JUMP_HEIGHT; y <= 0; y++)
+					{
+						if (glm::vec3(std::floor(m_position.x), std::floor(m_position.y - 2.0f), std::floor(m_position.z)) == 
+						glm::vec3(std::floor(rayPosition.x), std::floor(rayPosition.y + y), std::floor(rayPosition.z) ))
+						{
+							availablePostion = false;
+							break;
+						}
+					}
+
+					if (availablePostion)
+					{
+						chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) });
+					}
 					
 					blockPlaced = true;
 					break;
