@@ -1,5 +1,5 @@
 #include "SkyBox.h"
-#include "Utilities.h"
+#include "Globals.h"
 #include "glad.h"
 #include <SFML/Graphics.hpp>
 #include <array>
@@ -64,11 +64,11 @@ namespace
 
 SkyBox::SkyBox(unsigned int cubeMapID)
 	: m_cubeMapID(cubeMapID),
-	m_vaoID(Utilities::INVALID_OPENGL_ID),
-	m_vboID(Utilities::INVALID_OPENGL_ID)
+	m_vaoID(Globals::INVALID_OPENGL_ID),
+	m_vboID(Globals::INVALID_OPENGL_ID)
 
 {
-	assert(m_cubeMapID != Utilities::INVALID_OPENGL_ID);
+	assert(m_cubeMapID != Globals::INVALID_OPENGL_ID);
 
 	glGenBuffers(1, &m_vboID);
 	glGenVertexArrays(1, &m_vaoID);
@@ -86,19 +86,19 @@ SkyBox::SkyBox(unsigned int cubeMapID)
 
 SkyBox::~SkyBox()
 {
-	assert(m_cubeMapID != Utilities::INVALID_OPENGL_ID);
+	assert(m_cubeMapID != Globals::INVALID_OPENGL_ID);
 	glDeleteTextures(GL_TEXTURE_CUBE_MAP, &m_cubeMapID);
 
-	assert(m_vaoID != Utilities::INVALID_OPENGL_ID);
+	assert(m_vaoID != Globals::INVALID_OPENGL_ID);
 	glDeleteVertexArrays(1, &m_vaoID);
 
-	assert(m_vboID != Utilities::INVALID_OPENGL_ID);
+	assert(m_vboID != Globals::INVALID_OPENGL_ID);
 	glDeleteBuffers(1, &m_vboID);
 }
 
 std::unique_ptr<SkyBox> SkyBox::create()
 {
-	unsigned int cubeMapID = Utilities::INVALID_OPENGL_ID;
+	unsigned int cubeMapID = Globals::INVALID_OPENGL_ID;
 	glGenTextures(1, &cubeMapID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapID);
 
@@ -106,7 +106,7 @@ std::unique_ptr<SkyBox> SkyBox::create()
 	for (int i = 0; i < SKYBOX_FILEPATHS.size(); ++i)
 	{
 		sf::Image image;
-		if (image.loadFromFile(Utilities::TEXTURE_DIRECTORY + SKYBOX_FILEPATHS[i]))
+		if (image.loadFromFile(Globals::TEXTURE_DIRECTORY + SKYBOX_FILEPATHS[i]))
 		{
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, image.getSize().x, 
 				image.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());

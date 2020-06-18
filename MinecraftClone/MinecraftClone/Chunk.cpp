@@ -41,16 +41,16 @@ namespace
 
 	int converTo1D(const glm::ivec3& position)
 	{
-		return (position.z * Utilities::CHUNK_WIDTH * Utilities::CHUNK_HEIGHT) + (position.y * Utilities::CHUNK_WIDTH) + position.x;
+		return (position.z * Globals::CHUNK_WIDTH * Globals::CHUNK_HEIGHT) + (position.y * Globals::CHUNK_WIDTH) + position.x;
 	}
 
 	glm::ivec3 convertTo3D(int idx)
 	{
 		glm::ivec3 position;
-		position.z = idx / (Utilities::CHUNK_WIDTH * Utilities::CHUNK_HEIGHT);
-		idx -= (position.z * Utilities::CHUNK_WIDTH * Utilities::CHUNK_HEIGHT);
-		position.y = idx / Utilities::CHUNK_WIDTH;
-		position.x = idx % Utilities::CHUNK_WIDTH;
+		position.z = idx / (Globals::CHUNK_WIDTH * Globals::CHUNK_HEIGHT);
+		idx -= (position.z * Globals::CHUNK_WIDTH * Globals::CHUNK_HEIGHT);
+		position.y = idx / Globals::CHUNK_WIDTH;
+		position.x = idx % Globals::CHUNK_WIDTH;
 		return position;
 	}
 
@@ -85,12 +85,12 @@ Chunk::Chunk()
 
 Chunk::Chunk(const glm::ivec3& startingPosition)
 	: m_startingPosition(startingPosition),
-	m_endingPosition(startingPosition.x + Utilities::CHUNK_WIDTH, 
-		startingPosition.y + Utilities::CHUNK_HEIGHT, 
-		startingPosition.z + Utilities::CHUNK_DEPTH),
+	m_endingPosition(startingPosition.x + Globals::CHUNK_WIDTH, 
+		startingPosition.y + Globals::CHUNK_HEIGHT, 
+		startingPosition.z + Globals::CHUNK_DEPTH),
 	m_chunk(),
 	m_AABB(glm::ivec2(m_startingPosition.x, m_startingPosition.z) +
-		glm::ivec2(Utilities::CHUNK_WIDTH / 2, Utilities::CHUNK_DEPTH / 2), 16)
+		glm::ivec2(Globals::CHUNK_WIDTH / 2, Globals::CHUNK_DEPTH / 2), 16)
 {
 	regen(m_startingPosition);
 }
@@ -114,7 +114,7 @@ Chunk& Chunk::operator=(Chunk&& orig) noexcept
 
 glm::ivec3 Chunk::getHighestCubeAtPosition(const glm::ivec3& position) const
 {
-	for (int y = Utilities::CHUNK_HEIGHT - 1; y >= 0; --y)
+	for (int y = Globals::CHUNK_HEIGHT - 1; y >= 0; --y)
 	{
 		if (isCubeAtLocalPosition(convertToLocalPosition({ position.x, y, position.z }, m_startingPosition)))
 		{
@@ -123,13 +123,13 @@ glm::ivec3 Chunk::getHighestCubeAtPosition(const glm::ivec3& position) const
 	}
 
 	assert(false);
-	return glm::ivec3(position.x, Utilities::CHUNK_HEIGHT - 1, position.z);
+	return glm::ivec3(position.x, Globals::CHUNK_HEIGHT - 1, position.z);
 }
 
 bool Chunk::isCubeBelowCovering(const glm::ivec3& startingPosition) const
 {
 	for (int y = startingPosition.y + 1; 
-		y <= startingPosition.y + Utilities::MAX_SHADOW_HEIGHT && y < Utilities::CHUNK_HEIGHT - 1; ++y)
+		y <= startingPosition.y + Globals::MAX_SHADOW_HEIGHT && y < Globals::CHUNK_HEIGHT - 1; ++y)
 	{
 		eCubeType cubeAtPosition = static_cast<eCubeType>(getCubeDetailsWithoutBoundsCheck({ startingPosition.x, y, startingPosition.z }));
 		if (cubeAtPosition == eCubeType::Leaves)
@@ -212,7 +212,7 @@ bool Chunk::addCubeAtPosition(const glm::ivec3& placementPosition, const Neighbo
 	glm::ivec3 localPosition = convertToLocalPosition(placementPosition, m_startingPosition);
 	assert(isPositionInLocalBounds(localPosition));
 
-	if (localPosition.y < Utilities::CHUNK_HEIGHT && !isCubeAtLocalPosition(localPosition))
+	if (localPosition.y < Globals::CHUNK_HEIGHT && !isCubeAtLocalPosition(localPosition))
 	{
 		if (isCubeAtLocalPosition({ localPosition.x, localPosition.y - 1, localPosition.z }) &&
 			!NON_STACKABLE_CUBE_TYPES.isMatch(getCubeTypeByLocalPosition({ localPosition.x, localPosition.y - 1, localPosition.z })))
@@ -276,7 +276,7 @@ bool Chunk::destroyCubeAtPosition(const glm::ivec3& destroyPosition)
 	if (!isCubeAtLocalPosition(localPosition, eCubeType::Water) && !isCubeAtLocalPosition(localPosition, eCubeType::Air))
 	{
 		//Destroy specific Cubes on top
-		if (localPosition.y < Utilities::CHUNK_HEIGHT - 1 &&
+		if (localPosition.y < Globals::CHUNK_HEIGHT - 1 &&
 			isCubeAtLocalPosition({ localPosition.x, localPosition.y + 1, localPosition.z }, eCubeType::TallGrass) ||
 			isCubeAtLocalPosition({ localPosition.x, localPosition.y + 1, localPosition.z }, eCubeType::Shrub))
 		{
@@ -303,10 +303,10 @@ void Chunk::reuse(const glm::ivec3& startingPosition)
 	memset(&m_chunk, static_cast<char>(eCubeType::Air), m_chunk.size());
 
 	m_startingPosition = startingPosition;
-	m_endingPosition = glm::ivec3(startingPosition.x + Utilities::CHUNK_WIDTH, startingPosition.y + Utilities::CHUNK_HEIGHT,
-		startingPosition.z + Utilities::CHUNK_DEPTH);
+	m_endingPosition = glm::ivec3(startingPosition.x + Globals::CHUNK_WIDTH, startingPosition.y + Globals::CHUNK_HEIGHT,
+		startingPosition.z + Globals::CHUNK_DEPTH);
 	m_AABB.reset(glm::ivec2(m_startingPosition.x, m_startingPosition.z) +
-		glm::ivec2(Utilities::CHUNK_WIDTH / 2, Utilities::CHUNK_DEPTH / 2), 16);
+		glm::ivec2(Globals::CHUNK_WIDTH / 2, Globals::CHUNK_DEPTH / 2), 16);
 
 	regen(m_startingPosition);	
 }
@@ -344,9 +344,9 @@ void Chunk::reuse(const glm::ivec3& startingPosition)
 
 void Chunk::regen(const glm::ivec3& startingPosition)
 {
-	for (int z = startingPosition.z; z < startingPosition.z + Utilities::CHUNK_DEPTH; ++z)
+	for (int z = startingPosition.z; z < startingPosition.z + Globals::CHUNK_DEPTH; ++z)
 	{
-		for (int x = startingPosition.x; x < startingPosition.x + Utilities::CHUNK_WIDTH; ++x)
+		for (int x = startingPosition.x; x < startingPosition.x + Globals::CHUNK_WIDTH; ++x)
 		{
 			int elevation = getElevationAtPosition(x, z);
 			glm::ivec3 positionOnGrid(x - startingPosition.x, elevation, z - startingPosition.z);
@@ -359,7 +359,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 				bool firstBlockPlaced = false;
 				for (int y = elevation; y >= 0; --y)
 				{
-					if (y <= Utilities::STONE_MAX_HEIGHT)
+					if (y <= Globals::STONE_MAX_HEIGHT)
 					{
 						cubeType = eCubeType::Stone;
 					}
@@ -384,7 +384,7 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 			{
 				for (int y = elevation; y >= 0; --y)
 				{
-					if (y <= Utilities::STONE_MAX_HEIGHT)
+					if (y <= Globals::STONE_MAX_HEIGHT)
 					{
 						cubeType = eCubeType::Stone;
 					}
@@ -407,17 +407,17 @@ void Chunk::regen(const glm::ivec3& startingPosition)
 	spawnWater();
 	spawnTrees();
 	spawnCactus();
-	spawnPlant(Utilities::MAX_SHRUB_PER_CHUNK, eCubeType::Sand, eCubeType::Shrub);
-	spawnPlant(Utilities::MAX_TALL_GRASS_PER_CHUNK, eCubeType::Grass, eCubeType::TallGrass);
+	spawnPlant(Globals::MAX_SHRUB_PER_CHUNK, eCubeType::Sand, eCubeType::Shrub);
+	spawnPlant(Globals::MAX_TALL_GRASS_PER_CHUNK, eCubeType::Grass, eCubeType::TallGrass);
 }
 
 void Chunk::spawnWater()
 {
-	for (int z = 0; z < Utilities::CHUNK_DEPTH; ++z)
+	for (int z = 0; z < Globals::CHUNK_DEPTH; ++z)
 	{
-		for (int x = 0; x < Utilities::CHUNK_WIDTH; ++x)
+		for (int x = 0; x < Globals::CHUNK_WIDTH; ++x)
 		{
-			for (int y = 0; y <= Utilities::WATER_MAX_HEIGHT; ++y)
+			for (int y = 0; y <= Globals::WATER_MAX_HEIGHT; ++y)
 			{
 				glm::ivec3 position(x, y, z);
 				if ((isCubeAtLocalPosition(position, eCubeType::Air)))
@@ -431,27 +431,27 @@ void Chunk::spawnWater()
 
 void Chunk::spawnTrees()
 {
-	if (getRandomNumber(0, 100) < Utilities::CHANCE_TREE_SPAWN_IN_CHUNK)
+	if (getRandomNumber(0, 100) < Globals::CHANCE_TREE_SPAWN_IN_CHUNK)
 	{
 		return;
 	}
 	
 	int attemptsCount = 0;
 	int spawnCount = 0;
-	while (attemptsCount < Utilities::MAX_TREE_SPAWN_ATTEMPTS && spawnCount < Utilities::MAX_TREE_PER_CHUNK)
+	while (attemptsCount < Globals::MAX_TREE_SPAWN_ATTEMPTS && spawnCount < Globals::MAX_TREE_PER_CHUNK)
 	{
 		glm::ivec3 spawnPosition;
-		spawnPosition.x = getRandomNumber(MAX_LEAVES_DISTANCE, Utilities::CHUNK_WIDTH - MAX_LEAVES_DISTANCE - 1);
-		spawnPosition.z = getRandomNumber(MAX_LEAVES_DISTANCE, Utilities::CHUNK_DEPTH - MAX_LEAVES_DISTANCE - 1);
+		spawnPosition.x = getRandomNumber(MAX_LEAVES_DISTANCE, Globals::CHUNK_WIDTH - MAX_LEAVES_DISTANCE - 1);
+		spawnPosition.z = getRandomNumber(MAX_LEAVES_DISTANCE, Globals::CHUNK_DEPTH - MAX_LEAVES_DISTANCE - 1);
 
 		//Find Spawn Location
-		for (int y = Utilities::CHUNK_HEIGHT - Utilities::MAX_TREE_HEIGHT - MAX_LEAVES_DISTANCE - 1; y >= Utilities::SAND_MAX_HEIGHT; --y)
+		for (int y = Globals::CHUNK_HEIGHT - Globals::MAX_TREE_HEIGHT - MAX_LEAVES_DISTANCE - 1; y >= Globals::SAND_MAX_HEIGHT; --y)
 		{
 			spawnPosition.y = y;
 			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Grass) &&
 				isCubeAtLocalPosition({ spawnPosition.x, spawnPosition.y + 1, spawnPosition.z }, eCubeType::Air))
 			{
-				int treeHeight = getRandomNumber(Utilities::MIN_TREE_HEIGHT, Utilities::MAX_TREE_HEIGHT);
+				int treeHeight = getRandomNumber(Globals::MIN_TREE_HEIGHT, Globals::MAX_TREE_HEIGHT);
 				spawnLeaves(spawnPosition, treeHeight);
 				spawnTreeStump(spawnPosition, treeHeight);
 				++spawnCount;
@@ -467,21 +467,21 @@ void Chunk::spawnCactus()
 {
 	int attemptsCount = 0;
 	int spawnCount = 0;
-	while (attemptsCount < Utilities::MAX_CACTUS_SPAWN_ATTEMPTS && spawnCount < Utilities::MAX_CACTUS_PER_CHUNK)
+	while (attemptsCount < Globals::MAX_CACTUS_SPAWN_ATTEMPTS && spawnCount < Globals::MAX_CACTUS_PER_CHUNK)
 	{
 		glm::ivec3 spawnPosition;
-		spawnPosition.x = getRandomNumber(0, Utilities::CHUNK_WIDTH - 1);
-		spawnPosition.z = getRandomNumber(0, Utilities::CHUNK_DEPTH - 1);
+		spawnPosition.x = getRandomNumber(0, Globals::CHUNK_WIDTH - 1);
+		spawnPosition.z = getRandomNumber(0, Globals::CHUNK_DEPTH - 1);
 
 		//Find Spawn Location
-		for (int y = Utilities::CHUNK_HEIGHT - Utilities::CACTUS_MAX_HEIGHT - 1; y >= 0; --y)
+		for (int y = Globals::CHUNK_HEIGHT - Globals::CACTUS_MAX_HEIGHT - 1; y >= 0; --y)
 		{
 			spawnPosition.y = y;
 			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Sand) &&
 				isCubeAtLocalPosition({ spawnPosition.x, y + 1, spawnPosition.z }, eCubeType::Air))
 			{
 				//Spawn Cactus
-				int cactusHeight = getRandomNumber(Utilities::CACTUS_MIN_HEIGHT, Utilities::CACTUS_MAX_HEIGHT);
+				int cactusHeight = getRandomNumber(Globals::CACTUS_MIN_HEIGHT, Globals::CACTUS_MAX_HEIGHT);
 				for (int i = 1; i <= cactusHeight; ++i)
 				{
 					if (i == cactusHeight)
@@ -507,13 +507,13 @@ void Chunk::spawnPlant(int maxQuantity, eCubeType baseCubeType, eCubeType plantC
 {
 	int attemptsCount = 0;
 	int spawnCount = 0;
-	while (attemptsCount < Utilities::MAX_PLANT_SPAWN_ATTEMPTS && spawnCount < maxQuantity)
+	while (attemptsCount < Globals::MAX_PLANT_SPAWN_ATTEMPTS && spawnCount < maxQuantity)
 	{
 		glm::ivec3 spawnPosition;
-		spawnPosition.x = getRandomNumber(0, Utilities::CHUNK_WIDTH - 1);
-		spawnPosition.z = getRandomNumber(0, Utilities::CHUNK_DEPTH - 1);
+		spawnPosition.x = getRandomNumber(0, Globals::CHUNK_WIDTH - 1);
+		spawnPosition.z = getRandomNumber(0, Globals::CHUNK_DEPTH - 1);
 
-		for (int y = Utilities::CHUNK_HEIGHT - 5; y >= Utilities::WATER_MAX_HEIGHT; --y)
+		for (int y = Globals::CHUNK_HEIGHT - 5; y >= Globals::WATER_MAX_HEIGHT; --y)
 		{
 			spawnPosition.y = y;
 			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Air) &&
@@ -574,9 +574,9 @@ bool Chunk::isPositionInLocalBounds(const glm::ivec3& position) const
 	return (position.x >= 0 &&
 		position.y >= 0 &&
 		position.z >= 0 &&
-		position.x < Utilities::CHUNK_WIDTH &&
-		position.y < Utilities::CHUNK_HEIGHT &&
-		position.z < Utilities::CHUNK_DEPTH);
+		position.x < Globals::CHUNK_WIDTH &&
+		position.y < Globals::CHUNK_HEIGHT &&
+		position.z < Globals::CHUNK_DEPTH);
 }
 
 bool Chunk::isCubeAtLocalPosition(const glm::ivec3& localPosition, eCubeType cubeType) const
@@ -587,14 +587,14 @@ bool Chunk::isCubeAtLocalPosition(const glm::ivec3& localPosition, eCubeType cub
 
 int Chunk::getElevationAtPosition(int x, int z) const
 {
-	double ex = x / static_cast<float>(Utilities::MAP_SIZE);
-	double ey = z / static_cast<float>(Utilities::MAP_SIZE);
+	double ex = x / static_cast<float>(Globals::MAP_SIZE);
+	double ey = z / static_cast<float>(Globals::MAP_SIZE);
 
 	float elevation = 0.0f;
 
-	float persistence = Utilities::TERRAIN_PERSISTENCE;
-	float lacunarity = Utilities::TERRAIN_LACUNARITY;
-	for (int i = 0; i < Utilities::TERRAIN_OCTAVES; ++i)
+	float persistence = Globals::TERRAIN_PERSISTENCE;
+	float lacunarity = Globals::TERRAIN_LACUNARITY;
+	for (int i = 0; i < Globals::TERRAIN_OCTAVES; ++i)
 	{
 		elevation += persistence * glm::perlin(glm::vec2(ex * lacunarity, ey * lacunarity));
 
@@ -602,9 +602,9 @@ int Chunk::getElevationAtPosition(int x, int z) const
 		lacunarity *= 2.0f;
 	}
 	
-	persistence = Utilities::TERRAIN_PERSISTENCE;
+	persistence = Globals::TERRAIN_PERSISTENCE;
 	float total = 0.0f;
-	for (int i = 0; i < Utilities::TERRAIN_OCTAVES; ++i)
+	for (int i = 0; i < Globals::TERRAIN_OCTAVES; ++i)
 	{
 		total += persistence;
 		persistence /= 2.0f;
@@ -614,7 +614,7 @@ int Chunk::getElevationAtPosition(int x, int z) const
 	elevation /= total;
 	elevation = (elevation + 1) / 2;
 	elevation = glm::pow(elevation, 3.0f);
-	elevation = elevation * (float)Utilities::CHUNK_HEIGHT - 1;
+	elevation = elevation * (float)Globals::CHUNK_HEIGHT - 1;
 
 	return elevation;
 }
@@ -627,9 +627,9 @@ eBiomeType Chunk::getBiomeType(int x, int z) const
 	double by = z / 1000.0f;
 
 	float biomeType = 0.0f;
-	float moisturePersistence = Utilities::BIOME_PERSISTENCE;
-	float moistureLacunarity = Utilities::BIOME_LACUNARITY;
-	for (int i = 0; i < Utilities::BIOME_OCTAVES; ++i)
+	float moisturePersistence = Globals::BIOME_PERSISTENCE;
+	float moistureLacunarity = Globals::BIOME_LACUNARITY;
+	for (int i = 0; i < Globals::BIOME_OCTAVES; ++i)
 	{
 		biomeType += moisturePersistence * glm::perlin(glm::vec2(bx * moistureLacunarity, by * moistureLacunarity));
 
@@ -637,9 +637,9 @@ eBiomeType Chunk::getBiomeType(int x, int z) const
 		moistureLacunarity *= 2.0f;
 	}
 
-	float persistence = Utilities::BIOME_PERSISTENCE;
+	float persistence = Globals::BIOME_PERSISTENCE;
 	float total = 0.0f;
-	for (int i = 0; i < Utilities::BIOME_OCTAVES; ++i)
+	for (int i = 0; i < Globals::BIOME_OCTAVES; ++i)
 	{
 		total += persistence;
 		persistence /= 2.0f;

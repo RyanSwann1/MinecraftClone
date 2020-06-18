@@ -6,13 +6,13 @@ VertexBuffer::VertexBuffer()
 	: elementBufferIndex(0),
 	bindToVAO(false),
 	displayable(false),
-	positionsID(Utilities::INVALID_OPENGL_ID),
+	positionsID(Globals::INVALID_OPENGL_ID),
 	positions(),
-	lightIntensityID(Utilities::INVALID_OPENGL_ID),
+	lightIntensityID(Globals::INVALID_OPENGL_ID),
 	lightIntensityVertices(),
-	textCoordsID(Utilities::INVALID_OPENGL_ID),
+	textCoordsID(Globals::INVALID_OPENGL_ID),
 	textCoords(),
-	indiciesID(Utilities::INVALID_OPENGL_ID),
+	indiciesID(Globals::INVALID_OPENGL_ID),
 	indicies()
 {
 	glGenBuffers(1, &positionsID);
@@ -37,10 +37,10 @@ VertexBuffer::VertexBuffer(VertexBuffer&& orig) noexcept
 	orig.elementBufferIndex = 0;
 	orig.bindToVAO = false;
 	orig.displayable = false;
-	orig.positionsID = Utilities::INVALID_OPENGL_ID;
-	orig.textCoordsID = Utilities::INVALID_OPENGL_ID;
-	orig.indiciesID = Utilities::INVALID_OPENGL_ID;
-	orig.lightIntensityID = Utilities::INVALID_OPENGL_ID;
+	orig.positionsID = Globals::INVALID_OPENGL_ID;
+	orig.textCoordsID = Globals::INVALID_OPENGL_ID;
+	orig.indiciesID = Globals::INVALID_OPENGL_ID;
+	orig.lightIntensityID = Globals::INVALID_OPENGL_ID;
 }
 
 VertexBuffer& VertexBuffer::operator=(VertexBuffer&& orig) noexcept
@@ -60,26 +60,26 @@ VertexBuffer& VertexBuffer::operator=(VertexBuffer&& orig) noexcept
 	orig.elementBufferIndex = 0;
 	orig.bindToVAO = false;
 	orig.displayable = false;
-	orig.positionsID = Utilities::INVALID_OPENGL_ID;
-	orig.textCoordsID = Utilities::INVALID_OPENGL_ID;
-	orig.indiciesID = Utilities::INVALID_OPENGL_ID;
-	orig.lightIntensityID = Utilities::INVALID_OPENGL_ID;
+	orig.positionsID = Globals::INVALID_OPENGL_ID;
+	orig.textCoordsID = Globals::INVALID_OPENGL_ID;
+	orig.indiciesID = Globals::INVALID_OPENGL_ID;
+	orig.lightIntensityID = Globals::INVALID_OPENGL_ID;
 
 	return *this;
 }
 
 VertexBuffer::~VertexBuffer()
 {
-	assert(positionsID != Utilities::INVALID_OPENGL_ID);
+	assert(positionsID != Globals::INVALID_OPENGL_ID);
 	glDeleteBuffers(1, &positionsID);
 	
-	assert(lightIntensityID != Utilities::INVALID_OPENGL_ID);
+	assert(lightIntensityID != Globals::INVALID_OPENGL_ID);
 	glDeleteBuffers(1, &lightIntensityID);
 
-	assert(textCoordsID != Utilities::INVALID_OPENGL_ID);
+	assert(textCoordsID != Globals::INVALID_OPENGL_ID);
 	glDeleteBuffers(1, &textCoordsID);
 	
-	assert(indiciesID != Utilities::INVALID_OPENGL_ID);
+	assert(indiciesID != Globals::INVALID_OPENGL_ID);
 	glDeleteBuffers(1, &indiciesID);
 }
 

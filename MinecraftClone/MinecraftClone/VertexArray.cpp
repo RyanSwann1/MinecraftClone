@@ -1,14 +1,14 @@
 #include "VertexArray.h"
 #include "glad.h"
 #include "VertexBuffer.h"
-#include "Utilities.h"
+#include "Globals.h"
 #include <iostream>
 
 VertexArray::VertexArray()
 	: m_opaqueVertexBuffer(),
 	m_transparentVertexBuffer(),
-	m_opaqueID(Utilities::INVALID_OPENGL_ID),
-	m_transparentID(Utilities::INVALID_OPENGL_ID)
+	m_opaqueID(Globals::INVALID_OPENGL_ID),
+	m_transparentID(Globals::INVALID_OPENGL_ID)
 {
 	glGenVertexArrays(1, &m_opaqueID);
 	glGenVertexArrays(1, &m_transparentID);
@@ -16,10 +16,10 @@ VertexArray::VertexArray()
 
 VertexArray::~VertexArray()
 {
-	assert(m_opaqueID != Utilities::INVALID_OPENGL_ID);
+	assert(m_opaqueID != Globals::INVALID_OPENGL_ID);
 	glDeleteVertexArrays(1, &m_opaqueID);
 	
-	assert(m_transparentID != Utilities::INVALID_OPENGL_ID);
+	assert(m_transparentID != Globals::INVALID_OPENGL_ID);
 	glDeleteVertexArrays(1, &m_transparentID);
 }
 
@@ -29,8 +29,8 @@ VertexArray::VertexArray(VertexArray&& orig) noexcept
 	m_opaqueID(orig.m_opaqueID),
 	m_transparentID(orig.m_transparentID)
 {
-	orig.m_opaqueID = Utilities::INVALID_OPENGL_ID; 
-	orig.m_transparentID = Utilities::INVALID_OPENGL_ID;
+	orig.m_opaqueID = Globals::INVALID_OPENGL_ID; 
+	orig.m_transparentID = Globals::INVALID_OPENGL_ID;
 }
 
 VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
@@ -40,8 +40,8 @@ VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
 	m_opaqueID = orig.m_opaqueID;
 	m_transparentID = orig.m_transparentID;
 
-	orig.m_opaqueID = Utilities::INVALID_OPENGL_ID;
-	orig.m_transparentID = Utilities::INVALID_OPENGL_ID;
+	orig.m_opaqueID = Globals::INVALID_OPENGL_ID;
+	orig.m_transparentID = Globals::INVALID_OPENGL_ID;
 
 	return *this;
 }

@@ -1,5 +1,5 @@
 #include "Rectangle.h"
-#include "Utilities.h"
+#include "Globals.h"
 
 Rectangle::Rectangle()
 	: m_left(0.0f),

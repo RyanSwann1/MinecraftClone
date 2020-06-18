@@ -3,7 +3,7 @@
 #include "Chunk.h"
 #include "ChunkManager.h"
 #include "VertexBuffer.h"
-#include "Utilities.h"
+#include "Globals.h"
 #include "VertexArray.h"
 #include "Rectangle.h"
 #include "SkyBox.h"

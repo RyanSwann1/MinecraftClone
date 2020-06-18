@@ -1,7 +1,7 @@
 #pragma once
 
 #include "NonCopyable.h"
-#include "Utilities.h"
+#include "Globals.h"
 #include "Chunk.h"
 #include <unordered_map>
 #include "ObjectPool.h"

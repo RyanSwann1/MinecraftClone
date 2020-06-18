@@ -276,7 +276,7 @@ void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		}
 
 		//Top Face
-		if (position.y == Utilities::CHUNK_HEIGHT - 1 ||
+		if (position.y == Globals::CHUNK_HEIGHT - 1 ||
 			isFacingOpaqueCube({ position.x, position.y + 1, position.z }, chunk))
 		{
 			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
@@ -333,7 +333,7 @@ void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		}
 		else
 		{
-			if (position.y == Utilities::CHUNK_HEIGHT - 1 ||
+			if (position.y == Globals::CHUNK_HEIGHT - 1 ||
 				isFacingTransparentCube({ position.x, position.y + 1, position.z }, chunk))
 			{
 				addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
@@ -415,7 +415,7 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 
 
 		//Top Face
-		if (position.y == Utilities::CHUNK_HEIGHT - 1 ||
+		if (position.y == Globals::CHUNK_HEIGHT - 1 ||
 			isFacingOpaqueCube({ position.x, position.y + 1, position.z }, chunk))
 		{
 			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
@@ -511,7 +511,7 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 		else
 		{
 			//Top Face
-			if (position.y == Utilities::CHUNK_HEIGHT - 1 ||
+			if (position.y == Globals::CHUNK_HEIGHT - 1 ||
 				isFacingTransparentCube({ position.x, position.y + 1, position.z }, chunk))
 			{
 				addCubeFace(chunkMesh.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, position, false, shadow);
@@ -716,7 +716,7 @@ bool isFacingTransparentCube(const glm::ivec3& cubePosition, const Chunk& chunk)
 	eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(cubePosition));
 	if (cubeType != eCubeType::Air)
 	{
-		return Utilities::TRANSPARENT_CUBE_TYPES.isMatch(cubeType);
+		return Globals::TRANSPARENT_CUBE_TYPES.isMatch(cubeType);
 	}
 	else
 	{
@@ -729,7 +729,7 @@ bool isFacingOpaqueCube(const glm::ivec3& cubePosition, const Chunk& chunk)
 	eCubeType cubeType = static_cast<eCubeType>(chunk.getCubeDetailsWithoutBoundsCheck(cubePosition));
 	if (cubeType != eCubeType::Air)
 	{
-		return Utilities::OPAQUE_CUBE_TYPES.isMatch(cubeType);
+		return Globals::OPAQUE_CUBE_TYPES.isMatch(cubeType);
 	}
 	else
 	{

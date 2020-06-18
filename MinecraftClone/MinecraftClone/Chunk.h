@@ -2,7 +2,7 @@
 
 #include "glm/glm.hpp"
 #include "CubeType.h"
-#include "Utilities.h"
+#include "Globals.h"
 #include "Rectangle.h"
 #include "NonCopyable.h"
 #include <array>
@@ -49,7 +49,7 @@ public:
 private:
 	glm::ivec3 m_startingPosition;
 	glm::ivec3 m_endingPosition;
-	std::array<char, Utilities::CHUNK_VOLUME> m_chunk;
+	std::array<char, Globals::CHUNK_VOLUME> m_chunk;
 	Rectangle m_AABB;
 
 	bool isPositionInLocalBounds(const glm::ivec3& position) const;

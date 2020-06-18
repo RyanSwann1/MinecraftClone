@@ -2,7 +2,7 @@
 
 #include "glad.h"
 #include "glm/glm.hpp"
-#include "Utilities.h"
+#include "Globals.h"
 #include "NonCopyable.h"
 #include <vector>
 

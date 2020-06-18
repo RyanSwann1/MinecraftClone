@@ -1,5 +1,5 @@
 #include "ChunkManager.h"
-#include "Utilities.h"
+#include "Globals.h"
 #include "VertexBuffer.h"
 #include "VertexArray.h"
 #include "CubeType.h"
@@ -17,8 +17,8 @@ namespace
 
 	int getObjectPoolSize()
 	{
-		int x = 2 * Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_WIDTH + 1;
-		int z = 2 * Utilities::VISIBILITY_DISTANCE / Utilities::CHUNK_DEPTH + 1;
+		int x = 2 * Globals::VISIBILITY_DISTANCE / Globals::CHUNK_WIDTH + 1;
+		int z = 2 * Globals::VISIBILITY_DISTANCE / Globals::CHUNK_DEPTH + 1;
 
 		return x * z;
 	}
@@ -26,25 +26,25 @@ namespace
 	glm::ivec3 getClosestMiddlePosition(const glm::ivec3& position)
 	{
 		glm::ivec3 middlePosition = position;
-		if (position.x % (Utilities::CHUNK_WIDTH / 2) < 0)
+		if (position.x % (Globals::CHUNK_WIDTH / 2) < 0)
 		{
-			middlePosition.x += std::abs(position.x % Utilities::CHUNK_WIDTH / 2);
-			middlePosition.x -= Utilities::CHUNK_WIDTH / 2;
+			middlePosition.x += std::abs(position.x % Globals::CHUNK_WIDTH / 2);
+			middlePosition.x -= Globals::CHUNK_WIDTH / 2;
 		}
-		else if (position.x % (Utilities::CHUNK_WIDTH / 2) > 0)
+		else if (position.x % (Globals::CHUNK_WIDTH / 2) > 0)
 		{
-			middlePosition.x -= std::abs(position.x % Utilities::CHUNK_WIDTH / 2);
-			middlePosition.x += Utilities::CHUNK_WIDTH / 2;
+			middlePosition.x -= std::abs(position.x % Globals::CHUNK_WIDTH / 2);
+			middlePosition.x += Globals::CHUNK_WIDTH / 2;
 		}
-		if (position.z % (Utilities::CHUNK_DEPTH / 2) < 0)
+		if (position.z % (Globals::CHUNK_DEPTH / 2) < 0)
 		{
-			middlePosition.z += std::abs(position.z % Utilities::CHUNK_DEPTH / 2);
-			middlePosition.z -= Utilities::CHUNK_DEPTH / 2;
+			middlePosition.z += std::abs(position.z % Globals::CHUNK_DEPTH / 2);
+			middlePosition.z -= Globals::CHUNK_DEPTH / 2;
 		}
-		else if (position.z % (Utilities::CHUNK_DEPTH / 2) > 0)
+		else if (position.z % (Globals::CHUNK_DEPTH / 2) > 0)
 		{
-			middlePosition.z -= std::abs(position.z % Utilities::CHUNK_DEPTH / 2);
-			middlePosition.z += Utilities::CHUNK_DEPTH / 2;
+			middlePosition.z -= std::abs(position.z % Globals::CHUNK_DEPTH / 2);
+			middlePosition.z += Globals::CHUNK_DEPTH / 2;
 		}
 
 		return { middlePosition.x, 0, middlePosition.z };
@@ -53,23 +53,23 @@ namespace
 	glm::ivec3 getClosestChunkStartingPosition(const glm::ivec3& position)
 	{
 		glm::ivec3 closestChunkStartingPosition = position;
-		if (position.x % Utilities::CHUNK_WIDTH < 0)
+		if (position.x % Globals::CHUNK_WIDTH < 0)
 		{
-			closestChunkStartingPosition.x += std::abs(position.x % Utilities::CHUNK_WIDTH);
-			closestChunkStartingPosition.x -= Utilities::CHUNK_WIDTH;
+			closestChunkStartingPosition.x += std::abs(position.x % Globals::CHUNK_WIDTH);
+			closestChunkStartingPosition.x -= Globals::CHUNK_WIDTH;
 		}
-		else if (position.x % Utilities::CHUNK_WIDTH > 0)
+		else if (position.x % Globals::CHUNK_WIDTH > 0)
 		{
-			closestChunkStartingPosition.x -= std::abs(position.x % Utilities::CHUNK_WIDTH);
+			closestChunkStartingPosition.x -= std::abs(position.x % Globals::CHUNK_WIDTH);
 		}
-		if (position.z % Utilities::CHUNK_DEPTH < 0)
+		if (position.z % Globals::CHUNK_DEPTH < 0)
 		{
-			closestChunkStartingPosition.z += std::abs(position.z % Utilities::CHUNK_DEPTH);
-			closestChunkStartingPosition.z -= Utilities::CHUNK_DEPTH;
+			closestChunkStartingPosition.z += std::abs(position.z % Globals::CHUNK_DEPTH);
+			closestChunkStartingPosition.z -= Globals::CHUNK_DEPTH;
 		}
-		else if (position.z % Utilities::CHUNK_DEPTH > 0)
+		else if (position.z % Globals::CHUNK_DEPTH > 0)
 		{
-			closestChunkStartingPosition.z -= std::abs(position.z % Utilities::CHUNK_DEPTH);
+			closestChunkStartingPosition.z -= std::abs(position.z % Globals::CHUNK_DEPTH);
 		}
 
 		return { closestChunkStartingPosition.x, 0, closestChunkStartingPosition.z };
@@ -95,7 +95,7 @@ ChunkManager::ChunkManager()
 	m_generatedChunkQueue(),
 	m_chunkMeshRegenerationQueue()
 {
-	addChunks(Utilities::PLAYER_STARTING_POSITION);
+	addChunks(Globals::PLAYER_STARTING_POSITION);
 }
 
 glm::ivec3 ChunkManager::getHighestCubeAtPosition(const glm::vec3& playerPosition) const
@@ -266,7 +266,7 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 		playerLock.unlock();
 
 		glm::ivec3 startingPosition = getClosestMiddlePosition(playerPosition);
-		Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Utilities::VISIBILITY_DISTANCE);
+		Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Globals::VISIBILITY_DISTANCE);
 
 		deleteChunks(playerPosition, renderingMutex, visibilityRect);
 		addChunks(playerPosition);
@@ -365,9 +365,9 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 	std::vector<ChunkToAdd> chunksToAdd;
 	glm::ivec3 startPosition = getClosestMiddlePosition(playerPosition);
 	startPosition = getClosestChunkStartingPosition(startPosition);
-	for (int z = startPosition.z - Utilities::VISIBILITY_DISTANCE; z <= startPosition.z + Utilities::VISIBILITY_DISTANCE; z += Utilities::CHUNK_DEPTH)
+	for (int z = startPosition.z - Globals::VISIBILITY_DISTANCE; z <= startPosition.z + Globals::VISIBILITY_DISTANCE; z += Globals::CHUNK_DEPTH)
 	{
-		for (int x = startPosition.x - Utilities::VISIBILITY_DISTANCE; x <= startPosition.x + Utilities::VISIBILITY_DISTANCE; x += Utilities::CHUNK_WIDTH)
+		for (int x = startPosition.x - Globals::VISIBILITY_DISTANCE; x <= startPosition.x + Globals::VISIBILITY_DISTANCE; x += Globals::CHUNK_WIDTH)
 		{
 			glm::ivec3 chunkStartingPosition(x, 0, z);
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend() && 

@@ -3,7 +3,7 @@
 #include "CubeType.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include "Utilities.h"
+#include "Globals.h"
 #include <array>
 
 namespace
@@ -31,7 +31,7 @@ namespace
 	bool addTexture(const std::string& textureName, int textureCountIndex)
 	{
 		sf::Image image;
-		bool textureLoaded = image.loadFromFile(Utilities::TEXTURE_DIRECTORY + textureName);
+		bool textureLoaded = image.loadFromFile(Globals::TEXTURE_DIRECTORY + textureName);
 		assert(textureLoaded);
 		if (!textureLoaded)
 		{
@@ -55,13 +55,13 @@ TextureArray::TextureArray(unsigned int ID)
 	: m_slot(0),
 	m_ID(ID)
 {
-	assert(ID != Utilities::INVALID_OPENGL_ID);
+	assert(ID != Globals::INVALID_OPENGL_ID);
 	glActiveTexture(GL_TEXTURE0 + m_slot);
 }
 
 std::unique_ptr<TextureArray> TextureArray::create()
 {
-	unsigned int textureArrayID = Utilities::INVALID_OPENGL_ID;
+	unsigned int textureArrayID = Globals::INVALID_OPENGL_ID;
 	glGenTextures(1, &textureArrayID);
 
 	glBindTexture(GL_TEXTURE_2D_ARRAY, textureArrayID);
@@ -91,7 +91,7 @@ std::unique_ptr<TextureArray> TextureArray::create()
 
 TextureArray::~TextureArray()
 {
-	assert(m_ID != Utilities::INVALID_OPENGL_ID);
+	assert(m_ID != Globals::INVALID_OPENGL_ID);
 	glDeleteTextures(1, &m_ID);
 }
 

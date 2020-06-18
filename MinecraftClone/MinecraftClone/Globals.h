@@ -46,7 +46,7 @@ enum class eDirection
 
 //https://stackoverflow.com/questions/4422507/superiority-of-unnamed-namespace-over-static
 
-namespace Utilities
+namespace Globals
 {
 	constexpr int CHUNK_WIDTH = 32;
 	constexpr int CHUNK_HEIGHT = 320;

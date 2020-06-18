@@ -1,6 +1,6 @@
 #include "ShaderHandler.h"
 #include "glad.h"
-#include "Utilities.h"
+#include "Globals.h"
 #include "glm/gtc/type_ptr.hpp"
 #include <fstream>
 #include <iostream>
@@ -164,7 +164,7 @@ ShaderHandler::Shader::Shader(Shader&& orig) noexcept
 	m_type(orig.m_type),
 	m_uniformLocations(std::move(orig.m_uniformLocations))
 {
-	orig.m_ID = Utilities::INVALID_OPENGL_ID;
+	orig.m_ID = Globals::INVALID_OPENGL_ID;
 }
 
 ShaderHandler::Shader& ShaderHandler::Shader::operator=(Shader&& orig) noexcept
@@ -173,14 +173,14 @@ ShaderHandler::Shader& ShaderHandler::Shader::operator=(Shader&& orig) noexcept
 	m_type = orig.m_type;
 	m_uniformLocations = std::move(orig.m_uniformLocations);
 
-	orig.m_ID = Utilities::INVALID_OPENGL_ID;
+	orig.m_ID = Globals::INVALID_OPENGL_ID;
 
 	return *this;
 }
 
 ShaderHandler::Shader::~Shader()
 {
-	if (m_ID != Utilities::INVALID_OPENGL_ID)
+	if (m_ID != Globals::INVALID_OPENGL_ID)
 	{
 		glDeleteProgram(m_ID);
 	}

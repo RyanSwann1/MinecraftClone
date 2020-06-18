@@ -6,16 +6,16 @@ glm::ivec3 getNeighbouringChunkPosition(const glm::ivec3& chunkStartingPosition,
 	switch (direction)
 	{
 	case eDirection::Left:
-		return glm::ivec3(chunkStartingPosition.x - Utilities::CHUNK_WIDTH, 0, chunkStartingPosition.z);
+		return glm::ivec3(chunkStartingPosition.x - Globals::CHUNK_WIDTH, 0, chunkStartingPosition.z);
 
 	case eDirection::Right:
-		return glm::ivec3(chunkStartingPosition.x + Utilities::CHUNK_WIDTH, 0, chunkStartingPosition.z);
+		return glm::ivec3(chunkStartingPosition.x + Globals::CHUNK_WIDTH, 0, chunkStartingPosition.z);
 
 	case eDirection::Forward:
-		return glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.z + Utilities::CHUNK_DEPTH);
+		return glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.z + Globals::CHUNK_DEPTH);
 
 	case eDirection::Back:
-		return glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.z - Utilities::CHUNK_DEPTH);
+		return glm::ivec3(chunkStartingPosition.x, 0, chunkStartingPosition.z - Globals::CHUNK_DEPTH);
 
 	default:
 		assert(false);

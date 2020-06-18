@@ -195,7 +195,7 @@
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="ShaderHandler.h" />
     <ClInclude Include="TextureArray.h" />
-    <ClInclude Include="Utilities.h" />
+    <ClInclude Include="Globals.h" />
     <ClInclude Include="VertexArray.h" />
     <ClInclude Include="VertexBuffer.h" />
   </ItemGroup>
