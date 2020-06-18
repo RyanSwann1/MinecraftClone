@@ -19,6 +19,7 @@ namespace
 	
 	constexpr float AUTO_JUMP_HEIGHT = 2.0f;
 	constexpr float JUMP_BREAK = 1.0f;
+	constexpr float TIME_BETWEEN_JUMP = .25f;
 
 	constexpr float DESTROY_BLOCK_RANGE = 5.0f;
 	constexpr float DESTROY_BLOCK_INCREMENT = 0.5f;
@@ -26,6 +27,7 @@ namespace
 	constexpr float PLACE_BLOCK_INCREMENT = 0.1f;
 
 	constexpr float COLLISION_OFFSET = 0.35f;
+
 
 	const CubeTypeComparison NON_COLLIDABLE_CUBE_TYPES =
 	{
@@ -78,8 +80,11 @@ Player::Player()
 	m_currentState(ePlayerState::InAir),
 	m_position(),
 	m_velocity(),
-	m_autoJump(false)
-{}
+	m_autoJump(false),
+	m_jumpTimer()
+{
+	m_jumpTimer.restart();
+}
 
 const glm::vec3& Player::getPosition() const
 {
@@ -256,8 +261,11 @@ void Player::move(float deltaTime, std::mutex& playerMutex, const ChunkManager& 
 		m_velocity.y -= GRAVITY_AMOUNT;
 		break;
 	case ePlayerState::OnGround:
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && m_velocity.y == 0)
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && m_velocity.y == 0 &&
+			m_jumpTimer.getElapsedTime().asSeconds() >= TIME_BETWEEN_JUMP)
 		{
+			m_jumpTimer.restart();
+
 			if (m_velocity.x != 0 && m_velocity.z != 0)
 			{
 				eCubeType cubeType;

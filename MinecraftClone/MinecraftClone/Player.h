@@ -55,6 +55,7 @@ private:
 	glm::vec3 m_position;
 	glm::vec3 m_velocity;
 	bool m_autoJump;
+	sf::Clock m_jumpTimer;
 
 	void move(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager);
 	void applyDrag();
