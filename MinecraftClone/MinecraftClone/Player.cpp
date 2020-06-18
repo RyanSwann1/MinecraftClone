@@ -25,6 +25,8 @@ namespace
 	constexpr float PLACE_BLOCK_RANGE = 5.0f;
 	constexpr float PLACE_BLOCK_INCREMENT = 0.1f;
 
+	constexpr float COLLISION_OFFSET = 0.35f;
+
 	const CubeTypeComparison NON_COLLIDABLE_CUBE_TYPES =
 	{
 		{eCubeType::Water,
@@ -404,6 +406,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 			}
 		}
 
+
 		//Collide into faces - walking - X
 		if (!m_autoJump)
 		{
@@ -413,10 +416,21 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 			{
 				for (int y = -AUTO_JUMP_HEIGHT; y <= 0; y++)
 				{
-					glm::vec3 collisionPosition(
-						m_position.x + velocity.x,
-						m_position.y,
-						m_position.z);
+					glm::vec3 collisionPosition;
+					if (m_velocity.x > 0)
+					{
+						collisionPosition = {
+							m_position.x + COLLISION_OFFSET, //Positive & negative check
+							m_position.y,
+							m_position.z};
+					}
+					else
+					{
+						collisionPosition = {
+							m_position.x - COLLISION_OFFSET, //Positive & negative check
+							m_position.y,
+							m_position.z };
+					}
 
 					if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
 						std::floor(collisionPosition.y + y),
@@ -428,7 +442,6 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 						break;
 					}
 				}
-
 			}
 
 			//Collide into faces - walking - Z
@@ -436,10 +449,21 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 			{
 				for (int y = -AUTO_JUMP_HEIGHT; y <= 0; y++)
 				{
-					glm::vec3 collisionPosition(
-						m_position.x,
-						m_position.y,
-						m_position.z + velocity.z);
+					glm::vec3 collisionPosition;
+					if (m_velocity.z > 0)
+					{
+						collisionPosition = {
+							m_position.x, //Positive & negative check
+							m_position.y,
+							m_position.z + COLLISION_OFFSET };
+					}
+					else
+					{
+						collisionPosition = {
+							m_position.x, //Positive & negative check
+							m_position.y,
+							m_position.z - COLLISION_OFFSET };
+					}
 
 					if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
 						std::floor(collisionPosition.y + y),
