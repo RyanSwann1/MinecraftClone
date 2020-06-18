@@ -10,7 +10,7 @@ namespace
 	constexpr float WALKING_MOVEMENT_SPEED = 0.55f;
 	constexpr float FLYING_MOVEMENT_SPEED = 5.0f;
 	constexpr glm::vec3 MAX_VELOCITY = { 50.f, 50.0f, 50.0 };
-	constexpr float JUMP_SPEED = 11.0f;
+	constexpr float JUMP_SPEED = 12.0f;
 
 	constexpr float DRAG_AMOUNT = 0.9f;
 	constexpr float GRAVITY_AMOUNT = 1.0f;
@@ -18,7 +18,7 @@ namespace
 	constexpr int MS_BETWEEN_ATTEMPT_SPAWN = 250;
 	
 	constexpr float AUTO_JUMP_HEIGHT = 2.0f;
-	constexpr float AUTO_JUMP_BREAK_SCALAR = 0.01f;
+	constexpr float JUMP_BREAK = 0.35f;
 
 	constexpr float DESTROY_BLOCK_RANGE = 5.0f;
 	constexpr float DESTROY_BLOCK_INCREMENT = 0.5f;
@@ -199,7 +199,7 @@ void Player::moveCamera(const sf::Window& window)
 
 void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager)
 {
-	move(deltaTime);
+	move(deltaTime, playerMutex, chunkManager);
 	
 	std::lock_guard<std::mutex> playerLock(playerMutex);
 	handleCollisions(chunkManager, deltaTime);
@@ -208,7 +208,7 @@ void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager
 	applyDrag();
 }
 
-void Player::move(float deltaTime)
+void Player::move(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager)
 {
 	float movementSpeed = (m_currentState == ePlayerState::Flying ? FLYING_MOVEMENT_SPEED : WALKING_MOVEMENT_SPEED);
 
@@ -252,7 +252,33 @@ void Player::move(float deltaTime)
 	case ePlayerState::OnGround:
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && m_velocity.y == 0)
 		{
-			m_velocity.y += JUMP_SPEED;
+			if (m_velocity.x != 0 && m_velocity.z != 0)
+			{
+				eCubeType cubeType;
+				std::lock_guard<std::mutex> playerLock(playerMutex);
+				glm::vec3 collisionPosition(
+					m_position.x + glm::normalize(glm::vec2(m_velocity.x, m_velocity.z)).x,
+					m_position.y,
+					m_position.z + glm::normalize(glm::vec2(m_velocity.x, m_velocity.z)).y);
+
+				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
+					std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT),
+					std::floor(collisionPosition.z) }, cubeType) &&
+					!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+				{
+					m_velocity.y += JUMP_SPEED;
+					m_velocity.x *= JUMP_BREAK;
+					m_velocity.z *= JUMP_BREAK;
+				}
+				else
+				{
+					m_velocity.y += JUMP_SPEED;
+				}
+			}
+			else
+			{
+				m_velocity.y += JUMP_SPEED;
+			}
 		}
 		break;
 	default:
@@ -406,16 +432,16 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 				if (!chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT) + 1, std::floor(collisionPosition.z) }, cubeType))
 				{
 					m_velocity.y += JUMP_SPEED;
-					m_velocity.x *= AUTO_JUMP_BREAK_SCALAR;
-					m_velocity.z *= AUTO_JUMP_BREAK_SCALAR;
+					m_velocity.x *= JUMP_BREAK;
+					m_velocity.z *= JUMP_BREAK;
 				}
 				else
 				{
 					if (NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 					{
 						m_velocity.y += JUMP_SPEED;
-						m_velocity.x *= AUTO_JUMP_BREAK_SCALAR;
-						m_velocity.z *= AUTO_JUMP_BREAK_SCALAR;
+						m_velocity.x *= JUMP_BREAK;
+						m_velocity.z *= JUMP_BREAK;
 					}
 					else
 					{

@@ -56,7 +56,7 @@ private:
 	glm::vec3 m_velocity;
 	bool m_autoJump;
 
-	void move(float deltaTime);
+	void move(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager);
 	void applyDrag();
 	void handleCollisions(const ChunkManager& chunkManager, float deltaTime);
 };
