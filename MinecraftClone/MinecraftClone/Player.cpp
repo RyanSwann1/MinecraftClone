@@ -78,7 +78,7 @@ Player::Player()
 	m_currentState(ePlayerState::InAir),
 	m_position(),
 	m_velocity(),
-	m_autoJump(true)
+	m_autoJump(false)
 {}
 
 const glm::vec3& Player::getPosition() const
@@ -406,7 +406,9 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 			}
 		}
 
-		if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) &&
+		if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), 
+			std::floor(m_position.y - HEAD_HEIGHT), 
+			std::floor(m_position.z) }, cubeType) &&
 			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
 			m_velocity.y = 0;
@@ -418,7 +420,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 		break;
 	case ePlayerState::OnGround:
 		//Auto Jump
-		if (m_autoJump && m_velocity.y == 0 && glm::distance((m_velocity + m_position), m_position) > 1.0f)
+		if (m_autoJump && m_velocity.y == 0 && glm::distance((m_velocity + m_position), m_position) > 0.50f)
 		{
 			glm::vec2 n = glm::normalize(glm::vec2(m_velocity.x, m_velocity.z));
 			glm::vec3 collisionPosition(
@@ -426,101 +428,91 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 				m_position.y,
 				m_position.z + n.y);
 
-			if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT), std::floor(collisionPosition.z) }, cubeType) &&
+			if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), 
+				std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT), 
+				std::floor(collisionPosition.z) }, cubeType) &&
 				!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 			{
-				if (!chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT) + 1, std::floor(collisionPosition.z) }, cubeType))
+				if (NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType) ||
+					!chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x), 
+						std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT + 1), 
+						std::floor(collisionPosition.z) }, cubeType))
 				{
 					m_velocity.y += JUMP_SPEED;
 					m_velocity.x *= JUMP_BREAK;
 					m_velocity.z *= JUMP_BREAK;
-				}
-				else
-				{
-					if (NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-					{
-						m_velocity.y += JUMP_SPEED;
-						m_velocity.x *= JUMP_BREAK;
-						m_velocity.z *= JUMP_BREAK;
-					}
-					else
-					{
-						m_velocity.x = -m_velocity.x;
-						m_velocity.z = -m_velocity.z;
-					}
 				}
 			}
 		}
 
 
 		//Collide into faces - walking - X
-		if (!m_autoJump)
+
+		if (m_velocity.x != 0)
 		{
-			if (m_velocity.x != 0)
+			for (int y = -AUTO_JUMP_HEIGHT; y <= 0; y++)
 			{
-				for (int y = -AUTO_JUMP_HEIGHT; y <= 0; y++)
+				glm::vec3 collisionPosition;
+				if (m_velocity.x > 0)
 				{
-					glm::vec3 collisionPosition;
-					if (m_velocity.x > 0)
-					{
-						collisionPosition = {
-							m_position.x + COLLISION_OFFSET, //Positive & negative check
-							m_position.y,
-							m_position.z};
-					}
-					else
-					{
-						collisionPosition = {
-							m_position.x - COLLISION_OFFSET, //Positive & negative check
-							m_position.y,
-							m_position.z };
-					}
-
-					if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
-						std::floor(collisionPosition.y + y),
-						std::floor(collisionPosition.z) }, cubeType) &&
-						!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-					{
-						m_velocity.x = 0.0f;
-						//Handle when getting stuck
-						break;
-					}
+					collisionPosition = {
+						m_position.x + COLLISION_OFFSET, //Positive & negative check
+						m_position.y,
+						m_position.z};
 				}
-			}
-
-			//Collide into faces - walking - Z
-			if (m_velocity.z != 0)
-			{
-				for (int y = -AUTO_JUMP_HEIGHT; y <= 0; y++)
+				else
 				{
-					glm::vec3 collisionPosition;
-					if (m_velocity.z > 0)
-					{
-						collisionPosition = {
-							m_position.x, //Positive & negative check
-							m_position.y,
-							m_position.z + COLLISION_OFFSET };
-					}
-					else
-					{
-						collisionPosition = {
-							m_position.x, //Positive & negative check
-							m_position.y,
-							m_position.z - COLLISION_OFFSET };
-					}
+					collisionPosition = {
+						m_position.x - COLLISION_OFFSET, //Positive & negative check
+						m_position.y,
+						m_position.z };
+				}
 
-					if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
-						std::floor(collisionPosition.y + y),
-						std::floor(collisionPosition.z) }, cubeType) &&
-						!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-					{
-						m_velocity.z = 0.0f;
-						//Handle when getting stuck
-						break;
-					}
+				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
+					std::floor(collisionPosition.y + y),
+					std::floor(collisionPosition.z) }, cubeType) &&
+					!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+				{
+					m_velocity.x = 0.0f;
+					//Handle when getting stuck
+					break;
 				}
 			}
 		}
+
+		//Collide into faces - walking - Z
+		if (m_velocity.z != 0)
+		{
+			for (int y = -AUTO_JUMP_HEIGHT; y <= 0; y++)
+			{
+				glm::vec3 collisionPosition;
+				if (m_velocity.z > 0)
+				{
+					collisionPosition = {
+						m_position.x, //Positive & negative check
+						m_position.y,
+						m_position.z + COLLISION_OFFSET };
+				}
+				else
+				{
+					collisionPosition = {
+						m_position.x, //Positive & negative check
+						m_position.y,
+						m_position.z - COLLISION_OFFSET };
+				}
+
+				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
+					std::floor(collisionPosition.y + y),
+					std::floor(collisionPosition.z) }, cubeType) &&
+					!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+				{
+					m_velocity.z = 0.0f;
+					//Handle when getting stuck
+					break;
+				}
+			}
+		}
+		
 
 
 		if (!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) ||
