@@ -4,6 +4,13 @@
 #include <vector>
 #include <array>
 
+class Chunk;
+struct VertexArray;
+struct VertexBuffer;
+struct NeighbouringChunks;
+enum class eCubeSide;
+enum class eCubeType;
+
 namespace MeshGenerator
 {
 	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
@@ -22,13 +29,7 @@ namespace MeshGenerator
 	constexpr float RIGHT_FACE_LIGHTING_INTENSITY = 0.75f;
 	constexpr float SHADOW_INTENSITY = 0.4f;
 	constexpr float BOTTOM_FACE_LIGHTING_INTENSITY = 0.4f;
+
+	void generateChunkMesh(VertexArray& chunkMesh, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks);
+	void generatePickUpMesh(VertexBuffer& pickUpMesh, eCubeType cubeType, const glm::vec3& position);
 }
-
-class Chunk;
-struct VertexArray;
-struct NeighbouringChunks;
-enum class eCubeSide;
-enum class eCubeType;
-
-void getTextCoords(std::vector<glm::vec3>& textCoords, eCubeSide cubeSide, eCubeType cubeType);
-void generateChunkMesh(VertexArray& chunkMesh, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks);

@@ -12,6 +12,7 @@ namespace
 		glm::vec2(0.0f, 1.0f)
 	};
 
+	//Cube Position Coords
 	constexpr std::array<glm::vec3, 4> CUBE_FACE_FRONT = { glm::vec3(0, 0, 1), glm::vec3(1, 0, 1), glm::vec3(1, 1, 1), glm::vec3(0, 1, 1) };
 	constexpr std::array<glm::vec3, 4> CUBE_FACE_BACK = { glm::vec3(1, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 1, 0) };
 
@@ -23,6 +24,198 @@ namespace
 
 	constexpr std::array<glm::vec3, 4> FIRST_DIAGONAL_FACE = { glm::vec3(0, 0, 0), glm::vec3(1, 0, 1), glm::vec3(1, 1, 1), glm::vec3(0, 1, 0) };
 	constexpr std::array<glm::vec3, 4> SECOND_DIAGONAL_FACE = { glm::vec3(0, 0, 1), glm::vec3(1, 0, 0), glm::vec3(1, 1, 0), glm::vec3(0, 1, 1) };
+
+	//PickUp Position Coords
+	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_FRONT = { glm::vec3(0, 0, 0.25f), glm::vec3(0.25f, 0, 0.25f), glm::vec3(0.25f, 0.25f, 0.25f), glm::vec3(0, 0.25f, 0.25f) };
+	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_BACK = { glm::vec3(0.25f, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0.25f, 0), glm::vec3(0.25f, 0.25f, 0) };
+
+	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_LEFT = { glm::vec3(0, 0, 0), glm::vec3(0, 0, 0.25f), glm::vec3(0, 0.25f, 0.25f), glm::vec3(0, 0.25f, 0) };
+	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_RIGHT = { glm::vec3(0.25f, 0, 0.25f), glm::vec3(0.25f, 0, 0), glm::vec3(0.25f, 0.25f, 0), glm::vec3(0.25f, 0.25f, 0.25f) };
+
+	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_TOP = { glm::vec3(0, 0.25f, 0.25f), glm::vec3(0.25f, 0.25f, 0.25f), glm::vec3(0.25f, 0.25f, 0), glm::vec3(0, 0.25f, 0) };
+	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_BOTTOM = { glm::vec3(0, 0, 0), glm::vec3(0.25f, 0, 0), glm::vec3(0.25f, 0, 0.25f), glm::vec3(0, 0, 0.25f) };
+
+	constexpr std::array<glm::vec3, 4> PICKUP_FIRST_DIAGONAL_FACE = { glm::vec3(0, 0, 0), glm::vec3(0.25f, 0, 0.25f), glm::vec3(0.25f, 0.25f, 0.25f), glm::vec3(0, 0.25f, 0) };
+	constexpr std::array<glm::vec3, 4> PICKUP_SECOND_DIAGONAL_FACE = { glm::vec3(0, 0, 0.25f), glm::vec3(0.25f, 0, 0), glm::vec3(0.25f, 0.25f, 0), glm::vec3(0, 0.25f, 0.25f) };
+
+	void getTextCoords(std::vector<glm::vec3>& textCoords, eCubeSide cubeSide, eCubeType cubeType)
+	{
+		eTextureLayer textureLayer;
+		switch (cubeType)
+		{
+		case eCubeType::Dirt:
+			textureLayer = eTextureLayer::Dirt;
+			break;
+		case eCubeType::Stone:
+			textureLayer = eTextureLayer::Stone;
+			break;
+		case eCubeType::Sand:
+			textureLayer = eTextureLayer::Sand;
+			break;
+		case eCubeType::Grass:
+			switch (cubeSide)
+			{
+			case eCubeSide::Back:
+			case eCubeSide::Front:
+			case eCubeSide::Left:
+			case eCubeSide::Right:
+				textureLayer = eTextureLayer::GrassSide;
+				break;
+			case eCubeSide::Top:
+				textureLayer = eTextureLayer::Grass;
+				break;
+			case eCubeSide::Bottom:
+				textureLayer = eTextureLayer::Dirt;
+				break;
+			}
+			break;
+		case eCubeType::Log:
+			textureLayer = eTextureLayer::Log;
+			break;
+		case eCubeType::LogTop:
+			switch (cubeSide)
+			{
+			case eCubeSide::Back:
+			case eCubeSide::Front:
+			case eCubeSide::Left:
+			case eCubeSide::Right:
+				textureLayer = eTextureLayer::Log;
+				break;
+			case eCubeSide::Top:
+				textureLayer = eTextureLayer::LogTop;
+				break;
+			}
+			break;
+		case eCubeType::Leaves:
+			textureLayer = eTextureLayer::Leaves;
+			break;
+		case eCubeType::Cactus:
+			textureLayer = eTextureLayer::Cactus;
+			break;
+		case eCubeType::CactusTop:
+			switch (cubeSide)
+			{
+			case eCubeSide::Back:
+			case eCubeSide::Front:
+			case eCubeSide::Left:
+			case eCubeSide::Right:
+				textureLayer = eTextureLayer::Cactus;
+				break;
+			case eCubeSide::Top:
+				textureLayer = eTextureLayer::CactusTop;
+				break;
+			}
+			break;
+		case eCubeType::Water:
+			textureLayer = eTextureLayer::Water;
+			break;
+		case eCubeType::Shrub:
+			textureLayer = eTextureLayer::Shrub;
+			break;
+		case eCubeType::TallGrass:
+			textureLayer = eTextureLayer::TallGrass;
+			break;
+
+		default:
+			textureLayer = eTextureLayer::Error;
+		}
+
+		assert(textureLayer != eTextureLayer::Error);
+		for (const auto& i : TEXT_COORDS)
+		{
+			textCoords.emplace_back(i.x, i.y, static_cast<int>(textureLayer));
+		}
+	}
+
+	void addItemCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide, const glm::vec3& cubePosition)
+	{
+		glm::vec3 position = cubePosition;
+		switch (cubeSide)
+		{
+		case eCubeSide::Front:
+			for (const glm::vec3& i : PICKUP_CUBE_FACE_FRONT)
+			{
+				position += i;
+				vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
+
+				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::FRONT_FACE_LIGHTING_INTENSITY);
+			}
+
+			getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
+
+			break;
+		case eCubeSide::Back:
+			for (const glm::vec3& i : PICKUP_CUBE_FACE_BACK)
+			{
+				position += i;
+				vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
+
+				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::BACK_FACE_LIGHTING_INTENSITY);
+			}
+
+			getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
+
+			break;
+		case eCubeSide::Left:
+			for (const glm::vec3& i : PICKUP_CUBE_FACE_LEFT)
+			{
+				position += i;
+				vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
+
+				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::LEFT_FACE_LIGHTING_INTENSITY);
+			}
+			getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
+			break;
+		case eCubeSide::Right:
+			for (const glm::vec3& i : PICKUP_CUBE_FACE_RIGHT)
+			{
+				position += i;
+				vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
+
+				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::RIGHT_FACE_LIGHTING_INTENSITY);
+			}
+
+			getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
+
+			break;
+		case eCubeSide::Top:
+			for (const glm::vec3& i : PICKUP_CUBE_FACE_TOP)
+			{
+				position += i;
+				vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
+
+				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::TOP_LIGHTING_INTENSITY);
+			}
+			getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
+
+			break;
+		case eCubeSide::Bottom:
+			for (const glm::vec3& i : PICKUP_CUBE_FACE_BOTTOM)
+			{
+				position += i;
+				vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
+				position = cubePosition;
+
+				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::BOTTOM_FACE_LIGHTING_INTENSITY);
+			}
+
+			getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
+
+			break;
+		}
+
+		for (unsigned int i : MeshGenerator::CUBE_FACE_INDICIES)
+		{
+			vertexBuffer.indicies.emplace_back(i + vertexBuffer.elementBufferIndex);
+		}
+
+		vertexBuffer.elementBufferIndex += MeshGenerator::CUBE_FACE_INDICIE_COUNT;
+	}
 }
 
 void generateOuterChunkMesh(VertexArray& chunkMesh, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks);
@@ -38,96 +231,9 @@ void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const g
 bool isFacingTransparentCube(const glm::ivec3& cubePosition, const Chunk& chunk);
 bool isFacingOpaqueCube(const glm::ivec3& cubePosition, const Chunk& chunk);
 
-void getTextCoords(std::vector<glm::vec3>& textCoords, eCubeSide cubeSide, eCubeType cubeType)
-{
-	eTextureLayer textureLayer;
-	switch (cubeType)
-	{
-	case eCubeType::Dirt:
-		textureLayer = eTextureLayer::Dirt;
-		break;
-	case eCubeType::Stone:
-		textureLayer = eTextureLayer::Stone;
-		break;
-	case eCubeType::Sand:
-		textureLayer = eTextureLayer::Sand;
-		break;
-	case eCubeType::Grass:
-		switch (cubeSide)
-		{
-		case eCubeSide::Back:
-		case eCubeSide::Front:
-		case eCubeSide::Left:
-		case eCubeSide::Right:
-			textureLayer = eTextureLayer::GrassSide;
-			break;
-		case eCubeSide::Top:
-			textureLayer = eTextureLayer::Grass;
-			break;
-		case eCubeSide::Bottom:
-			textureLayer = eTextureLayer::Dirt;
-			break;
-		}
-		break;
-	case eCubeType::Log:
-		textureLayer = eTextureLayer::Log;
-		break;
-	case eCubeType::LogTop:
-		switch (cubeSide)
-		{
-		case eCubeSide::Back:
-		case eCubeSide::Front:
-		case eCubeSide::Left:
-		case eCubeSide::Right:
-			textureLayer = eTextureLayer::Log;
-			break;
-		case eCubeSide::Top:
-			textureLayer = eTextureLayer::LogTop;
-			break;
-		}
-		break;
-	case eCubeType::Leaves:
-		textureLayer = eTextureLayer::Leaves;
-		break;
-	case eCubeType::Cactus:
-		textureLayer = eTextureLayer::Cactus;
-		break;
-	case eCubeType::CactusTop:
-		switch (cubeSide)
-		{
-		case eCubeSide::Back:
-		case eCubeSide::Front:
-		case eCubeSide::Left:
-		case eCubeSide::Right:
-			textureLayer = eTextureLayer::Cactus;
-			break;
-		case eCubeSide::Top:
-			textureLayer = eTextureLayer::CactusTop;
-			break;
-		}
-		break;
-	case eCubeType::Water:
-		textureLayer = eTextureLayer::Water;
-		break;
-	case eCubeType::Shrub:
-		textureLayer = eTextureLayer::Shrub;
-		break;
-	case eCubeType::TallGrass:
-		textureLayer = eTextureLayer::TallGrass;
-		break;
 
-	default:
-		textureLayer = eTextureLayer::Error;
-	}
 
-	assert(textureLayer != eTextureLayer::Error);
-	for (const auto& i : TEXT_COORDS)
-	{
-		textCoords.emplace_back(i.x, i.y, static_cast<int>(textureLayer));
-	}
-}
-
-void generateChunkMesh(VertexArray& chunkMesh, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks)
+void MeshGenerator::generateChunkMesh(VertexArray& chunkMesh, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks)
 {
 	generateInnerChunkMesh(chunkMesh, chunk);
 	generateOuterChunkMesh(chunkMesh, chunk, neighbouringChunks);
@@ -141,6 +247,18 @@ void generateChunkMesh(VertexArray& chunkMesh, const Chunk& chunk, const Neighbo
 	{
 		chunkMesh.m_transparentVertexBuffer.bindToVAO = true;
 	}
+}
+
+void MeshGenerator::generatePickUpMesh(VertexBuffer& pickUpMesh, eCubeType cubeType, const glm::vec3& position)
+{
+	addItemCubeFace(pickUpMesh, cubeType, eCubeSide::Left, position);
+	addItemCubeFace(pickUpMesh, cubeType, eCubeSide::Right, position);
+	addItemCubeFace(pickUpMesh, cubeType, eCubeSide::Top, position);
+	addItemCubeFace(pickUpMesh, cubeType, eCubeSide::Bottom, position);
+	addItemCubeFace(pickUpMesh, cubeType, eCubeSide::Front, position);
+	addItemCubeFace(pickUpMesh, cubeType, eCubeSide::Back, position);
+
+	pickUpMesh.bindToVAO = true;
 }
 
 void generateOuterChunkMesh(VertexArray& chunkMesh, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks)
