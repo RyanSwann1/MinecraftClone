@@ -7,13 +7,6 @@
 #include "NonCopyable.h"
 #include <array>
 
-//Trees
-//https://www.reddit.com/r/proceduralgeneration/comments/72waky/how_does_layered_generation_work_when_generating/
-//https://www.reddit.com/r/proceduralgeneration/comments/2t2dyy/trees_in_minecraft_like_worlds_help/
-
-//Saving/Storing
-//https://www.reddit.com/r/proceduralgeneration/comments/3gwbux/question_how_does_the_world_remember_changes/
-
 enum class eBiomeType
 {
 	Plains = 0,
@@ -42,7 +35,7 @@ public:
 	bool isCubeAtLocalPosition(const glm::ivec3& localPosition) const;
 
 	bool addCubeAtPosition(const glm::ivec3& position, const NeighbouringChunks& neighbouringChunks);
-	bool destroyCubeAtPosition(const glm::ivec3& position);
+	bool destroyCubeAtPosition(const glm::ivec3& position, eCubeType& destroyedCubeType);
 	void reset();
 	void reuse(const glm::ivec3& startingPosition);
 

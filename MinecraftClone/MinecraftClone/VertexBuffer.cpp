@@ -90,10 +90,10 @@ void VertexBuffer::bind()
 	displayable = true;
 
 	glBindBuffer(GL_ARRAY_BUFFER, positionsID);
-	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(glm::ivec3), positions.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(glm::vec3), positions.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_INT, GL_FALSE, sizeof(glm::ivec3), (const void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (const void*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, textCoordsID);
 	glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(glm::vec3), textCoords.data(), GL_STATIC_DRAW);
@@ -112,7 +112,7 @@ void VertexBuffer::bind()
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	std::vector<glm::ivec3> newPositions;
+	std::vector<glm::vec3> newPositions;
 	positions.swap(newPositions);
 
 	std::vector<glm::vec3> newTextCoords;
@@ -130,7 +130,7 @@ void VertexBuffer::clear()
 	bindToVAO = false;
 	displayable = false;
 
-	std::vector<glm::ivec3> newPositions;
+	std::vector<glm::vec3> newPositions;
 	positions.swap(newPositions);
 
 	std::vector<float> newLightIntensityVertices;

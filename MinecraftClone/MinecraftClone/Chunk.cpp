@@ -270,7 +270,7 @@ bool Chunk::addCubeAtPosition(const glm::ivec3& placementPosition, const Neighbo
 	return false;
 }
 
-bool Chunk::destroyCubeAtPosition(const glm::ivec3& destroyPosition)
+bool Chunk::destroyCubeAtPosition(const glm::ivec3& destroyPosition, eCubeType& destroyedCubeType)
 {
 	glm::ivec3 localPosition = convertToLocalPosition(destroyPosition, m_startingPosition);
 	if (!isCubeAtLocalPosition(localPosition, eCubeType::Water) && !isCubeAtLocalPosition(localPosition, eCubeType::Air))
@@ -283,6 +283,7 @@ bool Chunk::destroyCubeAtPosition(const glm::ivec3& destroyPosition)
 			changeCubeAtLocalPosition({ localPosition.x, localPosition.y + 1, localPosition.z }, eCubeType::Air);
 		}
 
+		destroyedCubeType = getCubeTypeByLocalPosition(localPosition);
 		changeCubeAtLocalPosition(localPosition, eCubeType::Air);
 		return true;
 	}
@@ -311,36 +312,6 @@ void Chunk::reuse(const glm::ivec3& startingPosition)
 	regen(m_startingPosition);	
 }
 
-//Scale
-//Octaves
-///Lacunraity
-//Persistance
-//https://www.reddit.com/r/proceduralgeneration/comments/byju4s/minecraft_style_terrain_gen_question_how_to/
-//https://www.reddit.com/r/proceduralgeneration/comments/dkdfq0/different_generation_for_biomes/
-
-//https://rtouti.github.io/graphics/perlin-noise-algorithm
-//http://www.6by9.net/simplex-noise-for-c-and-python/
-//https://medium.com/@yvanscher/playing-with-perlin-noise-generating-realistic-archipelagos-b59f004d8401
-
-//Lacunarity = Controls the increase in frequency in octaves
-//Persistence = Controls decrease in amplitude of octaves
-
-//Amplitude - 'y' Axis
-//Frequency - 'x' Axis
-
-//https://www.reddit.com/r/proceduralgeneration/comments/4i9a08/terrain_generation_of_a_game_i_am_working_on/
-//http://pcgbook.com/wp-content/uploads/chapter04.pdf
-//https://www.reddit.com/r/proceduralgeneration/comments/drc96v/getting_started_in_proceduralgeneration/
-//https://notch.tumblr.com/post/3746989361/terrain-generation-part-1
-
-//https://www.reddit.com/r/proceduralgeneration/comments/4i9a08/terrain_generation_of_a_game_i_am_working_on/
-//http://pcgbook.com/wp-content/uploads/chapter04.pdf
-//https://www.reddit.com/r/proceduralgeneration/comments/drc96v/getting_started_in_proceduralgeneration/
-//https://notch.tumblr.com/post/3746989361/terrain-generation-part-1
-
-//https://www.reddit.com/r/VoxelGameDev/comments/c0fcsi/giving_terrain_oomph_ive_been_trying_to_go_for/
-
-//http://accidentalnoise.sourceforge.net/minecraftworlds.html
 
 void Chunk::regen(const glm::ivec3& startingPosition)
 {

@@ -93,7 +93,8 @@ ChunkManager::ChunkManager()
 	m_deletionQueue(),
 	m_generatedChunkMeshesQueue(),
 	m_generatedChunkQueue(),
-	m_chunkMeshRegenerationQueue()
+	m_chunkMeshRegenerationQueue(),
+	m_pickUps()
 {
 	addChunks(Globals::PLAYER_STARTING_POSITION);
 }
@@ -203,10 +204,13 @@ bool ChunkManager::destroyCubeAtPosition(const glm::ivec3& blockToDestroy)
 	auto chunk = m_chunks.find(chunkStartingPosition);
 	assert(chunk != m_chunks.end());
 	
-	if (chunk->second.getObject()->destroyCubeAtPosition(blockToDestroy))
+	eCubeType destroyedCubeType;
+	if (chunk->second.getObject()->destroyCubeAtPosition(blockToDestroy, destroyedCubeType))
 	{
 		auto chunkMesh = m_chunkMeshes.find(chunkStartingPosition);
 		assert(chunkMesh != m_chunkMeshes.end());
+
+		m_pickUps.emplace_back(std::make_unique<PickUp>(destroyedCubeType, blockToDestroy));
 
 		if (!m_chunkMeshRegenerationQueue.contains(chunkStartingPosition))
 		{
@@ -262,7 +266,7 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 	while (!resetGame && window.isOpen())
 	{
 		std::unique_lock<std::mutex> playerLock(playerMutex);
-		glm::ivec3 playerPosition = player.getPosition();
+		glm::vec3 playerPosition = player.getPosition();
 		playerLock.unlock();
 
 		glm::ivec3 startingPosition = getClosestMiddlePosition(playerPosition);
@@ -298,6 +302,23 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 
 			m_generatedChunkQueue.update(m_chunks);
 			m_generatedChunkMeshesQueue.update(m_chunkMeshes);
+		}
+	}
+}
+
+void ChunkManager::renderPickUps(const Frustum& frustum) 
+{
+	for (auto& pickUp : m_pickUps)
+	{
+		if (pickUp->m_vertexArray.m_opaqueVertexBuffer.bindToVAO)
+		{
+			pickUp->m_vertexArray.attachOpaqueVBO();
+		}
+
+		if (pickUp->m_vertexArray.m_opaqueVertexBuffer.displayable && frustum.isItemInFrustum(pickUp->m_position))
+		{
+			pickUp->m_vertexArray.bindOpaqueVAO();
+			glDrawElements(GL_TRIANGLES, pickUp->m_vertexArray.m_opaqueVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 		}
 	}
 }
@@ -407,4 +428,24 @@ void ChunkManager::clearQueues(const glm::ivec3& playerPosition, const Rectangle
 	m_chunkMeshesToGenerateQueue.removeOutOfBoundsElements(visibilityRect);
 	m_generatedChunkMeshesQueue.removeOutOfBoundsElements(visibilityRect);
 	m_generatedChunkQueue.removeOutOfBoundsElements(visibilityRect);
+}
+
+void ChunkManager::updatePickUps(const glm::vec3& playerPosition, float deltaTime)
+{
+	for (auto& pickup : m_pickUps)
+	{
+		pickup->update(playerPosition, deltaTime);
+	}
+
+	for (auto pickup = m_pickUps.begin(); pickup != m_pickUps.end();)
+	{
+		if (pickup->get()->m_delete)
+		{
+			pickup = m_pickUps.erase(pickup);
+		}
+		else
+		{
+			++pickup;
+		}
+	}
 }

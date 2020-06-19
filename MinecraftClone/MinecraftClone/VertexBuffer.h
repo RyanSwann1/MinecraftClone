@@ -21,7 +21,7 @@ struct VertexBuffer : private NonCopyable
 	bool bindToVAO;
 	bool displayable;
 	unsigned int positionsID;
-	std::vector<glm::ivec3> positions;
+	std::vector<glm::vec3> positions;
 	unsigned int lightIntensityID;
 	std::vector<float> lightIntensityVertices;
 	unsigned int textCoordsID;

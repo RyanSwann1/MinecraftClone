@@ -6,8 +6,10 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "Globals.h"
 #include <mutex>
 #include <SFML/Graphics.hpp>
+#include <vector>
 
 struct Camera : private NonCopyable, private NonMovable
 {
@@ -30,6 +32,13 @@ enum class ePlayerState
 	Flying = 0,
 	InAir,
 	OnGround,
+};
+
+struct Item
+{
+	const int max;
+	eCubeType cubeType;
+	int amount;
 };
 
 class ChunkManager;
@@ -56,6 +65,9 @@ private:
 	glm::vec3 m_velocity;
 	bool m_autoJump;
 	sf::Clock m_jumpTimer;
+	
+	//Inventory
+	std::vector<Item> m_items;
 
 	void move(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager);
 	void applyDrag();

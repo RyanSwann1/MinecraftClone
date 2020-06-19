@@ -31,6 +31,7 @@ public:
 
 	void update(const glm::mat4& mat);
 
+	bool isItemInFrustum(const glm::vec3& itemPosition) const;
 	bool isChunkInFustrum(const glm::vec3& chunkStartingPosition) const;
 	
 private:
