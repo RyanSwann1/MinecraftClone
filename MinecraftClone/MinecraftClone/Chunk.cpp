@@ -197,7 +197,7 @@ void Chunk::changeCubeAtLocalPosition(const glm::ivec3& position, eCubeType cube
 	m_chunk[converTo1D(position)] = static_cast<char>(cubeType);
 }
 
-bool Chunk::addCubeAtPosition(const glm::ivec3& placementPosition, const NeighbouringChunks& neighbouringChunks)
+bool Chunk::addCubeAtPosition(const glm::ivec3& placementPosition, const NeighbouringChunks& neighbouringChunks, eCubeType cubeType)
 {
 	glm::ivec3 localPosition = convertToLocalPosition(placementPosition, m_startingPosition);
 	assert(isPositionInLocalBounds(localPosition));
@@ -207,7 +207,7 @@ bool Chunk::addCubeAtPosition(const glm::ivec3& placementPosition, const Neighbo
 		if (isCubeAtLocalPosition({ localPosition.x, localPosition.y - 1, localPosition.z }) &&
 			!NON_STACKABLE_CUBE_TYPES.isMatch(getCubeTypeByLocalPosition({ localPosition.x, localPosition.y - 1, localPosition.z })))
 		{
-			changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
+			changeCubeAtLocalPosition(localPosition, cubeType);
 			return true;
 		}
 		else
@@ -217,7 +217,7 @@ bool Chunk::addCubeAtPosition(const glm::ivec3& placementPosition, const Neighbo
 			{
 				if (isPositionInLocalBounds({ localPosition.x, localPosition.y, z }) && isCubeAtLocalPosition({ localPosition.x, localPosition.y, z }))
 				{
-					changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
+					changeCubeAtLocalPosition(localPosition, cubeType);
 					return true;
 				}
 			}
@@ -226,7 +226,7 @@ bool Chunk::addCubeAtPosition(const glm::ivec3& placementPosition, const Neighbo
 			{
 				if (isPositionInLocalBounds({ x, localPosition.y, localPosition.z }) && isCubeAtLocalPosition({ x, localPosition.y, localPosition.z }))
 				{
-					changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
+					changeCubeAtLocalPosition(localPosition, cubeType);
 					return true;
 				}
 			}
@@ -239,7 +239,7 @@ bool Chunk::addCubeAtPosition(const glm::ivec3& placementPosition, const Neighbo
 					if (neighbouringChunk.get().isPositionInBounds({ placementPosition.x, placementPosition.y, z }) &&
 						neighbouringChunk.get().isCubeAtPosition({ placementPosition.x, placementPosition.y, z }))
 					{
-						changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
+						changeCubeAtLocalPosition(localPosition, cubeType);
 						return true;
 					}
 				}
@@ -249,7 +249,7 @@ bool Chunk::addCubeAtPosition(const glm::ivec3& placementPosition, const Neighbo
 					if (neighbouringChunk.get().isPositionInBounds({ x, placementPosition.y, placementPosition.z }) &&
 						neighbouringChunk.get().isCubeAtPosition({ x, placementPosition.y, placementPosition.z }))
 					{
-						changeCubeAtLocalPosition(localPosition, eCubeType::Dirt);
+						changeCubeAtLocalPosition(localPosition, cubeType);
 						return true;
 					}
 				}

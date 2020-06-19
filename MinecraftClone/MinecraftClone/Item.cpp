@@ -27,6 +27,11 @@ PickUp::PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
 	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, m_position);
 }
 
+eCubeType PickUp::getCubeType() const
+{
+	return m_cubeType;
+}
+
 bool PickUp::isInReachOfPlayer(const glm::vec3& playerPosition) const
 {
 	return glm::distance(m_position, { playerPosition.x, playerPosition.y - 1.0f, playerPosition.z }) <= 0.25f;
@@ -98,11 +103,28 @@ void PickUp::render(const Frustum& frustum)
 
 //Item
 Item::Item(eCubeType cubeType)
-	: m_max(5)
+	: m_cubeType(cubeType),
+	m_currentAmount(1)
+{}
+
+bool Item::isEmpty() const
 {
+	return m_currentAmount == 0;
 }
 
-bool Item::add()
+eCubeType Item::getCubeType() const
 {
-	return false;
+	assert(m_currentAmount > 0);
+	return m_cubeType;
+}
+
+void Item::remove()
+{
+	assert(m_currentAmount > 0);
+	--m_currentAmount;
+}
+
+void Item::add()
+{
+	++m_currentAmount;
 }

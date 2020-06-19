@@ -34,7 +34,7 @@ public:
 	bool isCubeAtPosition(const glm::ivec3& position, eCubeType cubeType) const;
 	bool isCubeAtLocalPosition(const glm::ivec3& localPosition) const;
 
-	bool addCubeAtPosition(const glm::ivec3& position, const NeighbouringChunks& neighbouringChunks);
+	bool addCubeAtPosition(const glm::ivec3& position, const NeighbouringChunks& neighbouringChunks, eCubeType cubeType);
 	bool destroyCubeAtPosition(const glm::ivec3& position, eCubeType& destroyedCubeType);
 	void reset();
 	void reuse(const glm::ivec3& startingPosition);

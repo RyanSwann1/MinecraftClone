@@ -112,13 +112,13 @@ bool ChunkManager::isChunkAtPosition(const glm::vec3& position) const
 	return chunk != m_chunks.cend();
 }
 
-bool ChunkManager::placeCubeAtPosition(const glm::ivec3& placementPosition)
+bool ChunkManager::placeCubeAtPosition(const glm::ivec3& placementPosition, eCubeType cubeTypeToPlace)
 {
 	glm::ivec3 chunkStartingPosition = getClosestChunkStartingPosition(placementPosition);
 	auto chunk = m_chunks.find(chunkStartingPosition);
 	assert(chunk != m_chunks.end());
 
-	if (chunk->second.getObject()->addCubeAtPosition(placementPosition, getAllNeighbouringChunks(m_chunks, chunkStartingPosition)))
+	if (chunk->second.getObject()->addCubeAtPosition(placementPosition, getAllNeighbouringChunks(m_chunks, chunkStartingPosition), cubeTypeToPlace))
 	{
 		auto chunkMesh = m_chunkMeshes.find(chunkStartingPosition);
 		assert(chunkMesh != m_chunkMeshes.end());

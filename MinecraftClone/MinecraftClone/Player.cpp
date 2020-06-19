@@ -75,7 +75,8 @@ Player::Player()
 	m_position(),
 	m_velocity(),
 	m_autoJump(false),
-	m_jumpTimer()
+	m_jumpTimer(),
+	m_inventory()
 {
 	m_jumpTimer.restart();
 }
@@ -95,10 +96,45 @@ const Camera& Player::getCamera() const
 	return m_camera;
 }
 
+void Player::addToInventory(eCubeType cubeTypeToAdd)
+{
+	auto iter = std::find_if(m_inventory.begin(), m_inventory.end(), [cubeTypeToAdd](const auto& item)
+	{
+		return cubeTypeToAdd == item.getCubeType();
+	});
+
+	if (iter != m_inventory.end())
+	{
+		iter->add();
+	}
+	else
+	{
+		m_inventory.emplace_back(cubeTypeToAdd);
+	}
+}
+
 void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 {
-	std::lock_guard<std::mutex> playerLock(playerMutex);
+	eCubeType cubeTypeToPlace = eCubeType::Air;
+	if (!m_inventory.empty())
+	{
+		cubeTypeToPlace = m_inventory.front().getCubeType();
+		m_inventory.front().remove();
+		if (m_inventory.front().isEmpty())
+		{
+			m_inventory.erase(m_inventory.begin());
+		}
+	}
+	else
+	{
+		return;
+	}
 
+
+	assert(cubeTypeToPlace != eCubeType::Air);
+	//Place Block
+	std::lock_guard<std::mutex> playerLock(playerMutex);
+	
 	bool blockPlaced = false;
 	for (float i = 0; i <= PLACE_BLOCK_RANGE; i += PLACE_BLOCK_INCREMENT)
 	{
@@ -123,7 +159,7 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 
 					if (availablePostion)
 					{
-						chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) });
+						chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToPlace);
 					}
 					
 					blockPlaced = true;
@@ -140,7 +176,7 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 		for (float i = PLACE_BLOCK_RANGE; i >= 0; i -= PLACE_BLOCK_INCREMENT)
 		{
 			glm::vec3 rayPosition = m_camera.front * i + m_position;
-			if (chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }))
+			if (chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToPlace))
 			{
 				break;
 			}

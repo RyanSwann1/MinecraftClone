@@ -13,6 +13,7 @@ class PickUp
 public:
 	PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition);
 
+	eCubeType getCubeType() const;
 	bool isInReachOfPlayer(const glm::vec3& playerPosition) const;
 	const Rectangle& getAABB() const;
 
@@ -35,10 +36,13 @@ class Item
 public:
 	Item(eCubeType cubeType);
 
-	bool add();
+	bool isEmpty() const;
+	eCubeType getCubeType() const;
+	
+	void remove();
+	void add();
 
 private:
-	const int m_max;
 	eCubeType m_cubeType;
-	int m_amount;
+	int m_currentAmount;
 };

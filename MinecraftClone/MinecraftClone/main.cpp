@@ -191,6 +191,7 @@ int main()
 		{
 			if (pickup->get()->isInReachOfPlayer(player.getPosition()) || !visibilityRect.contains(pickup->get()->getAABB()))
 			{
+				player.addToInventory(pickup->get()->getCubeType());
 				pickup = pickUps.erase(pickup);
 			}
 			else
