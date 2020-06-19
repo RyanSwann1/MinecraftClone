@@ -111,7 +111,8 @@ namespace
 }
 
 PickUp::PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
-	: m_cubeType(cubeType),
+	: m_AABB({ destroyedBlockPosition.x + 0.5f, destroyedBlockPosition.z + 0.5f }, 0.5f),
+	m_cubeType(cubeType),
 	m_position({ destroyedBlockPosition.x + 0.35f, destroyedBlockPosition.y + 0.35f, destroyedBlockPosition.z + 0.35f}),
 	m_velocity(),
 	m_movementSpeed(5.0f),
@@ -119,7 +120,9 @@ PickUp::PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
 	m_delete(false)
 {
 	glm::vec3 n = glm::normalize(glm::vec3(Globals::getRandomNumber(0, 360), 90, Globals::getRandomNumber(0, 360)));
-	m_velocity += n * 4.0f;
+	m_velocity.x += n.x * 5.0f;
+	m_velocity.y += n.y * 2.5f;
+	m_velocity.z += n.z * 5.0f;
 
 	addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, m_position);
 	addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, m_position);
@@ -146,6 +149,11 @@ void PickUp::update(const glm::vec3& playerPosition, float deltaTime, const Chun
 	else
 	{
 		m_velocity.y -= 0.1f;
+	}
+	
+	if (false)
+	{
+		//Apply sin wave thing - make bobble up & down
 	}
 
 	if (glm::distance(m_position, { playerPosition.x, playerPosition.y, playerPosition.z }) <= 2.5f)

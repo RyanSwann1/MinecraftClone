@@ -432,14 +432,12 @@ void ChunkManager::clearQueues(const glm::ivec3& playerPosition, const Rectangle
 
 void ChunkManager::updatePickUps(const glm::vec3& playerPosition, float deltaTime)
 {
-	for (auto& pickup : m_pickUps)
-	{
-		pickup->update(playerPosition, deltaTime, *this);
-	}
+	glm::ivec3 startingPosition = getClosestMiddlePosition(playerPosition);
+	Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Globals::VISIBILITY_DISTANCE);
 
 	for (auto pickup = m_pickUps.begin(); pickup != m_pickUps.end();)
 	{
-		if (pickup->get()->m_delete)
+		if (pickup->get()->m_delete || !visibilityRect.contains(pickup->get()->m_AABB))
 		{
 			pickup = m_pickUps.erase(pickup);
 		}
@@ -447,5 +445,10 @@ void ChunkManager::updatePickUps(const glm::vec3& playerPosition, float deltaTim
 		{
 			++pickup;
 		}
+	}
+
+	for (auto& pickup : m_pickUps)
+	{
+		pickup->update(playerPosition, deltaTime, *this);
 	}
 }

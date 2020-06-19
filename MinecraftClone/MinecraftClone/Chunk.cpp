@@ -58,8 +58,6 @@ namespace
 		return { worldPosition.x - chunkStartingPosition.x, worldPosition.y - chunkStartingPosition.y, worldPosition.z - chunkStartingPosition.z };
 	}
 
-
-
 	const CubeTypeComparison NON_STACKABLE_CUBE_TYPES =
 	{
 		{eCubeType::Water,

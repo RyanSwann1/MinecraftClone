@@ -3,6 +3,7 @@
 #include "glm/glm.hpp"
 #include "Globals.h"
 #include "VertexArray.h"
+#include "Rectangle.h"
 #include <unordered_map>
 
 class ChunkManager;
@@ -12,6 +13,7 @@ struct PickUp
 
 	void update(const glm::vec3& playerPosition, float deltaTime, const ChunkManager& chunkManager);
 
+	Rectangle m_AABB;
 	eCubeType m_cubeType;
 	glm::vec3 m_position;
 	glm::vec3 m_velocity;
