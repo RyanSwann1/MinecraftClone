@@ -4,6 +4,7 @@
 #include "CubeType.h"
 #include <string>
 #include <array>
+#include <random>
 
 enum class eTextureLayer
 {
@@ -103,6 +104,22 @@ namespace Globals
 		eCubeType::Cactus,
 		eCubeType::CactusTop}
 	};
+
+	const CubeTypeComparison NON_COLLIDABLE_CUBE_TYPES =
+	{
+		{eCubeType::Water,
+		eCubeType::TallGrass,
+		eCubeType::Shrub}
+	};
+
+	inline int getRandomNumber(int min, int max)
+	{
+		static std::random_device rd;  //Will be used to obtain a seed for the random number engine
+		static std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+		std::uniform_int_distribution<> dis(min, max);
+
+		return dis(gen);
+	}
 
 	constexpr int CUBE_SIZE = 1;
 	constexpr int VISIBILITY_DISTANCE = 96;

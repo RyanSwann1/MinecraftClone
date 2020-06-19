@@ -6,7 +6,6 @@
 #include "glm/gtc/noise.hpp"
 #include <algorithm>
 #include <limits>
-#include <random>
 
 //OLD VALUES
 
@@ -59,14 +58,7 @@ namespace
 		return { worldPosition.x - chunkStartingPosition.x, worldPosition.y - chunkStartingPosition.y, worldPosition.z - chunkStartingPosition.z };
 	}
 
-	int getRandomNumber(int min, int max)
-	{
-		static std::random_device rd;  //Will be used to obtain a seed for the random number engine
-		static std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-		std::uniform_int_distribution<> dis(min, max);
 
-		return dis(gen);
-	}
 
 	const CubeTypeComparison NON_STACKABLE_CUBE_TYPES =
 	{
@@ -402,7 +394,7 @@ void Chunk::spawnWater()
 
 void Chunk::spawnTrees()
 {
-	if (getRandomNumber(0, 100) < Globals::CHANCE_TREE_SPAWN_IN_CHUNK)
+	if (Globals::getRandomNumber(0, 100) < Globals::CHANCE_TREE_SPAWN_IN_CHUNK)
 	{
 		return;
 	}
@@ -412,8 +404,8 @@ void Chunk::spawnTrees()
 	while (attemptsCount < Globals::MAX_TREE_SPAWN_ATTEMPTS && spawnCount < Globals::MAX_TREE_PER_CHUNK)
 	{
 		glm::ivec3 spawnPosition;
-		spawnPosition.x = getRandomNumber(MAX_LEAVES_DISTANCE, Globals::CHUNK_WIDTH - MAX_LEAVES_DISTANCE - 1);
-		spawnPosition.z = getRandomNumber(MAX_LEAVES_DISTANCE, Globals::CHUNK_DEPTH - MAX_LEAVES_DISTANCE - 1);
+		spawnPosition.x = Globals::getRandomNumber(MAX_LEAVES_DISTANCE, Globals::CHUNK_WIDTH - MAX_LEAVES_DISTANCE - 1);
+		spawnPosition.z = Globals::getRandomNumber(MAX_LEAVES_DISTANCE, Globals::CHUNK_DEPTH - MAX_LEAVES_DISTANCE - 1);
 
 		//Find Spawn Location
 		for (int y = Globals::CHUNK_HEIGHT - Globals::MAX_TREE_HEIGHT - MAX_LEAVES_DISTANCE - 1; y >= Globals::SAND_MAX_HEIGHT; --y)
@@ -422,7 +414,7 @@ void Chunk::spawnTrees()
 			if (isCubeAtLocalPosition(spawnPosition, eCubeType::Grass) &&
 				isCubeAtLocalPosition({ spawnPosition.x, spawnPosition.y + 1, spawnPosition.z }, eCubeType::Air))
 			{
-				int treeHeight = getRandomNumber(Globals::MIN_TREE_HEIGHT, Globals::MAX_TREE_HEIGHT);
+				int treeHeight = Globals::getRandomNumber(Globals::MIN_TREE_HEIGHT, Globals::MAX_TREE_HEIGHT);
 				spawnLeaves(spawnPosition, treeHeight);
 				spawnTreeStump(spawnPosition, treeHeight);
 				++spawnCount;
@@ -441,8 +433,8 @@ void Chunk::spawnCactus()
 	while (attemptsCount < Globals::MAX_CACTUS_SPAWN_ATTEMPTS && spawnCount < Globals::MAX_CACTUS_PER_CHUNK)
 	{
 		glm::ivec3 spawnPosition;
-		spawnPosition.x = getRandomNumber(0, Globals::CHUNK_WIDTH - 1);
-		spawnPosition.z = getRandomNumber(0, Globals::CHUNK_DEPTH - 1);
+		spawnPosition.x = Globals::getRandomNumber(0, Globals::CHUNK_WIDTH - 1);
+		spawnPosition.z = Globals::getRandomNumber(0, Globals::CHUNK_DEPTH - 1);
 
 		//Find Spawn Location
 		for (int y = Globals::CHUNK_HEIGHT - Globals::CACTUS_MAX_HEIGHT - 1; y >= 0; --y)
@@ -452,7 +444,7 @@ void Chunk::spawnCactus()
 				isCubeAtLocalPosition({ spawnPosition.x, y + 1, spawnPosition.z }, eCubeType::Air))
 			{
 				//Spawn Cactus
-				int cactusHeight = getRandomNumber(Globals::CACTUS_MIN_HEIGHT, Globals::CACTUS_MAX_HEIGHT);
+				int cactusHeight = Globals::getRandomNumber(Globals::CACTUS_MIN_HEIGHT, Globals::CACTUS_MAX_HEIGHT);
 				for (int i = 1; i <= cactusHeight; ++i)
 				{
 					if (i == cactusHeight)
@@ -481,8 +473,8 @@ void Chunk::spawnPlant(int maxQuantity, eCubeType baseCubeType, eCubeType plantC
 	while (attemptsCount < Globals::MAX_PLANT_SPAWN_ATTEMPTS && spawnCount < maxQuantity)
 	{
 		glm::ivec3 spawnPosition;
-		spawnPosition.x = getRandomNumber(0, Globals::CHUNK_WIDTH - 1);
-		spawnPosition.z = getRandomNumber(0, Globals::CHUNK_DEPTH - 1);
+		spawnPosition.x = Globals::getRandomNumber(0, Globals::CHUNK_WIDTH - 1);
+		spawnPosition.z = Globals::getRandomNumber(0, Globals::CHUNK_DEPTH - 1);
 
 		for (int y = Globals::CHUNK_HEIGHT - 5; y >= Globals::WATER_MAX_HEIGHT; --y)
 		{

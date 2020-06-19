@@ -1,5 +1,6 @@
 #include "Item.h"
 #include "ChunkMeshGenerator.h"
+#include "ChunkManager.h"
 #include <iostream>
 
 namespace
@@ -105,15 +106,21 @@ namespace
 
 		vertexBuffer.elementBufferIndex += MeshGenerator::CUBE_FACE_INDICIE_COUNT;
 	}
+
+	constexpr float DRAG_AMOUNT = 0.5f;
 }
 
 PickUp::PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
 	: m_cubeType(cubeType),
 	m_position({ destroyedBlockPosition.x + 0.35f, destroyedBlockPosition.y + 0.35f, destroyedBlockPosition.z + 0.35f}),
-	m_velocity(10.0f, 10.0f, 10.0f),
+	m_velocity(),
+	m_movementSpeed(5.0f),
 	m_vertexArray(),
 	m_delete(false)
 {
+	glm::vec3 n = glm::normalize(glm::vec3(Globals::getRandomNumber(0, 360), 90, Globals::getRandomNumber(0, 360)));
+	m_velocity += n * 4.0f;
+
 	addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Left, m_position);
 	addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Right, m_position);
 	addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, cubeType, eCubeSide::Top, m_position);
@@ -124,24 +131,44 @@ PickUp::PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
 	m_vertexArray.m_opaqueVertexBuffer.bindToVAO = true;
 }
 
-void PickUp::update(const glm::vec3& playerPosition, float deltaTime)
+void PickUp::update(const glm::vec3& playerPosition, float deltaTime, const ChunkManager& chunkManager)
 {
-	if (glm::distance(m_position, { playerPosition.x, playerPosition.y, playerPosition.z }) <= 3.5f)
+	eCubeType cubeType;
+	if (chunkManager.isCubeAtPosition({ std::floor(m_position.x),
+	std::floor(m_position.y),
+	std::floor(m_position.z) }, cubeType) &&
+		!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 	{
-		m_vertexArray.m_opaqueVertexBuffer.clear();
-		addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, eCubeSide::Left, m_position);
-		addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, eCubeSide::Right, m_position);
-		addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, eCubeSide::Top, m_position);
-		addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, eCubeSide::Bottom, m_position);
-		addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, eCubeSide::Front, m_position);
-		addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, eCubeSide::Back, m_position);
-		m_vertexArray.m_opaqueVertexBuffer.bindToVAO = true;
+		m_velocity.y = 0;
+		m_position.y += std::abs(m_position.y - 0.35f - (std::floor(m_position.y - 0.35f) + 1));
+		m_position.y = std::floor(m_position.y);
+	}
+	else
+	{
+		m_velocity.y -= 0.1f;
+	}
 
-		m_position += glm::normalize(glm::vec3(glm::vec3(playerPosition.x, playerPosition.y - 1.0f, playerPosition.z) - m_position)) * m_velocity * deltaTime;		
-		
-		if (glm::distance(m_position, { playerPosition.x, playerPosition.y - 1.0f, playerPosition.z }) <= 0.5f)
-		{
-			m_delete = true;
-		}
+	if (glm::distance(m_position, { playerPosition.x, playerPosition.y, playerPosition.z }) <= 2.5f)
+	{
+		m_velocity += glm::normalize(glm::vec3(glm::vec3(playerPosition.x, playerPosition.y - 1.0f, playerPosition.z) - m_position)) * 5.0f;
+	}
+
+	m_position += m_velocity * deltaTime;
+
+	m_velocity.x *= 0.8f;
+	m_velocity.z *= 0.8f;
+
+	m_vertexArray.m_opaqueVertexBuffer.clear();
+	addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, eCubeSide::Left, m_position);
+	addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, eCubeSide::Right, m_position);
+	addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, eCubeSide::Top, m_position);
+	addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, eCubeSide::Bottom, m_position);
+	addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, eCubeSide::Front, m_position);
+	addItemCubeFace(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, eCubeSide::Back, m_position);
+	m_vertexArray.m_opaqueVertexBuffer.bindToVAO = true;
+
+	if (glm::distance(m_position, { playerPosition.x, playerPosition.y - 1.0f, playerPosition.z }) <= 0.5f)
+	{
+		m_delete = true;
 	}
 }

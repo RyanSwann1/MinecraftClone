@@ -434,7 +434,7 @@ void ChunkManager::updatePickUps(const glm::vec3& playerPosition, float deltaTim
 {
 	for (auto& pickup : m_pickUps)
 	{
-		pickup->update(playerPosition, deltaTime);
+		pickup->update(playerPosition, deltaTime, *this);
 	}
 
 	for (auto pickup = m_pickUps.begin(); pickup != m_pickUps.end();)

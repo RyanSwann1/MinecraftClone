@@ -47,6 +47,7 @@ class Player : private NonCopyable, private NonMovable
 public:
 	Player();
 	
+	const glm::vec3 getMiddlePosition() const;
 	const glm::vec3& getPosition() const;
 	const Camera& getCamera() const;
 	

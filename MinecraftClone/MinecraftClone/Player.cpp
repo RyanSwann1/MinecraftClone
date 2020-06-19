@@ -27,14 +27,6 @@ namespace
 	constexpr float PLACE_BLOCK_INCREMENT = 0.1f;
 
 	constexpr float COLLISION_OFFSET = 0.35f;
-
-
-	const CubeTypeComparison NON_COLLIDABLE_CUBE_TYPES =
-	{
-		{eCubeType::Water,
-		eCubeType::TallGrass,
-		eCubeType::Shrub}
-	};
 }
 
 //Camera
@@ -84,6 +76,11 @@ Player::Player()
 	m_jumpTimer()
 {
 	m_jumpTimer.restart();
+}
+
+const glm::vec3 Player::getMiddlePosition() const
+{
+	return { m_position.x, m_position.y - 1, m_position.z };
 }
 
 const glm::vec3& Player::getPosition() const
@@ -278,7 +275,7 @@ void Player::move(float deltaTime, std::mutex& playerMutex, const ChunkManager& 
 				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
 					std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT),
 					std::floor(collisionPosition.z) }, cubeType) &&
-					!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+					!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 				{
 					m_velocity.y += JUMP_SPEED;
 					m_velocity.x *= JUMP_BREAK;
@@ -348,7 +345,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 	case ePlayerState::Flying:
 	case ePlayerState::InAir:
 		if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y + COLLISION_OFFSET), std::floor(m_position.z) }, cubeType) &&
-			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+			!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
 			m_velocity.y = 0;
 			m_position.y -= std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT)));
@@ -377,7 +374,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
 					std::floor(collisionPosition.y + y),
 					std::floor(collisionPosition.z) }, cubeType) &&
-					!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+					!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 				{
 					m_velocity.x = 0.0f;
 					//Handle when getting stuck
@@ -411,7 +408,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
 					std::floor(collisionPosition.y + y),
 					std::floor(collisionPosition.z) }, cubeType) &&
-					!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+					!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 				{
 					m_velocity.z = 0.0f;
 					//Handle when getting stuck
@@ -423,7 +420,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 		if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), 
 			std::floor(m_position.y - HEAD_HEIGHT), 
 			std::floor(m_position.z) }, cubeType) &&
-			!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+			!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
 			m_velocity.y = 0;
 			m_position.y += std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT) + 1));
@@ -444,7 +441,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 			if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
 				std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT),
 				std::floor(collisionPosition.z) }, cubeType) &&
-				!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+				!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 			{
 				bool autoJumpAllowed = true;
 				for (int y = -AUTO_JUMP_HEIGHT + 1; y <= 1; y++)
@@ -452,7 +449,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 					if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
 						std::floor(collisionPosition.y + y),
 						std::floor(collisionPosition.z) }, cubeType) &&
-						!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+						!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 					{
 						autoJumpAllowed = false;
 						break;
@@ -493,7 +490,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
 					std::floor(collisionPosition.y + y),
 					std::floor(collisionPosition.z) }, cubeType) &&
-					!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+					!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 				{
 					m_velocity.x = 0.0f;
 					//Handle when getting stuck
@@ -526,7 +523,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
 					std::floor(collisionPosition.y + y),
 					std::floor(collisionPosition.z) }, cubeType) &&
-					!NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+					!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 				{
 					m_velocity.z = 0.0f;
 					//Handle when getting stuck
@@ -536,7 +533,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 		}
 		
 		if (!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) ||
-			NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+			Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 		{
 			m_currentState = (m_currentState == ePlayerState::Flying ? m_currentState : ePlayerState::InAir);
 		}
