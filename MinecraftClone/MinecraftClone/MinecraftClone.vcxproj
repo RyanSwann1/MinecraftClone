@@ -138,7 +138,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="ChunkManager.cpp" />
-    <ClCompile Include="ChunkMeshGenerator.cpp" />
+    <ClCompile Include="MeshGenerator.cpp" />
     <ClCompile Include="Frustum.cpp" />
     <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="glad.c" />
@@ -161,7 +161,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Chunk.h" />
     <ClInclude Include="ChunkManager.h" />
-    <ClInclude Include="ChunkMeshGenerator.h" />
+    <ClInclude Include="MeshGenerator.h" />
     <ClInclude Include="CubeType.h" />
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="ObjectQueue.h" />

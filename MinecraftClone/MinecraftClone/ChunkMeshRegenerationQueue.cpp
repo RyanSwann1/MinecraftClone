@@ -1,6 +1,6 @@
 #include "ChunkMeshRegenerationQueue.h"
 #include "NeighbouringChunks.h"
-#include "ChunkMeshGenerator.h"
+#include "MeshGenerator.h"
 
 //ChunkMeshToRegenerate
 ChunkMeshToRegenerate::ChunkMeshToRegenerate(const glm::ivec3& position, VertexArray& chunkMeshToRegenerate)

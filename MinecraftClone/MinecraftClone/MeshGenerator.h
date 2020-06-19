@@ -24,7 +24,6 @@ namespace MeshGenerator
 	constexpr float BOTTOM_FACE_LIGHTING_INTENSITY = 0.4f;
 }
 
-
 class Chunk;
 struct VertexArray;
 struct NeighbouringChunks;

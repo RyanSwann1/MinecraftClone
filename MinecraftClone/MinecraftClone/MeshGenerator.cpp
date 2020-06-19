@@ -1,12 +1,9 @@
-#include "ChunkMeshGenerator.h"
+#include "MeshGenerator.h"
 #include "ChunkManager.h"
 #include "NeighbouringChunks.h"
 
 namespace
 {
-
-
-
 	constexpr std::array<glm::vec2, 4> TEXT_COORDS =
 	{
 		glm::vec2(0.0f, 0.0f),
@@ -14,95 +11,6 @@ namespace
 		glm::vec2(1.0f, 1.0f),
 		glm::vec2(0.0f, 1.0f)
 	};
-
-	//void getTextCoords(std::vector<glm::vec3>& textCoords, eCubeSide cubeSide, eCubeType cubeType)
-	//{
-	//	eTextureLayer textureLayer;
-	//	switch (cubeType)
-	//	{
-	//	case eCubeType::Dirt:
-	//		textureLayer = eTextureLayer::Dirt;
-	//		break;
-	//	case eCubeType::Stone:
-	//		textureLayer = eTextureLayer::Stone;
-	//		break;
-	//	case eCubeType::Sand:
-	//		textureLayer = eTextureLayer::Sand;
-	//		break;
-	//	case eCubeType::Grass:
-	//		switch (cubeSide)
-	//		{
-	//		case eCubeSide::Back:
-	//		case eCubeSide::Front:
-	//		case eCubeSide::Left:
-	//		case eCubeSide::Right:
-	//			textureLayer = eTextureLayer::GrassSide;
-	//			break;
-	//		case eCubeSide::Top:
-	//			textureLayer = eTextureLayer::Grass;
-	//			break;
-	//		case eCubeSide::Bottom:
-	//			textureLayer = eTextureLayer::Dirt;
-	//			break;
-	//		}
-	//		break;
-	//	case eCubeType::Log:
-	//		textureLayer = eTextureLayer::Log;
-	//		break;
-	//	case eCubeType::LogTop:
-	//		switch (cubeSide)
-	//		{
-	//		case eCubeSide::Back:
-	//		case eCubeSide::Front:
-	//		case eCubeSide::Left:
-	//		case eCubeSide::Right:
-	//			textureLayer = eTextureLayer::Log;
-	//			break;
-	//		case eCubeSide::Top:
-	//			textureLayer = eTextureLayer::LogTop;
-	//			break;
-	//		}
-	//		break;
-	//	case eCubeType::Leaves:
-	//		textureLayer = eTextureLayer::Leaves;
-	//		break;
-	//	case eCubeType::Cactus:
-	//		textureLayer = eTextureLayer::Cactus;
-	//		break;
-	//	case eCubeType::CactusTop:
-	//		switch (cubeSide)
-	//		{
-	//		case eCubeSide::Back:
-	//		case eCubeSide::Front:
-	//		case eCubeSide::Left:
-	//		case eCubeSide::Right:
-	//			textureLayer = eTextureLayer::Cactus;
-	//			break;
-	//		case eCubeSide::Top:
-	//			textureLayer = eTextureLayer::CactusTop;
-	//			break;
-	//		}
-	//		break;
-	//	case eCubeType::Water:
-	//		textureLayer = eTextureLayer::Water;
-	//		break;
-	//	case eCubeType::Shrub:
-	//		textureLayer = eTextureLayer::Shrub;
-	//		break;
-	//	case eCubeType::TallGrass:
-	//		textureLayer = eTextureLayer::TallGrass;
-	//		break;
-
-	//	default:
-	//		textureLayer = eTextureLayer::Error;
-	//	}
-
-	//	assert(textureLayer != eTextureLayer::Error);
-	//	for (const auto& i : TEXT_COORDS)
-	//	{
-	//		textCoords.emplace_back(i.x, i.y, static_cast<int>(textureLayer));
-	//	}
-	//}
 
 	constexpr std::array<glm::vec3, 4> CUBE_FACE_FRONT = { glm::vec3(0, 0, 1), glm::vec3(1, 0, 1), glm::vec3(1, 1, 1), glm::vec3(0, 1, 1) };
 	constexpr std::array<glm::vec3, 4> CUBE_FACE_BACK = { glm::vec3(1, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 1, 0) };

@@ -6,7 +6,7 @@
 #include "Rectangle.h"
 #include "Player.h"
 #include "Frustum.h"
-#include "ChunkMeshGenerator.h"
+#include "MeshGenerator.h"
 #include "BoundingBox.h"
 #include "NeighbouringChunks.h"
 #include <deque>

@@ -1,5 +1,5 @@
 #include "Item.h"
-#include "ChunkMeshGenerator.h"
+#include "MeshGenerator.h"
 #include "ChunkManager.h"
 #include <iostream>
 

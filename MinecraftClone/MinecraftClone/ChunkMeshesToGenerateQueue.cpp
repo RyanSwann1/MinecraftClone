@@ -1,6 +1,6 @@
 #include "ChunkMeshesToGenerateQueue.h"
 #include "NeighbouringChunks.h"
-#include "ChunkMeshGenerator.h"
+#include "MeshGenerator.h"
 #include "GeneratedChunkMeshQueue.h"
 #include "Chunk.h"
 #include <assert.h>
