@@ -310,16 +310,7 @@ void ChunkManager::renderPickUps(const Frustum& frustum)
 {
 	for (auto& pickUp : m_pickUps)
 	{
-		if (pickUp->m_vertexArray.m_opaqueVertexBuffer.bindToVAO)
-		{
-			pickUp->m_vertexArray.attachOpaqueVBO();
-		}
-
-		if (pickUp->m_vertexArray.m_opaqueVertexBuffer.displayable && frustum.isItemInFrustum(pickUp->m_position))
-		{
-			pickUp->m_vertexArray.bindOpaqueVAO();
-			glDrawElements(GL_TRIANGLES, pickUp->m_vertexArray.m_opaqueVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
-		}
+		pickUp->render(frustum);
 	}
 }
 
@@ -437,7 +428,7 @@ void ChunkManager::updatePickUps(const glm::vec3& playerPosition, float deltaTim
 
 	for (auto pickup = m_pickUps.begin(); pickup != m_pickUps.end();)
 	{
-		if (pickup->get()->m_delete || !visibilityRect.contains(pickup->get()->m_AABB))
+		if (pickup->get()->isReadyToDestroy() || !visibilityRect.contains(pickup->get()->getAABB()))
 		{
 			pickup = m_pickUps.erase(pickup);
 		}

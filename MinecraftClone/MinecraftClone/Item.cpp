@@ -1,7 +1,7 @@
 #include "Item.h"
 #include "MeshGenerator.h"
 #include "ChunkManager.h"
-#include <iostream>
+#include "Frustum.h"
 
 PickUp::PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
 	: m_AABB({ destroyedBlockPosition.x + 0.5f, destroyedBlockPosition.z + 0.5f }, 0.5f),
@@ -20,6 +20,16 @@ PickUp::PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
 	m_velocity.z += n.z * 5.0f;
 
 	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, m_position);
+}
+
+bool PickUp::isReadyToDestroy() const
+{
+	return m_delete;
+}
+
+const Rectangle& PickUp::getAABB() const
+{
+	return m_AABB;
 }
 
 void PickUp::update(const glm::vec3& playerPosition, float deltaTime, const ChunkManager& chunkManager)
@@ -69,5 +79,19 @@ void PickUp::update(const glm::vec3& playerPosition, float deltaTime, const Chun
 	if (glm::distance(m_position, { playerPosition.x, playerPosition.y - 1.0f, playerPosition.z }) <= 0.5f)
 	{
 		m_delete = true;
+	}
+}
+
+void PickUp::render(const Frustum& frustum)
+{
+	if (m_vertexArray.m_opaqueVertexBuffer.bindToVAO)
+	{
+		m_vertexArray.attachOpaqueVBO();
+	}
+
+	if (m_vertexArray.m_opaqueVertexBuffer.displayable && frustum.isItemInFrustum(m_position))
+	{
+		m_vertexArray.bindOpaqueVAO();
+		glDrawElements(GL_TRIANGLES, m_vertexArray.m_opaqueVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 	}
 }

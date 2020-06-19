@@ -7,12 +7,19 @@
 #include <unordered_map>
 
 class ChunkManager;
-struct PickUp
+class Frustum;
+class PickUp
 {
+public:
 	PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition);
 
-	void update(const glm::vec3& playerPosition, float deltaTime, const ChunkManager& chunkManager);
+	bool isReadyToDestroy() const;
+	const Rectangle& getAABB() const;
 
+	void update(const glm::vec3& playerPosition, float deltaTime, const ChunkManager& chunkManager);
+	void render(const Frustum& frustum);
+
+private:
 	Rectangle m_AABB;
 	eCubeType m_cubeType;
 	glm::vec3 m_position;
