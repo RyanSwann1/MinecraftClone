@@ -148,22 +148,21 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 	}
 }
 
-void Player::destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, std::vector<std::unique_ptr<PickUp>>& pickUps)
+bool Player::destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, glm::ivec3& destroyedCubePosition, eCubeType& destroyedCubeType) const
 {
 	std::lock_guard<std::mutex> playerLock(playerMutex);
 	for (float i = 0; i <= DESTROY_BLOCK_RANGE; i += DESTROY_BLOCK_INCREMENT)
 	{
 		glm::vec3 rayPosition = m_camera.front * i + m_position;
-		eCubeType destroyedCubeType = eCubeType::Air;
 		if (chunkManager.destroyCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, destroyedCubeType))
 		{
+			destroyedCubePosition = { std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) };
 			assert(destroyedCubeType != eCubeType::Air);
-			pickUps.emplace_back(std::make_unique<PickUp>(destroyedCubeType,
-				glm::ivec3(std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z))));
-
-			break;
+			return true;
 		}
 	}
+
+	return false;
 }
 
 void Player::spawn(const ChunkManager& chunkManager, std::mutex& playerMutex)

@@ -46,7 +46,7 @@ public:
 	const Camera& getCamera() const;
 	
 	void placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex);
-	void destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, std::vector<std::unique_ptr<PickUp>>& pickUps);
+	bool destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, glm::ivec3& destroyedCubePosition, eCubeType& destroyedCubeType) const;
 	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
 	void toggleFlying();
 	void toggleAutoJump();

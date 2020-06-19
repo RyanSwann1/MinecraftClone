@@ -164,7 +164,12 @@ int main()
 			{
 				if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{
-					player.destroyFacingBlock(*chunkManager, playerMutex, pickUps);
+					eCubeType destroyedCubeType;
+					glm::ivec3 destroyedCubePosition;
+					if (player.destroyFacingBlock(*chunkManager, playerMutex, destroyedCubePosition, destroyedCubeType))
+					{
+						pickUps.push_back(std::make_unique<PickUp>(destroyedCubeType, destroyedCubePosition));
+					}
 				}
 				else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
 				{
