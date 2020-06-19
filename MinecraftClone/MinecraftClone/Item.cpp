@@ -118,7 +118,8 @@ PickUp::PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
 	m_movementSpeed(5.0f),
 	m_vertexArray(),
 	m_delete(false),
-	m_onGround(false)
+	m_onGround(false),
+	m_timeElasped(0.0f)
 {
 	glm::vec3 n = glm::normalize(glm::vec3(Globals::getRandomNumber(0, 360), 90, Globals::getRandomNumber(0, 360)));
 	m_velocity.x += n.x * 5.0f;
@@ -137,13 +138,22 @@ PickUp::PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
 
 void PickUp::update(const glm::vec3& playerPosition, float deltaTime, const ChunkManager& chunkManager)
 {
-	eCubeType cubeType;
+	eCubeType cubeType = eCubeType::Air;
 	if (chunkManager.isCubeAtPosition({ std::floor(m_position.x),
 		std::floor(m_position.y - 0.10f),
 		std::floor(m_position.z) }, cubeType) &&
 		!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
 	{
 		m_velocity.y += 0.1f;
+		m_onGround = false;
+	}
+	else if (!chunkManager.isCubeAtPosition({ std::floor(m_position.x),
+		std::floor((m_position.y - 0.10f - 0.5f)),
+		std::floor(m_position.z) }, cubeType) &&
+		!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+	{
+		m_velocity.y -= 0.1f;
+		m_onGround = false;
 	}
 	else
 	{
@@ -151,9 +161,9 @@ void PickUp::update(const glm::vec3& playerPosition, float deltaTime, const Chun
 		m_velocity.y = 0.0f;
 	}
 	
-	m_timeElasped += deltaTime;
 	if (m_onGround)
 	{
+		m_timeElasped += deltaTime;
 		m_position.y += glm::sin(m_timeElasped * 2.5f) * 0.005f;
 	}
 

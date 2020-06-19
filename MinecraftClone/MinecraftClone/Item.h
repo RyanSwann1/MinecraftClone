@@ -21,5 +21,5 @@ struct PickUp
 	VertexArray m_vertexArray;
 	bool m_delete;
 	bool m_onGround;
-	float m_timeElasped = 0.0f;
+	float m_timeElasped;
 };
