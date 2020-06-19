@@ -20,4 +20,6 @@ struct PickUp
 	float m_movementSpeed;
 	VertexArray m_vertexArray;
 	bool m_delete;
+	bool m_onGround;
+	float m_timeElasped = 0.0f;
 };
