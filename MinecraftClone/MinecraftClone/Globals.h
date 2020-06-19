@@ -121,6 +121,33 @@ namespace Globals
 		return dis(gen);
 	}
 
+	inline glm::ivec3 getClosestMiddlePosition(const glm::ivec3& position)
+	{
+		glm::ivec3 middlePosition = position;
+		if (position.x % (Globals::CHUNK_WIDTH / 2) < 0)
+		{
+			middlePosition.x += std::abs(position.x % Globals::CHUNK_WIDTH / 2);
+			middlePosition.x -= Globals::CHUNK_WIDTH / 2;
+		}
+		else if (position.x % (Globals::CHUNK_WIDTH / 2) > 0)
+		{
+			middlePosition.x -= std::abs(position.x % Globals::CHUNK_WIDTH / 2);
+			middlePosition.x += Globals::CHUNK_WIDTH / 2;
+		}
+		if (position.z % (Globals::CHUNK_DEPTH / 2) < 0)
+		{
+			middlePosition.z += std::abs(position.z % Globals::CHUNK_DEPTH / 2);
+			middlePosition.z -= Globals::CHUNK_DEPTH / 2;
+		}
+		else if (position.z % (Globals::CHUNK_DEPTH / 2) > 0)
+		{
+			middlePosition.z -= std::abs(position.z % Globals::CHUNK_DEPTH / 2);
+			middlePosition.z += Globals::CHUNK_DEPTH / 2;
+		}
+
+		return { middlePosition.x, 0, middlePosition.z };
+	}
+
 	constexpr int CUBE_SIZE = 1;
 	constexpr int VISIBILITY_DISTANCE = 384;
 	constexpr int MAP_SIZE = 8000;

@@ -34,13 +34,7 @@ enum class ePlayerState
 	OnGround,
 };
 
-struct Item
-{
-	const int max;
-	eCubeType cubeType;
-	int amount;
-};
-
+class PickUp;
 class ChunkManager;
 class Player : private NonCopyable, private NonMovable
 {
@@ -52,7 +46,7 @@ public:
 	const Camera& getCamera() const;
 	
 	void placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex);
-	void destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex);
+	void destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, std::vector<std::unique_ptr<PickUp>>& pickUps);
 	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
 	void toggleFlying();
 	void toggleAutoJump();
@@ -66,9 +60,6 @@ private:
 	glm::vec3 m_velocity;
 	bool m_autoJump;
 	sf::Clock m_jumpTimer;
-	
-	//Inventory
-	std::vector<Item> m_items;
 
 	void move(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager);
 	void applyDrag();

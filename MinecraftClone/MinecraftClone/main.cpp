@@ -60,7 +60,6 @@
 //Good OpenGL Tutorials
 //https://ahbejarano.gitbook.io/lwjglgamedev/chapter12
 
-
 //x + (y * width)
 int main()
 {
@@ -111,6 +110,7 @@ int main()
 
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
 	
+	std::vector<std::unique_ptr<PickUp>> pickUps;
 	Frustum frustum;
 	Player player;
 	std::atomic<bool> resetGame = false;
@@ -164,7 +164,7 @@ int main()
 			{
 				if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{
-					player.destroyFacingBlock(*chunkManager, playerMutex);
+					player.destroyFacingBlock(*chunkManager, playerMutex, pickUps);
 				}
 				else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
 				{
@@ -179,8 +179,22 @@ int main()
 
 		assert(chunkManager);
 		player.update(deltaTime, playerMutex, *chunkManager.get());
-		chunkManager->updatePickUps(player.getPosition(), deltaTime);
+		glm::ivec3 startingPosition = Globals::getClosestMiddlePosition(player.getPosition());
+		Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Globals::VISIBILITY_DISTANCE);
 
+		for (auto pickup = pickUps.begin(); pickup != pickUps.end();)
+		{
+			if (pickup->get()->isInReachOfPlayer(player.getPosition()) || !visibilityRect.contains(pickup->get()->getAABB()))
+			{
+				pickup = pickUps.erase(pickup);
+			}
+			else
+			{
+				pickup->get()->update(player.getPosition(), deltaTime, *chunkManager);
+				++pickup;
+			}
+		}
+		
 		if (resetGame)
 		{
 			chunkGenerationThread.join();
@@ -213,7 +227,10 @@ int main()
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK);
 			chunkManager->renderOpaque(frustum);
-			chunkManager->renderPickUps(frustum);
+			for (auto& pickUp : pickUps)
+			{
+				pickUp->render(frustum);
+			}
 			glDisable(GL_CULL_FACE);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

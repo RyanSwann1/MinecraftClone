@@ -3,6 +3,12 @@
 #include "ChunkManager.h"
 #include "Frustum.h"
 
+namespace
+{
+
+}
+
+//PickUp
 PickUp::PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
 	: m_AABB({ destroyedBlockPosition.x + 0.5f, destroyedBlockPosition.z + 0.5f }, 0.5f),
 	m_cubeType(cubeType),
@@ -10,7 +16,6 @@ PickUp::PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
 	m_velocity(),
 	m_movementSpeed(5.0f),
 	m_vertexArray(),
-	m_delete(false),
 	m_onGround(false),
 	m_timeElasped(0.0f)
 {
@@ -22,9 +27,9 @@ PickUp::PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
 	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, m_position);
 }
 
-bool PickUp::isReadyToDestroy() const
+bool PickUp::isInReachOfPlayer(const glm::vec3& playerPosition) const
 {
-	return m_delete;
+	return glm::distance(m_position, { playerPosition.x, playerPosition.y - 1.0f, playerPosition.z }) <= 0.25f;
 }
 
 const Rectangle& PickUp::getAABB() const
@@ -75,11 +80,6 @@ void PickUp::update(const glm::vec3& playerPosition, float deltaTime, const Chun
 
 	m_vertexArray.m_opaqueVertexBuffer.clear();
 	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, m_position);
-
-	if (glm::distance(m_position, { playerPosition.x, playerPosition.y - 1.0f, playerPosition.z }) <= 0.5f)
-	{
-		m_delete = true;
-	}
 }
 
 void PickUp::render(const Frustum& frustum)
@@ -94,4 +94,15 @@ void PickUp::render(const Frustum& frustum)
 		m_vertexArray.bindOpaqueVAO();
 		glDrawElements(GL_TRIANGLES, m_vertexArray.m_opaqueVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 	}
+}
+
+//Item
+Item::Item(eCubeType cubeType)
+	: m_max(5)
+{
+}
+
+bool Item::add()
+{
+	return false;
 }

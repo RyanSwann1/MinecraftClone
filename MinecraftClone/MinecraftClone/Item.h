@@ -13,7 +13,7 @@ class PickUp
 public:
 	PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition);
 
-	bool isReadyToDestroy() const;
+	bool isInReachOfPlayer(const glm::vec3& playerPosition) const;
 	const Rectangle& getAABB() const;
 
 	void update(const glm::vec3& playerPosition, float deltaTime, const ChunkManager& chunkManager);
@@ -26,7 +26,19 @@ private:
 	glm::vec3 m_velocity;
 	float m_movementSpeed;
 	VertexArray m_vertexArray;
-	bool m_delete;
 	bool m_onGround;
 	float m_timeElasped;
+};
+
+class Item
+{
+public:
+	Item(eCubeType cubeType);
+
+	bool add();
+
+private:
+	const int m_max;
+	eCubeType m_cubeType;
+	int m_amount;
 };

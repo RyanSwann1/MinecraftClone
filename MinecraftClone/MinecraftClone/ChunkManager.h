@@ -10,7 +10,6 @@
 #include "GeneratedChunkQueue.h"
 #include "ChunkMeshesToGenerateQueue.h"
 #include <vector>
-#include <memory>
 #include <unordered_map>
 #include <mutex>
 #include <SFML/Graphics.hpp>
@@ -31,13 +30,11 @@ public:
 	bool isChunkAtPosition(const glm::vec3& position) const;
 
 	bool placeCubeAtPosition(const glm::ivec3& placementPosition);
-	bool destroyCubeAtPosition(const glm::ivec3& blockToDestroy);
+	bool destroyCubeAtPosition(const glm::ivec3& blockToDestroy, eCubeType& destroyedCubeType);
 
-	void updatePickUps(const glm::vec3& playerPosition, float deltaTime);
 	void update(const Player& player, const sf::Window& window, std::atomic<bool>& resetGame, 
 		std::mutex& playerMutex, std::mutex& renderingMutex);
-	
-	void renderPickUps(const Frustum& frustum);
+
 	void renderOpaque(const Frustum& frustum) const;
 	void renderTransparent(const Frustum& frustum) const;
 
@@ -52,8 +49,6 @@ private:
 	GeneratedChunkQueue m_generatedChunkQueue;
 	ChunkMeshRegenerationQueue m_chunkMeshRegenerationQueue;
 	
-	std::vector<std::unique_ptr<PickUp>> m_pickUps;
-
 	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex, const Rectangle& visibilityRect);
 	void addChunks(const glm::ivec3& playerPosition);
 	void clearQueues(const glm::ivec3& playerPosition, const Rectangle& visibilityRect);

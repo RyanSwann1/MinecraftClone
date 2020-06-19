@@ -23,33 +23,6 @@ namespace
 		return x * z;
 	}
 
-	glm::ivec3 getClosestMiddlePosition(const glm::ivec3& position)
-	{
-		glm::ivec3 middlePosition = position;
-		if (position.x % (Globals::CHUNK_WIDTH / 2) < 0)
-		{
-			middlePosition.x += std::abs(position.x % Globals::CHUNK_WIDTH / 2);
-			middlePosition.x -= Globals::CHUNK_WIDTH / 2;
-		}
-		else if (position.x % (Globals::CHUNK_WIDTH / 2) > 0)
-		{
-			middlePosition.x -= std::abs(position.x % Globals::CHUNK_WIDTH / 2);
-			middlePosition.x += Globals::CHUNK_WIDTH / 2;
-		}
-		if (position.z % (Globals::CHUNK_DEPTH / 2) < 0)
-		{
-			middlePosition.z += std::abs(position.z % Globals::CHUNK_DEPTH / 2);
-			middlePosition.z -= Globals::CHUNK_DEPTH / 2;
-		}
-		else if (position.z % (Globals::CHUNK_DEPTH / 2) > 0)
-		{
-			middlePosition.z -= std::abs(position.z % Globals::CHUNK_DEPTH / 2);
-			middlePosition.z += Globals::CHUNK_DEPTH / 2;
-		}
-
-		return { middlePosition.x, 0, middlePosition.z };
-	}
-
 	glm::ivec3 getClosestChunkStartingPosition(const glm::ivec3& position)
 	{
 		glm::ivec3 closestChunkStartingPosition = position;
@@ -93,8 +66,7 @@ ChunkManager::ChunkManager()
 	m_deletionQueue(),
 	m_generatedChunkMeshesQueue(),
 	m_generatedChunkQueue(),
-	m_chunkMeshRegenerationQueue(),
-	m_pickUps()
+	m_chunkMeshRegenerationQueue()
 {
 	addChunks(Globals::PLAYER_STARTING_POSITION);
 }
@@ -198,19 +170,16 @@ bool ChunkManager::placeCubeAtPosition(const glm::ivec3& placementPosition)
 	return false;
 }
 
-bool ChunkManager::destroyCubeAtPosition(const glm::ivec3& blockToDestroy)
+bool ChunkManager::destroyCubeAtPosition(const glm::ivec3& blockToDestroy, eCubeType& destroyedCubeType)
 {
 	glm::ivec3 chunkStartingPosition = getClosestChunkStartingPosition(blockToDestroy);
 	auto chunk = m_chunks.find(chunkStartingPosition);
 	assert(chunk != m_chunks.end());
 	
-	eCubeType destroyedCubeType;
 	if (chunk->second.getObject()->destroyCubeAtPosition(blockToDestroy, destroyedCubeType))
 	{
 		auto chunkMesh = m_chunkMeshes.find(chunkStartingPosition);
 		assert(chunkMesh != m_chunkMeshes.end());
-
-		m_pickUps.emplace_back(std::make_unique<PickUp>(destroyedCubeType, blockToDestroy));
 
 		if (!m_chunkMeshRegenerationQueue.contains(chunkStartingPosition))
 		{
@@ -269,7 +238,7 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 		glm::vec3 playerPosition = player.getPosition();
 		playerLock.unlock();
 
-		glm::ivec3 startingPosition = getClosestMiddlePosition(playerPosition);
+		glm::ivec3 startingPosition = Globals::getClosestMiddlePosition(playerPosition);
 		Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Globals::VISIBILITY_DISTANCE);
 
 		deleteChunks(playerPosition, renderingMutex, visibilityRect);
@@ -303,14 +272,6 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 			m_generatedChunkQueue.update(m_chunks);
 			m_generatedChunkMeshesQueue.update(m_chunkMeshes);
 		}
-	}
-}
-
-void ChunkManager::renderPickUps(const Frustum& frustum) 
-{
-	for (auto& pickUp : m_pickUps)
-	{
-		pickUp->render(frustum);
 	}
 }
 
@@ -375,7 +336,7 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 	};
 
 	std::vector<ChunkToAdd> chunksToAdd;
-	glm::ivec3 startPosition = getClosestMiddlePosition(playerPosition);
+	glm::ivec3 startPosition = Globals::getClosestMiddlePosition(playerPosition);
 	startPosition = getClosestChunkStartingPosition(startPosition);
 	for (int z = startPosition.z - Globals::VISIBILITY_DISTANCE; z <= startPosition.z + Globals::VISIBILITY_DISTANCE; z += Globals::CHUNK_DEPTH)
 	{
@@ -419,27 +380,4 @@ void ChunkManager::clearQueues(const glm::ivec3& playerPosition, const Rectangle
 	m_chunkMeshesToGenerateQueue.removeOutOfBoundsElements(visibilityRect);
 	m_generatedChunkMeshesQueue.removeOutOfBoundsElements(visibilityRect);
 	m_generatedChunkQueue.removeOutOfBoundsElements(visibilityRect);
-}
-
-void ChunkManager::updatePickUps(const glm::vec3& playerPosition, float deltaTime)
-{
-	glm::ivec3 startingPosition = getClosestMiddlePosition(playerPosition);
-	Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Globals::VISIBILITY_DISTANCE);
-
-	for (auto pickup = m_pickUps.begin(); pickup != m_pickUps.end();)
-	{
-		if (pickup->get()->isReadyToDestroy() || !visibilityRect.contains(pickup->get()->getAABB()))
-		{
-			pickup = m_pickUps.erase(pickup);
-		}
-		else
-		{
-			++pickup;
-		}
-	}
-
-	for (auto& pickup : m_pickUps)
-	{
-		pickup->update(playerPosition, deltaTime, *this);
-	}
 }
