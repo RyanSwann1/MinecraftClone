@@ -11,6 +11,7 @@ class Frustum;
 class PickUp
 {
 public:
+	PickUp(eCubeType cubeType, const glm::vec3& destroyedBlockPosition, const glm::vec3& initialVelocity);
 	PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition);
 
 	eCubeType getCubeType() const;
@@ -28,6 +29,7 @@ private:
 	float m_movementSpeed;
 	VertexArray m_vertexArray;
 	bool m_onGround;
+	bool m_discardedByPlayer;
 	float m_timeElasped;
 };
 
@@ -38,7 +40,7 @@ public:
 
 	bool isEmpty() const;
 	eCubeType getCubeType() const;
-	
+
 	void remove();
 	void add();
 

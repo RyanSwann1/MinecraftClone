@@ -240,7 +240,7 @@ void Player::handleInputEvents(std::vector<std::unique_ptr<PickUp>>& pickUps, co
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
 		{
-			discardItem();
+			discardItem(pickUps);
 		}
 	}
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
@@ -620,12 +620,32 @@ void Player::toggleAutoJump()
 	m_autoJump = !m_autoJump;
 }
 
-void Player::discardItem()
+void Player::discardItem(std::vector<std::unique_ptr<PickUp>>& pickUps)
 {
 	if (m_inventory.empty())
 	{
 		return;
 	}
-
 	
+	glm::vec3 n = glm::normalize(glm::vec3(
+
+		glm::cos(glm::radians(m_camera.rotation.y)),
+		glm::sin(glm::radians(m_camera.rotation.x)),
+		glm::sin(glm::radians(m_camera.rotation.y))
+	));
+	
+	n.x *= 10.0f;
+	n.y *= 5.0f;
+	n.z *= 10.0f;
+
+	assert(!m_inventory.front().isEmpty());
+	eCubeType pickUpType = m_inventory.front().getCubeType();
+	m_inventory.front().remove();
+	if (m_inventory.front().isEmpty())
+	{
+		m_inventory.erase(m_inventory.begin());
+	}
+
+	pickUps.push_back(std::make_unique<PickUp>(pickUpType,
+		glm::vec3(m_position.x, m_position.y, m_position.z), n));
 }
