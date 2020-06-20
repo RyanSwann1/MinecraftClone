@@ -435,7 +435,6 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 					break;
 				}
 			}
-
 		}
 
 		//Collide into faces - walking - Z
@@ -627,10 +626,9 @@ void Player::discardItem(std::vector<std::unique_ptr<PickUp>>& pickUps)
 	}
 
 	glm::vec3 n = glm::normalize(m_camera.front);
-	float result = 0.0f;
-	if(result = glm::dot(n, m_camera.up) >= 0.6f)
+	if(float result = glm::dot(n, m_camera.up) >= 0.6f)
 	{
-		n *= glm::vec3(10.0f, 5.0f, 10.0f)* result;
+		n *= glm::vec3(10.0f, 4.0f, 10.0f) * result;
 	}
 	else
 	{

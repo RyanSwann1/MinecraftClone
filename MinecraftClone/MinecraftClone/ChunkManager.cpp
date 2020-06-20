@@ -95,7 +95,7 @@ bool ChunkManager::isCubeAtPosition(const glm::vec3& playerPosition, eCubeType& 
 	auto chunk = m_chunks.find(closestChunkStartingPosition);
 	assert(chunk != m_chunks.cend());
 
-	if (chunk->second.getObject()->isCubeAtPosition(playerPosition))
+ 	if (chunk->second.getObject()->isCubeAtPosition(playerPosition))
 	{
 		cubeType = static_cast<eCubeType>(chunk->second.getObject()->getCubeDetailsWithoutBoundsCheck(playerPosition));
 		return true;

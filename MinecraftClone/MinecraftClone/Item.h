@@ -6,6 +6,10 @@
 #include "Rectangle.h"
 #include <unordered_map>
 
+//One VBO per pick up type
+//Instancing
+//Update position only and not whole mesh
+
 class ChunkManager;
 class Frustum;
 class PickUp
