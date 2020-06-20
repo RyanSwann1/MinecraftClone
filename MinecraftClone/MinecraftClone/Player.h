@@ -47,13 +47,13 @@ public:
 	const Camera& getCamera() const;
 	
 	void addToInventory(eCubeType cubeType);
-	void placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex);
-	bool destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, glm::ivec3& destroyedCubePosition, eCubeType& destroyedCubeType) const;
+
 	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
-	void toggleFlying();
-	void toggleAutoJump();
-	void moveCamera(const sf::Window& window);
+
+
 	
+	void handleInputEvents(std::vector<std::unique_ptr<PickUp>>& pickUps, const sf::Event& currentSFMLEvent,
+		ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window);
 	void update(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager);
 
 private:
@@ -68,4 +68,10 @@ private:
 	void move(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager);
 	void applyDrag();
 	void handleCollisions(const ChunkManager& chunkManager, float deltaTime);
+	void toggleFlying();
+	void toggleAutoJump();
+	void discardItem();
+	void placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex);
+	void destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, std::vector<std::unique_ptr<PickUp>>& pickUps) const;
+	void moveCamera(const sf::Window& window);
 };

@@ -184,21 +184,21 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 	}
 }
 
-bool Player::destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, glm::ivec3& destroyedCubePosition, eCubeType& destroyedCubeType) const
+void Player::destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, std::vector<std::unique_ptr<PickUp>>& pickUps) const
 {
 	std::lock_guard<std::mutex> playerLock(playerMutex);
 	for (float i = 0; i <= DESTROY_BLOCK_RANGE; i += DESTROY_BLOCK_INCREMENT)
 	{
 		glm::vec3 rayPosition = m_camera.front * i + m_position;
+		eCubeType destroyedCubeType;
 		if (chunkManager.destroyCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, destroyedCubeType))
 		{
-			destroyedCubePosition = { std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) };
 			assert(destroyedCubeType != eCubeType::Air);
-			return true;
+			pickUps.push_back(std::make_unique<PickUp>(destroyedCubeType, 
+				glm::ivec3(std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) )));
+			break;
 		}
 	}
-
-	return false;
 }
 
 void Player::spawn(const ChunkManager& chunkManager, std::mutex& playerMutex)
@@ -220,31 +220,44 @@ void Player::spawn(const ChunkManager& chunkManager, std::mutex& playerMutex)
 	}
 }
 
-void Player::toggleFlying()
-{
-	switch (m_currentState)
-	{
-	case ePlayerState::InAir:
-		m_currentState = ePlayerState::Flying;
-		break;
-	case ePlayerState::Flying:
-		m_currentState = ePlayerState::InAir;
-		break;
-	case ePlayerState::OnGround:
-		break;
-	default:
-		assert(false);
-	}
-}
-
-void Player::toggleAutoJump()
-{
-	m_autoJump = !m_autoJump;
-}
-
 void Player::moveCamera(const sf::Window& window)
 {
 	m_camera.move(window);
+}
+
+void Player::handleInputEvents(std::vector<std::unique_ptr<PickUp>>& pickUps, const sf::Event& currentSFMLEvent,
+	ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window)
+{
+	if (currentSFMLEvent.type == sf::Event::KeyPressed)
+	{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+		{
+			toggleFlying();
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::T))
+		{
+			toggleAutoJump();
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+		{
+			discardItem();
+		}
+	}
+	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
+	{
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+		{
+			destroyFacingBlock(chunkManager, playerMutex, pickUps);
+		}
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
+		{
+			placeBlock(chunkManager, playerMutex);
+		}
+	}
+	if (currentSFMLEvent.MouseMoved)
+	{
+		moveCamera(window);
+	}
 }
 
 void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager)
@@ -583,4 +596,36 @@ void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
 	default:
 		assert(false);
 	}
+}
+
+void Player::toggleFlying()
+{
+	switch (m_currentState)
+	{
+	case ePlayerState::InAir:
+		m_currentState = ePlayerState::Flying;
+		break;
+	case ePlayerState::Flying:
+		m_currentState = ePlayerState::InAir;
+		break;
+	case ePlayerState::OnGround:
+		break;
+	default:
+		assert(false);
+	}
+}
+
+void Player::toggleAutoJump()
+{
+	m_autoJump = !m_autoJump;
+}
+
+void Player::discardItem()
+{
+	if (m_inventory.empty())
+	{
+		return;
+	}
+
+	
 }
