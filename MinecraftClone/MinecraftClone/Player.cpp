@@ -130,7 +130,6 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 		return;
 	}
 
-
 	assert(cubeTypeToPlace != eCubeType::Air);
 	//Place Block
 	std::lock_guard<std::mutex> playerLock(playerMutex);
@@ -626,17 +625,17 @@ void Player::discardItem(std::vector<std::unique_ptr<PickUp>>& pickUps)
 	{
 		return;
 	}
-	
-	glm::vec3 n = glm::normalize(glm::vec3(
 
-		glm::cos(glm::radians(m_camera.rotation.y)),
-		glm::sin(glm::radians(m_camera.rotation.x)),
-		glm::sin(glm::radians(m_camera.rotation.y))
-	));
-	
-	n.x *= 10.0f;
-	n.y *= 5.0f;
-	n.z *= 10.0f;
+	glm::vec3 n = glm::normalize(m_camera.front);
+	float result = 0.0f;
+	if(result = glm::dot(n, m_camera.up) >= 0.6f)
+	{
+		n *= glm::vec3(10.0f, 5.0f, 10.0f)* result;
+	}
+	else
+	{
+		n *= glm::vec3(10.0f, 6.0f, 10.0);
+	}
 
 	assert(!m_inventory.front().isEmpty());
 	eCubeType pickUpType = m_inventory.front().getCubeType();
