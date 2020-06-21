@@ -2,6 +2,7 @@
 #include "MeshGenerator.h"
 #include "ChunkManager.h"
 #include "Frustum.h"
+#include "CollisionHandler.h"
 
 //PickUp
 PickUp::PickUp(eCubeType cubeType, const glm::vec3& destroyedBlockPosition, const glm::vec3& initialVelocity)
@@ -81,19 +82,12 @@ const Rectangle& PickUp::getAABB() const
 
 void PickUp::update(const glm::vec3& playerPosition, float deltaTime, const ChunkManager& chunkManager)
 {
-	eCubeType cubeType = eCubeType::Air;
-	if (chunkManager.isCubeAtPosition({ std::floor(m_position.x),
-		std::floor(m_position.y - 0.10f),
-		std::floor(m_position.z) }, cubeType) &&
-		!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+	if (CollisionHandler::isCollision({ m_position.x, m_position.y - 0.10f, m_position.z }, chunkManager))
 	{
 		m_velocity.y += 0.1f;
 		m_onGround = false;
 	}
-	else if (!chunkManager.isCubeAtPosition({ std::floor(m_position.x),
-		std::floor((m_position.y - 0.10f - 0.5f)),
-		std::floor(m_position.z) }, cubeType) &&
-		!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+	else if(!CollisionHandler::isCollision({ m_position.x, m_position.y - 0.10f - 0.5f, m_position.z }, chunkManager))
 	{
 		m_velocity.y -= 0.1f;
 		m_onGround = false;
@@ -104,51 +98,16 @@ void PickUp::update(const glm::vec3& playerPosition, float deltaTime, const Chun
 		m_discardedByPlayer = false;
 		m_velocity.y = 0.0f;
 	}
-
-	for (float z = -0.25f; z <= 0.25f; z += 2)
-	{ 
-		if (chunkManager.isCubeAtPosition({ std::floor(m_position.x - 0.25f),
-			std::floor(m_position.y),
-			std::floor(m_position.z + z) }, cubeType) &&
-			!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-		{
-			m_velocity.z = 0.0f;
-			m_velocity.x = 0.0f;
-			break;
-		}
-		else if (chunkManager.isCubeAtPosition({ std::floor(m_position.x + 0.25f),
-			std::floor(m_position.y),
-			std::floor(m_position.z + z) }, cubeType) &&
-			!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-		{
-			m_velocity.z = 0.0f;
-			m_velocity.x = 0.0f;
-			break;
-		}
-	}
-
-	for (float x = -0.25f; x <= 0.25f; x += 2)
+		
+	if (m_velocity.x != 0)
 	{
-		if (chunkManager.isCubeAtPosition({ std::floor(m_position.x + x),
-			std::floor(m_position.y),
-			std::floor(m_position.z - 0.25f) }, cubeType) &&
-			!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-		{
-			m_velocity.x = 0.0f;
-			m_velocity.z = 0.0f;
-			break;
-		}
-		else if (chunkManager.isCubeAtPosition({ std::floor(m_position.x + x),
-			std::floor(m_position.y),
-			std::floor(m_position.z + 0.25f) }, cubeType) &&
-			!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-		{
-			m_velocity.x = 0.0f;
-			m_velocity.z = 0.0f;
-			break;
-		}
+		CollisionHandler::handleXAxisCollision(m_velocity.x, 0.25f, chunkManager, m_position);
 	}
 
+	if (m_velocity.z != 0)
+	{
+		CollisionHandler::handleZAxisCollision(m_velocity.z, 0.25f, chunkManager, m_position);
+	}
 	
 	if (m_onGround)
 	{
@@ -163,8 +122,7 @@ void PickUp::update(const glm::vec3& playerPosition, float deltaTime, const Chun
 
 	m_position += m_velocity * deltaTime;
 
-	m_velocity.x *= 0.95f;
-	m_velocity.z *= 0.95f;
+	CollisionHandler::applyDrag(m_velocity.x, m_velocity.z, 0.95f);
 
 	m_vertexArray.m_opaqueVertexBuffer.clear();
 	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, m_position);
