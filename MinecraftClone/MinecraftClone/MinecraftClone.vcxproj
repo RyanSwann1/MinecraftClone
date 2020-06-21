@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClCompile Include="ChunkMeshesToGenerateQueue.cpp" />
     <ClCompile Include="ChunkMeshRegenerationQueue.cpp" />
+    <ClCompile Include="CollisionHandler.cpp" />
     <ClCompile Include="GeneratedChunkMeshQueue.cpp" />
     <ClCompile Include="GeneratedChunkQueue.cpp" />
     <ClCompile Include="Item.cpp" />
@@ -153,6 +154,7 @@
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="ChunkMeshesToGenerateQueue.h" />
     <ClInclude Include="ChunkMeshRegenerationQueue.h" />
+    <ClInclude Include="CollisionHandler.h" />
     <ClInclude Include="GeneratedChunkMeshQueue.h" />
     <ClInclude Include="GeneratedChunkQueue.h" />
     <ClInclude Include="Item.h" />
