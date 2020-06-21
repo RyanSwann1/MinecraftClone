@@ -37,6 +37,33 @@ PickUp::PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
 	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, m_position);
 }
 
+PickUp::PickUp(PickUp&& orig) noexcept
+	: m_AABB(orig.m_AABB),
+	m_cubeType(orig.m_cubeType),
+	m_position(orig.m_position),
+	m_velocity(orig.m_velocity),
+	m_movementSpeed(orig.m_movementSpeed),
+	m_vertexArray(std::move(orig.m_vertexArray)),
+	m_onGround(orig.m_onGround),
+	m_discardedByPlayer(orig.m_discardedByPlayer),
+	m_timeElasped(orig.m_timeElasped)
+{}
+
+PickUp& PickUp::operator=(PickUp&& orig) noexcept
+{
+	m_AABB = orig.m_AABB;
+	m_cubeType = orig.m_cubeType;
+	m_position = orig.m_position;
+	m_velocity = orig.m_velocity;
+	m_movementSpeed = orig.m_movementSpeed;
+	m_vertexArray = std::move(orig.m_vertexArray);
+	m_onGround = orig.m_onGround;
+	m_discardedByPlayer = orig.m_discardedByPlayer;
+	m_timeElasped = orig.m_timeElasped;
+
+	return *this;
+}
+
 eCubeType PickUp::getCubeType() const
 {
 	return m_cubeType;

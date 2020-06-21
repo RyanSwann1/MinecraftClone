@@ -70,17 +70,23 @@ VertexBuffer& VertexBuffer::operator=(VertexBuffer&& orig) noexcept
 
 VertexBuffer::~VertexBuffer()
 {
-	assert(positionsID != Globals::INVALID_OPENGL_ID);
-	glDeleteBuffers(1, &positionsID);
-	
-	assert(lightIntensityID != Globals::INVALID_OPENGL_ID);
-	glDeleteBuffers(1, &lightIntensityID);
-
-	assert(textCoordsID != Globals::INVALID_OPENGL_ID);
-	glDeleteBuffers(1, &textCoordsID);
-	
-	assert(indiciesID != Globals::INVALID_OPENGL_ID);
-	glDeleteBuffers(1, &indiciesID);
+	if (positionsID != Globals::INVALID_OPENGL_ID &&
+		lightIntensityID != Globals::INVALID_OPENGL_ID &&
+		textCoordsID != Globals::INVALID_OPENGL_ID &&
+		indiciesID != Globals::INVALID_OPENGL_ID)
+	{
+		glDeleteBuffers(1, &positionsID);
+		glDeleteBuffers(1, &lightIntensityID);
+		glDeleteBuffers(1, &textCoordsID);
+		glDeleteBuffers(1, &indiciesID);
+	}
+	else
+	{
+		assert(positionsID == Globals::INVALID_OPENGL_ID &&
+			lightIntensityID == Globals::INVALID_OPENGL_ID &&
+			textCoordsID == Globals::INVALID_OPENGL_ID &&
+			indiciesID == Globals::INVALID_OPENGL_ID);
+	}
 }
 
 void VertexBuffer::bind()

@@ -184,7 +184,7 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 	}
 }
 
-void Player::destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, std::vector<std::unique_ptr<PickUp>>& pickUps) const
+void Player::destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, std::vector<PickUp>& pickUps) const
 {
 	std::lock_guard<std::mutex> playerLock(playerMutex);
 	for (float i = 0; i <= DESTROY_BLOCK_RANGE; i += DESTROY_BLOCK_INCREMENT)
@@ -194,8 +194,9 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMu
 		if (chunkManager.destroyCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, destroyedCubeType))
 		{
 			assert(destroyedCubeType != eCubeType::Air);
-			pickUps.push_back(std::make_unique<PickUp>(destroyedCubeType, 
-				glm::ivec3(std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) )));
+			pickUps.emplace_back(destroyedCubeType, 
+				glm::ivec3(std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) ));
+
 			break;
 		}
 	}
@@ -260,7 +261,7 @@ void Player::handleAutoJump(const ChunkManager& chunkManager)
 	}
 }
 
-void Player::handleInputEvents(std::vector<std::unique_ptr<PickUp>>& pickUps, const sf::Event& currentSFMLEvent,
+void Player::handleInputEvents(std::vector<PickUp>& pickUps, const sf::Event& currentSFMLEvent,
 	ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window)
 {
 	if (currentSFMLEvent.type == sf::Event::KeyPressed)
@@ -502,7 +503,7 @@ void Player::toggleAutoJump()
 	m_autoJump = !m_autoJump;
 }
 
-void Player::discardItem(std::vector<std::unique_ptr<PickUp>>& pickUps)
+void Player::discardItem(std::vector<PickUp>& pickUps)
 {
 	if (m_inventory.empty())
 	{
@@ -527,6 +528,6 @@ void Player::discardItem(std::vector<std::unique_ptr<PickUp>>& pickUps)
 		m_inventory.erase(m_inventory.begin());
 	}
 
-	pickUps.push_back(std::make_unique<PickUp>(pickUpType,
-		glm::vec3(m_position.x, m_position.y, m_position.z), n));
+	pickUps.emplace_back(pickUpType,
+		glm::vec3(m_position.x, m_position.y, m_position.z), n);
 }

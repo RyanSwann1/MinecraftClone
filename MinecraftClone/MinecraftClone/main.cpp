@@ -110,7 +110,7 @@ int main()
 
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
 	
-	std::vector<std::unique_ptr<PickUp>> pickUps;
+	std::vector<PickUp> pickUps;
 	Frustum frustum;
 	Player player;
 	std::atomic<bool> resetGame = false;
@@ -164,14 +164,14 @@ int main()
 
 		for (auto pickup = pickUps.begin(); pickup != pickUps.end();)
 		{
-			if (pickup->get()->isInReachOfPlayer(player.getPosition()) || !visibilityRect.contains(pickup->get()->getAABB()))
+			if (pickup->isInReachOfPlayer(player.getPosition()) || !visibilityRect.contains(pickup->getAABB()))
 			{
-				player.addToInventory(pickup->get()->getCubeType());
+				player.addToInventory(pickup->getCubeType());
 				pickup = pickUps.erase(pickup);
 			}
 			else
 			{
-				pickup->get()->update(player.getPosition(), deltaTime, *chunkManager);
+				pickup->update(player.getPosition(), deltaTime, *chunkManager);
 				++pickup;
 			}
 		}
@@ -210,7 +210,7 @@ int main()
 			chunkManager->renderOpaque(frustum);
 			for (auto& pickUp : pickUps)
 			{
-				pickUp->render(frustum);
+				pickUp.render(frustum);
 			}
 			glDisable(GL_CULL_FACE);
 			glEnable(GL_BLEND);

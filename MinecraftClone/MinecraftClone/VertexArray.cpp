@@ -16,11 +16,16 @@ VertexArray::VertexArray()
 
 VertexArray::~VertexArray()
 {
-	assert(m_opaqueID != Globals::INVALID_OPENGL_ID);
-	glDeleteVertexArrays(1, &m_opaqueID);
-	
-	assert(m_transparentID != Globals::INVALID_OPENGL_ID);
-	glDeleteVertexArrays(1, &m_transparentID);
+	if (m_opaqueID != Globals::INVALID_OPENGL_ID &&
+		m_transparentID != Globals::INVALID_OPENGL_ID)
+	{
+		glDeleteVertexArrays(1, &m_opaqueID);
+		glDeleteVertexArrays(1, &m_transparentID);
+	}
+	else
+	{
+		assert(m_opaqueID == Globals::INVALID_OPENGL_ID && m_transparentID == Globals::INVALID_OPENGL_ID);
+	}
 }
 
 VertexArray::VertexArray(VertexArray&& orig) noexcept

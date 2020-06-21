@@ -1,5 +1,6 @@
 #pragma once
 
+#include "NonCopyable.h"
 #include "glm/glm.hpp"
 #include "Globals.h"
 #include "VertexArray.h"
@@ -12,11 +13,13 @@
 
 class ChunkManager;
 class Frustum;
-class PickUp
+class PickUp : private NonCopyable
 {
 public:
 	PickUp(eCubeType cubeType, const glm::vec3& destroyedBlockPosition, const glm::vec3& initialVelocity);
 	PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition);
+	PickUp(PickUp&&) noexcept;
+	PickUp& operator=(PickUp&&) noexcept;
 
 	eCubeType getCubeType() const;
 	bool isInReachOfPlayer(const glm::vec3& playerPosition) const;
