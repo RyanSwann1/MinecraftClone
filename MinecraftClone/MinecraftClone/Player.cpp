@@ -5,6 +5,7 @@
 #include <iostream>
 #include "BoundingBox.h"
 #include "Item.h"
+#include "CollisionHandler.h"
 #include <memory>
 
 namespace 
@@ -19,7 +20,6 @@ namespace
 	constexpr float HEAD_HEIGHT = 2.25f;
 	constexpr int MS_BETWEEN_ATTEMPT_SPAWN = 250;
 	
-	constexpr float AUTO_JUMP_HEIGHT = 2.0f;
 	constexpr float JUMP_BREAK = 1.0f;
 	constexpr float TIME_BETWEEN_JUMP = .25f;
 
@@ -29,6 +29,7 @@ namespace
 	constexpr float PLACE_BLOCK_INCREMENT = 0.1f;
 
 	constexpr float COLLISION_OFFSET = 0.35f;
+	constexpr int BODY_HEIGHT = 2;
 }
 
 //Camera
@@ -146,7 +147,7 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 				if (!chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }))
 				{
 					bool availablePostion = true;
-					for (float y = -AUTO_JUMP_HEIGHT; y <= 0; y++)
+					for (float y = -BODY_HEIGHT; y <= 0; y++)
 					{
 						if (glm::vec3(std::floor(m_position.x), std::floor(m_position.y - 2.0f), std::floor(m_position.z)) == 
 						glm::vec3(std::floor(rayPosition.x), std::floor(rayPosition.y + y), std::floor(rayPosition.z) ))
@@ -224,6 +225,36 @@ void Player::moveCamera(const sf::Window& window)
 	m_camera.move(window);
 }
 
+void Player::handleAutoJump(const ChunkManager& chunkManager)
+{
+	eCubeType cubeType = eCubeType::Air;
+	glm::vec3 collisionPosition(
+		m_position.x + glm::normalize(glm::vec2(m_velocity.x, m_velocity.z)).x,
+		m_position.y,
+		m_position.z + glm::normalize(glm::vec2(m_velocity.x, m_velocity.z)).y);
+
+	bool autoJumpAllowed = false;
+	if (CollisionHandler::isCollision({ collisionPosition.x, collisionPosition.y - BODY_HEIGHT, collisionPosition.z }, chunkManager))
+	{
+		autoJumpAllowed = true;
+		for (int y = -BODY_HEIGHT + 1; y <= 1; y++)
+		{
+			if (CollisionHandler::isCollision({ collisionPosition.x, collisionPosition.y + y, collisionPosition.z }, chunkManager))
+			{
+				autoJumpAllowed = false;
+				break;
+			}
+		}
+	}
+
+	if (autoJumpAllowed)
+	{
+		m_velocity.y += JUMP_SPEED;
+		m_velocity.x *= JUMP_BREAK;
+		m_velocity.z *= JUMP_BREAK;
+	}
+}
+
 void Player::handleInputEvents(std::vector<std::unique_ptr<PickUp>>& pickUps, const sf::Event& currentSFMLEvent,
 	ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window)
 {
@@ -264,7 +295,7 @@ void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager
 	move(deltaTime, playerMutex, chunkManager);
 	
 	std::lock_guard<std::mutex> playerLock(playerMutex);
-	handleCollisions(chunkManager, deltaTime);
+	handleCollisions(chunkManager);
 	
 	m_position += m_velocity * deltaTime;
 	applyDrag();
@@ -319,17 +350,13 @@ void Player::move(float deltaTime, std::mutex& playerMutex, const ChunkManager& 
 
 			if (m_velocity.x != 0 && m_velocity.z != 0)
 			{
-				eCubeType cubeType;
-				std::lock_guard<std::mutex> playerLock(playerMutex);
 				glm::vec3 collisionPosition(
 					m_position.x + glm::normalize(glm::vec2(m_velocity.x, m_velocity.z)).x,
-					m_position.y,
+					m_position.y - BODY_HEIGHT,
 					m_position.z + glm::normalize(glm::vec2(m_velocity.x, m_velocity.z)).y);
 
-				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
-					std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT),
-					std::floor(collisionPosition.z) }, cubeType) &&
-					!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+				std::lock_guard<std::mutex> playerLock(playerMutex);
+				if (CollisionHandler::isCollision(collisionPosition, chunkManager))
 				{
 					m_velocity.y += JUMP_SPEED;
 					m_velocity.x *= JUMP_BREAK;
@@ -391,205 +418,87 @@ void Player::applyDrag()
 }
 
 //https://sites.google.com/site/letsmakeavoxelengine/home/collision-detection
-void Player::handleCollisions(const ChunkManager& chunkManager, float deltaTime)
+void Player::handleCollisions(const ChunkManager& chunkManager)
 {
 	eCubeType cubeType = eCubeType::Air;
 	switch (m_currentState)
 	{
 	case ePlayerState::Flying:
 	case ePlayerState::InAir:
-		if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y + COLLISION_OFFSET), std::floor(m_position.z) }, cubeType) &&
-			!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+		if (CollisionHandler::isCollision({ m_position.x, m_position.y + COLLISION_OFFSET, m_position.z }, chunkManager))
 		{
 			m_velocity.y = 0;
 			m_position.y -= std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT)));
 		}
-
-		if (m_velocity.x != 0)
-		{
-			for (int y = -AUTO_JUMP_HEIGHT; y <= 0; y++)
-			{
-				glm::vec3 collisionPosition;
-				if (m_velocity.x > 0)
-				{
-					collisionPosition = {
-						m_position.x + COLLISION_OFFSET,
-						m_position.y,
-						m_position.z };
-				}
-				else
-				{
-					collisionPosition = {
-						m_position.x - COLLISION_OFFSET,
-						m_position.y,
-						m_position.z };
-				}
-
-				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
-					std::floor(collisionPosition.y + y),
-					std::floor(collisionPosition.z) }, cubeType) &&
-					!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-				{
-					m_velocity.x = 0.0f;
-					//Handle when getting stuck
-					break;
-				}
-			}
-		}
-
-		//Collide into faces - walking - Z
-		if (m_velocity.z != 0)
-		{
-			for (int y = -AUTO_JUMP_HEIGHT; y <= 0; y++)
-			{
-				glm::vec3 collisionPosition;
-				if (m_velocity.z > 0)
-				{
-					collisionPosition = {
-						m_position.x,
-						m_position.y,
-						m_position.z + COLLISION_OFFSET };
-				}
-				else
-				{
-					collisionPosition = {
-						m_position.x,
-						m_position.y,
-						m_position.z - COLLISION_OFFSET };
-				}
-
-				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
-					std::floor(collisionPosition.y + y),
-					std::floor(collisionPosition.z) }, cubeType) &&
-					!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-				{
-					m_velocity.z = 0.0f;
-					//Handle when getting stuck
-					break;
-				}
-			}
-		}
-
-		if (chunkManager.isCubeAtPosition({ std::floor(m_position.x), 
-			std::floor(m_position.y - HEAD_HEIGHT), 
-			std::floor(m_position.z) }, cubeType) &&
-			!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+		else if((CollisionHandler::isCollision({ m_position.x, m_position.y - HEAD_HEIGHT, m_position.z }, chunkManager)))
 		{
 			m_velocity.y = 0;
 			m_position.y += std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT) + 1));
 			m_position.y = std::floor(m_position.y);
 
-			m_currentState = ePlayerState::OnGround;
-		}
-		break;
-	case ePlayerState::OnGround:
-		//Auto Jump
-		if(m_autoJump && m_velocity.y == 0 && glm::distance(m_position + m_velocity, m_position) >= 0.5f)
-		{
-			glm::vec3 collisionPosition(
-				m_position.x + glm::normalize(glm::vec2(m_velocity.x, m_velocity.z)).x,
-				m_position.y,
-				m_position.z + glm::normalize(glm::vec2(m_velocity.x, m_velocity.z)).y);
-
-			if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
-				std::floor(collisionPosition.y - AUTO_JUMP_HEIGHT),
-				std::floor(collisionPosition.z) }, cubeType) &&
-				!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-			{
-				bool autoJumpAllowed = true;
-				for (int y = -AUTO_JUMP_HEIGHT + 1; y <= 1; y++)
-				{
-					if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
-						std::floor(collisionPosition.y + y),
-						std::floor(collisionPosition.z) }, cubeType) &&
-						!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-					{
-						autoJumpAllowed = false;
-						break;
-					}
-				}
-
-				if (autoJumpAllowed)
-				{
-					m_velocity.y += JUMP_SPEED;
-					m_velocity.x *= JUMP_BREAK;
-					m_velocity.z *= JUMP_BREAK;
-				}
-			}
+			m_currentState = ePlayerState::OnGround;	
 		}
 
-
-		//Collide into faces - walking - X
 		if (m_velocity.x != 0)
 		{
-			for (int y = -AUTO_JUMP_HEIGHT; y <= 0; y++)
+			for (int y = -BODY_HEIGHT; y <= 0; y++)
 			{
-				glm::vec3 collisionPosition;
-				if (m_velocity.x > 0)
+				if (CollisionHandler::handleXAxisCollision(m_velocity.x, COLLISION_OFFSET, chunkManager, 
+					{ m_position.x, m_position.y + y, m_position.z }))
 				{
-					collisionPosition = {
-						m_position.x + COLLISION_OFFSET, //Positive & negative check
-						m_position.y,
-						m_position.z};
-				}
-				else
-				{
-					collisionPosition = {
-						m_position.x - COLLISION_OFFSET, //Positive & negative check
-						m_position.y,
-						m_position.z };
-				}
-
-				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
-					std::floor(collisionPosition.y + y),
-					std::floor(collisionPosition.z) }, cubeType) &&
-					!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
-				{
-					m_velocity.x = 0.0f;
-					//Handle when getting stuck
 					break;
 				}
 			}
 		}
 
-		//Collide into faces - walking - Z
 		if (m_velocity.z != 0)
 		{
-			for (int y = -AUTO_JUMP_HEIGHT; y <= 0; y++)
+			for (int y = -BODY_HEIGHT; y <= 0; y++)
 			{
-				glm::vec3 collisionPosition;
-				if (m_velocity.z > 0)
+				if (CollisionHandler::handleZAxisCollision(m_velocity.z, COLLISION_OFFSET, chunkManager,
+					{ m_position.x, m_position.y + y, m_position.z }))
 				{
-					collisionPosition = {
-						m_position.x, //Positive & negative check
-						m_position.y,
-						m_position.z + COLLISION_OFFSET };
+					break;
 				}
-				else
-				{
-					collisionPosition = {
-						m_position.x, //Positive & negative check
-						m_position.y,
-						m_position.z - COLLISION_OFFSET };
-				}
+			}
+		}
 
-				if (chunkManager.isCubeAtPosition({ std::floor(collisionPosition.x),
-					std::floor(collisionPosition.y + y),
-					std::floor(collisionPosition.z) }, cubeType) &&
-					!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+		break;
+	case ePlayerState::OnGround:
+		if(m_autoJump && m_velocity.y == 0 && glm::distance(m_position + m_velocity, m_position) >= 0.5f)
+		{
+			handleAutoJump(chunkManager);
+		}
+
+		if (m_velocity.x != 0)
+		{
+			for (int y = -BODY_HEIGHT; y <= 0; y++)
+			{
+				if(CollisionHandler::handleXAxisCollision(m_velocity.x, COLLISION_OFFSET, chunkManager, 
+					{ m_position.x, m_position.y + y, m_position.z }))
 				{
-					m_velocity.z = 0.0f;
-					//Handle when getting stuck
+					break;
+				}
+			}
+		}
+
+		if (m_velocity.z != 0)
+		{
+			for (int y = -BODY_HEIGHT; y <= 0; y++)
+			{
+				if (CollisionHandler::handleZAxisCollision(m_velocity.z, COLLISION_OFFSET, chunkManager, 
+					{ m_position.x, m_position.y + y, m_position.z }))
+				{
 					break;
 				}
 			}
 		}
 		
-		if (!chunkManager.isCubeAtPosition({ std::floor(m_position.x), std::floor(m_position.y - HEAD_HEIGHT), std::floor(m_position.z) }, cubeType) ||
-			Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType))
+		if (!CollisionHandler::isGroundCollision({ m_position.x, m_position.y - HEAD_HEIGHT, m_position.z }, chunkManager))
 		{
 			m_currentState = (m_currentState == ePlayerState::Flying ? m_currentState : ePlayerState::InAir);
 		}
+
 		break;
 	default:
 		assert(false);

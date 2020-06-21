@@ -63,11 +63,12 @@ private:
 
 	void move(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager);
 	void applyDrag();
-	void handleCollisions(const ChunkManager& chunkManager, float deltaTime);
+	void handleCollisions(const ChunkManager& chunkManager);
 	void toggleFlying();
 	void toggleAutoJump();
 	void discardItem(std::vector<std::unique_ptr<PickUp>>& pickUps);
 	void placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex);
 	void destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, std::vector<std::unique_ptr<PickUp>>& pickUps) const;
 	void moveCamera(const sf::Window& window);
+	void handleAutoJump(const ChunkManager& chunkManager);
 };
