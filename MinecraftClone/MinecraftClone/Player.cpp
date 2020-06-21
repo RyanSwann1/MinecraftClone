@@ -510,14 +510,14 @@ void Player::discardItem(std::vector<PickUp>& pickUps)
 		return;
 	}
 
-	glm::vec3 n = glm::normalize(m_camera.front);
-	if(float result = glm::dot(n, m_camera.up) >= 0.6f)
+	glm::vec3 initialVelocity = glm::normalize(m_camera.front);
+	if(float result = glm::dot(initialVelocity, m_camera.up) >= 0.6f)
 	{
-		n *= glm::vec3(10.0f, 4.0f, 10.0f) * result;
+		initialVelocity *= glm::vec3(10.0f, 4.0f, 10.0f) * result;
 	}
 	else
 	{
-		n *= glm::vec3(10.0f, 6.0f, 10.0);
+		initialVelocity *= glm::vec3(10.0f, 6.0f, 10.0);
 	}
 
 	assert(!m_inventory.front().isEmpty());
@@ -528,6 +528,5 @@ void Player::discardItem(std::vector<PickUp>& pickUps)
 		m_inventory.erase(m_inventory.begin());
 	}
 
-	pickUps.emplace_back(pickUpType,
-		glm::vec3(m_position.x, m_position.y, m_position.z), n);
+	pickUps.emplace_back(pickUpType, m_position, initialVelocity);
 }

@@ -109,7 +109,6 @@ int main()
 	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", 0);
 
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
-	
 	std::vector<PickUp> pickUps;
 	Frustum frustum;
 	Player player;
