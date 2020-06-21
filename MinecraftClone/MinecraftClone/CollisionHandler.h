@@ -10,4 +10,6 @@ namespace CollisionHandler
 
 	bool isGroundCollision(const glm::vec3& position, const ChunkManager& chunkManager);
 	bool isCollision(const glm::vec3& position, const ChunkManager& chunkManager);
+	void applyDrag(glm::vec3& velocity, float resistence);
+	void applyDrag(float& velocityX, float& velocityZ, float resistence);
 }

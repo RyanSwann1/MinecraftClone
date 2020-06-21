@@ -62,7 +62,6 @@ private:
 	std::vector<Item> m_inventory;
 
 	void move(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager);
-	void applyDrag();
 	void handleCollisions(const ChunkManager& chunkManager);
 	void toggleFlying();
 	void toggleAutoJump();
