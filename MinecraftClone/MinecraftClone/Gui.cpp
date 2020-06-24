@@ -102,6 +102,9 @@ void Gui::drawSprite(eCubeType cubeType, ShaderHandler& shaderHandler, glm::vec2
 	case eCubeType::LogTop:
 		textureLayer = eTextureLayer::Log;
 		break;
+	case eCubeType::Stone:
+		textureLayer = eTextureLayer::Stone;
+		break;
 	default:
 		assert(false);
 	}

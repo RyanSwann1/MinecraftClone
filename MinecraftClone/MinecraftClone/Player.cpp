@@ -128,23 +128,11 @@ void Player::addToInventory(eCubeType cubeTypeToAdd)
 
 void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 {
-	eCubeType cubeTypeToPlace = eCubeType::Air;
-	if (!m_inventory.empty())
-	{
-		cubeTypeToPlace = m_inventory.front().getCubeType();
-		m_inventory.front().remove();
-		if (m_inventory.front().isEmpty())
-		{
-			m_inventory.erase(m_inventory.begin());
-		}
-	}
-	else
+	if (isInventoryEmpty())
 	{
 		return;
 	}
 
-	assert(cubeTypeToPlace != eCubeType::Air);
-	//Place Block
 	std::lock_guard<std::mutex> playerLock(playerMutex);
 	
 	bool blockPlaced = false;
@@ -171,7 +159,17 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 
 					if (availablePostion)
 					{
-						chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToPlace);
+						eCubeType cubeTypeToPlace = eCubeType::Air;
+						assert(!isInventoryEmpty());
+						cubeTypeToPlace = m_inventory.front().getCubeType();
+						if (chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToPlace))
+						{
+							m_inventory.front().remove();
+							if (m_inventory.front().isEmpty())
+							{
+								m_inventory.erase(m_inventory.begin());
+							}
+						}
 					}
 					
 					blockPlaced = true;
@@ -188,8 +186,16 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 		for (float i = PLACE_BLOCK_RANGE; i >= 0; i -= PLACE_BLOCK_INCREMENT)
 		{
 			glm::vec3 rayPosition = m_camera.front * i + m_position;
+			eCubeType cubeTypeToPlace = eCubeType::Air;
+			assert(!isInventoryEmpty());
+			cubeTypeToPlace = m_inventory.front().getCubeType();
 			if (chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToPlace))
 			{
+				m_inventory.front().remove();
+				if (m_inventory.front().isEmpty())
+				{
+					m_inventory.erase(m_inventory.begin());
+				}
 				break;
 			}
 		}
