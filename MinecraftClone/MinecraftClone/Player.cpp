@@ -31,6 +31,13 @@ namespace
 
 	constexpr float COLLISION_OFFSET = 0.35f;
 	constexpr int BODY_HEIGHT = 2;
+
+	const CubeTypeComparison NON_COLLECTABLE_CUBE_TYPES =
+	{
+		{ eCubeType::Shrub,
+		eCubeType::TallGrass,
+		eCubeType::Leaves}
+	};
 }
 
 //Camera
@@ -212,8 +219,11 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMu
 		if (chunkManager.destroyCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, destroyedCubeType))
 		{
 			assert(destroyedCubeType != eCubeType::Air);
-			pickUps.emplace_back(destroyedCubeType, 
-				glm::ivec3(std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) ));
+			if (!NON_COLLECTABLE_CUBE_TYPES.isMatch(destroyedCubeType))
+			{
+				pickUps.emplace_back(destroyedCubeType,
+					glm::ivec3(std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z)));
+			}
 
 			break;
 		}
