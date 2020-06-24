@@ -134,6 +134,7 @@
     <ClCompile Include="CollisionHandler.cpp" />
     <ClCompile Include="GeneratedChunkMeshQueue.cpp" />
     <ClCompile Include="GeneratedChunkQueue.cpp" />
+    <ClCompile Include="Gui.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="NeighbouringChunks.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="CollisionHandler.h" />
     <ClInclude Include="GeneratedChunkMeshQueue.h" />
     <ClInclude Include="GeneratedChunkQueue.h" />
+    <ClInclude Include="Gui.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="NeighbouringChunks.h" />
     <ClInclude Include="Notes.h" />
@@ -209,6 +211,8 @@
     <None Include="OpenGLShaders\ChunkVertexShader.glsl" />
     <None Include="OpenGLShaders\SkyboxFragmentShader.glsl" />
     <None Include="OpenGLShaders\SkyboxVertexShader.glsl" />
+    <None Include="OpenGLShaders\UIFragmentShader.glsl" />
+    <None Include="OpenGLShaders\UIVertexShader.glsl" />
     <None Include="Shaders\ChunkFragmentShader.glsl" />
     <None Include="Shaders\ChunkVertexShader.glsl" />
     <None Include="Shaders\SkyboxFragmentShader.glsl" />

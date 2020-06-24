@@ -75,6 +75,9 @@
     <ClCompile Include="CollisionHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Gui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glad.h">
@@ -233,6 +236,9 @@
     <ClInclude Include="CollisionHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Gui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\ChunkFragmentShader.glsl" />
@@ -243,5 +249,7 @@
     <None Include="OpenGLShaders\ChunkVertexShader.glsl" />
     <None Include="OpenGLShaders\SkyboxFragmentShader.glsl" />
     <None Include="OpenGLShaders\SkyboxVertexShader.glsl" />
+    <None Include="OpenGLShaders\UIVertexShader.glsl" />
+    <None Include="OpenGLShaders\UIFragmentShader.glsl" />
   </ItemGroup>
 </Project>
