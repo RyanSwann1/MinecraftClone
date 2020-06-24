@@ -6,6 +6,7 @@
 #include "BoundingBox.h"
 #include "Item.h"
 #include "CollisionHandler.h"
+#include "Gui.h"
 #include <memory>
 
 namespace 
@@ -95,6 +96,17 @@ const glm::vec3& Player::getPosition() const
 const Camera& Player::getCamera() const
 {
 	return m_camera;
+}
+
+bool Player::isInventoryEmpty() const
+{
+	return m_inventory.empty();
+}
+
+eCubeType Player::getFirstItemInInventory() const
+{
+	assert(!isInventoryEmpty());
+	return m_inventory.front().getCubeType();
 }
 
 void Player::addToInventory(eCubeType cubeTypeToAdd)

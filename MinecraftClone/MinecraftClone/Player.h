@@ -35,6 +35,7 @@ enum class ePlayerState
 	OnGround,
 };
 
+class Gui;
 class PickUp;
 class ChunkManager;
 class Player : private NonCopyable, private NonMovable
@@ -45,7 +46,9 @@ public:
 	const glm::vec3 getMiddlePosition() const;
 	const glm::vec3& getPosition() const;
 	const Camera& getCamera() const;
-	
+	bool isInventoryEmpty() const;
+	eCubeType getFirstItemInInventory() const;
+
 	void addToInventory(eCubeType cubeType);
 	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
 	void handleInputEvents(std::vector<PickUp>& pickUps, const sf::Event& currentSFMLEvent,

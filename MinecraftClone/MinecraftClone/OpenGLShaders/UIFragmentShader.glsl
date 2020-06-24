@@ -7,5 +7,9 @@ in vec3 vTextCoord;
 
 void main()
 {
-	color =  texture(uTexture, vTextCoord);
+	color = texture(uTexture, vTextCoord);
+	if (color.a == 0)
+	{
+		discard;
+	}
 };

@@ -5,6 +5,7 @@
 #include "glm/glm.hpp"
 
 enum class eTextureLayer;
+enum class eCubeType;
 class ShaderHandler;
 class Gui : private NonCopyable, private NonMovable
 {
@@ -12,7 +13,7 @@ public:
 	Gui();
 	~Gui();
 
-	void drawSprite(eTextureLayer textureLayer, ShaderHandler& shaderHandler, glm::ivec2 windowSize) const;
+	void drawSprite(eCubeType cubeType, ShaderHandler& shaderHandler, glm::vec2 windowSize) const;
 
 private:
 	unsigned int m_ID;

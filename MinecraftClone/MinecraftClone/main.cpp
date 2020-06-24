@@ -235,9 +235,12 @@ int main()
 			skybox->render();
 			glDepthFunc(GL_LESS);
 
-			//Draw GUI
-			assert(shaderHandler);
-			gui.drawSprite(eTextureLayer::Dirt, *shaderHandler, windowSize);
+			////Draw GUI
+			if (!player.isInventoryEmpty())
+			{
+				assert(shaderHandler);
+				gui.drawSprite(player.getFirstItemInInventory(), *shaderHandler, windowSize);
+			}
 		}
 
 		window.display();
