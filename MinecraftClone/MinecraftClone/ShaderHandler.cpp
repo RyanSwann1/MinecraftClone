@@ -103,36 +103,27 @@ ShaderHandler::ShaderHandler()
 std::unique_ptr<ShaderHandler> ShaderHandler::create()
 {
 	std::unique_ptr<ShaderHandler> shaderHandler = std::unique_ptr<ShaderHandler>(new ShaderHandler());
+	bool shaderLoaded = false;
 	for (const auto& shader : shaderHandler->m_shader)
 	{
 		switch (shader.getType())
 		{
 		case eShaderType::Chunk :
-		{
-			bool shaderLoaded = createShaderProgram(shader.getID(), "ChunkVertexShader.glsl", "ChunkFragmentShader.glsl");
-			assert(shaderLoaded);
-			if (!shaderLoaded)
-			{
-				return std::unique_ptr<ShaderHandler>();
-			}
-		}
+			shaderLoaded = createShaderProgram(shader.getID(), "ChunkVertexShader.glsl", "ChunkFragmentShader.glsl");
 			break;
 		case eShaderType::Skybox :
-		{
-			bool shaderLoaded = createShaderProgram(shader.getID(), "SkyboxVertexShader.glsl", "SkyboxFragmentShader.glsl");
-			assert(shaderLoaded);
-			if (!shaderLoaded)
-			{
-				return std::unique_ptr<ShaderHandler>();
-			}
-		}
+			shaderLoaded = createShaderProgram(shader.getID(), "SkyboxVertexShader.glsl", "SkyboxFragmentShader.glsl");
+			break;
+		case eShaderType::UI :
+			shaderLoaded = createShaderProgram(shader.getID(), "UIVertexShader.glsl", "UIFragmentShader.glsl");
 			break;
 		default:
 			assert(false);
 		}
 	}
 
-	return shaderHandler;
+	assert(shaderLoaded);
+	return (shaderLoaded ? std::move(shaderHandler) : std::unique_ptr<ShaderHandler>());
 }
 
 void ShaderHandler::setUniformMat4f(eShaderType shaderType, const std::string& uniformName, const glm::mat4& matrix)

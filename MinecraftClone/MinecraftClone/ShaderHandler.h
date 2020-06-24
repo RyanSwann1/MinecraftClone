@@ -13,7 +13,8 @@ enum class eShaderType
 {
 	Chunk,
 	Skybox,
-	Max = Skybox
+	UI,
+	Max = UI
 };
 
 class ShaderHandler : private NonCopyable, private NonMovable
@@ -49,6 +50,7 @@ private:
 	std::array<Shader, static_cast<int>(eShaderType::Max) + 1> m_shader =
 	{
 		eShaderType::Chunk,
-		eShaderType::Skybox
+		eShaderType::Skybox,
+		eShaderType::UI
 	};
 };
