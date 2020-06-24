@@ -114,8 +114,8 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create()
 		case eShaderType::Skybox :
 			shaderLoaded = createShaderProgram(shader.getID(), "SkyboxVertexShader.glsl", "SkyboxFragmentShader.glsl");
 			break;
-		case eShaderType::UI :
-			shaderLoaded = createShaderProgram(shader.getID(), "UIVertexShader.glsl", "UIFragmentShader.glsl");
+		case eShaderType::UIItem :
+			shaderLoaded = createShaderProgram(shader.getID(), "UIItemVertexShader.glsl", "UIItemFragmentShader.glsl");
 			break;
 		default:
 			assert(false);

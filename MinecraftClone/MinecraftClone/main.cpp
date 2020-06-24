@@ -108,8 +108,8 @@ int main()
 	shaderHandler->setUniform1i(eShaderType::Skybox, "uSkyboxTexture", 0);
 	shaderHandler->switchToShader(eShaderType::Chunk);
 	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", 0);
-	shaderHandler->switchToShader(eShaderType::UI);
-	shaderHandler->setUniform1i(eShaderType::UI, "uTexture", 0);
+	shaderHandler->switchToShader(eShaderType::UIItem);
+	shaderHandler->setUniform1i(eShaderType::UIItem, "uTexture", 0);
 
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
 	Gui gui;

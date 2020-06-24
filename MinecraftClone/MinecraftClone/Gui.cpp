@@ -18,14 +18,15 @@ namespace
 		glm::ivec2(0, 0)
 	};
 
-	std::array<glm::ivec3, 6> getTextCoords(eTextureLayer textureLayer) 
+
+	std::array<glm::vec3, 6> getTextCoords(eTextureLayer textureLayer) 
 	{
-		return { glm::ivec3(0, 0, static_cast<int>(textureLayer)),
-			glm::ivec3(1, 0, static_cast<int>(textureLayer)),
-			glm::ivec3(1, 1, static_cast<int>(textureLayer)),
-			glm::ivec3(1, 1, static_cast<int>(textureLayer)),
-			glm::ivec3(0, 1, static_cast<int>(textureLayer)),
-			glm::ivec3(0, 0, static_cast<int>(textureLayer)) };
+		return { glm::vec3(0, 0, static_cast<int>(textureLayer)),
+			glm::vec3(1, 0, static_cast<int>(textureLayer)),
+			glm::vec3(1, 1, static_cast<int>(textureLayer)),
+			glm::vec3(1, 1, static_cast<int>(textureLayer)),
+			glm::vec3(0, 1, static_cast<int>(textureLayer)),
+			glm::vec3(0, 0, static_cast<int>(textureLayer)) };
 	};
 }
 
@@ -68,10 +69,10 @@ Gui::~Gui()
 
 void Gui::drawSprite(eCubeType cubeType, ShaderHandler& shaderHandler, glm::vec2 windowSize) const
 {
-	shaderHandler.switchToShader(eShaderType::UI);
+	shaderHandler.switchToShader(eShaderType::UIItem);
 
-	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(windowSize.x), static_cast<float>(windowSize.y), 0.0f, -1.0f, 1.0f);
-	shaderHandler.setUniformMat4f(eShaderType::UI, "uProjection", projection);
+	glm::mat4 projection = glm::ortho(0.0f, windowSize.x, windowSize.y, 0.0f, -1.0f, 1.0f);
+	shaderHandler.setUniformMat4f(eShaderType::UIItem, "uProjection", projection);
 	
 	eTextureLayer textureLayer = eTextureLayer::Error;
 	switch (cubeType)
@@ -109,18 +110,18 @@ void Gui::drawSprite(eCubeType cubeType, ShaderHandler& shaderHandler, glm::vec2
 		assert(false);
 	}
 
-	std::array<glm::ivec3, 6> textCoords = getTextCoords(textureLayer);
+	std::array<glm::vec3, 6> textCoords = getTextCoords(textureLayer);
 
 	glBindVertexArray(m_ID);
 	glBindBuffer(GL_ARRAY_BUFFER, m_textCoordsVBO);
-	glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(glm::ivec3), textCoords.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(glm::vec3), textCoords.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_INT, GL_FALSE, sizeof(glm::ivec3), (const void*)(0));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (const void*)(0));
 
 	glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(glm::vec2(50.0f, 50.0f), 0.0f));
 	model = glm::scale(model, glm::vec3(50.0f, 50.0f, 1.0f));
-	shaderHandler.setUniformMat4f(eShaderType::UI, "uModel", model);
+	shaderHandler.setUniformMat4f(eShaderType::UIItem, "uModel", model);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);

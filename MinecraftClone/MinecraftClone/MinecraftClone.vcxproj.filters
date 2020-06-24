@@ -249,7 +249,7 @@
     <None Include="OpenGLShaders\ChunkVertexShader.glsl" />
     <None Include="OpenGLShaders\SkyboxFragmentShader.glsl" />
     <None Include="OpenGLShaders\SkyboxVertexShader.glsl" />
-    <None Include="OpenGLShaders\UIVertexShader.glsl" />
-    <None Include="OpenGLShaders\UIFragmentShader.glsl" />
+    <None Include="OpenGLShaders\UIItemVertexShader.glsl" />
+    <None Include="OpenGLShaders\UIItemFragmentShader.glsl" />
   </ItemGroup>
 </Project>
