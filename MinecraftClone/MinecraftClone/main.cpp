@@ -10,6 +10,7 @@
 #include "glm/gtc/noise.hpp"
 #include "ShaderHandler.h"
 #include "Frustum.h"
+#include "Gui.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -54,8 +55,6 @@
 //https://community.khronos.org/t/how-do-you-implement-texture-arrays/75315
 
 //http://ogldev.atspace.co.uk/index.html
-
-
 
 //Good OpenGL Tutorials
 //https://ahbejarano.gitbook.io/lwjglgamedev/chapter12
@@ -107,8 +106,10 @@ int main()
 
 	shaderHandler->setUniform1i(eShaderType::Skybox, "uSkyboxTexture", 0);
 	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", 0);
+	shaderHandler->setUniform1i(eShaderType::UI, "uTexture", 0);
 
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
+	Gui gui;
 	std::vector<PickUp> pickUps;
 	Frustum frustum;
 	Player player;
@@ -206,15 +207,20 @@ int main()
 			std::lock_guard<std::mutex> renderingLock(renderingMutex);
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK);
+			
 			chunkManager->renderOpaque(frustum);
+			
 			for (auto& pickUp : pickUps)
 			{
 				pickUp.render(frustum);
 			}
+
 			glDisable(GL_CULL_FACE);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			
 			chunkManager->renderTransparent(frustum);
+			
 			glDisable(GL_BLEND);
 
 			//Draw Skybox
@@ -225,6 +231,10 @@ int main()
 
 			skybox->render();
 			glDepthFunc(GL_LESS);
+
+			//Draw UI
+			shaderHandler->switchToShader(eShaderType::UI);
+			gui.render();
 		}
 
 		window.display();
