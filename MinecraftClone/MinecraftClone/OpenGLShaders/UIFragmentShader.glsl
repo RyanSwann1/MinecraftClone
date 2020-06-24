@@ -7,5 +7,5 @@ in vec3 vTextCoord;
 
 void main()
 {
-	color = texture(uTexture, vTextCoord);
+	color =  texture(uTexture, vTextCoord);
 };

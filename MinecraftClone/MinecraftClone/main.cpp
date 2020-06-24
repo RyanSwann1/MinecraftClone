@@ -69,7 +69,7 @@ int main()
 	settings.majorVersion = 3;
 	settings.minorVersion = 3;
 	settings.attributeFlags = sf::ContextSettings::Core;
-	sf::Vector2i windowSize(1980, 1080);
+	glm::ivec2 windowSize(1980, 1080);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft Clone", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(60);
 	window.setMouseCursorVisible(false);
@@ -104,8 +104,11 @@ int main()
 		return -1;
 	}
 
+	shaderHandler->switchToShader(eShaderType::Skybox);
 	shaderHandler->setUniform1i(eShaderType::Skybox, "uSkyboxTexture", 0);
+	shaderHandler->switchToShader(eShaderType::Chunk);
 	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", 0);
+	shaderHandler->switchToShader(eShaderType::UI);
 	shaderHandler->setUniform1i(eShaderType::UI, "uTexture", 0);
 
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
@@ -232,9 +235,9 @@ int main()
 			skybox->render();
 			glDepthFunc(GL_LESS);
 
-			//Draw UI
-			shaderHandler->switchToShader(eShaderType::UI);
-			gui.render();
+			//Draw GUI
+			assert(shaderHandler);
+			gui.drawSprite(eTextureLayer::Dirt, *shaderHandler, windowSize);
 		}
 
 		window.display();
