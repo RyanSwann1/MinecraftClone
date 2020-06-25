@@ -10,7 +10,7 @@ namespace
 {
 	constexpr glm::ivec2 TEXTURE_SIZE = { 16, 16 };
 
-	const std::array<std::string, 14> TEXTURE_FILENAMES =
+	const std::array<std::string, 14> TERRAIN_TEXTURE_FILENAMES =
 	{
 		"grass.png",
 		"grass_side.png",
@@ -27,6 +27,28 @@ namespace
 		"common_tall_grass.png",
 		"error.png"
 	};
+
+	bool addTexture(const std::string& textureName)
+	{
+		sf::Image image;
+		bool textureLoaded = image.loadFromFile(Globals::TEXTURE_DIRECTORY + textureName);
+		assert(textureLoaded);
+		if (!textureLoaded)
+		{
+			std::cout << textureName << " not loaded.\n";
+			return false;
+		}
+		image.flipVertically();
+		
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.getSize().x, image.getSize().y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		return true;
+	}
 
 	bool addTexture(const std::string& textureName, int textureCountIndex)
 	{
@@ -51,6 +73,49 @@ namespace
 	}
 }
 
+//Texture
+Texture::Texture(unsigned int ID)
+	: m_ID(ID)
+{
+	bind();
+}
+
+Texture::~Texture()
+{
+	assert(m_ID != Globals::INVALID_OPENGL_ID);
+	glDeleteTextures(1, &m_ID);
+}
+
+void Texture::bind() const
+{
+	glActiveTexture(GL_TEXTURE0 + 1);
+	glBindTexture(GL_TEXTURE_2D, m_ID);
+}
+
+void Texture::unbind() const
+{
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+std::unique_ptr<Texture> Texture::create(const std::string& textureName)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	std::cout << textureID << "\n";
+
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	if (!addTexture(textureName))
+	{
+		return std::unique_ptr<Texture>();
+	}
+	else
+	{
+		return std::unique_ptr<Texture>(new Texture(textureID));
+	}
+}
+
+//Texture Array
 TextureArray::TextureArray(unsigned int ID)
 	: m_slot(0),
 	m_ID(ID)
@@ -72,12 +137,12 @@ std::unique_ptr<TextureArray> TextureArray::create()
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, TEXTURE_SIZE.x, TEXTURE_SIZE.y, static_cast<int>(eTextureLayer::Max) + 1, 0,
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, TEXTURE_SIZE.x, TEXTURE_SIZE.y, static_cast<int>(eTerrainTextureLayer::Max) + 1, 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
-	for (int i = 0; i < TEXTURE_FILENAMES.size(); ++i)
+	for (int i = 0; i < TERRAIN_TEXTURE_FILENAMES.size(); ++i)
 	{
-		bool textureAdded = addTexture(TEXTURE_FILENAMES[i], i);
+		bool textureAdded = addTexture(TERRAIN_TEXTURE_FILENAMES[i], i);
 		assert(textureAdded);
 		if (!textureAdded)
 		{
@@ -102,6 +167,7 @@ unsigned int TextureArray::getCurrentSlot() const
 
 void TextureArray::bind() const
 {
+	glActiveTexture(GL_TEXTURE0 + m_ID);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, m_ID);
 }
 
