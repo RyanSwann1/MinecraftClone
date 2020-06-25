@@ -35,6 +35,24 @@ enum class ePlayerState
 	OnGround,
 };
 
+class Inventory : private NonCopyable, private NonMovable
+{
+public:
+	Inventory();
+	
+	eCubeType getFirstItem() const;
+	bool isEmpty() const;
+	bool isSelectedItemEmpty() const;
+
+	void add(eCubeType cubeTypeToAdd);
+	void handleInputEvents(const sf::Event& currentSFMLEvent);
+	void removeFirstItem();
+
+private:
+	std::vector<Item> m_items;
+	eHotBarSelection m_currentSelectedItem;
+};
+
 class Gui;
 class PickUp;
 class ChunkManager;
@@ -42,12 +60,11 @@ class Player : private NonCopyable, private NonMovable
 {
 public:
 	Player();
-	
+
+	const Inventory& getInventory() const;
 	const glm::vec3 getMiddlePosition() const;
 	const glm::vec3& getPosition() const;
 	const Camera& getCamera() const;
-	bool isInventoryEmpty() const;
-	eCubeType getFirstItemInInventory() const;
 
 	void addToInventory(eCubeType cubeType);
 	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
@@ -62,7 +79,7 @@ private:
 	glm::vec3 m_velocity;
 	bool m_autoJump;
 	sf::Clock m_jumpTimer;
-	std::vector<Item> m_inventory;
+	Inventory m_inventory;
 
 	void move(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager);
 	void handleCollisions(const ChunkManager& chunkManager);

@@ -112,7 +112,6 @@ int main()
 		return -1;
 	}
 
-
 	textureArray->bind();
 
 	shaderHandler->switchToShader(eShaderType::Skybox);
@@ -249,10 +248,10 @@ int main()
 			glDepthFunc(GL_LESS);
 
 			//Draw GUI
-			if (!player.isInventoryEmpty())
+			if (!player.getInventory().isEmpty())
 			{
 				assert(shaderHandler);
-				gui.renderSprite(player.getFirstItemInInventory(), *shaderHandler, windowSize);
+				gui.renderSprite(player.getInventory().getFirstItem(), *shaderHandler, windowSize);
 			}
 			widjetsTexture->bind();
 			gui.renderToolbar(*shaderHandler, windowSize);

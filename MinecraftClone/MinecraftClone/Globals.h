@@ -6,6 +6,19 @@
 #include <array>
 #include <random>
 
+enum class eHotBarSelection
+{
+	One = 0,
+	Two,
+	Three, 
+	Four, 
+	Five, 
+	Six, 
+	Seven, 
+	Eight,
+	Max = Eight
+};
+
 enum class eTerrainTextureLayer
 {
 	Grass = 0,

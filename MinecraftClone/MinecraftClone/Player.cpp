@@ -77,6 +77,82 @@ void Camera::move(const sf::Window& window)
 	front = glm::normalize(v);
 }
 
+//Inventory
+Inventory::Inventory()
+	: m_items(), 
+	m_currentSelectedItem(eHotBarSelection::One)
+{}
+
+eCubeType Inventory::getFirstItem() const
+{
+	assert(!isEmpty());
+	return m_items.front().getCubeType();
+}
+
+bool Inventory::isEmpty() const
+{
+	return m_items.empty();
+}
+
+bool Inventory::isSelectedItemEmpty() const
+{
+	return false;
+}
+
+void Inventory::add(eCubeType cubeTypeToAdd)
+{
+	auto iter = std::find_if(m_items.begin(), m_items.end(), [cubeTypeToAdd](const auto& item)
+	{
+		return cubeTypeToAdd == item.getCubeType();
+	});
+
+	if (iter != m_items.end())
+	{
+		iter->add();
+	}
+	else
+	{
+		m_items.emplace_back(cubeTypeToAdd);
+	}
+}
+
+void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
+{
+	assert(currentSFMLEvent.type == sf::Event::MouseWheelScrolled);
+	int currentSelectedItem = static_cast<int>(m_currentSelectedItem);
+
+	if (currentSFMLEvent.mouseWheel.delta > 0)
+	{
+		--currentSelectedItem;
+	}
+	else if(currentSFMLEvent.mouseWheel.delta < 0)
+	{
+		++currentSelectedItem;
+	}
+
+	if (currentSelectedItem < static_cast<int>(eHotBarSelection::One))
+	{
+		m_currentSelectedItem = eHotBarSelection::Eight;
+	}
+	else if (currentSelectedItem > static_cast<int>(eHotBarSelection::Max))
+	{
+		m_currentSelectedItem = eHotBarSelection::One;
+	}
+
+	std::cout << static_cast<int>(m_currentSelectedItem);
+}
+
+void Inventory::removeFirstItem()
+{
+	assert(!isEmpty());
+
+	m_items.front().remove();
+	if (m_items.front().isEmpty())
+	{
+		m_items.erase(m_items.begin());
+	}
+}
+
 //Player
 Player::Player()
 	: m_camera(),
@@ -88,6 +164,11 @@ Player::Player()
 	m_inventory()
 {
 	m_jumpTimer.restart();
+}
+
+const Inventory& Player::getInventory() const
+{
+	return m_inventory;
 }
 
 const glm::vec3 Player::getMiddlePosition() const
@@ -105,37 +186,15 @@ const Camera& Player::getCamera() const
 	return m_camera;
 }
 
-bool Player::isInventoryEmpty() const
-{
-	return m_inventory.empty();
-}
-
-eCubeType Player::getFirstItemInInventory() const
-{
-	assert(!isInventoryEmpty());
-	return m_inventory.front().getCubeType();
-}
-
 void Player::addToInventory(eCubeType cubeTypeToAdd)
 {
-	auto iter = std::find_if(m_inventory.begin(), m_inventory.end(), [cubeTypeToAdd](const auto& item)
-	{
-		return cubeTypeToAdd == item.getCubeType();
-	});
+	m_inventory.add(cubeTypeToAdd);
 
-	if (iter != m_inventory.end())
-	{
-		iter->add();
-	}
-	else
-	{
-		m_inventory.emplace_back(cubeTypeToAdd);
-	}
 }
 
 void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 {
-	if (isInventoryEmpty())
+	if (m_inventory.isEmpty())
 	{
 		return;
 	}
@@ -166,16 +225,10 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 
 					if (availablePostion)
 					{
-						eCubeType cubeTypeToPlace = eCubeType::Air;
-						assert(!isInventoryEmpty());
-						cubeTypeToPlace = m_inventory.front().getCubeType();
+						eCubeType cubeTypeToPlace = m_inventory.getFirstItem();
 						if (chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToPlace))
 						{
-							m_inventory.front().remove();
-							if (m_inventory.front().isEmpty())
-							{
-								m_inventory.erase(m_inventory.begin());
-							}
+							m_inventory.removeFirstItem();
 						}
 					}
 					
@@ -193,16 +246,10 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 		for (float i = PLACE_BLOCK_RANGE; i >= 0; i -= PLACE_BLOCK_INCREMENT)
 		{
 			glm::vec3 rayPosition = m_camera.front * i + m_position;
-			eCubeType cubeTypeToPlace = eCubeType::Air;
-			assert(!isInventoryEmpty());
-			cubeTypeToPlace = m_inventory.front().getCubeType();
+			eCubeType cubeTypeToPlace = m_inventory.getFirstItem();
 			if (chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToPlace))
 			{
-				m_inventory.front().remove();
-				if (m_inventory.front().isEmpty())
-				{
-					m_inventory.erase(m_inventory.begin());
-				}
+				m_inventory.removeFirstItem();
 				break;
 			}
 		}
@@ -318,9 +365,13 @@ void Player::handleInputEvents(std::vector<PickUp>& pickUps, const sf::Event& cu
 			placeBlock(chunkManager, playerMutex);
 		}
 	}
-	if (currentSFMLEvent.MouseMoved)
+	if (currentSFMLEvent.type == currentSFMLEvent.MouseMoved)
 	{
 		moveCamera(window);
+	}
+	if (currentSFMLEvent.type == currentSFMLEvent.MouseWheelScrolled)
+	{
+		m_inventory.handleInputEvents(currentSFMLEvent);
 	}
 }
 
@@ -533,7 +584,7 @@ void Player::toggleAutoJump()
 
 void Player::discardItem(std::vector<PickUp>& pickUps)
 {
-	if (m_inventory.empty())
+	if (m_inventory.isEmpty())
 	{
 		return;
 	}
@@ -548,13 +599,8 @@ void Player::discardItem(std::vector<PickUp>& pickUps)
 		initialVelocity *= glm::vec3(10.0f, 6.0f, 10.0);
 	}
 
-	assert(!m_inventory.front().isEmpty());
-	eCubeType pickUpType = m_inventory.front().getCubeType();
-	m_inventory.front().remove();
-	if (m_inventory.front().isEmpty())
-	{
-		m_inventory.erase(m_inventory.begin());
-	}
+	eCubeType pickUpType = m_inventory.getFirstItem();
+	m_inventory.removeFirstItem();
 
 	pickUps.emplace_back(pickUpType, m_position, initialVelocity);
 }
