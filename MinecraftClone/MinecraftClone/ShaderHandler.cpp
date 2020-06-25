@@ -117,6 +117,9 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create()
 		case eShaderType::UIItem :
 			shaderLoaded = createShaderProgram(shader.getID(), "UIItemVertexShader.glsl", "UIItemFragmentShader.glsl");
 			break;
+		case eShaderType::UIToolbar :
+			shaderLoaded = createShaderProgram(shader.getID(), "UIToolbarVertexShader.glsl", "UIToolbarFragmentShader.glsl");
+			break;
 		default:
 			assert(false);
 		}
@@ -145,41 +148,41 @@ void ShaderHandler::switchToShader(eShaderType shaderType)
 	glUseProgram(m_shader[static_cast<int>(shaderType)].getID());
 }
 ShaderHandler::Shader::Shader(eShaderType shaderType)
-	: m_ID(glCreateProgram()),
+	: m_itemID(glCreateProgram()),
 	m_type(shaderType),
 	m_uniformLocations()
 {}
 
 ShaderHandler::Shader::Shader(Shader&& orig) noexcept
-	: m_ID(orig.m_ID),
+	: m_itemID(orig.m_itemID),
 	m_type(orig.m_type),
 	m_uniformLocations(std::move(orig.m_uniformLocations))
 {
-	orig.m_ID = Globals::INVALID_OPENGL_ID;
+	orig.m_itemID = Globals::INVALID_OPENGL_ID;
 }
 
 ShaderHandler::Shader& ShaderHandler::Shader::operator=(Shader&& orig) noexcept
 {
-	m_ID = orig.m_ID;
+	m_itemID = orig.m_itemID;
 	m_type = orig.m_type;
 	m_uniformLocations = std::move(orig.m_uniformLocations);
 
-	orig.m_ID = Globals::INVALID_OPENGL_ID;
+	orig.m_itemID = Globals::INVALID_OPENGL_ID;
 
 	return *this;
 }
 
 ShaderHandler::Shader::~Shader()
 {
-	if (m_ID != Globals::INVALID_OPENGL_ID)
+	if (m_itemID != Globals::INVALID_OPENGL_ID)
 	{
-		glDeleteProgram(m_ID);
+		glDeleteProgram(m_itemID);
 	}
 }
 
 unsigned int ShaderHandler::Shader::getID() const
 {
-	return m_ID;
+	return m_itemID;
 }
 
 eShaderType ShaderHandler::Shader::getType() const
@@ -195,7 +198,7 @@ int ShaderHandler::Shader::getUniformLocation(const std::string& uniformName)
 	}
 	else
 	{
-		int location = glGetUniformLocation(m_ID, uniformName.c_str());
+		int location = glGetUniformLocation(m_itemID, uniformName.c_str());
 		if (location == -1)
 		{
 			std::cout << "Failed to find uniform: " << uniformName << "\n";

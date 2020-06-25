@@ -14,7 +14,8 @@ enum class eShaderType
 	Chunk,
 	Skybox,
 	UIItem,
-	Max = UIItem
+	UIToolbar,
+	Max = UIToolbar
 };
 
 class ShaderHandler : private NonCopyable, private NonMovable
@@ -32,7 +33,7 @@ class ShaderHandler : private NonCopyable, private NonMovable
 		int getUniformLocation(const std::string& uniformName);
 
 	private:
-		unsigned int m_ID;
+		unsigned int m_itemID;
 		eShaderType m_type;
 		std::unordered_map<std::string, int> m_uniformLocations;
 	};
@@ -51,6 +52,7 @@ private:
 	{
 		eShaderType::Chunk,
 		eShaderType::Skybox,
-		eShaderType::UIItem
+		eShaderType::UIItem,
+		eShaderType::UIToolbar
 	};
 };

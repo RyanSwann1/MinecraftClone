@@ -40,17 +40,17 @@ namespace
 
 	void getTextCoords(std::vector<glm::vec3>& textCoords, eCubeSide cubeSide, eCubeType cubeType)
 	{
-		eTextureLayer textureLayer;
+		eTerrainTextureLayer textureLayer;
 		switch (cubeType)
 		{
 		case eCubeType::Dirt:
-			textureLayer = eTextureLayer::Dirt;
+			textureLayer = eTerrainTextureLayer::Dirt;
 			break;
 		case eCubeType::Stone:
-			textureLayer = eTextureLayer::Stone;
+			textureLayer = eTerrainTextureLayer::Stone;
 			break;
 		case eCubeType::Sand:
-			textureLayer = eTextureLayer::Sand;
+			textureLayer = eTerrainTextureLayer::Sand;
 			break;
 		case eCubeType::Grass:
 			switch (cubeSide)
@@ -59,18 +59,18 @@ namespace
 			case eCubeSide::Front:
 			case eCubeSide::Left:
 			case eCubeSide::Right:
-				textureLayer = eTextureLayer::GrassSide;
+				textureLayer = eTerrainTextureLayer::GrassSide;
 				break;
 			case eCubeSide::Top:
-				textureLayer = eTextureLayer::Grass;
+				textureLayer = eTerrainTextureLayer::Grass;
 				break;
 			case eCubeSide::Bottom:
-				textureLayer = eTextureLayer::Dirt;
+				textureLayer = eTerrainTextureLayer::Dirt;
 				break;
 			}
 			break;
 		case eCubeType::Log:
-			textureLayer = eTextureLayer::Log;
+			textureLayer = eTerrainTextureLayer::Log;
 			break;
 		case eCubeType::LogTop:
 			switch (cubeSide)
@@ -79,18 +79,18 @@ namespace
 			case eCubeSide::Front:
 			case eCubeSide::Left:
 			case eCubeSide::Right:
-				textureLayer = eTextureLayer::Log;
+				textureLayer = eTerrainTextureLayer::Log;
 				break;
 			case eCubeSide::Top:
-				textureLayer = eTextureLayer::LogTop;
+				textureLayer = eTerrainTextureLayer::LogTop;
 				break;
 			}
 			break;
 		case eCubeType::Leaves:
-			textureLayer = eTextureLayer::Leaves;
+			textureLayer = eTerrainTextureLayer::Leaves;
 			break;
 		case eCubeType::Cactus:
-			textureLayer = eTextureLayer::Cactus;
+			textureLayer = eTerrainTextureLayer::Cactus;
 			break;
 		case eCubeType::CactusTop:
 			switch (cubeSide)
@@ -99,28 +99,28 @@ namespace
 			case eCubeSide::Front:
 			case eCubeSide::Left:
 			case eCubeSide::Right:
-				textureLayer = eTextureLayer::Cactus;
+				textureLayer = eTerrainTextureLayer::Cactus;
 				break;
 			case eCubeSide::Top:
-				textureLayer = eTextureLayer::CactusTop;
+				textureLayer = eTerrainTextureLayer::CactusTop;
 				break;
 			}
 			break;
 		case eCubeType::Water:
-			textureLayer = eTextureLayer::Water;
+			textureLayer = eTerrainTextureLayer::Water;
 			break;
 		case eCubeType::Shrub:
-			textureLayer = eTextureLayer::Shrub;
+			textureLayer = eTerrainTextureLayer::Shrub;
 			break;
 		case eCubeType::TallGrass:
-			textureLayer = eTextureLayer::TallGrass;
+			textureLayer = eTerrainTextureLayer::TallGrass;
 			break;
 
 		default:
-			textureLayer = eTextureLayer::Error;
+			textureLayer = eTerrainTextureLayer::Error;
 		}
 
-		assert(textureLayer != eTextureLayer::Error);
+		assert(textureLayer != eTerrainTextureLayer::Error);
 		for (const auto& i : TEXT_COORDS)
 		{
 			textCoords.emplace_back(i.x, i.y, static_cast<int>(textureLayer));

@@ -6,7 +6,7 @@
 #include <array>
 #include <random>
 
-enum class eTextureLayer
+enum class eTerrainTextureLayer
 {
 	Grass = 0,
 	GrassSide,
@@ -23,6 +23,12 @@ enum class eTextureLayer
 	TallGrass,
 	Error,
 	Max = Error
+};
+
+enum class eGuiTextureLayer
+{
+	InventoryBar,
+	Selected
 };
 
 enum class eCubeSide

@@ -104,13 +104,26 @@ int main()
 		return -1;
 	}
 
+	std::unique_ptr<Texture> widjetsTexture = Texture::create("widgets.png");
+	assert(widjetsTexture);
+	if (!widjetsTexture)
+	{
+		std::cout << "Couldn't load widjets texture\n";
+		return -1;
+	}
+
+
+	textureArray->bind();
+
 	shaderHandler->switchToShader(eShaderType::Skybox);
-	shaderHandler->setUniform1i(eShaderType::Skybox, "uSkyboxTexture", 0);
+	shaderHandler->setUniform1i(eShaderType::Skybox, "uSkyboxTexture", 1);
 	shaderHandler->switchToShader(eShaderType::Chunk);
 	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", 0);
 	shaderHandler->switchToShader(eShaderType::UIItem);
 	shaderHandler->setUniform1i(eShaderType::UIItem, "uTexture", 0);
-
+	shaderHandler->switchToShader(eShaderType::UIToolbar);
+	shaderHandler->setUniform1i(eShaderType::UIToolbar, "uTexture", 1);
+	
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
 	Gui gui;
 	std::vector<PickUp> pickUps;
@@ -235,12 +248,15 @@ int main()
 			skybox->render();
 			glDepthFunc(GL_LESS);
 
-			////Draw GUI
+			//Draw GUI
 			if (!player.isInventoryEmpty())
 			{
 				assert(shaderHandler);
-				gui.drawSprite(player.getFirstItemInInventory(), *shaderHandler, windowSize);
+				gui.renderSprite(player.getFirstItemInInventory(), *shaderHandler, windowSize);
 			}
+			widjetsTexture->bind();
+			gui.renderToolbar(*shaderHandler, windowSize);
+			textureArray->bind();
 		}
 
 		window.display();

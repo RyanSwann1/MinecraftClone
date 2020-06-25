@@ -162,6 +162,7 @@
     <ClInclude Include="Item.h" />
     <ClInclude Include="NeighbouringChunks.h" />
     <ClInclude Include="Notes.h" />
+    <ClInclude Include="OpenGLShaders\UIToolbarVertexShader.glsl" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Chunk.h" />
     <ClInclude Include="ChunkManager.h" />
@@ -213,6 +214,7 @@
     <None Include="OpenGLShaders\SkyboxVertexShader.glsl" />
     <None Include="OpenGLShaders\UIItemFragmentShader.glsl" />
     <None Include="OpenGLShaders\UIItemVertexShader.glsl" />
+    <None Include="OpenGLShaders\UIToolbarFragmentShader.glsl" />
     <None Include="Shaders\ChunkFragmentShader.glsl" />
     <None Include="Shaders\ChunkVertexShader.glsl" />
     <None Include="Shaders\SkyboxFragmentShader.glsl" />
