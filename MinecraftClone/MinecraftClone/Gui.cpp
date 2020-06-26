@@ -31,11 +31,21 @@ namespace
 	std::array<glm::vec2, 6> getToolbarTextCoords()
 	{
 		return { glm::vec2(0.0f, .92f),
-			glm::vec2(0.7f, .92f),
-			glm::vec2(0.7f, 1.0f),
-			glm::vec2(0.7f, 1.0f),
+			glm::vec2(0.71f, .92f),
+			glm::vec2(0.71f, 1.0f),
+			glm::vec2(0.71f, 1.0f),
 			glm::vec2(0.0f, 1.0f),
 			glm::vec2(0.0f, .92f) };
+	};
+
+	std::array<glm::vec2, 6> getSelectionTextCoords()
+	{
+		return { glm::vec2(0.0f, .828125f),
+			glm::vec2(0.1066f, .828125f),
+			glm::vec2(0.1066f, 0.9101f),
+			glm::vec2(0.1066f, 0.9101f),
+			glm::vec2(0.0f, 0.9101f),
+			glm::vec2(0.0f, .828125f) };
 	};
 }
 
@@ -45,9 +55,12 @@ Gui::Gui()
 	m_itemTextCoordsVBO(Globals::INVALID_OPENGL_ID),
 	m_toolbarID(Globals::INVALID_OPENGL_ID),
 	m_toolbarPostionsVBO(Globals::INVALID_OPENGL_ID),
-	m_toolbarTextCoordsVBO(Globals::INVALID_OPENGL_ID)
+	m_toolbarTextCoordsVBO(Globals::INVALID_OPENGL_ID),
+	m_selectionID(Globals::INVALID_OPENGL_ID),
+	m_selectionPositionsVBO(Globals::INVALID_OPENGL_ID),
+	m_selectionTextCoordsVBO(Globals::INVALID_OPENGL_ID)
 {
-	//Initialize Items GUI
+	//Initialize Items 
 	{
 		glGenVertexArrays(1, &m_itemID);
 		glBindVertexArray(m_itemID);
@@ -64,7 +77,7 @@ Gui::Gui()
 		glBindVertexArray(0);
 	}
 
-	//Initiailize Toolbar GUI
+	//Initiailize Toolbar
 	{
 		glGenVertexArrays(1, &m_toolbarID);
 		glBindVertexArray(m_toolbarID);
@@ -86,10 +99,34 @@ Gui::Gui()
 
 		glBindVertexArray(0);
 	}
+	
+	//Initialize Selection 
+	{
+		glGenVertexArrays(1, &m_selectionID);
+		glBindVertexArray(m_selectionID);
+
+		glGenBuffers(1, &m_selectionPositionsVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, m_selectionPositionsVBO);
+		glBufferData(GL_ARRAY_BUFFER, QUAD_COORDS.size() * sizeof(glm::vec2), QUAD_COORDS.data(), GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::ivec2), (const void*)0);
+
+		glGenBuffers(1, &m_selectionTextCoordsVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, m_selectionTextCoordsVBO);
+		std::array<glm::vec2, 6> textCoords = getSelectionTextCoords();
+		glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(glm::vec2), textCoords.data(), GL_STATIC_DRAW);
+		
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)0);
+
+		glBindVertexArray(0);
+	}
 }
 
 Gui::~Gui()
 {
+	//Item
 	assert(m_itemID != Globals::INVALID_OPENGL_ID);
 	glDeleteVertexArrays(1, &m_itemID);
 
@@ -103,18 +140,23 @@ Gui::~Gui()
 		glDeleteBuffers(1, &m_itemTextCoordsVBO);
 	}
 
-	assert(m_toolbarID != Globals::INVALID_OPENGL_ID);
+	//Toolbar
+	assert(m_toolbarID != Globals::INVALID_OPENGL_ID &&
+	m_toolbarPostionsVBO != Globals::INVALID_OPENGL_ID &&
+	m_toolbarTextCoordsVBO != Globals::INVALID_OPENGL_ID);
+
 	glDeleteVertexArrays(1, &m_toolbarID);
+	glDeleteBuffers(1, &m_toolbarPostionsVBO);
+	glDeleteBuffers(1, &m_toolbarTextCoordsVBO);
 
-	if (m_toolbarPostionsVBO != Globals::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &m_toolbarPostionsVBO);
-	}
+	//Selection
+	assert(m_selectionID != Globals::INVALID_OPENGL_ID &&
+		m_selectionPositionsVBO != Globals::INVALID_OPENGL_ID &&
+		m_selectionTextCoordsVBO != Globals::INVALID_OPENGL_ID);
 
-	if (m_toolbarTextCoordsVBO != Globals::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &m_toolbarTextCoordsVBO);
-	}
+	glDeleteVertexArrays(1, &m_selectionID);
+	glDeleteBuffers(1, &m_selectionPositionsVBO);
+	glDeleteBuffers(1, &m_selectionTextCoordsVBO);
 }
 
 void Gui::renderSprite(eCubeType cubeType, ShaderHandler& shaderHandler, glm::vec2 windowSize) const
@@ -169,14 +211,57 @@ void Gui::renderSprite(eCubeType cubeType, ShaderHandler& shaderHandler, glm::ve
 
 void Gui::renderToolbar(ShaderHandler& shaderHandler, glm::vec2 windowSize) const
 {
-	shaderHandler.switchToShader(eShaderType::UIToolbar);
 	glBindVertexArray(m_toolbarID);
 
 	glm::mat4 projection = glm::ortho(0.0f, windowSize.x, windowSize.y, 0.0f, -1.0f, 1.0f);
 	shaderHandler.setUniformMat4f(eShaderType::UIToolbar, "uProjection", projection);
 
-	glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(glm::vec2(250.0f, 250.0f), 0.0f));
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(glm::vec2(700.0f, 1025.0f), 0.0f));
 	model = glm::scale(model, glm::vec3(400.0f, 50.0f, 1.0f));
+	shaderHandler.setUniformMat4f(eShaderType::UIToolbar, "uModel", model);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+}
+
+void Gui::renderSelectionBox(ShaderHandler& shaderHandler, glm::vec2 windowSize, eHotBarSelection hotBarSelection) const
+{
+	glm::vec2 position(670, 950);
+	float offsetX = 25.0f;
+	switch (hotBarSelection)
+	{
+	case eHotBarSelection::One:
+		position.x = position.x + offsetX * 1;
+		break;
+	case eHotBarSelection::Two:
+		position.x = position.x + offsetX * 2;
+		break;
+	case eHotBarSelection::Three:
+		position.x = position.x + offsetX * 3;
+		break;
+	case eHotBarSelection::Four:
+		position.x = position.x + offsetX * 4;
+		break;
+	case eHotBarSelection::Five:
+		position.x = position.x + offsetX * 5;
+		break;
+	case eHotBarSelection::Six:
+		position.x = position.x + offsetX * 6;
+		break;
+	case eHotBarSelection::Seven:
+		position.x = position.x + offsetX * 7;
+		break;
+	case eHotBarSelection::Eight:
+		position.x = position.x + offsetX * 8;
+		break;
+	}
+
+	glBindVertexArray(m_selectionID);
+	glm::mat4 projection = glm::ortho(0.0f, windowSize.x, windowSize.y, 0.0f, -1.0f, 1.0f);
+	shaderHandler.setUniformMat4f(eShaderType::UIToolbar, "uProjection", projection);
+
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(glm::vec2(position.x, position.y), 0.0f));
+	model = glm::scale(model, glm::vec3(30.0f, 30.0f, 1.0f));
 	shaderHandler.setUniformMat4f(eShaderType::UIToolbar, "uModel", model);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);

@@ -251,11 +251,13 @@ int main()
 			//Draw GUI
 			if (!player.getInventory().isEmpty())
 			{
-				assert(shaderHandler);
 				gui.renderSprite(player.getInventory().getFirstItem(), *shaderHandler, windowSize);
 			}
+
+			shaderHandler->switchToShader(eShaderType::UIToolbar);
 			widjetsTexture->bind();
 			gui.renderToolbar(*shaderHandler, windowSize);
+			gui.renderSelectionBox(*shaderHandler, windowSize, player.getInventory().getSelectedHotbarItem());
 			textureArray->bind();
 		}
 

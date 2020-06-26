@@ -26,6 +26,7 @@ class Inventory : private NonCopyable, private NonMovable
 public:
 	Inventory();
 
+	eHotBarSelection getSelectedHotbarItem() const;
 	eCubeType getFirstItem() const;
 	bool isEmpty() const;
 	bool isSelectedItemEmpty() const;

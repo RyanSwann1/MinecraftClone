@@ -35,6 +35,11 @@ Inventory::Inventory()
 	m_currentSelectedItem(eHotBarSelection::One)
 {}
 
+eHotBarSelection Inventory::getSelectedHotbarItem() const
+{
+	return m_currentSelectedItem;
+}
+
 eCubeType Inventory::getFirstItem() const
 {
 	assert(!isEmpty());
@@ -102,8 +107,6 @@ void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
 			m_currentSelectedItem = eHotBarSelection::Eight;
 			break;
 		}
-
-		std::cout << static_cast<int>(m_currentSelectedItem) << "\n";
 	}
 	else
 	{
@@ -131,7 +134,7 @@ void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
 
 		//std::cout << static_cast<int>(m_currentSelectedItem) << "\n";
 		//currentSFMLEvent.mouseWheel.delta
-		std::cout << currentSFMLEvent.mouseWheel.delta << "\n";
+		//std::cout << currentSFMLEvent.mouseWheel.delta << "\n";
 	}
 }
 
