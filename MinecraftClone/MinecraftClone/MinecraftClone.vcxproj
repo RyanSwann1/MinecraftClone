@@ -135,6 +135,7 @@
     <ClCompile Include="GeneratedChunkMeshQueue.cpp" />
     <ClCompile Include="GeneratedChunkQueue.cpp" />
     <ClCompile Include="Gui.cpp" />
+    <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="NeighbouringChunks.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="GeneratedChunkMeshQueue.h" />
     <ClInclude Include="GeneratedChunkQueue.h" />
     <ClInclude Include="Gui.h" />
+    <ClInclude Include="Inventory.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="NeighbouringChunks.h" />
     <ClInclude Include="Notes.h" />

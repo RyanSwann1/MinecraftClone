@@ -77,81 +77,7 @@ void Camera::move(const sf::Window& window)
 	front = glm::normalize(v);
 }
 
-//Inventory
-Inventory::Inventory()
-	: m_items(), 
-	m_currentSelectedItem(eHotBarSelection::One)
-{}
 
-eCubeType Inventory::getFirstItem() const
-{
-	assert(!isEmpty());
-	return m_items.front().getCubeType();
-}
-
-bool Inventory::isEmpty() const
-{
-	return m_items.empty();
-}
-
-bool Inventory::isSelectedItemEmpty() const
-{
-	return false;
-}
-
-void Inventory::add(eCubeType cubeTypeToAdd)
-{
-	auto iter = std::find_if(m_items.begin(), m_items.end(), [cubeTypeToAdd](const auto& item)
-	{
-		return cubeTypeToAdd == item.getCubeType();
-	});
-
-	if (iter != m_items.end())
-	{
-		iter->add();
-	}
-	else
-	{
-		m_items.emplace_back(cubeTypeToAdd);
-	}
-}
-
-void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
-{
-	assert(currentSFMLEvent.type == sf::Event::MouseWheelScrolled);
-	int currentSelectedItem = static_cast<int>(m_currentSelectedItem);
-
-	if (currentSFMLEvent.mouseWheel.delta > 0)
-	{
-		--currentSelectedItem;
-	}
-	else if(currentSFMLEvent.mouseWheel.delta < 0)
-	{
-		++currentSelectedItem;
-	}
-
-	if (currentSelectedItem < static_cast<int>(eHotBarSelection::One))
-	{
-		m_currentSelectedItem = eHotBarSelection::Eight;
-	}
-	else if (currentSelectedItem > static_cast<int>(eHotBarSelection::Max))
-	{
-		m_currentSelectedItem = eHotBarSelection::One;
-	}
-
-	std::cout << static_cast<int>(m_currentSelectedItem);
-}
-
-void Inventory::removeFirstItem()
-{
-	assert(!isEmpty());
-
-	m_items.front().remove();
-	if (m_items.front().isEmpty())
-	{
-		m_items.erase(m_items.begin());
-	}
-}
 
 //Player
 Player::Player()
@@ -365,7 +291,7 @@ void Player::handleInputEvents(std::vector<PickUp>& pickUps, const sf::Event& cu
 			placeBlock(chunkManager, playerMutex);
 		}
 	}
-	if (currentSFMLEvent.type == currentSFMLEvent.MouseMoved)
+	if (currentSFMLEvent.MouseMoved)
 	{
 		moveCamera(window);
 	}

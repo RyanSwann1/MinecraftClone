@@ -7,7 +7,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "Globals.h"
-#include "Item.h"
+#include "Inventory.h"
 #include <mutex>
 #include <SFML/Graphics.hpp>
 #include <vector>
@@ -33,24 +33,6 @@ enum class ePlayerState
 	Flying = 0,
 	InAir,
 	OnGround,
-};
-
-class Inventory : private NonCopyable, private NonMovable
-{
-public:
-	Inventory();
-	
-	eCubeType getFirstItem() const;
-	bool isEmpty() const;
-	bool isSelectedItemEmpty() const;
-
-	void add(eCubeType cubeTypeToAdd);
-	void handleInputEvents(const sf::Event& currentSFMLEvent);
-	void removeFirstItem();
-
-private:
-	std::vector<Item> m_items;
-	eHotBarSelection m_currentSelectedItem;
 };
 
 class Gui;

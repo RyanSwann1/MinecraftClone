@@ -39,19 +39,3 @@ private:
 	bool m_discardedByPlayer;
 	float m_timeElasped;
 };
-
-class Item
-{
-public:
-	Item(eCubeType cubeType);
-
-	bool isEmpty() const;
-	eCubeType getCubeType() const;
-
-	void remove();
-	void add();
-
-private:
-	eCubeType m_cubeType;
-	int m_currentAmount;
-};

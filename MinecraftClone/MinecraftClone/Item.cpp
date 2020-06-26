@@ -142,30 +142,3 @@ void PickUp::render(const Frustum& frustum)
 	}
 }
 
-//Item
-Item::Item(eCubeType cubeType)
-	: m_cubeType(cubeType),
-	m_currentAmount(1)
-{}
-
-bool Item::isEmpty() const
-{
-	return m_currentAmount == 0;
-}
-
-eCubeType Item::getCubeType() const
-{
-	assert(m_currentAmount > 0);
-	return m_cubeType;
-}
-
-void Item::remove()
-{
-	assert(m_currentAmount > 0);
-	--m_currentAmount;
-}
-
-void Item::add()
-{
-	++m_currentAmount;
-}
