@@ -13,13 +13,13 @@
 
 class ChunkManager;
 class Frustum;
-class PickUp : private NonCopyable
+class Pickup : private NonCopyable
 {
 public:
-	PickUp(eCubeType cubeType, const glm::vec3& destroyedBlockPosition, const glm::vec3& initialVelocity);
-	PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition);
-	PickUp(PickUp&&) noexcept;
-	PickUp& operator=(PickUp&&) noexcept;
+	Pickup(eCubeType cubeType, const glm::vec3& destroyedBlockPosition, const glm::vec3& initialVelocity);
+	Pickup(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition);
+	Pickup(Pickup&&) noexcept;
+	Pickup& operator=(Pickup&&) noexcept;
 
 	eCubeType getCubeType() const;
 	bool isInReachOfPlayer(const glm::vec3& playerPosition) const;

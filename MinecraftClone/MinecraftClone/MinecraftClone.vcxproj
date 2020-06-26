@@ -136,7 +136,7 @@
     <ClCompile Include="GeneratedChunkQueue.cpp" />
     <ClCompile Include="Gui.cpp" />
     <ClCompile Include="Inventory.cpp" />
-    <ClCompile Include="Item.cpp" />
+    <ClCompile Include="Pickup.cpp" />
     <ClCompile Include="NeighbouringChunks.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Chunk.cpp" />
@@ -161,7 +161,7 @@
     <ClInclude Include="GeneratedChunkQueue.h" />
     <ClInclude Include="Gui.h" />
     <ClInclude Include="Inventory.h" />
-    <ClInclude Include="Item.h" />
+    <ClInclude Include="Pickup.h" />
     <ClInclude Include="NeighbouringChunks.h" />
     <ClInclude Include="Notes.h" />
     <ClInclude Include="OpenGLShaders\UIToolbarVertexShader.glsl" />

@@ -1,11 +1,11 @@
-#include "Item.h"
+#include "Pickup.h"
 #include "MeshGenerator.h"
 #include "ChunkManager.h"
 #include "Frustum.h"
 #include "CollisionHandler.h"
 
 //PickUp
-PickUp::PickUp(eCubeType cubeType, const glm::vec3& destroyedBlockPosition, const glm::vec3& initialVelocity)
+Pickup::Pickup(eCubeType cubeType, const glm::vec3& destroyedBlockPosition, const glm::vec3& initialVelocity)
 	: m_AABB({ destroyedBlockPosition.x + 0.5f, destroyedBlockPosition.z + 0.5f }, 0.5f),
 	m_cubeType(cubeType),
 	m_position(destroyedBlockPosition),
@@ -19,7 +19,7 @@ PickUp::PickUp(eCubeType cubeType, const glm::vec3& destroyedBlockPosition, cons
 	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, m_position);
 }
 
-PickUp::PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
+Pickup::Pickup(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
 	: m_AABB({ destroyedBlockPosition.x + 0.5f, destroyedBlockPosition.z + 0.5f }, 0.5f),
 	m_cubeType(cubeType),
 	m_position({ destroyedBlockPosition.x + 0.35f, destroyedBlockPosition.y + 0.35f, destroyedBlockPosition.z + 0.35f}),
@@ -38,7 +38,7 @@ PickUp::PickUp(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
 	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, m_position);
 }
 
-PickUp::PickUp(PickUp&& orig) noexcept
+Pickup::Pickup(Pickup&& orig) noexcept
 	: m_AABB(orig.m_AABB),
 	m_cubeType(orig.m_cubeType),
 	m_position(orig.m_position),
@@ -50,7 +50,7 @@ PickUp::PickUp(PickUp&& orig) noexcept
 	m_timeElasped(orig.m_timeElasped)
 {}
 
-PickUp& PickUp::operator=(PickUp&& orig) noexcept
+Pickup& Pickup::operator=(Pickup&& orig) noexcept
 {
 	m_AABB = orig.m_AABB;
 	m_cubeType = orig.m_cubeType;
@@ -65,22 +65,22 @@ PickUp& PickUp::operator=(PickUp&& orig) noexcept
 	return *this;
 }
 
-eCubeType PickUp::getCubeType() const
+eCubeType Pickup::getCubeType() const
 {
 	return m_cubeType;
 }
 
-bool PickUp::isInReachOfPlayer(const glm::vec3& playerPosition) const
+bool Pickup::isInReachOfPlayer(const glm::vec3& playerPosition) const
 {
 	return glm::distance(m_position, { playerPosition.x, playerPosition.y - 1.0f, playerPosition.z }) <= 0.4f;
 }
 
-const Rectangle& PickUp::getAABB() const
+const Rectangle& Pickup::getAABB() const
 {
 	return m_AABB;
 }
 
-void PickUp::update(const glm::vec3& playerPosition, float deltaTime, const ChunkManager& chunkManager)
+void Pickup::update(const glm::vec3& playerPosition, float deltaTime, const ChunkManager& chunkManager)
 {
 	if (CollisionHandler::isCollision({ m_position.x, m_position.y - 0.10f, m_position.z }, chunkManager))
 	{
@@ -128,7 +128,7 @@ void PickUp::update(const glm::vec3& playerPosition, float deltaTime, const Chun
 	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, m_position);
 }
 
-void PickUp::render(const Frustum& frustum)
+void Pickup::render(const Frustum& frustum)
 {
 	if (m_vertexArray.m_opaqueVertexBuffer.bindToVAO)
 	{

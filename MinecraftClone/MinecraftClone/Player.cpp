@@ -4,7 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include "BoundingBox.h"
-#include "Item.h"
+#include "PickUp.h"
 #include "CollisionHandler.h"
 #include "Gui.h"
 #include <memory>
@@ -182,7 +182,7 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 	}
 }
 
-void Player::destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, std::vector<PickUp>& pickUps) const
+void Player::destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, std::vector<Pickup>& pickUps) const
 {
 	std::lock_guard<std::mutex> playerLock(playerMutex);
 	for (float i = 0; i <= DESTROY_BLOCK_RANGE; i += DESTROY_BLOCK_INCREMENT)
@@ -262,7 +262,7 @@ void Player::handleAutoJump(const ChunkManager& chunkManager)
 	}
 }
 
-void Player::handleInputEvents(std::vector<PickUp>& pickUps, const sf::Event& currentSFMLEvent,
+void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& currentSFMLEvent,
 	ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window)
 {
 	if (currentSFMLEvent.type == sf::Event::KeyPressed)
@@ -508,7 +508,7 @@ void Player::toggleAutoJump()
 	m_autoJump = !m_autoJump;
 }
 
-void Player::discardItem(std::vector<PickUp>& pickUps)
+void Player::discardItem(std::vector<Pickup>& pickUps)
 {
 	if (m_inventory.isEmpty())
 	{

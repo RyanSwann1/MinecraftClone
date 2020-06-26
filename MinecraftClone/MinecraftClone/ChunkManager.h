@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Item.h"
 #include "ObjectPool.h"
 #include "Chunk.h"
 #include "VertexArray.h"

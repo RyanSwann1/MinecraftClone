@@ -11,6 +11,7 @@
 #include "ShaderHandler.h"
 #include "Frustum.h"
 #include "Gui.h"
+#include "Pickup.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -125,7 +126,7 @@ int main()
 	
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
 	Gui gui;
-	std::vector<PickUp> pickUps;
+	std::vector<Pickup> pickUps;
 	Frustum frustum;
 	Player player;
 	std::atomic<bool> resetGame = false;

@@ -36,7 +36,7 @@ enum class ePlayerState
 };
 
 class Gui;
-class PickUp;
+class Pickup;
 class ChunkManager;
 class Player : private NonCopyable, private NonMovable
 {
@@ -50,7 +50,7 @@ public:
 
 	void addToInventory(eCubeType cubeType);
 	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
-	void handleInputEvents(std::vector<PickUp>& pickUps, const sf::Event& currentSFMLEvent,
+	void handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& currentSFMLEvent,
 		ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window);
 	void update(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager);
 
@@ -67,9 +67,9 @@ private:
 	void handleCollisions(const ChunkManager& chunkManager);
 	void toggleFlying();
 	void toggleAutoJump();
-	void discardItem(std::vector<PickUp>& pickUps);
+	void discardItem(std::vector<Pickup>& pickUps);
 	void placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex);
-	void destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, std::vector<PickUp>& pickUps) const;
+	void destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, std::vector<Pickup>& pickUps) const;
 	void moveCamera(const sf::Window& window);
 	void handleAutoJump(const ChunkManager& chunkManager);
 };
