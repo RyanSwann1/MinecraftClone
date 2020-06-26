@@ -21,21 +21,23 @@ private:
 	int m_currentAmount;
 };
 
+class Gui;
 class Inventory : private NonCopyable, private NonMovable
 {
 public:
 	Inventory();
 
-	eHotBarSelection getSelectedHotbarItem() const;
+	const std::vector<Item>& getItems() const;
+	eHotbarIndex getSelectedHotbarItem() const;
 	eCubeType getFirstItem() const;
 	bool isEmpty() const;
 	bool isSelectedItemEmpty() const;
 
-	void add(eCubeType cubeTypeToAdd);
+	void add(eCubeType cubeTypeToAdd, Gui& gui);
 	void handleInputEvents(const sf::Event& currentSFMLEvent);
 	void removeFirstItem();
 
 private:
 	std::vector<Item> m_items;
-	eHotBarSelection m_currentSelectedItem;
+	eHotbarIndex m_currentSelectedItem;
 };

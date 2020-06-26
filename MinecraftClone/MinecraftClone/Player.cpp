@@ -110,10 +110,9 @@ const Camera& Player::getCamera() const
 	return m_camera;
 }
 
-void Player::addToInventory(eCubeType cubeTypeToAdd)
+void Player::addToInventory(eCubeType cubeTypeToAdd, Gui& gui)
 {
-	m_inventory.add(cubeTypeToAdd);
-
+	m_inventory.add(cubeTypeToAdd, gui);
 }
 
 void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)

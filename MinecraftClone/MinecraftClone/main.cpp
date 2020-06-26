@@ -8,6 +8,7 @@
 #include "Rectangle.h"
 #include "SkyBox.h"
 #include "glm/gtc/noise.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 #include "ShaderHandler.h"
 #include "Frustum.h"
 #include "Gui.h"
@@ -115,14 +116,22 @@ int main()
 
 	textureArray->bind();
 
+	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(windowSize.x),
+		static_cast<float>(windowSize.y), 0.0f, -1.0f, 1.0f);
+
 	shaderHandler->switchToShader(eShaderType::Skybox);
 	shaderHandler->setUniform1i(eShaderType::Skybox, "uSkyboxTexture", 1);
+
 	shaderHandler->switchToShader(eShaderType::Chunk);
 	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", 0);
+	
 	shaderHandler->switchToShader(eShaderType::UIItem);
 	shaderHandler->setUniform1i(eShaderType::UIItem, "uTexture", 0);
+	shaderHandler->setUniformMat4f(eShaderType::UIItem, "uProjection", projection);
+
 	shaderHandler->switchToShader(eShaderType::UIToolbar);
 	shaderHandler->setUniform1i(eShaderType::UIToolbar, "uTexture", 1);
+	shaderHandler->setUniformMat4f(eShaderType::UIToolbar, "uProjection", projection);
 	
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
 	Gui gui;
@@ -182,7 +191,7 @@ int main()
 		{
 			if (pickup->isInReachOfPlayer(player.getPosition()) || !visibilityRect.contains(pickup->getAABB()))
 			{
-				player.addToInventory(pickup->getCubeType());
+				player.addToInventory(pickup->getCubeType(), gui);
 				pickup = pickUps.erase(pickup);
 			}
 			else
@@ -247,17 +256,17 @@ int main()
 
 			skybox->render();
 			glDepthFunc(GL_LESS);
+		}
 
-			//Draw GUI
-			if (!player.getInventory().isEmpty())
-			{
-				gui.renderSprite(player.getInventory().getFirstItem(), *shaderHandler, windowSize);
-			}
-
+		//Draw GUI
+		{	
+			shaderHandler->switchToShader(eShaderType::UIItem);
+			gui.renderItems(*shaderHandler);
+		
 			shaderHandler->switchToShader(eShaderType::UIToolbar);
 			widjetsTexture->bind();
-			gui.renderToolbar(*shaderHandler, windowSize);
-			gui.renderSelectionBox(*shaderHandler, windowSize, player.getInventory().getSelectedHotbarItem());
+			//gui.renderToolbar(*shaderHandler, windowSize);
+			//gui.renderSelectionBox(*shaderHandler, windowSize, player.getInventory().getSelectedHotbarItem());
 			textureArray->bind();
 		}
 

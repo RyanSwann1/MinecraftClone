@@ -1,4 +1,5 @@
 #include "Inventory.h"
+#include "Gui.h"
 #include <iostream>
 
 //Item
@@ -32,10 +33,15 @@ void Item::add()
 //Inventory
 Inventory::Inventory()
 	: m_items(),
-	m_currentSelectedItem(eHotBarSelection::One)
+	m_currentSelectedItem(eHotbarIndex::One)
 {}
 
-eHotBarSelection Inventory::getSelectedHotbarItem() const
+const std::vector<Item>& Inventory::getItems() const
+{
+	return m_items;
+}
+
+eHotbarIndex Inventory::getSelectedHotbarItem() const
 {
 	return m_currentSelectedItem;
 }
@@ -56,7 +62,7 @@ bool Inventory::isSelectedItemEmpty() const
 	return false;
 }
 
-void Inventory::add(eCubeType cubeTypeToAdd)
+void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
 {
 	auto iter = std::find_if(m_items.begin(), m_items.end(), [cubeTypeToAdd](const auto& item)
 	{
@@ -70,6 +76,7 @@ void Inventory::add(eCubeType cubeTypeToAdd)
 	else
 	{
 		m_items.emplace_back(cubeTypeToAdd);
+		gui.addItem(static_cast<eHotbarIndex>(m_items.size() - 1), cubeTypeToAdd);
 	}
 }
 
@@ -83,28 +90,28 @@ void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
 		switch (currentSFMLEvent.key.code)
 		{
 		case sf::Keyboard::Num1:
-			m_currentSelectedItem = eHotBarSelection::One;
+			m_currentSelectedItem = eHotbarIndex::One;
 			break;
 		case sf::Keyboard::Num2:
-			m_currentSelectedItem = eHotBarSelection::Two;
+			m_currentSelectedItem = eHotbarIndex::Two;
 			break;
 		case sf::Keyboard::Num3:
-			m_currentSelectedItem = eHotBarSelection::Three;
+			m_currentSelectedItem = eHotbarIndex::Three;
 			break;
 		case sf::Keyboard::Num4:
-			m_currentSelectedItem = eHotBarSelection::Four;
+			m_currentSelectedItem = eHotbarIndex::Four;
 			break;
 		case sf::Keyboard::Num5:
-			m_currentSelectedItem = eHotBarSelection::Five;
+			m_currentSelectedItem = eHotbarIndex::Five;
 			break;
 		case sf::Keyboard::Num6:
-			m_currentSelectedItem = eHotBarSelection::Six;
+			m_currentSelectedItem = eHotbarIndex::Six;
 			break;
 		case sf::Keyboard::Num7:
-			m_currentSelectedItem = eHotBarSelection::Seven;
+			m_currentSelectedItem = eHotbarIndex::Seven;
 			break;
 		case sf::Keyboard::Num8:
-			m_currentSelectedItem = eHotBarSelection::Eight;
+			m_currentSelectedItem = eHotbarIndex::Eight;
 			break;
 		}
 	}
@@ -121,15 +128,15 @@ void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
 			++currentSelectedItem;
 		}
 
-		m_currentSelectedItem = static_cast<eHotBarSelection>(currentSelectedItem);
+		m_currentSelectedItem = static_cast<eHotbarIndex>(currentSelectedItem);
 
-		if (static_cast<int>(m_currentSelectedItem) < static_cast<int>(eHotBarSelection::One))
+		if (static_cast<int>(m_currentSelectedItem) < static_cast<int>(eHotbarIndex::One))
 		{
-			m_currentSelectedItem = eHotBarSelection::Eight;
+			m_currentSelectedItem = eHotbarIndex::Eight;
 		}
-		else if (static_cast<int>(m_currentSelectedItem) > static_cast<int>(eHotBarSelection::Max))
+		else if (static_cast<int>(m_currentSelectedItem) > static_cast<int>(eHotbarIndex::Max))
 		{
-			m_currentSelectedItem = eHotBarSelection::One;
+			m_currentSelectedItem = eHotbarIndex::One;
 		}
 
 		//std::cout << static_cast<int>(m_currentSelectedItem) << "\n";

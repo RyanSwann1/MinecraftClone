@@ -48,7 +48,7 @@ public:
 	const glm::vec3& getPosition() const;
 	const Camera& getCamera() const;
 
-	void addToInventory(eCubeType cubeType);
+	void addToInventory(eCubeType cubeType, Gui& gui);
 	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
 	void handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& currentSFMLEvent,
 		ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window);

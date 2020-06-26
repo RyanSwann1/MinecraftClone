@@ -6,7 +6,7 @@
 #include <array>
 #include <random>
 
-enum class eHotBarSelection
+enum class eHotbarIndex
 {
 	One = 0,
 	Two,

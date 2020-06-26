@@ -1,4 +1,26 @@
 #pragma once
+
+
+////Example Project
+//https://www.youtube.com/watch?v=MfaXf6Gs8oY
+//
+//https://github.com/rhysboer/VoxitCraft/tree/master/Minecraft
+//
+//
+////Lighting
+//https://www.seedofandromeda.com/blogs/29-fast-flood-fill-lighting-in-a-blocky-voxel-game-pt-1
+//https://www.seedofandromeda.com/blogs/30-fast-flood-fill-lighting-in-a-blocky-voxel-game-pt-2
+//https://github.com/Unarelith/OpenMiner/issues/21
+//
+////Gui
+//well, when you code your UI you'll define a projection matrix with the size of the screen, and render using that matrix (gluOrtho2D for old opengl and glm::ortho for modern opengl)
+//so you can pick a small size, (mine is 1920 / 3; 1080 / 3) and upscale it to the actual screen
+//for the other stuff, definining UI element position relative to screen sizeand screen scaling is a good idea most of the time
+//hmm, I highly suggest that you create an Image class instead of doing things like getToolbarTextCoords()
+//https ://github.com/Unarelith/GameKit/blob/master/include/gk/graphics/Image.hpp
+//https://github.com/Unarelith/GameKit/blob/master/source/graphics/Image.cpp
+//something like this
+
 //Dyanmic Chunk Generation
 //https://gamedev.stackexchange.com/questions/173820/how-should-i-store-loaded-world-chunks-in-ram-for-my-game-similar-to-minecraft
 //https://gamedev.stackexchange.com/questions/37911/how-to-deal-with-large-open-worlds
