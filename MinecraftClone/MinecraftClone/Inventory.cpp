@@ -73,32 +73,66 @@ void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
 	assert(currentSFMLEvent.type == sf::Event::MouseWheelScrolled ||
 		currentSFMLEvent.type == sf::Event::KeyPressed);
 
-
-	int currentSelectedItem = static_cast<int>(m_currentSelectedItem);
-
-	if (currentSFMLEvent.mouseWheel.delta > 0)
+	if (currentSFMLEvent.type == sf::Event::KeyPressed)
 	{
-		--currentSelectedItem;
-	}
-	else if (currentSFMLEvent.mouseWheel.delta < 0)
-	{
-		++currentSelectedItem;
-	}
+		switch (currentSFMLEvent.key.code)
+		{
+		case sf::Keyboard::Num1:
+			m_currentSelectedItem = eHotBarSelection::One;
+			break;
+		case sf::Keyboard::Num2:
+			m_currentSelectedItem = eHotBarSelection::Two;
+			break;
+		case sf::Keyboard::Num3:
+			m_currentSelectedItem = eHotBarSelection::Three;
+			break;
+		case sf::Keyboard::Num4:
+			m_currentSelectedItem = eHotBarSelection::Four;
+			break;
+		case sf::Keyboard::Num5:
+			m_currentSelectedItem = eHotBarSelection::Five;
+			break;
+		case sf::Keyboard::Num6:
+			m_currentSelectedItem = eHotBarSelection::Six;
+			break;
+		case sf::Keyboard::Num7:
+			m_currentSelectedItem = eHotBarSelection::Seven;
+			break;
+		case sf::Keyboard::Num8:
+			m_currentSelectedItem = eHotBarSelection::Eight;
+			break;
+		}
 
-	m_currentSelectedItem = static_cast<eHotBarSelection>(currentSelectedItem);
-
-	if (static_cast<int>(m_currentSelectedItem) < static_cast<int>(eHotBarSelection::One))
-	{
-		m_currentSelectedItem = eHotBarSelection::Eight;
+		std::cout << static_cast<int>(m_currentSelectedItem) << "\n";
 	}
-	else if (static_cast<int>(m_currentSelectedItem) > static_cast<int>(eHotBarSelection::Max))
+	else
 	{
-		m_currentSelectedItem = eHotBarSelection::One;
-	}
+		int currentSelectedItem = static_cast<int>(m_currentSelectedItem);
 
-	//std::cout << static_cast<int>(m_currentSelectedItem) << "\n";
-	//currentSFMLEvent.mouseWheel.delta
-	std::cout << currentSFMLEvent.mouseWheel.delta << "\n";
+		if (currentSFMLEvent.mouseWheel.delta > 0)
+		{
+			--currentSelectedItem;
+		}
+		else if (currentSFMLEvent.mouseWheel.delta < 0)
+		{
+			++currentSelectedItem;
+		}
+
+		m_currentSelectedItem = static_cast<eHotBarSelection>(currentSelectedItem);
+
+		if (static_cast<int>(m_currentSelectedItem) < static_cast<int>(eHotBarSelection::One))
+		{
+			m_currentSelectedItem = eHotBarSelection::Eight;
+		}
+		else if (static_cast<int>(m_currentSelectedItem) > static_cast<int>(eHotBarSelection::Max))
+		{
+			m_currentSelectedItem = eHotBarSelection::One;
+		}
+
+		//std::cout << static_cast<int>(m_currentSelectedItem) << "\n";
+		//currentSFMLEvent.mouseWheel.delta
+		std::cout << currentSFMLEvent.mouseWheel.delta << "\n";
+	}
 }
 
 void Inventory::removeFirstItem()

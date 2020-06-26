@@ -77,8 +77,6 @@ void Camera::move(const sf::Window& window)
 	front = glm::normalize(v);
 }
 
-
-
 //Player
 Player::Player()
 	: m_camera(),
@@ -279,6 +277,8 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 		{
 			discardItem(pickUps);
 		}
+
+		m_inventory.handleInputEvents(currentSFMLEvent);
 	}
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
 	{
