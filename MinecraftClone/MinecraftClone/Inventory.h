@@ -8,13 +8,14 @@
 class Item
 {
 public:
-	Item(eCubeType cubeType);
+	Item();
 
 	bool isEmpty() const;
 	eCubeType getCubeType() const;
 
-	void remove();
-	void add();
+	void reduce();
+	void incrementQuantity();
+	void reset(eCubeType cubeType);
 
 private:
 	eCubeType m_cubeType;
@@ -27,17 +28,17 @@ class Inventory : private NonCopyable, private NonMovable
 public:
 	Inventory();
 
-	const std::vector<Item>& getItems() const;
-	eHotbarIndex getSelectedHotbarItem() const;
-	eCubeType getFirstItem() const;
-	bool isEmpty() const;
+	eCubeType getSelectedItemType() const;
 	bool isSelectedItemEmpty() const;
 
+	void reduceSelectedItem();
 	void add(eCubeType cubeTypeToAdd, Gui& gui);
 	void handleInputEvents(const sf::Event& currentSFMLEvent);
-	void removeFirstItem();
 
 private:
-	std::vector<Item> m_items;
+	std::array<Item, 8> m_items;
 	eHotbarIndex m_currentSelectedItem;
+
+	const Item& getSelectedItem() const;
+	Item& getSelectedItem();
 };

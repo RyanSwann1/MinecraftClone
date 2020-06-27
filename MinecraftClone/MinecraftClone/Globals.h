@@ -8,7 +8,7 @@
 
 enum class eHotbarIndex
 {
-	One = 0,
+	One = 1,
 	Two,
 	Three, 
 	Four, 
