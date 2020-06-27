@@ -83,34 +83,34 @@ namespace
 		return textureLayer;
 	}
 
-	glm::vec2 getPositionOnHotbar(eHotbarIndex hotbarIndex, glm::ivec2 basePosition)
+	glm::vec2 getPositionOnHotbar(eInventoryIndex hotbarIndex, glm::ivec2 basePosition)
 	{
 		glm::vec2 position = basePosition;
 		float offsetX = 75.0f;
 		switch (hotbarIndex)
 		{
-		case eHotbarIndex::One:
+		case eInventoryIndex::One:
 			position.x = position.x + offsetX * 1;
 			break;
-		case eHotbarIndex::Two:
+		case eInventoryIndex::Two:
 			position.x = position.x + offsetX * 2;
 			break;
-		case eHotbarIndex::Three:
+		case eInventoryIndex::Three:
 			position.x = position.x + offsetX * 3;
 			break;
-		case eHotbarIndex::Four:
+		case eInventoryIndex::Four:
 			position.x = position.x + offsetX * 4;
 			break;
-		case eHotbarIndex::Five:
+		case eInventoryIndex::Five:
 			position.x = position.x + offsetX * 5;
 			break;
-		case eHotbarIndex::Six:
+		case eInventoryIndex::Six:
 			position.x = position.x + offsetX * 6;
 			break;
-		case eHotbarIndex::Seven:
+		case eInventoryIndex::Seven:
 			position.x = position.x + offsetX * 7;
 			break;
-		case eHotbarIndex::Eight:
+		case eInventoryIndex::Eight:
 			position.x = position.x + offsetX * 8;
 			break;
 		}
@@ -243,7 +243,7 @@ Gui::Gui()
 	m_selectionBox.setActive(true);
 }
 
-void Gui::addItem(eHotbarIndex hotbarIndex, eCubeType cubeType)
+void Gui::addItem(eInventoryIndex hotbarIndex, eCubeType cubeType)
 {
 	assert(!m_items[static_cast<int>(hotbarIndex)].isActive());
 	if (!m_items[static_cast<int>(hotbarIndex)].isActive())
@@ -253,7 +253,7 @@ void Gui::addItem(eHotbarIndex hotbarIndex, eCubeType cubeType)
 	}
 }
 
-void Gui::removeItem(eHotbarIndex hotbarIndex)
+void Gui::removeItem(eInventoryIndex hotbarIndex)
 {
 	assert(m_items[static_cast<int>(hotbarIndex)].isActive());
 	m_items[static_cast<int>(hotbarIndex)].setActive(false);
@@ -264,7 +264,7 @@ void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture) con
 	shaderHandler.switchToShader(eShaderType::UIItem);
 	for (int i = 0; i < m_items.size(); ++i)
 	{
-		glm::vec2 position = getPositionOnHotbar(static_cast<eHotbarIndex>(i), { 250, 250 });
+		glm::vec2 position = getPositionOnHotbar(static_cast<eInventoryIndex>(i), { 250, 250 });
 		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f));
 		model = glm::scale(model, glm::vec3(50.0f, 50.0f, 1.0f));
 

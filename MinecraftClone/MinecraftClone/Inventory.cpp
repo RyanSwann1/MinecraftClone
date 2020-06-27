@@ -39,7 +39,7 @@ void Item::reset(eCubeType cubeType)
 //Inventory
 Inventory::Inventory()
 	: m_items(),
-	m_currentSelectedItem(eHotbarIndex::One)
+	m_currentSelectedItem(eInventoryIndex::One)
 {}
 
 eCubeType Inventory::getSelectedItemType() const
@@ -68,7 +68,7 @@ void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
 {
 	//Add to existing item in Inventory
 	bool itemAdded = false;
-	for (int i = 0; i < static_cast<int>(eHotbarIndex::Max) + 1; ++i)
+	for (int i = 0; i < static_cast<int>(eInventoryIndex::Max) + 1; ++i)
 	{
 		if (!m_items[i].isEmpty() && m_items[i].getCubeType() == cubeTypeToAdd)
 		{
@@ -79,14 +79,14 @@ void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
 	}
 
 	//Add to next available free space in Inventory
-	for (int i = 0; !itemAdded && i < static_cast<int>(eHotbarIndex::Max) + 1; ++i)
+	for (int i = 0; !itemAdded && i < static_cast<int>(eInventoryIndex::Max) + 1; ++i)
 	{
 		if (m_items[i].isEmpty())
 		{
 			m_items[i].reset(cubeTypeToAdd);
 			m_items[i].incrementQuantity();
 
-			gui.addItem(static_cast<eHotbarIndex>(i), cubeTypeToAdd);
+			gui.addItem(static_cast<eInventoryIndex>(i), cubeTypeToAdd);
 			break;
 		}
 	}
@@ -102,28 +102,28 @@ void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
 		switch (currentSFMLEvent.key.code)
 		{
 		case sf::Keyboard::Num1:
-			m_currentSelectedItem = eHotbarIndex::One;
+			m_currentSelectedItem = eInventoryIndex::One;
 			break;
 		case sf::Keyboard::Num2:
-			m_currentSelectedItem = eHotbarIndex::Two;
+			m_currentSelectedItem = eInventoryIndex::Two;
 			break;
 		case sf::Keyboard::Num3:
-			m_currentSelectedItem = eHotbarIndex::Three;
+			m_currentSelectedItem = eInventoryIndex::Three;
 			break;
 		case sf::Keyboard::Num4:
-			m_currentSelectedItem = eHotbarIndex::Four;
+			m_currentSelectedItem = eInventoryIndex::Four;
 			break;
 		case sf::Keyboard::Num5:
-			m_currentSelectedItem = eHotbarIndex::Five;
+			m_currentSelectedItem = eInventoryIndex::Five;
 			break;
 		case sf::Keyboard::Num6:
-			m_currentSelectedItem = eHotbarIndex::Six;
+			m_currentSelectedItem = eInventoryIndex::Six;
 			break;
 		case sf::Keyboard::Num7:
-			m_currentSelectedItem = eHotbarIndex::Seven;
+			m_currentSelectedItem = eInventoryIndex::Seven;
 			break;
 		case sf::Keyboard::Num8:
-			m_currentSelectedItem = eHotbarIndex::Eight;
+			m_currentSelectedItem = eInventoryIndex::Eight;
 			break;
 		}
 	}
@@ -140,15 +140,15 @@ void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
 			++currentSelectedItem;
 		}
 
-		m_currentSelectedItem = static_cast<eHotbarIndex>(currentSelectedItem);
+		m_currentSelectedItem = static_cast<eInventoryIndex>(currentSelectedItem);
 
-		if (static_cast<int>(m_currentSelectedItem) < static_cast<int>(eHotbarIndex::One))
+		if (static_cast<int>(m_currentSelectedItem) < static_cast<int>(eInventoryIndex::One))
 		{
-			m_currentSelectedItem = eHotbarIndex::Eight;
+			m_currentSelectedItem = eInventoryIndex::Eight;
 		}
-		else if (static_cast<int>(m_currentSelectedItem) > static_cast<int>(eHotbarIndex::Max))
+		else if (static_cast<int>(m_currentSelectedItem) > static_cast<int>(eInventoryIndex::Max))
 		{
-			m_currentSelectedItem = eHotbarIndex::One;
+			m_currentSelectedItem = eInventoryIndex::One;
 		}
 	}
 }

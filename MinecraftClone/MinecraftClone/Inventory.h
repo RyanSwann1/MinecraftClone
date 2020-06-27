@@ -37,7 +37,7 @@ public:
 
 private:
 	std::array<Item, 8> m_items;
-	eHotbarIndex m_currentSelectedItem;
+	eInventoryIndex m_currentSelectedItem;
 
 	const Item& getSelectedItem() const;
 	Item& getSelectedItem();

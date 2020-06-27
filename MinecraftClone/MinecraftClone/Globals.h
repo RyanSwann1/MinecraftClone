@@ -6,7 +6,7 @@
 #include <array>
 #include <random>
 
-enum class eHotbarIndex
+enum class eInventoryIndex
 {
 	One = 0,
 	Two,
@@ -95,6 +95,8 @@ namespace Globals
 	constexpr int CHANCE_TREE_SPAWN_IN_CHUNK = 50;
 
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
+
+	constexpr int MAX_PLAYER_INVENTORY_SPACE = static_cast<int>(eInventoryIndex::Max) + 1;
 
 	constexpr float BIOME_LACUNARITY = 5.0f;
 	constexpr float BIOME_PERSISTENCE = 0.5f;

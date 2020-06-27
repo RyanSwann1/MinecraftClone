@@ -31,15 +31,15 @@ private:
 
 class Texture;
 enum class eCubeType;
-enum class eHotbarIndex;
+enum class eInventoryIndex;
 class ShaderHandler;
 class Gui : private NonCopyable, private NonMovable
 {
 public:
 	Gui();
 
-	void addItem(eHotbarIndex hotbarIndex, eCubeType cubeType);
-	void removeItem(eHotbarIndex hotbarIndex);
+	void addItem(eInventoryIndex hotbarIndex, eCubeType cubeType);
+	void removeItem(eInventoryIndex hotbarIndex);
 
 
 	void render(ShaderHandler& shaderHandler, const Texture& widgetTexture) const;
