@@ -286,11 +286,8 @@ Gui::Gui()
 void Gui::addItem(eInventoryIndex hotbarIndex, eCubeType cubeType)
 {
 	assert(!m_items[static_cast<int>(hotbarIndex)].isActive());
-	if (!m_items[static_cast<int>(hotbarIndex)].isActive())
-	{
-		m_items[static_cast<int>(hotbarIndex)].setTextureRect(getTextCoords(getTextureLayer(cubeType)));
-		m_items[static_cast<int>(hotbarIndex)].setActive(true);
-	}
+	m_items[static_cast<int>(hotbarIndex)].setTextureRect(getTextCoords(getTextureLayer(cubeType)));
+	m_items[static_cast<int>(hotbarIndex)].setActive(true);
 }
 
 void Gui::removeItem(eInventoryIndex hotbarIndex)

@@ -6,7 +6,6 @@
 #include "glm/glm.hpp"
 #include <vector>
 
-struct Rectangle;
 class Image : private NonCopyable
 {
 public:
