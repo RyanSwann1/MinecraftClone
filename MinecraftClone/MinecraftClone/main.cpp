@@ -268,13 +268,7 @@ int main()
 
 		//Draw GUI
 		{	
-			shaderHandler->switchToShader(eShaderType::UIItem);
-			gui.renderItems(*shaderHandler);
-		
-			shaderHandler->switchToShader(eShaderType::UIToolbar);
-			widjetsTexture->bind();
-			//gui.renderToolbar(*shaderHandler, windowSize);
-			//gui.renderSelectionBox(*shaderHandler, windowSize, player.getInventory().getSelectedHotbarItem());
+			gui.render(*shaderHandler, *widjetsTexture);
 			textureArray->bind();
 		}
 

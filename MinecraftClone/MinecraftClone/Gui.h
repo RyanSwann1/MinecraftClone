@@ -18,6 +18,7 @@ public:
 	bool isActive() const;
 	void setActive(bool active);
 	void setTextureRect(const std::array<glm::vec3, 6>& drawableRect);
+	void setTextureRect(const std::array<glm::vec2, 6>& drawableRect);
 
 	void render() const;
 
@@ -28,7 +29,7 @@ private:
 	bool m_active;
 };
 
-class Inventory;
+class Texture;
 enum class eCubeType;
 enum class eHotbarIndex;
 class ShaderHandler;
@@ -36,27 +37,15 @@ class Gui : private NonCopyable, private NonMovable
 {
 public:
 	Gui();
-	~Gui();
 
 	void addItem(eHotbarIndex hotbarIndex, eCubeType cubeType);
 	void removeItem(eHotbarIndex hotbarIndex);
-	void renderItems(ShaderHandler& shaderHandler) const;
 
-	void renderToolbar(ShaderHandler& shaderHandler, glm::vec2 windowSize) const;
-	void renderSelectionBox(ShaderHandler& shaderHandler, glm::vec2 windowSize, eHotbarIndex hotBarSelection) const;
+
+	void render(ShaderHandler& shaderHandler, const Texture& widgetTexture) const;
 
 private:
 	std::array<Image, 8> m_items;
-
-	unsigned int m_itemID;
-	unsigned int m_itemPositionsVBO;
-	unsigned int m_itemTextCoordsVBO;
-
-	unsigned int m_toolbarID;
-	unsigned int m_toolbarPostionsVBO;
-	unsigned int m_toolbarTextCoordsVBO;
-	
-	unsigned int m_selectionID;
-	unsigned int m_selectionPositionsVBO;
-	unsigned int m_selectionTextCoordsVBO;
+	Image m_toolbar;
+	Image m_selectionBox;
 };
