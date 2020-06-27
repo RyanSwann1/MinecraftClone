@@ -39,8 +39,8 @@ public:
 	~Gui();
 
 	void addItem(eHotbarIndex hotbarIndex, eCubeType cubeType);
+	void removeItem(eHotbarIndex hotbarIndex);
 	void renderItems(ShaderHandler& shaderHandler) const;
-
 
 	void renderToolbar(ShaderHandler& shaderHandler, glm::vec2 windowSize) const;
 	void renderSelectionBox(ShaderHandler& shaderHandler, glm::vec2 windowSize, eHotbarIndex hotBarSelection) const;

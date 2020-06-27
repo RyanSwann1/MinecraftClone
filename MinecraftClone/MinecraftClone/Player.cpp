@@ -115,7 +115,7 @@ void Player::addToInventory(eCubeType cubeTypeToAdd, Gui& gui)
 	m_inventory.add(cubeTypeToAdd, gui);
 }
 
-void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
+void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex, Gui& gui)
 {
 	if (m_inventory.isSelectedItemEmpty())
 	{
@@ -151,7 +151,7 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 						eCubeType cubeTypeToPlace = m_inventory.getSelectedItemType();
 						if (chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToPlace))
 						{
-							m_inventory.reduceSelectedItem();
+							m_inventory.reduceSelectedItem(gui);
 						}
 					}
 					
@@ -172,7 +172,7 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex)
 			eCubeType cubeTypeToPlace = m_inventory.getSelectedItemType();
 			if (chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToPlace))
 			{
-				m_inventory.reduceSelectedItem();
+				m_inventory.reduceSelectedItem(gui);
 				break;
 			}
 		}
@@ -260,7 +260,7 @@ void Player::handleAutoJump(const ChunkManager& chunkManager)
 }
 
 void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& currentSFMLEvent,
-	ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window)
+	ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window, Gui& gui)
 {
 	if (currentSFMLEvent.type == sf::Event::KeyPressed)
 	{
@@ -274,7 +274,7 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
 		{
-			discardItem(pickUps);
+			discardItem(pickUps, gui);
 		}
 
 		m_inventory.handleInputEvents(currentSFMLEvent);
@@ -287,7 +287,7 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 		}
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
 		{
-			placeBlock(chunkManager, playerMutex);
+			placeBlock(chunkManager, playerMutex, gui);
 		}
 	}
 	if (currentSFMLEvent.MouseMoved)
@@ -507,7 +507,7 @@ void Player::toggleAutoJump()
 	m_autoJump = !m_autoJump;
 }
 
-void Player::discardItem(std::vector<Pickup>& pickUps)
+void Player::discardItem(std::vector<Pickup>& pickUps, Gui& gui)
 {
 	if (m_inventory.isSelectedItemEmpty())
 	{
@@ -525,7 +525,7 @@ void Player::discardItem(std::vector<Pickup>& pickUps)
 	}
 
 	eCubeType pickUpType = m_inventory.getSelectedItemType();
-	m_inventory.reduceSelectedItem();
+	m_inventory.reduceSelectedItem(gui);
 
 	pickUps.emplace_back(pickUpType, m_position, initialVelocity);
 }

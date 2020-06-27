@@ -31,7 +31,7 @@ public:
 	eCubeType getSelectedItemType() const;
 	bool isSelectedItemEmpty() const;
 
-	void reduceSelectedItem();
+	void reduceSelectedItem(Gui& Gui);
 	void add(eCubeType cubeTypeToAdd, Gui& gui);
 	void handleInputEvents(const sf::Event& currentSFMLEvent);
 

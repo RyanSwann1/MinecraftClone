@@ -182,7 +182,7 @@ int main()
 			}
 
 			assert(chunkManager);
-			player.handleInputEvents(pickUps, currentSFMLEvent, *chunkManager, playerMutex, window);
+			player.handleInputEvents(pickUps, currentSFMLEvent, *chunkManager, playerMutex, window, gui);
 		}
 
 		assert(chunkManager);

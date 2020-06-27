@@ -53,18 +53,22 @@ bool Inventory::isSelectedItemEmpty() const
 	return getSelectedItem().isEmpty();
 }
 
-void Inventory::reduceSelectedItem()
+void Inventory::reduceSelectedItem(Gui& gui)
 {
 	assert(!isSelectedItemEmpty());
 
 	getSelectedItem().reduce();
+	if (getSelectedItem().isEmpty())
+	{
+		gui.removeItem(m_currentSelectedItem);
+	}
 }
 
 void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
 {
 	//Add to existing item in Inventory
 	bool itemAdded = false;
-	for (int i = 0; i < static_cast<int>(eHotbarIndex::Max); ++i)
+	for (int i = 0; i < static_cast<int>(eHotbarIndex::Max) + 1; ++i)
 	{
 		if (!m_items[i].isEmpty() && m_items[i].getCubeType() == cubeTypeToAdd)
 		{
@@ -75,7 +79,7 @@ void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
 	}
 
 	//Add to next available free space in Inventory
-	for (int i = 0; !itemAdded && i < static_cast<int>(eHotbarIndex::Max); ++i)
+	for (int i = 0; !itemAdded && i < static_cast<int>(eHotbarIndex::Max) + 1; ++i)
 	{
 		if (m_items[i].isEmpty())
 		{
@@ -151,10 +155,10 @@ void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
 
 const Item& Inventory::getSelectedItem() const
 {
-	return m_items[static_cast<int>(m_currentSelectedItem) - 1];
+	return m_items[static_cast<int>(m_currentSelectedItem)];
 }
 
 Item& Inventory::getSelectedItem()
 {
-	return m_items[static_cast<int>(m_currentSelectedItem) - 1];
+	return m_items[static_cast<int>(m_currentSelectedItem)];
 }

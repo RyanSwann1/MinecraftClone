@@ -230,7 +230,6 @@ Gui::Gui()
 	m_selectionPositionsVBO(Globals::INVALID_OPENGL_ID),
 	m_selectionTextCoordsVBO(Globals::INVALID_OPENGL_ID)
 {
-
 	//Initialize Items 
 	{
 		glGenVertexArrays(1, &m_itemID);
@@ -332,11 +331,18 @@ Gui::~Gui()
 
 void Gui::addItem(eHotbarIndex hotbarIndex, eCubeType cubeType)
 {
+	assert(!m_items[static_cast<int>(hotbarIndex)].isActive());
 	if (!m_items[static_cast<int>(hotbarIndex)].isActive())
 	{
 		m_items[static_cast<int>(hotbarIndex)].setTextureRect(getTextCoords(getTextureLayer(cubeType)));
 		m_items[static_cast<int>(hotbarIndex)].setActive(true);
 	}
+}
+
+void Gui::removeItem(eHotbarIndex hotbarIndex)
+{
+	assert(m_items[static_cast<int>(hotbarIndex)].isActive());
+	m_items[static_cast<int>(hotbarIndex)].setActive(false);
 }
 
 void Gui::renderItems(ShaderHandler& shaderHandler) const

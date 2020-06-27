@@ -51,7 +51,7 @@ public:
 	void addToInventory(eCubeType cubeType, Gui& gui);
 	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
 	void handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& currentSFMLEvent,
-		ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window);
+		ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window, Gui& gui);
 	void update(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager);
 
 private:
@@ -67,8 +67,8 @@ private:
 	void handleCollisions(const ChunkManager& chunkManager);
 	void toggleFlying();
 	void toggleAutoJump();
-	void discardItem(std::vector<Pickup>& pickUps);
-	void placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex);
+	void discardItem(std::vector<Pickup>& pickUps, Gui& gui);
+	void placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex, Gui& gui);
 	void destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, std::vector<Pickup>& pickUps) const;
 	void moveCamera(const sf::Window& window);
 	void handleAutoJump(const ChunkManager& chunkManager);

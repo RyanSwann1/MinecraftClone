@@ -79,6 +79,7 @@ namespace
 			case eCubeSide::Front:
 			case eCubeSide::Left:
 			case eCubeSide::Right:
+			case eCubeSide::Bottom:
 				textureLayer = eTerrainTextureLayer::Log;
 				break;
 			case eCubeSide::Top:
@@ -99,6 +100,7 @@ namespace
 			case eCubeSide::Front:
 			case eCubeSide::Left:
 			case eCubeSide::Right:
+			case eCubeSide::Bottom:
 				textureLayer = eTerrainTextureLayer::Cactus;
 				break;
 			case eCubeSide::Top:
