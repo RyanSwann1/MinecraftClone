@@ -124,7 +124,9 @@ Image::Image()
 	: m_ID(Globals::INVALID_OPENGL_ID),
 	m_positionsVBO(Globals::INVALID_OPENGL_ID),
 	m_textCoordsVBO(Globals::INVALID_OPENGL_ID),
-	m_active(false)
+	m_active(false),
+	m_position(),
+	m_scale()
 {	
 	glGenVertexArrays(1, &m_ID);
 	glBindVertexArray(m_ID);
@@ -163,7 +165,9 @@ Image::Image(Image&& orig) noexcept
 	: m_ID(orig.m_ID),
 	m_positionsVBO(orig.m_positionsVBO),
 	m_textCoordsVBO(orig.m_textCoordsVBO),
-	m_active(orig.m_active)
+	m_active(orig.m_active),
+	m_position(orig.m_position),
+	m_scale(orig.m_scale)
 {
 	orig.m_ID = Globals::INVALID_OPENGL_ID;
 	orig.m_positionsVBO = Globals::INVALID_OPENGL_ID;
@@ -177,6 +181,9 @@ Image& Image::operator=(Image&& orig) noexcept
 	m_positionsVBO = orig.m_positionsVBO;
 	m_textCoordsVBO = orig.m_textCoordsVBO;
 	m_active = orig.m_active;
+	m_position = orig.m_position;
+	m_scale = orig.m_scale;
+	
 
 	orig.m_ID = Globals::INVALID_OPENGL_ID;
 	orig.m_positionsVBO = Globals::INVALID_OPENGL_ID;
@@ -184,6 +191,16 @@ Image& Image::operator=(Image&& orig) noexcept
 	orig.m_active = false;
 
 	return *this;
+}
+
+const glm::vec2& Image::getPosition() const
+{
+	return m_position;
+}
+
+const glm::vec2& Image::getScale() const
+{
+	return m_scale;
 }
 
 bool Image::isActive() const
@@ -220,6 +237,16 @@ void Image::setTextureRect(const std::array<glm::vec2, 6>& drawableRect)
 	glBindVertexArray(0);
 }
 
+void Image::setPosition(const glm::vec2& position)
+{
+	m_position = position;
+}
+
+void Image::setScale(const glm::vec2& scale)
+{
+	m_scale = scale;
+}
+
 void Image::render() const
 {
 	if (m_active)
@@ -236,9 +263,22 @@ Gui::Gui()
 	m_toolbar(),
 	m_selectionBox()
 {
+	//Items
+	for (int i = 0; i < m_items.size(); ++i)
+	{
+		m_items[i].setPosition(getPositionOnHotbar(static_cast<eInventoryIndex>(i), { 250, 250 }));
+		m_items[i].setScale({ 50.0f, 50.0f });
+	}
+
+	//Toolbar
+	m_toolbar.setPosition({ 700.0f, 1025.f });
+	m_toolbar.setScale({ 400.0f, 50.0f });
 	m_toolbar.setTextureRect(getToolbarTextCoords());
 	m_toolbar.setActive(true);
 
+	//Selection Box
+	m_selectionBox.setPosition({ 670.0f, 950.0f });
+	m_selectionBox.setScale({ 30.0f, 30.0f });
 	m_selectionBox.setTextureRect(getSelectionTextCoords());
 	m_selectionBox.setActive(true);
 }
@@ -262,32 +302,30 @@ void Gui::removeItem(eInventoryIndex hotbarIndex)
 void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture) const
 {
 	shaderHandler.switchToShader(eShaderType::UIItem);
-	for (int i = 0; i < m_items.size(); ++i)
+	for (const auto& item : m_items)
 	{
-		glm::vec2 position = getPositionOnHotbar(static_cast<eInventoryIndex>(i), { 250, 250 });
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f));
-		model = glm::scale(model, glm::vec3(50.0f, 50.0f, 1.0f));
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(item.getPosition(), 0.0f));
+		model = glm::scale(model, glm::vec3(item.getScale(), 1.0f));
 
 		shaderHandler.switchToShader(eShaderType::UIItem);
 		shaderHandler.setUniformMat4f(eShaderType::UIItem, "uModel", model);
 
-		m_items[i].render();
+		item.render();
 	}
 
 	widgetTexture.bind();
 	shaderHandler.switchToShader(eShaderType::UIToolbar);
 	{
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(glm::vec2(700.0f, 1025.0f), 0.0f));
-		model = glm::scale(model, glm::vec3(400.0f, 50.0f, 1.0f));
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(m_toolbar.getPosition(), 0.0f));
+		model = glm::scale(model, glm::vec3(m_toolbar.getScale(), 1.0f));
 		shaderHandler.setUniformMat4f(eShaderType::UIToolbar, "uModel", model);
 
 		m_toolbar.render();
 	}
 
 	{
-		glm::vec2 position = { 670, 950 };
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(glm::vec2(position.x, position.y), 0.0f));
-		model = glm::scale(model, glm::vec3(30.0f, 30.0f, 1.0f));
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(m_selectionBox.getPosition(), 0.0f));
+		model = glm::scale(model, glm::vec3(m_selectionBox.getScale(), 1.0f));
 		shaderHandler.setUniformMat4f(eShaderType::UIToolbar, "uModel", model);
 
 		m_selectionBox.render();

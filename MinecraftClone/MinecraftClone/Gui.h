@@ -15,10 +15,15 @@ public:
 	Image(Image&&) noexcept;
 	Image& operator=(Image&&) noexcept;
 
+	const glm::vec2& getPosition() const;
+	const glm::vec2& getScale() const;
 	bool isActive() const;
+	
 	void setActive(bool active);
 	void setTextureRect(const std::array<glm::vec3, 6>& drawableRect);
 	void setTextureRect(const std::array<glm::vec2, 6>& drawableRect);
+	void setPosition(const glm::vec2& position);
+	void setScale(const glm::vec2& scale);
 
 	void render() const;
 
@@ -27,6 +32,8 @@ private:
 	unsigned int m_positionsVBO;
 	unsigned int m_textCoordsVBO;
 	bool m_active;
+	glm::vec2 m_position;
+	glm::vec2 m_scale;
 };
 
 class Texture;
@@ -40,7 +47,6 @@ public:
 
 	void addItem(eInventoryIndex hotbarIndex, eCubeType cubeType);
 	void removeItem(eInventoryIndex hotbarIndex);
-
 
 	void render(ShaderHandler& shaderHandler, const Texture& widgetTexture) const;
 
