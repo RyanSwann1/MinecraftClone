@@ -3,6 +3,7 @@
 #include "ChunkManager.h"
 #include "Frustum.h"
 #include "CollisionHandler.h"
+#include "ShaderHandler.h"
 
 //PickUp
 Pickup::Pickup(eCubeType cubeType, const glm::vec3& destroyedBlockPosition, const glm::vec3& initialVelocity)
@@ -123,12 +124,9 @@ void Pickup::update(const glm::vec3& playerPosition, float deltaTime, const Chun
 	m_position += m_velocity * deltaTime;
 
 	CollisionHandler::applyDrag(m_velocity.x, m_velocity.z, 0.95f);
-
-	m_vertexArray.m_opaqueVertexBuffer.clear();
-	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, m_position);
 }
 
-void Pickup::render(const Frustum& frustum)
+void Pickup::render(const Frustum& frustum, ShaderHandler& shaderHandler)
 {
 	if (m_vertexArray.m_opaqueVertexBuffer.bindToVAO)
 	{
@@ -138,7 +136,9 @@ void Pickup::render(const Frustum& frustum)
 	if (m_vertexArray.m_opaqueVertexBuffer.displayable && frustum.isItemInFrustum(m_position))
 	{
 		m_vertexArray.bindOpaqueVAO();
+
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), m_position);
+		shaderHandler.setUniformMat4f(eShaderType::Pickup, "uModel", model);
 		glDrawElements(GL_TRIANGLES, m_vertexArray.m_opaqueVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 	}
 }
-

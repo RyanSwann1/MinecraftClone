@@ -127,87 +127,61 @@ namespace
 		}
 	}
 
-	void addItemCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide, const glm::vec3& cubePosition)
+	void addPickupCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide)
 	{
-		glm::vec3 position = cubePosition;
 		switch (cubeSide)
 		{
 		case eCubeSide::Front:
-			for (const glm::vec3& i : PICKUP_CUBE_FACE_FRONT)
+			for (const glm::vec3& position : PICKUP_CUBE_FACE_FRONT)
 			{
-				position += i;
-				vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
-				position = cubePosition;
-
+				vertexBuffer.positions.push_back(position);
 				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::FRONT_FACE_LIGHTING_INTENSITY);
 			}
 
-			getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
-
 			break;
 		case eCubeSide::Back:
-			for (const glm::vec3& i : PICKUP_CUBE_FACE_BACK)
+			for (const glm::vec3& position : PICKUP_CUBE_FACE_BACK)
 			{
-				position += i;
-				vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
-				position = cubePosition;
-
+				vertexBuffer.positions.push_back(position);
 				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::BACK_FACE_LIGHTING_INTENSITY);
 			}
 
-			getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
-
 			break;
 		case eCubeSide::Left:
-			for (const glm::vec3& i : PICKUP_CUBE_FACE_LEFT)
+			for (const glm::vec3& position : PICKUP_CUBE_FACE_LEFT)
 			{
-				position += i;
-				vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
-				position = cubePosition;
-
+				vertexBuffer.positions.push_back(position);
 				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::LEFT_FACE_LIGHTING_INTENSITY);
 			}
-			getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
 			break;
 		case eCubeSide::Right:
-			for (const glm::vec3& i : PICKUP_CUBE_FACE_RIGHT)
+			for (const glm::vec3& position : PICKUP_CUBE_FACE_RIGHT)
 			{
-				position += i;
-				vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
-				position = cubePosition;
-
+				vertexBuffer.positions.push_back(position);
 				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::RIGHT_FACE_LIGHTING_INTENSITY);
 			}
 
-			getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
-
 			break;
 		case eCubeSide::Top:
-			for (const glm::vec3& i : PICKUP_CUBE_FACE_TOP)
+			for (const glm::vec3& position : PICKUP_CUBE_FACE_TOP)
 			{
-				position += i;
-				vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
-				position = cubePosition;
-
+				vertexBuffer.positions.push_back(position);
 				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::TOP_LIGHTING_INTENSITY);
 			}
-			getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
-
 			break;
 		case eCubeSide::Bottom:
-			for (const glm::vec3& i : PICKUP_CUBE_FACE_BOTTOM)
+			for (const glm::vec3& position : PICKUP_CUBE_FACE_BOTTOM)
 			{
-				position += i;
-				vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
-				position = cubePosition;
-
+				vertexBuffer.positions.push_back(position);
 				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::BOTTOM_FACE_LIGHTING_INTENSITY);
 			}
 
-			getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
-
 			break;
+		default:
+			assert(false);
 		}
+
+		getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
 
 		for (unsigned int i : MeshGenerator::CUBE_FACE_INDICIES)
 		{
@@ -251,12 +225,12 @@ void MeshGenerator::generateChunkMesh(VertexArray& chunkMesh, const Chunk& chunk
 
 void MeshGenerator::generatePickUpMesh(VertexBuffer& pickUpMesh, eCubeType cubeType, const glm::vec3& position)
 {
-	addItemCubeFace(pickUpMesh, cubeType, eCubeSide::Left, position);
-	addItemCubeFace(pickUpMesh, cubeType, eCubeSide::Right, position);
-	addItemCubeFace(pickUpMesh, cubeType, eCubeSide::Top, position);
-	addItemCubeFace(pickUpMesh, cubeType, eCubeSide::Bottom, position);
-	addItemCubeFace(pickUpMesh, cubeType, eCubeSide::Front, position);
-	addItemCubeFace(pickUpMesh, cubeType, eCubeSide::Back, position);
+	addPickupCubeFace(pickUpMesh, cubeType, eCubeSide::Left);
+	addPickupCubeFace(pickUpMesh, cubeType, eCubeSide::Right);
+	addPickupCubeFace(pickUpMesh, cubeType, eCubeSide::Top);
+	addPickupCubeFace(pickUpMesh, cubeType, eCubeSide::Bottom);
+	addPickupCubeFace(pickUpMesh, cubeType, eCubeSide::Front);
+	addPickupCubeFace(pickUpMesh, cubeType, eCubeSide::Back);
 
 	pickUpMesh.bindToVAO = true;
 }

@@ -111,6 +111,9 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create()
 		case eShaderType::Chunk :
 			shaderLoaded = createShaderProgram(shader.getID(), "ChunkVertexShader.glsl", "ChunkFragmentShader.glsl");
 			break;
+		case eShaderType::Pickup:
+			shaderLoaded = createShaderProgram(shader.getID(), "PickupVertexShader.glsl", "PickupFragmentShader.glsl");
+			break;
 		case eShaderType::Skybox :
 			shaderLoaded = createShaderProgram(shader.getID(), "SkyboxVertexShader.glsl", "SkyboxFragmentShader.glsl");
 			break;

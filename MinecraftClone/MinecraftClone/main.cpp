@@ -119,11 +119,14 @@ int main()
 	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(windowSize.x),
 		static_cast<float>(windowSize.y), 0.0f, -1.0f, 1.0f);
 
-	shaderHandler->switchToShader(eShaderType::Skybox);
-	shaderHandler->setUniform1i(eShaderType::Skybox, "uSkyboxTexture", 1);
-
 	shaderHandler->switchToShader(eShaderType::Chunk);
 	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", 0);
+
+	shaderHandler->switchToShader(eShaderType::Pickup);
+	shaderHandler->setUniform1i(eShaderType::Pickup, "uTexture", 0);
+
+	shaderHandler->switchToShader(eShaderType::Skybox);
+	shaderHandler->setUniform1i(eShaderType::Skybox, "uSkyboxTexture", 1);
 	
 	shaderHandler->switchToShader(eShaderType::UIItem);
 	shaderHandler->setUniform1i(eShaderType::UIItem, "uTexture", 0);
@@ -187,20 +190,6 @@ int main()
 		glm::ivec3 startingPosition = Globals::getClosestMiddlePosition(player.getPosition());
 		Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Globals::VISIBILITY_DISTANCE);
 
-		for (auto pickup = pickUps.begin(); pickup != pickUps.end();)
-		{
-			if (pickup->isInReachOfPlayer(player.getPosition()) || !visibilityRect.contains(pickup->getAABB()))
-			{
-				player.addToInventory(pickup->getCubeType(), gui);
-				pickup = pickUps.erase(pickup);
-			}
-			else
-			{
-				pickup->update(player.getPosition(), deltaTime, *chunkManager);
-				++pickup;
-			}
-		}
-		
 		if (resetGame)
 		{
 			chunkGenerationThread.join();
@@ -215,14 +204,27 @@ int main()
 			player.spawn(*chunkManager, playerMutex);
 		}
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		glm::mat4 view = glm::lookAt(player.getPosition(), player.getPosition() + player.getCamera().front, player.getCamera().up);
 		glm::mat4 projection = glm::perspective(glm::radians(player.getCamera().FOV),
 			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), player.getCamera().nearPlaneDistance, player.getCamera().farPlaneDistance);
 
+		for (auto pickup = pickUps.begin(); pickup != pickUps.end();)
+		{
+			if (pickup->isInReachOfPlayer(player.getPosition()) || !visibilityRect.contains(pickup->getAABB()))
+			{
+				player.addToInventory(pickup->getCubeType(), gui);
+				pickup = pickUps.erase(pickup);
+			}
+			else
+			{
+				pickup->update(player.getPosition(), deltaTime, *chunkManager);
+				++pickup;
+			}
+		}
+
 		frustum.update(projection * view);
 		
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		if (chunkManager)
 		{
 			shaderHandler->switchToShader(eShaderType::Chunk);
@@ -235,15 +237,21 @@ int main()
 			
 			chunkManager->renderOpaque(frustum);
 			
+			shaderHandler->switchToShader(eShaderType::Pickup);
+			shaderHandler->setUniformMat4f(eShaderType::Pickup, "uView", view);
+			shaderHandler->setUniformMat4f(eShaderType::Pickup, "uProjection", projection);
 			for (auto& pickUp : pickUps)
 			{
-				pickUp.render(frustum);
+				pickUp.render(frustum, *shaderHandler);
 			}
 
 			glDisable(GL_CULL_FACE);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			
+			shaderHandler->switchToShader(eShaderType::Chunk);
+			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
+			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
 			chunkManager->renderTransparent(frustum);
 			
 			glDisable(GL_BLEND);

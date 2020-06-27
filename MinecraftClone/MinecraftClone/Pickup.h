@@ -11,6 +11,7 @@
 //Instancing
 //Update position only and not whole mesh
 
+class ShaderHandler;
 class ChunkManager;
 class Frustum;
 class Pickup : private NonCopyable
@@ -26,7 +27,7 @@ public:
 	const Rectangle& getAABB() const;
 
 	void update(const glm::vec3& playerPosition, float deltaTime, const ChunkManager& chunkManager);
-	void render(const Frustum& frustum);
+	void render(const Frustum& frustum, ShaderHandler& shaderHandler);
 
 private:
 	Rectangle m_AABB;

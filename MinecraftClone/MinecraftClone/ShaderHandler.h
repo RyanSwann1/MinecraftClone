@@ -12,6 +12,7 @@
 enum class eShaderType
 {
 	Chunk,
+	Pickup,
 	Skybox,
 	UIItem,
 	UIToolbar,
@@ -51,6 +52,7 @@ private:
 	std::array<Shader, static_cast<int>(eShaderType::Max) + 1> m_shader =
 	{
 		eShaderType::Chunk,
+		eShaderType::Pickup,
 		eShaderType::Skybox,
 		eShaderType::UIItem,
 		eShaderType::UIToolbar
