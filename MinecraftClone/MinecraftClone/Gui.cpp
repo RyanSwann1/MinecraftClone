@@ -299,6 +299,11 @@ void Gui::removeItem(eInventoryIndex hotbarIndex)
 	m_items[static_cast<int>(hotbarIndex)].setActive(false);
 }
 
+void Gui::update(eInventoryIndex selectedItemIndex)
+{
+	m_selectionBox.setPosition(getPositionOnHotbar(selectedItemIndex, { 670.0f, 950.0f }));
+}
+
 void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture) const
 {
 	shaderHandler.switchToShader(eShaderType::UIItem);

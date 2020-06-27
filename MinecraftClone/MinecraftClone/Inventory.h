@@ -28,6 +28,7 @@ class Inventory : private NonCopyable, private NonMovable
 public:
 	Inventory();
 
+	eInventoryIndex getSelectedItemIndex() const;
 	eCubeType getSelectedItemType() const;
 	bool isSelectedItemEmpty() const;
 

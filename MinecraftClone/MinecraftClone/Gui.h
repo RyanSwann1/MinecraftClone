@@ -48,6 +48,7 @@ public:
 	void addItem(eInventoryIndex hotbarIndex, eCubeType cubeType);
 	void removeItem(eInventoryIndex hotbarIndex);
 
+	void update(eInventoryIndex selectedItemIndex);
 	void render(ShaderHandler& shaderHandler, const Texture& widgetTexture) const;
 
 private:

@@ -42,6 +42,11 @@ Inventory::Inventory()
 	m_currentSelectedItem(eInventoryIndex::One)
 {}
 
+eInventoryIndex Inventory::getSelectedItemIndex() const
+{
+	return m_currentSelectedItem;
+}
+
 eCubeType Inventory::getSelectedItemType() const
 {
 	assert(!isSelectedItemEmpty());
