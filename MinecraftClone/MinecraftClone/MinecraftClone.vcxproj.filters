@@ -261,5 +261,7 @@
     <None Include="OpenGLShaders\UIItemVertexShader.glsl" />
     <None Include="OpenGLShaders\UIItemFragmentShader.glsl" />
     <None Include="OpenGLShaders\UIToolbarFragmentShader.glsl" />
+    <None Include="OpenGLShaders\PickupVertexShader.glsl" />
+    <None Include="OpenGLShaders\PickupFragmentShader.glsl" />
   </ItemGroup>
 </Project>

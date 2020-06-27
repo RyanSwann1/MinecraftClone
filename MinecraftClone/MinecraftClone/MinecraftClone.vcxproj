@@ -212,6 +212,8 @@
   <ItemGroup>
     <None Include="OpenGLShaders\ChunkFragmentShader.glsl" />
     <None Include="OpenGLShaders\ChunkVertexShader.glsl" />
+    <None Include="OpenGLShaders\PickupFragmentShader.glsl" />
+    <None Include="OpenGLShaders\PickupVertexShader.glsl" />
     <None Include="OpenGLShaders\SkyboxFragmentShader.glsl" />
     <None Include="OpenGLShaders\SkyboxVertexShader.glsl" />
     <None Include="OpenGLShaders\UIItemFragmentShader.glsl" />
