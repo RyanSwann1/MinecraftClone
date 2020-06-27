@@ -5,7 +5,7 @@
 #include "Globals.h"
 #include <SFML/Graphics.hpp>
 
-class Item
+class Item : private NonCopyable, private NonMovable
 {
 public:
 	Item();
