@@ -2,9 +2,9 @@
 
 #include "NonCopyable.h"
 #include "NonMovable.h"
+#include "Globals.h"
 #include "glm/glm.hpp"
 #include <vector>
-#include <array>
 
 struct Rectangle;
 class Image : private NonCopyable
@@ -45,7 +45,7 @@ public:
 	void render(ShaderHandler& shaderHandler, const Texture& widgetTexture) const;
 
 private:
-	std::array<Image, 8> m_items;
+	std::array<Image, static_cast<size_t>(eInventoryIndex::Max) + 1> m_items;
 	Image m_toolbar;
 	Image m_selectionBox;
 };

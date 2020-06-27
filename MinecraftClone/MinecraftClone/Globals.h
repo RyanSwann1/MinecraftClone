@@ -96,8 +96,6 @@ namespace Globals
 
 	constexpr unsigned int INVALID_OPENGL_ID = 0;
 
-	constexpr int MAX_PLAYER_INVENTORY_SPACE = static_cast<int>(eInventoryIndex::Max) + 1;
-
 	constexpr float BIOME_LACUNARITY = 5.0f;
 	constexpr float BIOME_PERSISTENCE = 0.5f;
 	constexpr int BIOME_OCTAVES = 12;

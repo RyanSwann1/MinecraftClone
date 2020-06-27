@@ -36,7 +36,7 @@ public:
 	void handleInputEvents(const sf::Event& currentSFMLEvent);
 
 private:
-	std::array<Item, 8> m_items;
+	std::array<Item, static_cast<size_t>(eInventoryIndex::Max) + 1> m_items;
 	eInventoryIndex m_currentSelectedItem;
 
 	const Item& getSelectedItem() const;
