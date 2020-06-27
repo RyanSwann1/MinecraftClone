@@ -63,17 +63,19 @@ void Inventory::reduceSelectedItem()
 void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
 {
 	//Add to existing item in Inventory
+	bool itemAdded = false;
 	for (int i = 0; i < static_cast<int>(eHotbarIndex::Max); ++i)
 	{
 		if (!m_items[i].isEmpty() && m_items[i].getCubeType() == cubeTypeToAdd)
 		{
 			m_items[i].incrementQuantity();
+			itemAdded = true;
 			break;
 		}
 	}
 
 	//Add to next available free space in Inventory
-	for (int i = 0; i < static_cast<int>(eHotbarIndex::Max); ++i)
+	for (int i = 0; !itemAdded && i < static_cast<int>(eHotbarIndex::Max); ++i)
 	{
 		if (m_items[i].isEmpty())
 		{
