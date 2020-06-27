@@ -81,8 +81,9 @@ void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
 		{
 			m_items[i].reset(cubeTypeToAdd);
 			m_items[i].incrementQuantity();
+
+			gui.addItem(static_cast<eHotbarIndex>(i), cubeTypeToAdd);
 			break;
-			//gui.addItem(static_cast<eHotbarIndex>(m_items.size() - 1), cubeTypeToAdd);
 		}
 	}
 }
