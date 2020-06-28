@@ -4,6 +4,23 @@
 
 namespace
 {
+	constexpr int CUBE_FACE_INDICIE_COUNT = 4;
+
+	constexpr std::array<unsigned int, 6> CUBE_FACE_INDICIES =
+	{
+		0, 1, 2,
+		2, 3, 0
+	};
+
+	constexpr float DEFAULT_LIGHTING_INTENSITY = 1.0f;
+	constexpr float TOP_LIGHTING_INTENSITY = 1.0f;
+	constexpr float FRONT_FACE_LIGHTING_INTENSITY = 0.8f;
+	constexpr float BACK_FACE_LIGHTING_INTENSITY = 0.8f;
+	constexpr float LEFT_FACE_LIGHTING_INTENSITY = 0.75f;
+	constexpr float RIGHT_FACE_LIGHTING_INTENSITY = 0.75f;
+	constexpr float SHADOW_INTENSITY = 0.4f;
+	constexpr float BOTTOM_FACE_LIGHTING_INTENSITY = 0.4f;
+
 	constexpr std::array<glm::vec2, 4> TEXT_COORDS =
 	{
 		glm::vec2(0.0f, 0.0f),
@@ -137,7 +154,7 @@ namespace
 			for (const glm::vec3& position : PICKUP_CUBE_FACE_FRONT)
 			{
 				vertexBuffer.positions.push_back(position);
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::FRONT_FACE_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(FRONT_FACE_LIGHTING_INTENSITY);
 			}
 
 			break;
@@ -145,7 +162,7 @@ namespace
 			for (const glm::vec3& position : PICKUP_CUBE_FACE_BACK)
 			{
 				vertexBuffer.positions.push_back(position);
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::BACK_FACE_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(BACK_FACE_LIGHTING_INTENSITY);
 			}
 
 			break;
@@ -153,14 +170,14 @@ namespace
 			for (const glm::vec3& position : PICKUP_CUBE_FACE_LEFT)
 			{
 				vertexBuffer.positions.push_back(position);
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::LEFT_FACE_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(LEFT_FACE_LIGHTING_INTENSITY);
 			}
 			break;
 		case eCubeSide::Right:
 			for (const glm::vec3& position : PICKUP_CUBE_FACE_RIGHT)
 			{
 				vertexBuffer.positions.push_back(position);
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::RIGHT_FACE_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(RIGHT_FACE_LIGHTING_INTENSITY);
 			}
 
 			break;
@@ -168,14 +185,14 @@ namespace
 			for (const glm::vec3& position : PICKUP_CUBE_FACE_TOP)
 			{
 				vertexBuffer.positions.push_back(position);
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::TOP_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(TOP_LIGHTING_INTENSITY);
 			}
 			break;
 		case eCubeSide::Bottom:
 			for (const glm::vec3& position : PICKUP_CUBE_FACE_BOTTOM)
 			{
 				vertexBuffer.positions.push_back(position);
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::BOTTOM_FACE_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(BOTTOM_FACE_LIGHTING_INTENSITY);
 			}
 
 			break;
@@ -185,12 +202,12 @@ namespace
 
 		getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
 
-		for (unsigned int i : MeshGenerator::CUBE_FACE_INDICIES)
+		for (unsigned int i : CUBE_FACE_INDICIES)
 		{
 			vertexBuffer.indicies.emplace_back(i + vertexBuffer.elementBufferIndex);
 		}
 
-		vertexBuffer.elementBufferIndex += MeshGenerator::CUBE_FACE_INDICIE_COUNT;
+		vertexBuffer.elementBufferIndex += CUBE_FACE_INDICIE_COUNT;
 	}
 }
 
@@ -613,19 +630,18 @@ void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeS
 
 			if (shadow)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::SHADOW_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(SHADOW_INTENSITY);
 			}
 			else if (transparent)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::DEFAULT_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(DEFAULT_LIGHTING_INTENSITY);
 			}
 			else
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::FRONT_FACE_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(FRONT_FACE_LIGHTING_INTENSITY);
 			}
 		}
 
-		getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
 		break;
 	case eCubeSide::Back:
 		for (const glm::ivec3& i : CUBE_FACE_BACK)
@@ -636,19 +652,17 @@ void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeS
 
 			if (shadow)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::SHADOW_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(SHADOW_INTENSITY);
 			}
 			else if (transparent)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::DEFAULT_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(DEFAULT_LIGHTING_INTENSITY);
 			}
 			else
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::BACK_FACE_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(BACK_FACE_LIGHTING_INTENSITY);
 			}
 		}
-
-		getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
 
 		break;
 	case eCubeSide::Left:
@@ -660,18 +674,18 @@ void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeS
 
 			if (shadow)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::SHADOW_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(SHADOW_INTENSITY);
 			}
 			else if (transparent)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::DEFAULT_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(DEFAULT_LIGHTING_INTENSITY);
 			}
 			else
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::LEFT_FACE_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(LEFT_FACE_LIGHTING_INTENSITY);
 			}
 		}
-		getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
+
 		break;
 	case eCubeSide::Right:
 		for (const glm::ivec3& i : CUBE_FACE_RIGHT)
@@ -682,19 +696,17 @@ void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeS
 
 			if (shadow)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::SHADOW_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(SHADOW_INTENSITY);
 			}
 			else if (transparent)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::DEFAULT_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(DEFAULT_LIGHTING_INTENSITY);
 			}
 			else
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::RIGHT_FACE_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(RIGHT_FACE_LIGHTING_INTENSITY);
 			}
 		}
-
-		getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
 
 		break;
 	case eCubeSide::Top:
@@ -706,19 +718,18 @@ void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeS
 
 			if (shadow)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::SHADOW_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(SHADOW_INTENSITY);
 			}
 			else if (transparent)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::DEFAULT_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(DEFAULT_LIGHTING_INTENSITY);
 			}
 			else
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::TOP_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(TOP_LIGHTING_INTENSITY);
 			}
 
 		}
-		getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
 
 		break;
 	case eCubeSide::Bottom:
@@ -730,29 +741,29 @@ void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeS
 
 			if (shadow)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::SHADOW_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(SHADOW_INTENSITY);
 			}
 			else if (transparent)
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::DEFAULT_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(DEFAULT_LIGHTING_INTENSITY);
 			}
 			else
 			{
-				vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::BOTTOM_FACE_LIGHTING_INTENSITY);
+				vertexBuffer.lightIntensityVertices.push_back(BOTTOM_FACE_LIGHTING_INTENSITY);
 			}
 		}
-
-		getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
 
 		break;
 	}
 
-	for (unsigned int i : MeshGenerator::CUBE_FACE_INDICIES)
+	getTextCoords(vertexBuffer.textCoords, cubeSide, cubeType);
+	
+	for (unsigned int i : CUBE_FACE_INDICIES)
 	{
 		vertexBuffer.indicies.emplace_back(i + vertexBuffer.elementBufferIndex);
 	}
 
-	vertexBuffer.elementBufferIndex += MeshGenerator::CUBE_FACE_INDICIE_COUNT;
+	vertexBuffer.elementBufferIndex += CUBE_FACE_INDICIE_COUNT;
 }
 
 void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const glm::ivec3& cubePosition, const std::array<glm::vec3, 4>& diagonalFace, bool shadow)
@@ -768,11 +779,11 @@ void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const g
 		//Lighting
 		if (shadow)
 		{
-			vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::SHADOW_INTENSITY);
+			vertexBuffer.lightIntensityVertices.push_back(SHADOW_INTENSITY);
 		}
 		else
 		{
-			vertexBuffer.lightIntensityVertices.push_back(MeshGenerator::DEFAULT_LIGHTING_INTENSITY);
+			vertexBuffer.lightIntensityVertices.push_back(DEFAULT_LIGHTING_INTENSITY);
 		}
 
 	}
@@ -781,12 +792,12 @@ void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const g
 	getTextCoords(vertexBuffer.textCoords, eCubeSide::Front, cubeType);
 
 	//Indicies
-	for (unsigned int i : MeshGenerator::CUBE_FACE_INDICIES)
+	for (unsigned int i : CUBE_FACE_INDICIES)
 	{
 		vertexBuffer.indicies.emplace_back(i + vertexBuffer.elementBufferIndex);
 	}
 
-	vertexBuffer.elementBufferIndex += MeshGenerator::CUBE_FACE_INDICIE_COUNT;
+	vertexBuffer.elementBufferIndex += CUBE_FACE_INDICIE_COUNT;
 }
 
 bool isFacingTransparentCube(const glm::ivec3& cubePosition, const Chunk& chunk)
