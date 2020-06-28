@@ -114,6 +114,14 @@ int main()
 		return -1;
 	}
 
+	std::unique_ptr<Texture> fontTexture = Texture::create("ExportedFont.bmp");
+	assert(fontTexture);
+	if (!fontTexture)
+	{
+		std::cout << "Couldn't load font texture\n";
+		return -1;
+	}
+
 	textureArray->bind();
 
 	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(windowSize.x),
@@ -269,7 +277,8 @@ int main()
 
 		//Draw GUI
 		{	
-			gui.render(*shaderHandler, *widjetsTexture);
+			
+			gui.render(*shaderHandler, *widjetsTexture, *fontTexture);
 			textureArray->bind();
 		}
 

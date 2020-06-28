@@ -8,7 +8,8 @@ in vec2 vTextCoord;
 void main()
 {
 	color = texture(uTexture, vTextCoord);
-	if (color.a == 0)
+	if (color == vec4(0.0, 0.0, 0.0, 1.0) ||
+		color.a == 0)
 	{
 		discard;
 	}

@@ -6,6 +6,26 @@
 #include "glm/glm.hpp"
 #include <vector>
 
+//
+//class Widget : 
+//{
+//
+//};
+
+class Text : private NonCopyable
+{
+public:
+	Text(const std::array<glm::vec2, 6>& drawableRect);
+	~Text();
+
+	void render() const;
+
+private:
+	unsigned int m_ID;
+	unsigned int m_positionsVBO;
+	unsigned int m_textCoordsVBO;
+};
+
 class Image : private NonCopyable
 {
 public:
@@ -48,10 +68,11 @@ public:
 	void removeItem(eInventoryIndex hotbarIndex);
 
 	void update(eInventoryIndex selectedItemIndex);
-	void render(ShaderHandler& shaderHandler, const Texture& widgetTexture) const;
+	void render(ShaderHandler& shaderHandler, const Texture& widgetTexture, const Texture& fontTexture) const;
 
 private:
 	std::array<Image, static_cast<size_t>(eInventoryIndex::Max) + 1> m_items;
 	Image m_toolbar;
 	Image m_selectionBox;
+	Text m_text;
 };

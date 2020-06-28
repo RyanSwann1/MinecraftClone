@@ -77,7 +77,7 @@ namespace
 Texture::Texture(unsigned int ID)
 	: m_ID(ID)
 {
-	bind();
+	//bind();
 }
 
 Texture::~Texture()
@@ -86,9 +86,9 @@ Texture::~Texture()
 	glDeleteTextures(1, &m_ID);
 }
 
-void Texture::bind() const
+void Texture::bind(int ID) const
 {
-	glActiveTexture(GL_TEXTURE0 + 1);
+	glActiveTexture(GL_TEXTURE0 + ID);
 	glBindTexture(GL_TEXTURE_2D, m_ID);
 }
 
