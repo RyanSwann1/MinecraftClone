@@ -373,8 +373,6 @@ void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture, con
 	{
 		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(item.getPosition(), 0.0f));
 		model = glm::scale(model, glm::vec3(item.getScale(), 1.0f));
-
-		shaderHandler.switchToShader(eShaderType::UIItem);
 		shaderHandler.setUniformMat4f(eShaderType::UIItem, "uModel", model);
 
 		item.render();

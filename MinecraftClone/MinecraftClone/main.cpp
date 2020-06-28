@@ -127,7 +127,6 @@ int main()
 	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(windowSize.x),
 		static_cast<float>(windowSize.y), 0.0f, -1.0f, 1.0f);
 
-	shaderHandler->switchToShader(eShaderType::Chunk);
 	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", 0);
 
 	shaderHandler->switchToShader(eShaderType::Pickup);

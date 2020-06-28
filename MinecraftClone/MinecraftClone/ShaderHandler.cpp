@@ -98,6 +98,7 @@ namespace
 }
 
 ShaderHandler::ShaderHandler()
+	: m_currentShaderType(eShaderType::Chunk)
 {}
 
 std::unique_ptr<ShaderHandler> ShaderHandler::create()
@@ -134,6 +135,7 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create()
 
 void ShaderHandler::setUniformMat4f(eShaderType shaderType, const std::string& uniformName, const glm::mat4& matrix)
 {
+	assert(shaderType == m_currentShaderType);
 	int uniformLocation = m_shader[static_cast<int>(shaderType)].getUniformLocation(uniformName);
 	assert(uniformLocation != INVALID_UNIFORM_LOCATION);
 	glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(matrix));
@@ -141,6 +143,7 @@ void ShaderHandler::setUniformMat4f(eShaderType shaderType, const std::string& u
 
 void ShaderHandler::setUniform1i(eShaderType shaderType, const std::string& uniformName, int value)
 {
+	assert(shaderType == m_currentShaderType);
 	int uniformLocation = m_shader[static_cast<int>(shaderType)].getUniformLocation(uniformName);
 	assert(uniformLocation != INVALID_UNIFORM_LOCATION);
 	glUniform1i(uniformLocation, value);
@@ -148,6 +151,8 @@ void ShaderHandler::setUniform1i(eShaderType shaderType, const std::string& unif
 
 void ShaderHandler::switchToShader(eShaderType shaderType)
 {
+	assert(shaderType != m_currentShaderType);
+	m_currentShaderType = shaderType;
 	glUseProgram(m_shader[static_cast<int>(shaderType)].getID());
 }
 ShaderHandler::Shader::Shader(eShaderType shaderType)

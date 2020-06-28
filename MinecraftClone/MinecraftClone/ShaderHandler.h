@@ -48,6 +48,7 @@ public:
 
 private:
 	ShaderHandler();
+	eShaderType m_currentShaderType;
 	
 	std::array<Shader, static_cast<int>(eShaderType::Max) + 1> m_shader =
 	{
