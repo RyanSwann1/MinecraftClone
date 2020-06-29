@@ -33,6 +33,18 @@ namespace
 		glm::vec2(0.125f, 0.375f)
 	};
 
+	//0.25
+	//0.375
+	constexpr std::array<glm::vec2, 6> CHARACTER_TWO =
+	{
+		glm::vec2(0.25f, 0.375f),
+		glm::vec2(0.375f, 0.375f),
+		glm::vec2(0.375f, 0.25f),
+		glm::vec2(0.375f, 0.25f),
+		glm::vec2(0.25f, 0.25f),
+		glm::vec2(0.25f, 0.375f)
+	};
+
 	std::array<glm::vec3, 6> getTextCoords(eTerrainTextureLayer textureLayer) 
 	{
 		return { glm::vec3(0, 0, static_cast<int>(textureLayer)),
@@ -43,24 +55,24 @@ namespace
 			glm::vec3(0, 0, static_cast<int>(textureLayer)) };
 	};
 
-	std::array<glm::vec2, 6> getToolbarTextCoords()
+	constexpr std::array<glm::vec2, 6> toolbarTextCoords =
 	{
-		return { glm::vec2(0.0f, .92f),
-			glm::vec2(0.71f, .92f),
-			glm::vec2(0.71f, 1.0f),
-			glm::vec2(0.71f, 1.0f),
-			glm::vec2(0.0f, 1.0f),
-			glm::vec2(0.0f, .92f) };
+		glm::vec2(0.0f, .92f),
+		glm::vec2(0.71f, .92f),
+		glm::vec2(0.71f, 1.0f),
+		glm::vec2(0.71f, 1.0f),
+		glm::vec2(0.0f, 1.0f),
+		glm::vec2(0.0f, .92f)
 	};
 
-	std::array<glm::vec2, 6> getSelectionTextCoords()
+	constexpr std::array<glm::vec2, 6> selectionBoxTextCoords =
 	{
-		return { glm::vec2(0.0f, .828125f),
-			glm::vec2(0.1066f, .828125f),
-			glm::vec2(0.1066f, 0.9101f),
-			glm::vec2(0.1066f, 0.9101f),
-			glm::vec2(0.0f, 0.9101f),
-			glm::vec2(0.0f, .828125f) };
+		glm::vec2(0.0f, .828125f),
+		glm::vec2(0.1066f, .828125f),
+		glm::vec2(0.1066f, 0.9101f),
+		glm::vec2(0.1066f, 0.9101f),
+		glm::vec2(0.0f, 0.9101f),
+		glm::vec2(0.0f, .828125f)
 	};
 
 	eTerrainTextureLayer getTextureLayer(eCubeType cubeType)
@@ -131,101 +143,7 @@ namespace
 	}
 }
 
-//Text
-Text::Text(const std::array<glm::vec2, 6>& drawableRect)
-	: m_ID(Globals::INVALID_OPENGL_ID),
-	m_positionsVBO(Globals::INVALID_OPENGL_ID),
-	m_textCoordsVBO(Globals::INVALID_OPENGL_ID)
-{
-	glGenVertexArrays(1, &m_ID);
-	glBindVertexArray(m_ID);
-
-	glGenBuffers(1, &m_textCoordsVBO);
-	glGenBuffers(1, &m_positionsVBO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_positionsVBO);
-	glBufferData(GL_ARRAY_BUFFER, QUAD_COORDS.size() * sizeof(glm::vec2), QUAD_COORDS.data(), GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_textCoordsVBO);
-	glBufferData(GL_ARRAY_BUFFER, drawableRect.size() * sizeof(glm::vec2), drawableRect.data(), GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)(0));
-
-	glBindVertexArray(0);
-}
-
-Text::~Text()
-{
-	if (m_ID != Globals::INVALID_OPENGL_ID)
-	{
-		glDeleteVertexArrays(1, &m_ID);
-	}
-
-	if (m_positionsVBO != Globals::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &m_positionsVBO);
-	}
-
-	if (m_textCoordsVBO != Globals::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &m_textCoordsVBO);
-	}
-}
-
-void Text::render() const
-{
-	glBindVertexArray(m_ID);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
-}
-
-//Image
-Image::Image()
-	: m_ID(Globals::INVALID_OPENGL_ID),
-	m_positionsVBO(Globals::INVALID_OPENGL_ID),
-	m_textCoordsVBO(Globals::INVALID_OPENGL_ID),
-	m_active(false),
-	m_position(),
-	m_scale()
-{	
-	glGenVertexArrays(1, &m_ID);
-	glBindVertexArray(m_ID);
-
-	glGenBuffers(1, &m_textCoordsVBO);
-	glGenBuffers(1, &m_positionsVBO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_positionsVBO);
-	glBufferData(GL_ARRAY_BUFFER, QUAD_COORDS.size() * sizeof(glm::vec2), QUAD_COORDS.data(), GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)0);
-
-	glBindVertexArray(0);
-}
-
-Image::~Image()
-{
-	if (m_ID != Globals::INVALID_OPENGL_ID)
-	{
-		glDeleteVertexArrays(1, &m_ID);
-	}
-
-	if (m_positionsVBO != Globals::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &m_positionsVBO);
-	}
-
-	if (m_textCoordsVBO != Globals::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &m_textCoordsVBO);
-	}
-}
-
-Image::Image(Image&& orig) noexcept
+Widget::Widget(Widget&& orig) noexcept
 	: m_ID(orig.m_ID),
 	m_positionsVBO(orig.m_positionsVBO),
 	m_textCoordsVBO(orig.m_textCoordsVBO),
@@ -239,7 +157,7 @@ Image::Image(Image&& orig) noexcept
 	orig.m_active = false;
 }
 
-Image& Image::operator=(Image&& orig) noexcept
+Widget& Widget::operator=(Widget&& orig) noexcept
 {
 	m_ID = orig.m_ID;
 	m_positionsVBO = orig.m_positionsVBO;
@@ -247,7 +165,6 @@ Image& Image::operator=(Image&& orig) noexcept
 	m_active = orig.m_active;
 	m_position = orig.m_position;
 	m_scale = orig.m_scale;
-	
 
 	orig.m_ID = Globals::INVALID_OPENGL_ID;
 	orig.m_positionsVBO = Globals::INVALID_OPENGL_ID;
@@ -257,24 +174,138 @@ Image& Image::operator=(Image&& orig) noexcept
 	return *this;
 }
 
-const glm::vec2& Image::getPosition() const
+//Widget
+const glm::vec2& Widget::getPosition() const
 {
 	return m_position;
 }
 
-const glm::vec2& Image::getScale() const
+const glm::vec2& Widget::getScale() const
 {
 	return m_scale;
 }
 
-bool Image::isActive() const
+bool Widget::isActive() const
 {
 	return m_active;
 }
 
-void Image::setActive(bool active)
+void Widget::setActive(bool active)
 {
 	m_active = active;
+}
+
+void Widget::setTextureRect(const std::array<glm::vec2, 6>& drawableRect)
+{
+	glBindVertexArray(m_ID);
+	glBindBuffer(GL_ARRAY_BUFFER, m_textCoordsVBO);
+	glBufferData(GL_ARRAY_BUFFER, drawableRect.size() * sizeof(glm::vec2), drawableRect.data(), GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)(0));
+
+	glBindVertexArray(0);
+}
+
+void Widget::setPosition(const glm::vec2& position)
+{
+	m_position = position;
+}
+
+void Widget::setScale(const glm::vec2& scale)
+{
+	m_scale = scale;
+}
+
+void Widget::render() const
+{
+	if (m_active)
+	{
+		glBindVertexArray(m_ID);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
+	}
+}
+
+Widget::Widget(bool active)
+	: m_ID(Globals::INVALID_OPENGL_ID),
+	m_positionsVBO(Globals::INVALID_OPENGL_ID),
+	m_textCoordsVBO(Globals::INVALID_OPENGL_ID),
+	m_active(active),
+	m_position(),
+	m_scale()
+{
+	glGenVertexArrays(1, &m_ID);
+	glBindVertexArray(m_ID);
+
+	glGenBuffers(1, &m_textCoordsVBO);
+	glGenBuffers(1, &m_positionsVBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_positionsVBO);
+	glBufferData(GL_ARRAY_BUFFER, QUAD_COORDS.size() * sizeof(glm::vec2), QUAD_COORDS.data(), GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)0);
+
+	glBindVertexArray(0);
+}
+
+Widget::Widget(const std::array<glm::vec2, 6>& drawableRect, bool active)
+	: m_ID(Globals::INVALID_OPENGL_ID),
+	m_positionsVBO(Globals::INVALID_OPENGL_ID),
+	m_textCoordsVBO(Globals::INVALID_OPENGL_ID),
+	m_active(active),
+	m_position(),
+	m_scale()
+{
+	glGenVertexArrays(1, &m_ID);
+	glBindVertexArray(m_ID);
+
+	glGenBuffers(1, &m_textCoordsVBO);
+	glGenBuffers(1, &m_positionsVBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_positionsVBO);
+	glBufferData(GL_ARRAY_BUFFER, QUAD_COORDS.size() * sizeof(glm::vec2), QUAD_COORDS.data(), GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)0);
+
+	glBindVertexArray(0);
+
+	setTextureRect(drawableRect);
+}
+
+Widget::~Widget()
+{
+	if (m_ID != Globals::INVALID_OPENGL_ID)
+	{
+		glDeleteVertexArrays(1, &m_ID);
+	}
+
+	if (m_positionsVBO != Globals::INVALID_OPENGL_ID)
+	{
+		glDeleteBuffers(1, &m_positionsVBO);
+	}
+
+	if (m_textCoordsVBO != Globals::INVALID_OPENGL_ID)
+	{
+		glDeleteBuffers(1, &m_textCoordsVBO);
+	}
+}
+
+//Text
+Text::Text(const std::array<glm::vec2, 6>& drawableRect)
+	: Widget(drawableRect, true)
+{}
+
+//Image
+Image::Image()
+	: Widget(false)
+{}
+
+void Image::setTextureRect(const std::array<glm::vec2, 6>& drawableRect)
+{
+	Widget::setTextureRect(drawableRect);
 }
 
 void Image::setTextureRect(const std::array<glm::vec3, 6>& drawableRect)
@@ -289,44 +320,13 @@ void Image::setTextureRect(const std::array<glm::vec3, 6>& drawableRect)
 	glBindVertexArray(0);
 }
 
-void Image::setTextureRect(const std::array<glm::vec2, 6>& drawableRect)
-{
-	glBindVertexArray(m_ID);
-	glBindBuffer(GL_ARRAY_BUFFER, m_textCoordsVBO);
-	glBufferData(GL_ARRAY_BUFFER, drawableRect.size() * sizeof(glm::vec2), drawableRect.data(), GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)(0));
-
-	glBindVertexArray(0);
-}
-
-void Image::setPosition(const glm::vec2& position)
-{
-	m_position = position;
-}
-
-void Image::setScale(const glm::vec2& scale)
-{
-	m_scale = scale;
-}
-
-void Image::render() const
-{
-	if (m_active)
-	{
-		glBindVertexArray(m_ID);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glBindVertexArray(0);
-	}
-}
-
 //GUI
 Gui::Gui()
 	: m_items(),
 	m_toolbar(),
 	m_selectionBox(),
-	m_text(CHARACTER_ONE)
+	m_text(CHARACTER_ONE),
+	m_text2(CHARACTER_TWO)
 {
 	//Items
 	for (int i = 0; i < m_items.size(); ++i)
@@ -338,13 +338,13 @@ Gui::Gui()
 	//Toolbar
 	m_toolbar.setPosition({ 700.0f, 1025.f });
 	m_toolbar.setScale({ 400.0f, 50.0f });
-	m_toolbar.setTextureRect(getToolbarTextCoords());
+	m_toolbar.setTextureRect(toolbarTextCoords);
 	m_toolbar.setActive(true);
 
 	//Selection Box
 	m_selectionBox.setPosition({ 670.0f, 950.0f });
 	m_selectionBox.setScale({ 30.0f, 30.0f });
-	m_selectionBox.setTextureRect(getSelectionTextCoords());
+	m_selectionBox.setTextureRect(selectionBoxTextCoords);
 	m_selectionBox.setActive(true);
 }
 
@@ -406,6 +406,12 @@ void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture, con
 		shaderHandler.setUniformMat4f(eShaderType::UIToolbar, "uModel", model);
 
 		m_text.render();
+
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(glm::vec2(208.0f, 200.0f), 0.0f));
+		model = glm::scale(model, glm::vec3(glm::vec2(50.0f, 50.0f), 1.0f));
+		shaderHandler.setUniform1i(eShaderType::UIToolbar, "uTexture", 2);
+		shaderHandler.setUniformMat4f(eShaderType::UIToolbar, "uModel", model);
+
+		m_text2.render();
 	}
 }
-
