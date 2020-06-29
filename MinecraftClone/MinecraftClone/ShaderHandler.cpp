@@ -124,6 +124,9 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create()
 		case eShaderType::UIToolbar :
 			shaderLoaded = createShaderProgram(shader.getID(), "UIToolbarVertexShader.glsl", "UIToolbarFragmentShader.glsl");
 			break;
+		case eShaderType::UIFont:
+			shaderLoaded = createShaderProgram(shader.getID(), "UIFontVertexShader.glsl", "UIFontFragmentShader.glsl");
+			break;
 		default:
 			assert(false);
 		}

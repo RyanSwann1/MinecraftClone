@@ -143,6 +143,10 @@ int main()
 	shaderHandler->setUniform1i(eShaderType::UIToolbar, "uTexture", 1);
 	shaderHandler->setUniformMat4f(eShaderType::UIToolbar, "uProjection", projection);
 	
+	shaderHandler->switchToShader(eShaderType::UIFont);
+	shaderHandler->setUniform1i(eShaderType::UIFont, "uTexture", 2);
+	shaderHandler->setUniformMat4f(eShaderType::UIFont, "uProjection", projection);
+
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
 	Gui gui;
 	std::vector<Pickup> pickUps;

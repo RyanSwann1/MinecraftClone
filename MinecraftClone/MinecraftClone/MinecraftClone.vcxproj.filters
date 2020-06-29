@@ -263,5 +263,7 @@
     <None Include="OpenGLShaders\UIToolbarFragmentShader.glsl" />
     <None Include="OpenGLShaders\PickupVertexShader.glsl" />
     <None Include="OpenGLShaders\PickupFragmentShader.glsl" />
+    <None Include="OpenGLShaders\UIFontVertexShader.glsl" />
+    <None Include="OpenGLShaders\UIFontFragmentShader.glsl" />
   </ItemGroup>
 </Project>

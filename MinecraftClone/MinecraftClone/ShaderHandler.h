@@ -16,7 +16,8 @@ enum class eShaderType
 	Skybox,
 	UIItem,
 	UIToolbar,
-	Max = UIToolbar
+	UIFont,
+	Max = UIFont
 };
 
 class ShaderHandler : private NonCopyable, private NonMovable
@@ -56,6 +57,7 @@ private:
 		eShaderType::Pickup,
 		eShaderType::Skybox,
 		eShaderType::UIItem,
-		eShaderType::UIToolbar
+		eShaderType::UIToolbar,
+		eShaderType::UIFont
 	};
 };
