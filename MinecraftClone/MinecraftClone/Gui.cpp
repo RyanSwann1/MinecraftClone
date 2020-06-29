@@ -303,11 +303,6 @@ Image::Image()
 	: Widget(false)
 {}
 
-void Image::setTextureRect(const std::array<glm::vec2, 6>& drawableRect)
-{
-	Widget::setTextureRect(drawableRect);
-}
-
 void Image::setTextureRect(const std::array<glm::vec3, 6>& drawableRect)
 {
 	glBindVertexArray(m_ID);
@@ -325,8 +320,7 @@ Gui::Gui()
 	: m_items(),
 	m_toolbar(),
 	m_selectionBox(),
-	m_text(CHARACTER_ONE),
-	m_text2(CHARACTER_TWO)
+	m_text(CHARACTER_ONE)
 {
 	//Items
 	for (int i = 0; i < m_items.size(); ++i)
@@ -361,9 +355,9 @@ void Gui::removeItem(eInventoryIndex hotbarIndex)
 	m_items[static_cast<int>(hotbarIndex)].setActive(false);
 }
 
-void Gui::update(eInventoryIndex selectedItemIndex)
+void Gui::updateSelectionBox(eInventoryIndex selectedItem)
 {
-	m_selectionBox.setPosition(getPositionOnHotbar(selectedItemIndex, { 670.0f, 950.0f }));
+	m_selectionBox.setPosition(getPositionOnHotbar(selectedItem, { 670.0f, 950.0f }));
 }
 
 void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture, const Texture& fontTexture) const
@@ -406,12 +400,5 @@ void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture, con
 		shaderHandler.setUniformMat4f(eShaderType::UIToolbar, "uModel", model);
 
 		m_text.render();
-
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(glm::vec2(208.0f, 200.0f), 0.0f));
-		model = glm::scale(model, glm::vec3(glm::vec2(50.0f, 50.0f), 1.0f));
-		shaderHandler.setUniform1i(eShaderType::UIToolbar, "uTexture", 2);
-		shaderHandler.setUniformMat4f(eShaderType::UIToolbar, "uModel", model);
-
-		m_text2.render();
 	}
 }

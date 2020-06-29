@@ -97,7 +97,7 @@ void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
 	}
 }
 
-void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
+void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent, Gui& gui)
 {
 	assert(currentSFMLEvent.type == sf::Event::MouseWheelScrolled ||
 		currentSFMLEvent.type == sf::Event::KeyPressed);
@@ -156,6 +156,8 @@ void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
 			m_currentSelectedItem = eInventoryIndex::One;
 		}
 	}
+
+	gui.updateSelectionBox(m_currentSelectedItem);
 }
 
 const Item& Inventory::getSelectedItem() const

@@ -90,11 +90,6 @@ Player::Player()
 	m_jumpTimer.restart();
 }
 
-const Inventory& Player::getInventory() const
-{
-	return m_inventory;
-}
-
 const glm::vec3 Player::getMiddlePosition() const
 {
 	return { m_position.x, m_position.y - 1, m_position.z };
@@ -277,7 +272,7 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 			discardItem(pickUps, gui);
 		}
 
-		m_inventory.handleInputEvents(currentSFMLEvent);
+		m_inventory.handleInputEvents(currentSFMLEvent, gui);
 	}
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
 	{
@@ -296,7 +291,7 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 	}
 	if (currentSFMLEvent.type == currentSFMLEvent.MouseWheelScrolled)
 	{
-		m_inventory.handleInputEvents(currentSFMLEvent);
+		m_inventory.handleInputEvents(currentSFMLEvent, gui);
 	}
 }
 

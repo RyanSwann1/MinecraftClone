@@ -34,7 +34,7 @@ public:
 
 	void reduceSelectedItem(Gui& Gui);
 	void add(eCubeType cubeTypeToAdd, Gui& gui);
-	void handleInputEvents(const sf::Event& currentSFMLEvent);
+	void handleInputEvents(const sf::Event& currentSFMLEvent, Gui& gui);
 
 private:
 	std::array<Item, static_cast<size_t>(eInventoryIndex::Max) + 1> m_items;

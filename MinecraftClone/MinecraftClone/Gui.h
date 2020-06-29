@@ -45,7 +45,7 @@ class Image : public Widget
 public:
 	Image();
 
-	void setTextureRect(const std::array<glm::vec2, 6>& drawableRect);
+	using Widget::setTextureRect;
 	void setTextureRect(const std::array<glm::vec3, 6>& drawableRect);
 };
 
@@ -60,8 +60,8 @@ public:
 
 	void addItem(eInventoryIndex hotbarIndex, eCubeType cubeType);
 	void removeItem(eInventoryIndex hotbarIndex);
+	void updateSelectionBox(eInventoryIndex selectedItemIndex);
 
-	void update(eInventoryIndex selectedItemIndex);
 	void render(ShaderHandler& shaderHandler, const Texture& widgetTexture, const Texture& fontTexture) const;
 
 private:
@@ -69,5 +69,4 @@ private:
 	Image m_toolbar;
 	Image m_selectionBox;
 	Text m_text;
-	Text m_text2;
 };
