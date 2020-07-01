@@ -150,6 +150,7 @@ int main()
 	{
 		deltaTime = deltaClock.restart().asSeconds();
 
+		//Handle Inputs
 		sf::Event currentSFMLEvent;
 		while (window.pollEvent(currentSFMLEvent))
 		{
@@ -162,6 +163,16 @@ int main()
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
 				{
 					resetGame = true;
+					chunkGenerationThread.join();
+					resetGame = false;
+					chunkManager.reset();
+					chunkManager = std::make_unique<ChunkManager>();
+
+					chunkGenerationThread = std::thread{ [&](std::unique_ptr<ChunkManager>* chunkManager)
+						{chunkManager->get()->update(std::ref(player), std::ref(window), std::ref(resetGame),
+							std::ref(playerMutex), std::ref(renderingMutex)); }, &chunkManager };
+
+					player.spawn(*chunkManager, playerMutex);
 				}
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 				{
@@ -169,33 +180,14 @@ int main()
 				}
 			}
 
-			assert(chunkManager);
 			player.handleInputEvents(pickUps, currentSFMLEvent, *chunkManager, playerMutex, window, gui);
 		}
 
-		assert(chunkManager);
+
+		//Update
 		player.update(deltaTime, playerMutex, *chunkManager.get());
-		glm::ivec3 startingPosition = Globals::getClosestMiddlePosition(player.getPosition());
-		Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Globals::VISIBILITY_DISTANCE);
 
-		if (resetGame)
-		{
-			chunkGenerationThread.join();
-			resetGame = false;
-			chunkManager.reset();
-			chunkManager = std::make_unique<ChunkManager>();
-
-			chunkGenerationThread = std::thread{[&](std::unique_ptr<ChunkManager>* chunkManager)
-				{chunkManager->get()->update(std::ref(player), std::ref(window), std::ref(resetGame), 
-					std::ref(playerMutex), std::ref(renderingMutex)); }, &chunkManager };
-		
-			player.spawn(*chunkManager, playerMutex);
-		}
-
-		glm::mat4 view = glm::lookAt(player.getPosition(), player.getPosition() + player.getCamera().front, player.getCamera().up);
-		glm::mat4 projection = glm::perspective(glm::radians(player.getCamera().FOV),
-			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), player.getCamera().nearPlaneDistance, player.getCamera().farPlaneDistance);
-
+		Rectangle visibilityRect = Globals::getVisibilityRect(player.getPosition());
 		for (auto pickup = pickUps.begin(); pickup != pickUps.end();)
 		{
 			if (pickup->isInReachOfPlayer(player.getPosition()) || !visibilityRect.contains(pickup->getAABB()))
@@ -210,57 +202,59 @@ int main()
 			}
 		}
 
+		glm::mat4 view = glm::lookAt(player.getPosition(), player.getPosition() + player.getCamera().front, player.getCamera().up);
+		glm::mat4 projection = glm::perspective(glm::radians(player.getCamera().FOV),
+			static_cast<float>(windowSize.x) / static_cast<float>(windowSize.y), player.getCamera().nearPlaneDistance, player.getCamera().farPlaneDistance);
+
 		frustum.update(projection * view);
 		
+		//Render
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		if (chunkManager)
+
+		shaderHandler->switchToShader(eShaderType::Chunk);
+		shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
+		shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
+
+		std::lock_guard<std::mutex> renderingLock(renderingMutex);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+			
+		textureArray->bind();
+		chunkManager->renderOpaque(frustum);
+		
+		//Draw Pickups
+		shaderHandler->switchToShader(eShaderType::Pickup);
+		shaderHandler->setUniformMat4f(eShaderType::Pickup, "uView", view);
+		shaderHandler->setUniformMat4f(eShaderType::Pickup, "uProjection", projection);
+		for (auto& pickUp : pickUps)
 		{
-			shaderHandler->switchToShader(eShaderType::Chunk);
-			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
-			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
-			//Draw Scene
-			std::lock_guard<std::mutex> renderingLock(renderingMutex);
-			glEnable(GL_CULL_FACE);
-			glCullFace(GL_BACK);
-			
-			textureArray->bind();
-			chunkManager->renderOpaque(frustum);
-			
-			shaderHandler->switchToShader(eShaderType::Pickup);
-			shaderHandler->setUniformMat4f(eShaderType::Pickup, "uView", view);
-			shaderHandler->setUniformMat4f(eShaderType::Pickup, "uProjection", projection);
-			for (auto& pickUp : pickUps)
-			{
-				pickUp.render(frustum, *shaderHandler);
-			}
-
-			glDisable(GL_CULL_FACE);
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			
-			shaderHandler->switchToShader(eShaderType::Chunk);
-			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
-			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
-			chunkManager->renderTransparent(frustum);
-			
-			glDisable(GL_BLEND);
-
-			//Draw Skybox
-			glDepthFunc(GL_LEQUAL);
-			shaderHandler->switchToShader(eShaderType::Skybox);
-			shaderHandler->setUniformMat4f(eShaderType::Skybox, "uView", glm::mat4(glm::mat3(view)));
-			shaderHandler->setUniformMat4f(eShaderType::Skybox, "uProjection", projection);
-
-			skybox->render();
-			glDepthFunc(GL_LESS);
+			pickUp.render(frustum, *shaderHandler);
 		}
 
+		glDisable(GL_CULL_FACE);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			
+		shaderHandler->switchToShader(eShaderType::Chunk);
+		shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
+		shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
+		chunkManager->renderTransparent(frustum);
+			
+		glDisable(GL_BLEND);
+
+		//Draw Skybox
+		glDepthFunc(GL_LEQUAL);
+		shaderHandler->switchToShader(eShaderType::Skybox);
+		shaderHandler->setUniformMat4f(eShaderType::Skybox, "uView", glm::mat4(glm::mat3(view)));
+		shaderHandler->setUniformMat4f(eShaderType::Skybox, "uProjection", projection);
+
+		skybox->render();
+		glDepthFunc(GL_LESS);
+		
 		//Draw GUI
-		{	
-			textureArray->bind();
-			gui.render(*shaderHandler, *widjetsTexture, *fontTexture);
-		}
-
+		textureArray->bind();
+		gui.render(*shaderHandler, *widjetsTexture, *fontTexture);
+		
 		window.display();
 	}
 

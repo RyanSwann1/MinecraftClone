@@ -2,6 +2,7 @@
 
 #include "glm/glm.hpp"
 #include "CubeType.h"
+#include "Rectangle.h"
 #include <string>
 #include <array>
 #include <random>
@@ -174,4 +175,10 @@ namespace Globals
 	const std::string TEXTURE_DIRECTORY = "Textures/";
 	const std::string FONTS_DIRECTORY = "Fonts/";
 	constexpr glm::ivec3 PLAYER_STARTING_POSITION = { 0.0f, 0.0f, 0.0f };
+
+	inline Rectangle getVisibilityRect(const glm::vec3& position)
+	{
+		glm::ivec3 startingPosition = Globals::getClosestMiddlePosition(position);
+		return { glm::vec2(startingPosition.x, startingPosition.z), Globals::VISIBILITY_DISTANCE };
+	}
 }
