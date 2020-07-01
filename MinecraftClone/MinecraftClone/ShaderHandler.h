@@ -41,7 +41,7 @@ class ShaderHandler : private NonCopyable, private NonMovable
 	};
 
 public:
-	static std::unique_ptr<ShaderHandler> create();
+	static std::unique_ptr<ShaderHandler> create(const glm::ivec2& windowSize);
 
 	void setUniformMat4f(eShaderType shaderType, const std::string& uniformName, const glm::mat4& matrix);
 	void setUniform1i(eShaderType shaderType, const std::string& uniformName, int value);

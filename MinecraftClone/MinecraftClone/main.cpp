@@ -81,7 +81,7 @@ int main()
 	glCheck(glViewport(0, 0, windowSize.x, windowSize.y));
 	glEnable(GL_DEPTH_TEST);
 
-	std::unique_ptr<ShaderHandler> shaderHandler = ShaderHandler::create();
+	std::unique_ptr<ShaderHandler> shaderHandler = ShaderHandler::create(windowSize);
 	assert(shaderHandler);
 	if (!shaderHandler)
 	{
@@ -121,18 +121,6 @@ int main()
 		std::cout << "Couldn't load font texture\n";
 		return -1;
 	}
-
-	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(windowSize.x),
-		static_cast<float>(windowSize.y), 0.0f, -1.0f, 1.0f);
-
-	shaderHandler->switchToShader(eShaderType::UIItem);
-	shaderHandler->setUniformMat4f(eShaderType::UIItem, "uProjection", projection);
-
-	shaderHandler->switchToShader(eShaderType::UIToolbar);
-	shaderHandler->setUniformMat4f(eShaderType::UIToolbar, "uProjection", projection);
-	
-	shaderHandler->switchToShader(eShaderType::UIFont);
-	shaderHandler->setUniformMat4f(eShaderType::UIFont, "uProjection", projection);
 
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
 	Gui gui;

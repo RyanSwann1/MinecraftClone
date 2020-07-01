@@ -101,7 +101,7 @@ ShaderHandler::ShaderHandler()
 	: m_currentShaderType(eShaderType::Chunk)
 {}
 
-std::unique_ptr<ShaderHandler> ShaderHandler::create()
+std::unique_ptr<ShaderHandler> ShaderHandler::create(const glm::ivec2& windowSize)
 {
 	std::unique_ptr<ShaderHandler> shaderHandler = std::unique_ptr<ShaderHandler>(new ShaderHandler());
 	bool shaderLoaded = false;
@@ -131,6 +131,18 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create()
 			assert(false);
 		}
 	}
+
+	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(windowSize.x),
+		static_cast<float>(windowSize.y), 0.0f, -1.0f, 1.0f);
+
+	shaderHandler->switchToShader(eShaderType::UIItem);
+	shaderHandler->setUniformMat4f(eShaderType::UIItem, "uProjection", projection);
+
+	shaderHandler->switchToShader(eShaderType::UIToolbar);
+	shaderHandler->setUniformMat4f(eShaderType::UIToolbar, "uProjection", projection);
+
+	shaderHandler->switchToShader(eShaderType::UIFont);
+	shaderHandler->setUniformMat4f(eShaderType::UIFont, "uProjection", projection);
 
 	assert(shaderLoaded);
 	return (shaderLoaded ? std::move(shaderHandler) : std::unique_ptr<ShaderHandler>());
