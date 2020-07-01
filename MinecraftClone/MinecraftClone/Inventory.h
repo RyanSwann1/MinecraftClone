@@ -10,6 +10,7 @@ class Item : private NonCopyable, private NonMovable
 public:
 	Item();
 
+	int getSize() const;
 	bool isEmpty() const;
 	eCubeType getCubeType() const;
 

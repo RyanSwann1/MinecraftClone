@@ -73,6 +73,7 @@ public:
 
 private:
 	std::array<Image, static_cast<size_t>(eInventoryIndex::Max) + 1> m_items;
+
 	Image m_toolbar;
 	Image m_selectionBox;
 	Text m_text;

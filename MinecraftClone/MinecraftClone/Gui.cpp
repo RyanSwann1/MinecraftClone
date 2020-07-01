@@ -406,9 +406,6 @@ Gui::Gui()
 	m_selectionBox.setScale({ 30.0f, 30.0f });
 	m_selectionBox.setTextureRect(selectionBoxTextCoords);
 	m_selectionBox.setActive(true);
-
-	m_text.setText("Hello World", { 150, 150 });
-	m_text.setActive(true);
 }
 
 void Gui::addItem(eInventoryIndex hotbarIndex, eCubeType cubeType)
@@ -431,22 +428,25 @@ void Gui::updateSelectionBox(eInventoryIndex selectedItem)
 
 void Gui::updateItemQuantity(eInventoryIndex selectedItem, int quantity)
 {
-	assert(m_items[static_cast<int>(selectedItem)].isActive());
+	assert(quantity >= 1 && 
+		m_items[static_cast<int>(selectedItem)].isActive());
 
 	if (quantity >= 10)
 	{
-		int i = 0;
-		std::array<int, MAX_DIGITS> digits;
-		collectDigits(digits, quantity, i);
-		switch (digits[0])
-		{
-		default:
-			break;
-		}
+		//int i = 0;
+		//std::array<int, MAX_DIGITS> digits;
+		//collectDigits(digits, quantity, i);
+		//switch (digits[0])
+		//{
+		//default:
+		//	break;
+		//}
 	}
 	else
 	{
 
+		m_text.setText(std::to_string(quantity), { 150, 150 });
+		m_text.setActive(true);
 	}
 }
 

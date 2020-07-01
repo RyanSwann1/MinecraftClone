@@ -8,6 +8,11 @@ Item::Item()
 	m_currentAmount(0)
 {}
 
+int Item::getSize() const
+{
+	return m_currentAmount;
+}
+
 bool Item::isEmpty() const
 {
 	return m_currentAmount == 0;
@@ -78,6 +83,7 @@ void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
 		if (!m_items[i].isEmpty() && m_items[i].getCubeType() == cubeTypeToAdd)
 		{
 			m_items[i].incrementQuantity();
+			gui.updateItemQuantity(static_cast<eInventoryIndex>(i), m_items[i].getSize());
 			itemAdded = true;
 			break;
 		}
@@ -92,6 +98,7 @@ void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
 			m_items[i].incrementQuantity();
 
 			gui.addItem(static_cast<eInventoryIndex>(i), cubeTypeToAdd);
+			gui.updateItemQuantity(static_cast<eInventoryIndex>(i), m_items[i].getSize());
 			break;
 		}
 	}
