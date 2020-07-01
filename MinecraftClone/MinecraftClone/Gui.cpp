@@ -310,14 +310,17 @@ void Text::setText(const std::string& text, glm::vec2 position)
 	std::vector<glm::vec2> positions;
 	std::vector<glm::vec2> textCoords;
 
-	for (int i = 0; i < text.size(); ++i)
+	for (auto i : text)
 	{
-		std::array<glm::vec2, 6> quadCoords = getQuadCoords(position);
-		positions.insert(positions.begin() + positions.size(), quadCoords.begin(), quadCoords.end());
+		if (i != ' ')
+		{
+			std::array<glm::vec2, 6> quadCoords = getQuadCoords(position);
+			positions.insert(positions.begin() + positions.size(), quadCoords.begin(), quadCoords.end());
 
-		std::array<glm::vec2, 6> characterTextCoords = CHARACTER_TWO;
-		textCoords.insert(textCoords.begin() + textCoords.size(), characterTextCoords.begin(), characterTextCoords.end());
-		
+			std::array<glm::vec2, 6> characterTextCoords = CHARACTER_TWO;
+			textCoords.insert(textCoords.begin() + textCoords.size(), characterTextCoords.begin(), characterTextCoords.end());
+		}
+
 		position.x += CHARACTER_SPACING;
 	}
 
