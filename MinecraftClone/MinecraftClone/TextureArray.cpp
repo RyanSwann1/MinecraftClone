@@ -77,7 +77,7 @@ namespace
 Texture::Texture(unsigned int ID)
 	: m_ID(ID)
 {
-	//bind();
+
 }
 
 Texture::~Texture()
@@ -88,7 +88,7 @@ Texture::~Texture()
 
 void Texture::bind(int ID) const
 {
-	glActiveTexture(GL_TEXTURE0 + ID);
+	//glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_ID);
 }
 
@@ -101,7 +101,6 @@ std::unique_ptr<Texture> Texture::create(const std::string& textureName)
 {
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
-	std::cout << textureID << "\n";
 
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
@@ -120,8 +119,7 @@ TextureArray::TextureArray(unsigned int ID)
 	: m_slot(0),
 	m_ID(ID)
 {
-	assert(ID != Globals::INVALID_OPENGL_ID);
-	glActiveTexture(GL_TEXTURE0 + m_slot);
+	//glActiveTexture(GL_TEXTURE0 + m_slot);
 }
 
 std::unique_ptr<TextureArray> TextureArray::create()
@@ -167,7 +165,8 @@ unsigned int TextureArray::getCurrentSlot() const
 
 void TextureArray::bind() const
 {
-	glActiveTexture(GL_TEXTURE0 + m_ID);
+	//glActiveTexture(GL_TEXTURE0 + m_ID);
+	//glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, m_ID);
 }
 

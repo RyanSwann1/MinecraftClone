@@ -1,5 +1,8 @@
 #pragma once
 
+//Math
+//https://www.reddit.com/r/gamedev/comments/hh98gh/what_kind_of_math_do_i_need_to_learn/
+//https://www.reddit.com/r/gamedev/comments/gqndy3/what_types_of_math_would_you_say_are_essential_to/
 
 ////Example Project
 //https://www.youtube.com/watch?v=MfaXf6Gs8oY

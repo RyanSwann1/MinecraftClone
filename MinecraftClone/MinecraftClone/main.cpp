@@ -122,29 +122,16 @@ int main()
 		return -1;
 	}
 
-	textureArray->bind();
-
 	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(windowSize.x),
 		static_cast<float>(windowSize.y), 0.0f, -1.0f, 1.0f);
 
-	shaderHandler->setUniform1i(eShaderType::Chunk, "uTexture", 0);
-
-	shaderHandler->switchToShader(eShaderType::Pickup);
-	shaderHandler->setUniform1i(eShaderType::Pickup, "uTexture", 0);
-
-	shaderHandler->switchToShader(eShaderType::Skybox);
-	shaderHandler->setUniform1i(eShaderType::Skybox, "uSkyboxTexture", 1);
-	
 	shaderHandler->switchToShader(eShaderType::UIItem);
-	shaderHandler->setUniform1i(eShaderType::UIItem, "uTexture", 0);
 	shaderHandler->setUniformMat4f(eShaderType::UIItem, "uProjection", projection);
 
 	shaderHandler->switchToShader(eShaderType::UIToolbar);
-	shaderHandler->setUniform1i(eShaderType::UIToolbar, "uTexture", 1);
 	shaderHandler->setUniformMat4f(eShaderType::UIToolbar, "uProjection", projection);
 	
 	shaderHandler->switchToShader(eShaderType::UIFont);
-	shaderHandler->setUniform1i(eShaderType::UIFont, "uTexture", 2);
 	shaderHandler->setUniformMat4f(eShaderType::UIFont, "uProjection", projection);
 
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
@@ -162,6 +149,8 @@ int main()
 
 	player.spawn(*chunkManager, playerMutex);
 
+	std::cout << glGetError() << "\n";
+	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 
@@ -246,6 +235,7 @@ int main()
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK);
 			
+			textureArray->bind();
 			chunkManager->renderOpaque(frustum);
 			
 			shaderHandler->switchToShader(eShaderType::Pickup);
@@ -279,8 +269,8 @@ int main()
 
 		//Draw GUI
 		{	
-			gui.render(*shaderHandler, *widjetsTexture, *fontTexture);
 			textureArray->bind();
+			gui.render(*shaderHandler, *widjetsTexture, *fontTexture);
 		}
 
 		window.display();
