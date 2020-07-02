@@ -21,7 +21,7 @@ namespace
 
 	constexpr glm::vec2 TOOLBAR_STARTING_POSITION = { 700.0f, 1000.0f };
 	constexpr glm::vec2 INITIAL_ITEM_STARTING_POSITION = { 710.0f, 1000.0f };
-	constexpr glm::vec2 ITEM_QUANTITY_STARTING_POSITION = { 720.0f, 975.0f };
+	constexpr glm::vec2 ITEM_QUANTITY_STARTING_POSITION = { 720.0f, 925.0f };
 
 	std::array<glm::vec2, 6> getQuadCoords(const glm::vec2& position, const glm::vec2& scale)
 	{
@@ -160,6 +160,9 @@ namespace
 		case eInventoryIndex::Eight:
 			position.x = position.x + offsetX * 7;
 			break;
+		case eInventoryIndex::Nine:
+			position.x = position.x + offsetX * 8;
+			break;
 		}
 
 		return position;
@@ -214,8 +217,6 @@ void Widget::setActive(bool active)
 {
 	m_active = active;
 }
-
-
 
 void Widget::render() const
 {

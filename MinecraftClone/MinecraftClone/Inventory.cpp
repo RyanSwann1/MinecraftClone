@@ -152,6 +152,9 @@ void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent, Gui& gui)
 		case sf::Keyboard::Num8:
 			m_currentSelectedItem = eInventoryIndex::Eight;
 			break;
+		case sf::Keyboard::Num9:
+			m_currentSelectedItem = eInventoryIndex::Nine;
+			break;
 		}
 	}
 	else
@@ -171,7 +174,7 @@ void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent, Gui& gui)
 
 		if (static_cast<int>(m_currentSelectedItem) < static_cast<int>(eInventoryIndex::One))
 		{
-			m_currentSelectedItem = eInventoryIndex::Eight;
+			m_currentSelectedItem = eInventoryIndex::Max;
 		}
 		else if (static_cast<int>(m_currentSelectedItem) > static_cast<int>(eInventoryIndex::Max))
 		{
