@@ -4,7 +4,7 @@
 
 namespace
 {
-	constexpr int MAX_ITEM_CAPACITY = 9;
+	constexpr int MAX_ITEM_CAPACITY = 64;
 }
 
 //Item

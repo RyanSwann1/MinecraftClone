@@ -9,14 +9,9 @@
 #include <array>
 #include <iostream>
 
-//sf::IntRect Texture::getFrameRect(int tileID) const
-//{
-//	Rect (T rectLeft, T rectTop, T rectWidth, T rectHeight)
-//	return sf::IntRect(tileID % m_columns * m_tileSize.x, tileID / m_columns * m_tileSize.x, m_tileSize.x, m_tileSize.y);
-//}
-
 namespace
 {
+	constexpr size_t MAX_DIGITS = 2;
 	constexpr int TEXT_SIZE = 32;
 	constexpr int CHARACTER_SPACING = TEXT_SIZE / 2;
 	constexpr int FONT_TEXTURE_COLUMNS = 8;
@@ -85,36 +80,6 @@ namespace
 		glm::vec2(1, 1),
 		glm::vec2(0, 1),
 		glm::vec2(0, 0)
-	};
-
-	constexpr std::array<glm::vec2, 6> CHARACTER_ONE =
-	{
-		glm::vec2(0.125f, 0.375f),
-		glm::vec2(0.25f, 0.375f),
-		glm::vec2(0.25f, 0.25f),
-		glm::vec2(0.25f, 0.25f),
-		glm::vec2(0.125f, 0.25f),
-		glm::vec2(0.125f, 0.375f)
-	};
-
-	constexpr std::array<glm::vec2, 6> CHARACTER_TWO =
-	{
-		glm::vec2(0.25f, 0.375f),
-		glm::vec2(0.375f, 0.375f),
-		glm::vec2(0.375f, 0.25f),
-		glm::vec2(0.375f, 0.25f),
-		glm::vec2(0.25f, 0.25f),
-		glm::vec2(0.25f, 0.375f)
-	};
-
-	constexpr std::array<glm::vec2, 6> CHARACTER_THREE =
-	{
-		glm::vec2(0.25f, 0.375f),
-		glm::vec2(0.375f, 0.375f),
-		glm::vec2(0.375f, 0.25f),
-		glm::vec2(0.375f, 0.25f),
-		glm::vec2(0.25f, 0.25f),
-		glm::vec2(0.25f, 0.375f)
 	};
 
 	std::array<glm::vec3, 6> getTextCoords(eTerrainTextureLayer textureLayer) 
@@ -354,69 +319,48 @@ Text::Text(const std::array<glm::vec2, 6>& drawableRect)
 	m_size(0)
 {}
 
-void Text::setText(const std::array<int, MAX_DIGITS>& number, glm::vec2 position, const std::unordered_map<char, int>& characterIDMap)
-{
-	std::vector<glm::vec2> positions;
-	std::vector<glm::vec2> textCoords;
-
-	for (auto i : number)
-	{
-		std::array<glm::vec2, 6> quadCoords = getQuadCoords(position);
-		positions.insert(positions.begin() + positions.size(), quadCoords.cbegin(), quadCoords.cend());
-
-		auto characterID = characterIDMap.find(convertDigit(i));
-		assert(characterID != characterIDMap.cend());
-
-		glm::vec2 position =
-			convertTo2DTextCoord(characterID->second, FONT_TEXTURE_TILESIZE, FONT_TEXTURE_COLUMNS, FONT_TEXTURE_SIZE);
-		
-		std::array<glm::vec2, 6> characterTextCoords = 
-			getCharacterTextCoords(position, FONT_TEXTURE_COLUMNS);
-		
-		textCoords.insert(textCoords.begin() + textCoords.size(), characterTextCoords.cbegin(), characterTextCoords.cend());
-		
-		position.x += CHARACTER_SPACING;
-	}
-
-	setText(positions, textCoords);
-}
-
 void Text::setText(int number, const std::unordered_map<char, int>& characterIDMap)
 {
+	assert(number > 0);
+
 	std::vector<glm::vec2> positions;
 	std::vector<glm::vec2> textCoords;
 
-	std::array<glm::vec2, 6> quadCoords = getQuadCoords(m_position);
-	positions.insert(positions.begin() + positions.size(), quadCoords.cbegin(), quadCoords.cend());
-
-	auto characterID = characterIDMap.find(convertDigit(number));
-	assert(characterID != characterIDMap.cend());
-
-	std::array<glm::vec2, 6> characterTextCoords = 
-		getCharacterTextCoords(convertTo2DTextCoord(characterID->second, FONT_TEXTURE_TILESIZE, FONT_TEXTURE_COLUMNS, FONT_TEXTURE_SIZE), FONT_TEXTURE_COLUMNS);
-
-	textCoords.insert(textCoords.begin() + textCoords.size(), characterTextCoords.cbegin(), characterTextCoords.cend());
-	
-	setText(positions, textCoords);
-}
-
-void Text::setText(const std::string& text, glm::vec2 position)
-{
-	std::vector<glm::vec2> positions;
-	std::vector<glm::vec2> textCoords;
-
-	for (auto i : text)
+	if (number >= 10)
 	{
-		if (i != ' ')
+		int i = 0;
+		std::array<int, MAX_DIGITS> digits;
+		collectDigits(digits, number, i);
+
+		glm::ivec2 position = m_position;
+		for (auto digit : digits)
 		{
 			std::array<glm::vec2, 6> quadCoords = getQuadCoords(position);
 			positions.insert(positions.begin() + positions.size(), quadCoords.cbegin(), quadCoords.cend());
 
-			std::array<glm::vec2, 6> characterTextCoords = CHARACTER_TWO;
-			textCoords.insert(textCoords.begin() + textCoords.size(), characterTextCoords.cbegin(), characterTextCoords.cend());
-		}
+			auto characterID = characterIDMap.find(convertDigit(digit));
+			assert(characterID != characterIDMap.cend());
 
-		position.x += CHARACTER_SPACING;
+			std::array<glm::vec2, 6> characterTextCoords =
+				getCharacterTextCoords(convertTo2DTextCoord(characterID->second, FONT_TEXTURE_TILESIZE, FONT_TEXTURE_COLUMNS, FONT_TEXTURE_SIZE), FONT_TEXTURE_COLUMNS);
+
+			textCoords.insert(textCoords.begin() + textCoords.size(), characterTextCoords.cbegin(), characterTextCoords.cend());
+			
+			position.x += CHARACTER_SPACING;
+		}
+	}
+	else
+	{
+		std::array<glm::vec2, 6> quadCoords = getQuadCoords(m_position);
+		positions.insert(positions.begin() + positions.size(), quadCoords.cbegin(), quadCoords.cend());
+
+		auto characterID = characterIDMap.find(convertDigit(number));
+		assert(characterID != characterIDMap.cend());
+
+		std::array<glm::vec2, 6> characterTextCoords =
+			getCharacterTextCoords(convertTo2DTextCoord(characterID->second, FONT_TEXTURE_TILESIZE, FONT_TEXTURE_COLUMNS, FONT_TEXTURE_SIZE), FONT_TEXTURE_COLUMNS);
+
+		textCoords.insert(textCoords.begin() + textCoords.size(), characterTextCoords.cbegin(), characterTextCoords.cend());
 	}
 
 	setText(positions, textCoords);
@@ -503,7 +447,7 @@ Gui::Gui()
 	{
 		itemQuantityText.setPosition(position);
 
-		position.x += 25.0f;
+		position.x += 75.0f;
 	}
 
 	//Toolbar
@@ -552,18 +496,7 @@ void Gui::updateItemQuantity(eInventoryIndex selectedItem, int quantity)
 {
 	assert(m_items[static_cast<int>(selectedItem)].isActive());
 
-	if (quantity >= 10)
-	{
-		//int i = 0;
-		//std::array<int, MAX_DIGITS> digits;
-		//collectDigits(digits, quantity, i);
-		//switch (digits[0])
-		//{
-		//default:
-		//	break;
-		//}
-	}
-	else if(quantity >= 1)
+	if (quantity > 0)
 	{
 		m_itemQuantityText[static_cast<int>(selectedItem)].setText(quantity, m_characterIDMap);
 		m_itemQuantityText[static_cast<int>(selectedItem)].setActive(true);

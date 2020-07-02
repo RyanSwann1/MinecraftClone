@@ -7,7 +7,7 @@
 #include <vector>
 #include <unordered_map>
 
-constexpr size_t MAX_DIGITS = 2;
+
 
 class Widget : private NonCopyable
 {
@@ -42,12 +42,7 @@ public:
 	Text();
 	Text(const std::array<glm::vec2, 6>& drawableRect);
 
-	void setText(const std::array<int, MAX_DIGITS>& number, glm::vec2 position, 
-		const std::unordered_map<char, int>& characterIDMap);
-
 	void setText(int number, const std::unordered_map<char, int>& characterIDMap);
-	
-	void setText(const std::string& text, glm::vec2 position);
 	void render() const override;
 
 private:
