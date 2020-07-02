@@ -8,7 +8,7 @@ namespace
 }
 
 //Item
-Item::Item()
+Item::Item()	
 	: m_cubeType(),
 	m_currentAmount(0)
 {}
@@ -79,6 +79,8 @@ void Inventory::reduceSelectedItem(Gui& gui)
 	assert(!isSelectedItemEmpty());
 
 	getSelectedItem().reduce();
+	gui.updateItemQuantity(m_currentSelectedItem, getSelectedItem().getSize());
+	
 	if (getSelectedItem().isEmpty())
 	{
 		gui.removeItem(m_currentSelectedItem);
