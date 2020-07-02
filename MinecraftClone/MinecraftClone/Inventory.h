@@ -11,6 +11,7 @@ public:
 	Item();
 
 	int getSize() const;
+	bool isFull() const;
 	bool isEmpty() const;
 	eCubeType getCubeType() const;
 

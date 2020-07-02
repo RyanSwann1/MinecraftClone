@@ -2,6 +2,11 @@
 #include "Gui.h"
 #include <iostream>
 
+namespace
+{
+	constexpr int MAX_ITEM_CAPACITY = 9;
+}
+
 //Item
 Item::Item()
 	: m_cubeType(),
@@ -11,6 +16,11 @@ Item::Item()
 int Item::getSize() const
 {
 	return m_currentAmount;
+}
+
+bool Item::isFull() const
+{
+	return m_currentAmount == MAX_ITEM_CAPACITY;
 }
 
 bool Item::isEmpty() const
@@ -32,6 +42,7 @@ void Item::reduce()
 
 void Item::incrementQuantity()
 {
+	assert(m_currentAmount < MAX_ITEM_CAPACITY);
 	++m_currentAmount;
 }
 
@@ -80,7 +91,9 @@ void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
 	bool itemAdded = false;
 	for (int i = 0; i < static_cast<int>(eInventoryIndex::Max) + 1; ++i)
 	{
-		if (!m_items[i].isEmpty() && m_items[i].getCubeType() == cubeTypeToAdd)
+		if (!m_items[i].isEmpty() && 
+			!m_items[i].isFull() && 
+			m_items[i].getCubeType() == cubeTypeToAdd)
 		{
 			m_items[i].incrementQuantity();
 			gui.updateItemQuantity(static_cast<eInventoryIndex>(i), m_items[i].getSize());
