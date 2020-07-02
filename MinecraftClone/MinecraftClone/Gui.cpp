@@ -9,15 +9,24 @@
 #include <array>
 #include <iostream>
 
+//sf::IntRect Texture::getFrameRect(int tileID) const
+//{
+//	Rect (T rectLeft, T rectTop, T rectWidth, T rectHeight)
+//	return sf::IntRect(tileID % m_columns * m_tileSize.x, tileID / m_columns * m_tileSize.x, m_tileSize.x, m_tileSize.y);
+//}
+
 namespace
 {
 	constexpr int TEXT_SIZE = 32;
 	constexpr int CHARACTER_SPACING = TEXT_SIZE / 2;
+	constexpr int FONT_TEXTURE_COLUMNS = 8;
+	constexpr glm::vec2 FONT_TEXTURE_TILESIZE = { 32, 32 };
+	constexpr glm::vec2 FONT_TEXTURE_SIZE = { 256, 256 };
 
 	std::array<glm::vec2, 6> getQuadCoords(const glm::vec2& position)
 	{
 		return {
-			glm::vec2(position.x, position.y),
+			position, 
 			glm::vec2(position.x + TEXT_SIZE, position.y),
 			glm::vec2(position.x + TEXT_SIZE, position.y + TEXT_SIZE),
 			glm::vec2(position.x + TEXT_SIZE, position.y + TEXT_SIZE),
@@ -25,6 +34,111 @@ namespace
 			glm::vec2(position.x, position.y)
 		};
 	};
+
+	char convertDigit(int i)
+	{
+		return static_cast<char>('0' + i);
+	}
+
+	int convertCharacter(char c)
+	{
+		return static_cast<int>(c - '0');
+	}
+
+	glm::vec2 convertTo2DTextCoord(int ID, glm::vec2 tileSize, int columns, glm::vec2 textureSize)
+	{
+		glm::vec2 position((ID % columns) / static_cast<float>(columns), (ID / columns) / static_cast<float>(columns));
+		position.y = 1.0f - position.y;
+
+		return position;
+	}
+
+	std::array<glm::vec2, 6> getCharacterTextCoords(const glm::vec2& startingPosition, int columns)
+	{
+		float x = 1.0f / static_cast<float>(columns);
+		float y = 1.0f / static_cast<float>(columns);
+
+		return {
+			glm::vec2(startingPosition.x, startingPosition.y - y),
+			glm::vec2(startingPosition.x + x, startingPosition.y - y),
+			glm::vec2(startingPosition.x + x, startingPosition.y),
+			glm::vec2(startingPosition.x + x, startingPosition.y),
+			glm::vec2(startingPosition.x, startingPosition.y),
+			glm::vec2(startingPosition.x, startingPosition.y - y)
+		};
+	}
+
+	//glm::vec2 convertTo2DTextCoord(int ID, glm::vec2 tileSize, int columns, glm::vec2 textureSize)
+	//{
+	//	assert(ID < columns* columns);
+
+	//	glm::vec2 position((ID % columns) / static_cast<float>(columns), (ID / columns) / static_cast<float>(columns));
+	//	position.y = 1 - position.y;
+	//	return position;
+	//}
+
+	//std::array<glm::vec2, 6> getCharacterTextCoords(const glm::vec2& startingPosition, const glm::vec2& endingPosition)
+	//{
+	//	assert(endingPosition.x > startingPosition.x);
+	//	float x = endingPosition.x - startingPosition.x;
+
+	//	assert(endingPosition.y > startingPosition.y);
+	//	float y = endingPosition.y - startingPosition.y;
+
+	//	return {
+	//		glm::vec2(startingPosition),
+	//		glm::vec2(startingPosition.x, startingPosition.y + y),
+	//		glm::vec2(startingPosition.x + x, startingPosition.y),
+	//		glm::vec2(startingPosition.x + x, startingPosition.y),
+	//		glm::vec2(startingPosition.x, startingPosition.y + y),
+	//		glm::vec2(startingPosition.x + x, startingPosition.y + y)
+	//	};
+	//}
+
+	//glm::vec2 convertTo2DTextCoord(int ID, glm::vec2 tileSize, int columns, glm::vec2 textureSize)
+	//{
+	//	assert(ID < columns* columns);
+	//	glm::vec2 position((ID % columns) / static_cast<float>(columns), (ID / columns) / static_cast<float>(columns));
+	//	position.y = 1 - position.y;
+	//	return position;
+
+	//	assert(ID < columns* columns);
+
+	//	//glm::vec2 position((ID % columns) / static_cast<float>(columns), (ID / columns) / static_cast<float>(columns));
+	//	//return position;
+
+
+	//	position.x = std::abs((((columns - position.x) * tileSize.x) / textureSize.x) - (columns * tileSize.x) / textureSize.x);
+	//	position.y = ((columns - position.y) * tileSize.y) / textureSize.y;
+
+	//	return position;
+	//}
+
+	glm::vec2 convertTo2DTextCoord(int i)
+	{
+		assert(i < 8 * 8);
+
+		glm::vec2 position(i % 8, i / 8);
+		return { 8 - position.x, 8 - position.y };
+	}
+
+	//std::array<glm::vec2, 6> getCharacterTextCoords(const glm::vec2& startingPosition, const glm::vec2& endingPosition)
+	//{
+	//	assert(endingPosition.x > startingPosition.x);
+	//	float x = endingPosition.x - startingPosition.x;
+	//	
+	//	//assert(endingPosition.y > startingPosition.y);
+	//	float y = startingPosition.y - endingPosition.y;
+
+	//	return {
+	//		glm::vec2(startingPosition),
+	//		glm::vec2(startingPosition.x, startingPosition.y + y),
+	//		glm::vec2(startingPosition.x + x, startingPosition.y),
+	//		glm::vec2(startingPosition.x + x, startingPosition.y),
+	//		glm::vec2(startingPosition.x, startingPosition.y + y),
+	//		glm::vec2(startingPosition.x + x, startingPosition.y + y)
+	//	};
+	//}
 
 	constexpr std::array<glm::vec2, 6> QUAD_COORDS =
 	{
@@ -163,8 +277,6 @@ namespace
 		return position;
 	}
 
-	constexpr size_t MAX_DIGITS = 2;
-	
 	void collectDigits(std::array<int, MAX_DIGITS>& digits, int quantity, int& i)
 	{
 		if (quantity >= 10)
@@ -305,6 +417,52 @@ Text::Text(const std::array<glm::vec2, 6>& drawableRect)
 	m_size(0)
 {}
 
+void Text::setText(const std::array<int, MAX_DIGITS>& number, glm::vec2 position, const std::unordered_map<char, int>& characterIDMap)
+{
+	std::vector<glm::vec2> positions;
+	std::vector<glm::vec2> textCoords;
+
+	for (auto i : number)
+	{
+		std::array<glm::vec2, 6> quadCoords = getQuadCoords(position);
+		positions.insert(positions.begin() + positions.size(), quadCoords.cbegin(), quadCoords.cend());
+
+		auto characterID = characterIDMap.find(convertDigit(i));
+		assert(characterID != characterIDMap.cend());
+
+		glm::vec2 position =
+			convertTo2DTextCoord(characterID->second, FONT_TEXTURE_TILESIZE, FONT_TEXTURE_COLUMNS, FONT_TEXTURE_SIZE);
+		
+		std::array<glm::vec2, 6> characterTextCoords = 
+			getCharacterTextCoords(position, FONT_TEXTURE_COLUMNS);
+		
+		textCoords.insert(textCoords.begin() + textCoords.size(), characterTextCoords.cbegin(), characterTextCoords.cend());
+		
+		position.x += CHARACTER_SPACING;
+	}
+
+	setText(positions, textCoords);
+}
+
+void Text::setText(int number, glm::vec2 position, const std::unordered_map<char, int>& characterIDMap)
+{
+	std::vector<glm::vec2> positions;
+	std::vector<glm::vec2> textCoords;
+
+	std::array<glm::vec2, 6> quadCoords = getQuadCoords(position);
+	positions.insert(positions.begin() + positions.size(), quadCoords.cbegin(), quadCoords.cend());
+
+	auto characterID = characterIDMap.find(convertDigit(number));
+	assert(characterID != characterIDMap.cend());
+
+	std::array<glm::vec2, 6> characterTextCoords = 
+		getCharacterTextCoords(convertTo2DTextCoord(characterID->second, FONT_TEXTURE_TILESIZE, FONT_TEXTURE_COLUMNS, FONT_TEXTURE_SIZE), FONT_TEXTURE_COLUMNS);
+
+	textCoords.insert(textCoords.begin() + textCoords.size(), characterTextCoords.cbegin(), characterTextCoords.cend());
+	
+	setText(positions, textCoords);
+}
+
 void Text::setText(const std::string& text, glm::vec2 position)
 {
 	std::vector<glm::vec2> positions;
@@ -315,14 +473,33 @@ void Text::setText(const std::string& text, glm::vec2 position)
 		if (i != ' ')
 		{
 			std::array<glm::vec2, 6> quadCoords = getQuadCoords(position);
-			positions.insert(positions.begin() + positions.size(), quadCoords.begin(), quadCoords.end());
+			positions.insert(positions.begin() + positions.size(), quadCoords.cbegin(), quadCoords.cend());
 
 			std::array<glm::vec2, 6> characterTextCoords = CHARACTER_TWO;
-			textCoords.insert(textCoords.begin() + textCoords.size(), characterTextCoords.begin(), characterTextCoords.end());
+			textCoords.insert(textCoords.begin() + textCoords.size(), characterTextCoords.cbegin(), characterTextCoords.cend());
 		}
 
 		position.x += CHARACTER_SPACING;
 	}
+
+	setText(positions, textCoords);
+}
+
+void Text::render() const
+{
+	if (m_active)
+	{
+		assert(m_size > 0);
+
+		glBindVertexArray(m_ID);
+		glDrawArrays(GL_TRIANGLES, 0, m_size);
+		glBindVertexArray(0);
+	}
+}
+
+void Text::setText(const std::vector<glm::vec2>& positions, const std::vector<glm::vec2>& textCoords)
+{
+	assert(!positions.empty() && !textCoords.empty());
 
 	m_size = positions.size();
 	glBindVertexArray(m_ID);
@@ -340,18 +517,6 @@ void Text::setText(const std::string& text, glm::vec2 position)
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)(0));
 
 	glBindVertexArray(0);
-}
-
-void Text::render() const
-{
-	if (m_active)
-	{
-		assert(m_size > 0);
-
-		glBindVertexArray(m_ID);
-		glDrawArrays(GL_TRIANGLES, 0, m_size);
-		glBindVertexArray(0);
-	}
 }
 
 //Image
@@ -384,6 +549,7 @@ void Image::setTextureRect(const std::array<glm::vec3, 6>& drawableRect)
 //GUI
 Gui::Gui()
 	: m_items(),
+	m_characterIDMap(),
 	m_toolbar(),
 	m_selectionBox(),
 	m_text(CHARACTER_ONE)
@@ -406,6 +572,17 @@ Gui::Gui()
 	m_selectionBox.setScale({ 30.0f, 30.0f });
 	m_selectionBox.setTextureRect(selectionBoxTextCoords);
 	m_selectionBox.setActive(true);
+
+	m_characterIDMap.insert({ '0', 16 });
+	m_characterIDMap.insert({ '1', 17 });
+	m_characterIDMap.insert({ '2', 18 });
+	m_characterIDMap.insert({ '3', 19 });
+	m_characterIDMap.insert({ '4', 20 });
+	m_characterIDMap.insert({ '5', 21 });
+	m_characterIDMap.insert({ '6', 22 });
+	m_characterIDMap.insert({ '7', 23 });
+	m_characterIDMap.insert({ '8', 24 });
+	m_characterIDMap.insert({ '9', 25 });
 }
 
 void Gui::addItem(eInventoryIndex hotbarIndex, eCubeType cubeType)
@@ -444,8 +621,7 @@ void Gui::updateItemQuantity(eInventoryIndex selectedItem, int quantity)
 	}
 	else
 	{
-
-		m_text.setText(std::to_string(quantity), { 150, 150 });
+		m_text.setText(quantity, { 150, 150 }, m_characterIDMap);
 		m_text.setActive(true);
 	}
 }
@@ -481,7 +657,10 @@ void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture, con
 		m_selectionBox.render();
 	}
 
-	fontTexture.bind(0);
-	shaderHandler.switchToShader(eShaderType::UIFont);
-	m_text.render();
+	if (m_text.isActive())
+	{
+		fontTexture.bind(0);
+		shaderHandler.switchToShader(eShaderType::UIFont);
+		m_text.render();
+	}
 }
