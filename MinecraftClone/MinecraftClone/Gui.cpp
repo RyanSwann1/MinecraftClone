@@ -68,52 +68,6 @@ namespace
 		};
 	}
 
-	//glm::vec2 convertTo2DTextCoord(int ID, glm::vec2 tileSize, int columns, glm::vec2 textureSize)
-	//{
-	//	assert(ID < columns* columns);
-
-	//	glm::vec2 position((ID % columns) / static_cast<float>(columns), (ID / columns) / static_cast<float>(columns));
-	//	position.y = 1 - position.y;
-	//	return position;
-	//}
-
-	//std::array<glm::vec2, 6> getCharacterTextCoords(const glm::vec2& startingPosition, const glm::vec2& endingPosition)
-	//{
-	//	assert(endingPosition.x > startingPosition.x);
-	//	float x = endingPosition.x - startingPosition.x;
-
-	//	assert(endingPosition.y > startingPosition.y);
-	//	float y = endingPosition.y - startingPosition.y;
-
-	//	return {
-	//		glm::vec2(startingPosition),
-	//		glm::vec2(startingPosition.x, startingPosition.y + y),
-	//		glm::vec2(startingPosition.x + x, startingPosition.y),
-	//		glm::vec2(startingPosition.x + x, startingPosition.y),
-	//		glm::vec2(startingPosition.x, startingPosition.y + y),
-	//		glm::vec2(startingPosition.x + x, startingPosition.y + y)
-	//	};
-	//}
-
-	//glm::vec2 convertTo2DTextCoord(int ID, glm::vec2 tileSize, int columns, glm::vec2 textureSize)
-	//{
-	//	assert(ID < columns* columns);
-	//	glm::vec2 position((ID % columns) / static_cast<float>(columns), (ID / columns) / static_cast<float>(columns));
-	//	position.y = 1 - position.y;
-	//	return position;
-
-	//	assert(ID < columns* columns);
-
-	//	//glm::vec2 position((ID % columns) / static_cast<float>(columns), (ID / columns) / static_cast<float>(columns));
-	//	//return position;
-
-
-	//	position.x = std::abs((((columns - position.x) * tileSize.x) / textureSize.x) - (columns * tileSize.x) / textureSize.x);
-	//	position.y = ((columns - position.y) * tileSize.y) / textureSize.y;
-
-	//	return position;
-	//}
-
 	glm::vec2 convertTo2DTextCoord(int i)
 	{
 		assert(i < 8 * 8);
@@ -122,23 +76,6 @@ namespace
 		return { 8 - position.x, 8 - position.y };
 	}
 
-	//std::array<glm::vec2, 6> getCharacterTextCoords(const glm::vec2& startingPosition, const glm::vec2& endingPosition)
-	//{
-	//	assert(endingPosition.x > startingPosition.x);
-	//	float x = endingPosition.x - startingPosition.x;
-	//	
-	//	//assert(endingPosition.y > startingPosition.y);
-	//	float y = startingPosition.y - endingPosition.y;
-
-	//	return {
-	//		glm::vec2(startingPosition),
-	//		glm::vec2(startingPosition.x, startingPosition.y + y),
-	//		glm::vec2(startingPosition.x + x, startingPosition.y),
-	//		glm::vec2(startingPosition.x + x, startingPosition.y),
-	//		glm::vec2(startingPosition.x, startingPosition.y + y),
-	//		glm::vec2(startingPosition.x + x, startingPosition.y + y)
-	//	};
-	//}
 
 	constexpr std::array<glm::vec2, 6> QUAD_COORDS =
 	{
@@ -444,12 +381,12 @@ void Text::setText(const std::array<int, MAX_DIGITS>& number, glm::vec2 position
 	setText(positions, textCoords);
 }
 
-void Text::setText(int number, glm::vec2 position, const std::unordered_map<char, int>& characterIDMap)
+void Text::setText(int number, const std::unordered_map<char, int>& characterIDMap)
 {
 	std::vector<glm::vec2> positions;
 	std::vector<glm::vec2> textCoords;
 
-	std::array<glm::vec2, 6> quadCoords = getQuadCoords(position);
+	std::array<glm::vec2, 6> quadCoords = getQuadCoords(m_position);
 	positions.insert(positions.begin() + positions.size(), quadCoords.cbegin(), quadCoords.cend());
 
 	auto characterID = characterIDMap.find(convertDigit(number));
@@ -551,14 +488,22 @@ Gui::Gui()
 	: m_items(),
 	m_characterIDMap(),
 	m_toolbar(),
-	m_selectionBox(),
-	m_text(CHARACTER_ONE)
+	m_selectionBox()
 {
 	//Items
 	for (int i = 0; i < m_items.size(); ++i)
 	{
 		m_items[i].setPosition(getPositionOnHotbar(static_cast<eInventoryIndex>(i), { 250, 250 }));
 		m_items[i].setScale({ 50.0f, 50.0f });
+	}
+
+	glm::vec2 position{ 150.0f, 150.0f };
+	//Item Quantity Text
+	for (auto& itemQuantityText : m_itemQuantityText)
+	{
+		itemQuantityText.setPosition(position);
+
+		position.x += 25.0f;
 	}
 
 	//Toolbar
@@ -605,8 +550,7 @@ void Gui::updateSelectionBox(eInventoryIndex selectedItem)
 
 void Gui::updateItemQuantity(eInventoryIndex selectedItem, int quantity)
 {
-	assert(quantity >= 1 && 
-		m_items[static_cast<int>(selectedItem)].isActive());
+	assert(m_items[static_cast<int>(selectedItem)].isActive());
 
 	if (quantity >= 10)
 	{
@@ -619,10 +563,14 @@ void Gui::updateItemQuantity(eInventoryIndex selectedItem, int quantity)
 		//	break;
 		//}
 	}
+	else if(quantity >= 1)
+	{
+		m_itemQuantityText[static_cast<int>(selectedItem)].setText(quantity, m_characterIDMap);
+		m_itemQuantityText[static_cast<int>(selectedItem)].setActive(true);
+	}
 	else
 	{
-		m_text.setText(quantity, { 150, 150 }, m_characterIDMap);
-		m_text.setActive(true);
+		m_itemQuantityText[static_cast<int>(selectedItem)].setActive(false);
 	}
 }
 
@@ -657,10 +605,10 @@ void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture, con
 		m_selectionBox.render();
 	}
 
-	if (m_text.isActive())
+	fontTexture.bind(0);
+	shaderHandler.switchToShader(eShaderType::UIFont);
+	for (const auto& text : m_itemQuantityText)
 	{
-		fontTexture.bind(0);
-		shaderHandler.switchToShader(eShaderType::UIFont);
-		m_text.render();
+		text.render();
 	}
 }

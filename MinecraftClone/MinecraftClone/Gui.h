@@ -45,8 +45,7 @@ public:
 	void setText(const std::array<int, MAX_DIGITS>& number, glm::vec2 position, 
 		const std::unordered_map<char, int>& characterIDMap);
 
-	void setText(int number, glm::vec2 position,
-		const std::unordered_map<char, int>& characterIDMap);
+	void setText(int number, const std::unordered_map<char, int>& characterIDMap);
 	
 	void setText(const std::string& text, glm::vec2 position);
 	void render() const override;
@@ -84,9 +83,9 @@ public:
 
 private:
 	std::array<Image, static_cast<size_t>(eInventoryIndex::Max) + 1> m_items;
+	std::array<Text, static_cast<size_t>(eInventoryIndex::Max) + 1> m_itemQuantityText;
 	std::unordered_map<char, int> m_characterIDMap;
 
 	Image m_toolbar;
 	Image m_selectionBox;
-	Text m_text;
 };
