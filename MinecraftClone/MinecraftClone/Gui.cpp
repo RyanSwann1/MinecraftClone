@@ -12,20 +12,21 @@
 namespace
 {
 	constexpr size_t MAX_DIGITS = 2;
-	constexpr int TEXT_SIZE = 32;
-	constexpr int CHARACTER_SPACING = TEXT_SIZE / 2;
+	constexpr int TEXT_SIZE = 52;
+	constexpr int CHARACTER_SPACING = TEXT_SIZE / 3;
 	constexpr int FONT_TEXTURE_COLUMNS = 8;
 	constexpr glm::vec2 FONT_TEXTURE_TILESIZE = { 32, 32 };
 	constexpr glm::vec2 FONT_TEXTURE_SIZE = { 256, 256 };
+	constexpr glm::vec2 ITEM_SIZE = { 36, 36 };
 
-	std::array<glm::vec2, 6> getQuadCoords(const glm::vec2& position)
+	std::array<glm::vec2, 6> getQuadCoords(const glm::vec2& position, const glm::vec2& scale)
 	{
 		return {
 			position, 
-			glm::vec2(position.x + TEXT_SIZE, position.y),
-			glm::vec2(position.x + TEXT_SIZE, position.y + TEXT_SIZE),
-			glm::vec2(position.x + TEXT_SIZE, position.y + TEXT_SIZE),
-			glm::vec2(position.x, position.y + TEXT_SIZE),
+			glm::vec2(position.x + scale.x, position.y),
+			glm::vec2(position.x + scale.x, position.y + scale.y),
+			glm::vec2(position.x + scale.x, position.y + scale.y),
+			glm::vec2(position.x, position.y + scale.y),
 			glm::vec2(position.x, position.y)
 		};
 	};
@@ -71,7 +72,6 @@ namespace
 		return { 8 - position.x, 8 - position.y };
 	}
 
-
 	constexpr std::array<glm::vec2, 6> QUAD_COORDS =
 	{
 		glm::vec2(0, 0),
@@ -105,9 +105,9 @@ namespace
 	constexpr std::array<glm::vec2, 6> selectionBoxTextCoords =
 	{
 		glm::vec2(0.0f, .828125f),
-		glm::vec2(0.1066f, .828125f),
-		glm::vec2(0.1066f, 0.9101f),
-		glm::vec2(0.1066f, 0.9101f),
+		glm::vec2(0.09f, .828125f),
+		glm::vec2(0.09f, 0.9101f),
+		glm::vec2(0.09f, 0.9101f),
 		glm::vec2(0.0f, 0.9101f),
 		glm::vec2(0.0f, .828125f)
 	};
@@ -147,32 +147,32 @@ namespace
 	glm::vec2 getPositionOnHotbar(eInventoryIndex hotbarIndex, glm::ivec2 basePosition)
 	{
 		glm::vec2 position = basePosition;
-		float offsetX = 75.0f;
+		float offsetX = 55.0f;
 		switch (hotbarIndex)
 		{
 		case eInventoryIndex::One:
-			position.x = position.x + offsetX * 1;
+			position.x = position.x;
 			break;
 		case eInventoryIndex::Two:
-			position.x = position.x + offsetX * 2;
+			position.x = position.x + offsetX * 1;
 			break;
 		case eInventoryIndex::Three:
-			position.x = position.x + offsetX * 3;
+			position.x = position.x + offsetX * 2;
 			break;
 		case eInventoryIndex::Four:
-			position.x = position.x + offsetX * 4;
+			position.x = position.x + offsetX * 3;
 			break;
 		case eInventoryIndex::Five:
-			position.x = position.x + offsetX * 5;
+			position.x = position.x + offsetX * 4;
 			break;
 		case eInventoryIndex::Six:
-			position.x = position.x + offsetX * 6;
+			position.x = position.x + offsetX * 5;
 			break;
 		case eInventoryIndex::Seven:
-			position.x = position.x + offsetX * 7;
+			position.x = position.x + offsetX * 6;
 			break;
 		case eInventoryIndex::Eight:
-			position.x = position.x + offsetX * 8;
+			position.x = position.x + offsetX * 7;
 			break;
 		}
 
@@ -196,10 +196,7 @@ Widget::Widget(Widget&& orig) noexcept
 	: m_ID(orig.m_ID),
 	m_positionsVBO(orig.m_positionsVBO),
 	m_textCoordsVBO(orig.m_textCoordsVBO),
-	m_vertexSize(orig.m_vertexSize),
-	m_active(orig.m_active),
-	m_position(orig.m_position),
-	m_scale(orig.m_scale)
+	m_active(orig.m_active)
 {
 	orig.m_ID = Globals::INVALID_OPENGL_ID;
 	orig.m_positionsVBO = Globals::INVALID_OPENGL_ID;
@@ -212,10 +209,7 @@ Widget& Widget::operator=(Widget&& orig) noexcept
 	m_ID = orig.m_ID;
 	m_positionsVBO = orig.m_positionsVBO;
 	m_textCoordsVBO = orig.m_textCoordsVBO;
-	m_vertexSize = orig.m_vertexSize;
 	m_active = orig.m_active;
-	m_position = orig.m_position;
-	m_scale = orig.m_scale;
 
 	orig.m_ID = Globals::INVALID_OPENGL_ID;
 	orig.m_positionsVBO = Globals::INVALID_OPENGL_ID;
@@ -223,17 +217,6 @@ Widget& Widget::operator=(Widget&& orig) noexcept
 	orig.m_active = false;
 
 	return *this;
-}
-
-//Widget
-const glm::vec2& Widget::getPosition() const
-{
-	return m_position;
-}
-
-const glm::vec2& Widget::getScale() const
-{
-	return m_scale;
 }
 
 bool Widget::isActive() const
@@ -246,27 +229,7 @@ void Widget::setActive(bool active)
 	m_active = active;
 }
 
-void Widget::setTextureRect(const std::array<glm::vec2, 6>& drawableRect)
-{
-	glBindVertexArray(m_ID);
-	glBindBuffer(GL_ARRAY_BUFFER, m_textCoordsVBO);
-	glBufferData(GL_ARRAY_BUFFER, drawableRect.size() * sizeof(glm::vec2), drawableRect.data(), GL_STATIC_DRAW);
 
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)(0));
-
-	glBindVertexArray(0);
-}
-
-void Widget::setPosition(const glm::vec2& position)
-{
-	m_position = position;
-}
-
-void Widget::setScale(const glm::vec2& scale)
-{
-	m_scale = scale;
-}
 
 void Widget::render() const
 {
@@ -282,10 +245,7 @@ Widget::Widget()
 	: m_ID(Globals::INVALID_OPENGL_ID),
 	m_positionsVBO(Globals::INVALID_OPENGL_ID),
 	m_textCoordsVBO(Globals::INVALID_OPENGL_ID),
-	m_vertexSize(0),
-	m_active(false),
-	m_position(),
-	m_scale()
+	m_active(false)
 {
 	glGenVertexArrays(1, &m_ID);
 
@@ -313,12 +273,21 @@ Widget::~Widget()
 
 //Text
 Text::Text()
-	: Widget()
+	: Widget(),
+	m_vertexCount(0),
+	m_position()
 {}
 
 Text::Text(const std::array<glm::vec2, 6>& drawableRect)
-	: Widget()
+	: Widget(),
+	m_vertexCount(0),
+	m_position()
 {}
+
+void Text::setPosition(const glm::vec2& position)
+{
+	m_position = position;
+}
 
 void Text::setText(int number, const std::unordered_map<char, int>& characterIDMap)
 {
@@ -336,7 +305,7 @@ void Text::setText(int number, const std::unordered_map<char, int>& characterIDM
 		glm::ivec2 position = m_position;
 		for (auto digit : digits)
 		{
-			std::array<glm::vec2, 6> quadCoords = getQuadCoords(position);
+			std::array<glm::vec2, 6> quadCoords = getQuadCoords(position, { TEXT_SIZE, TEXT_SIZE });
 			positions.insert(positions.begin() + positions.size(), quadCoords.cbegin(), quadCoords.cend());
 
 			auto characterID = characterIDMap.find(convertDigit(digit));
@@ -352,7 +321,7 @@ void Text::setText(int number, const std::unordered_map<char, int>& characterIDM
 	}
 	else
 	{
-		std::array<glm::vec2, 6> quadCoords = getQuadCoords(m_position);
+		std::array<glm::vec2, 6> quadCoords = getQuadCoords(m_position, { TEXT_SIZE, TEXT_SIZE });
 		positions.insert(positions.begin() + positions.size(), quadCoords.cbegin(), quadCoords.cend());
 
 		auto characterID = characterIDMap.find(convertDigit(number));
@@ -371,10 +340,10 @@ void Text::render() const
 {
 	if (m_active)
 	{
-		assert(m_vertexSize > 0);
+		assert(m_vertexCount > 0);
 
 		glBindVertexArray(m_ID);
-		glDrawArrays(GL_TRIANGLES, 0, m_vertexSize);
+		glDrawArrays(GL_TRIANGLES, 0, m_vertexCount);
 		glBindVertexArray(0);
 	}
 }
@@ -383,7 +352,7 @@ void Text::setText(const std::vector<glm::vec2>& positions, const std::vector<gl
 {
 	assert(!positions.empty() && !textCoords.empty());
 
-	m_vertexSize = positions.size();
+	m_vertexCount = positions.size();
 	glBindVertexArray(m_ID);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_positionsVBO);
@@ -404,19 +373,33 @@ void Text::setText(const std::vector<glm::vec2>& positions, const std::vector<gl
 //Image
 Image::Image()
 	: Widget()
+{}
+
+void Image::setPosition(const std::array<glm::vec2, 6>& quadCoords) const
 {
 	glBindVertexArray(m_ID);
-
 	glBindBuffer(GL_ARRAY_BUFFER, m_positionsVBO);
-	glBufferData(GL_ARRAY_BUFFER, QUAD_COORDS.size() * sizeof(glm::vec2), QUAD_COORDS.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, quadCoords.size() * sizeof(glm::vec2), quadCoords.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)(0));
 
 	glBindVertexArray(0);
 }
 
-void Image::setTextureRect(const std::array<glm::vec3, 6>& drawableRect)
+void Image::setTextureRect(const std::array<glm::vec2, 6>& drawableRect) const
+{
+	glBindVertexArray(m_ID);
+	glBindBuffer(GL_ARRAY_BUFFER, m_textCoordsVBO);
+	glBufferData(GL_ARRAY_BUFFER, drawableRect.size() * sizeof(glm::vec2), drawableRect.data(), GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)(0));
+
+	glBindVertexArray(0);
+}
+
+void Image::setTextureRect(const std::array<glm::vec3, 6>& drawableRect) const
 {
 	glBindVertexArray(m_ID);
 	glBindBuffer(GL_ARRAY_BUFFER, m_textCoordsVBO);
@@ -431,37 +414,40 @@ void Image::setTextureRect(const std::array<glm::vec3, 6>& drawableRect)
 //GUI
 Gui::Gui()
 	: m_items(),
+	m_itemQuantityText(),
 	m_characterIDMap(),
 	m_toolbar(),
 	m_selectionBox()
 {
+	constexpr glm::vec2 INITIAL_ITEM_STARTING_POSITION = { 710.0f, 1000.0f };
+
 	//Items
 	for (int i = 0; i < m_items.size(); ++i)
 	{
-		m_items[i].setPosition(getPositionOnHotbar(static_cast<eInventoryIndex>(i), { 250, 250 }));
-		m_items[i].setScale({ 50.0f, 50.0f });
+		glm::vec2 position = getPositionOnHotbar(static_cast<eInventoryIndex>(i), INITIAL_ITEM_STARTING_POSITION);
+		m_items[i].setPosition(getQuadCoords(position, ITEM_SIZE));
 	}
 
-	glm::vec2 position{ 150.0f, 150.0f };
+	constexpr glm::vec2 ITEM_QUANTITY_STARTING_POSITION = { 720.0f, 975.0f };
+	glm::vec2 position = ITEM_QUANTITY_STARTING_POSITION;
 	//Item Quantity Text
 	for (auto& itemQuantityText : m_itemQuantityText)
 	{
 		itemQuantityText.setPosition(position);
 
-		position.x += 75.0f;
+		position.x += 55.0f;
 	}
 
+	constexpr glm::vec2 TOOLBAR_STARTING_POSITION = { 700.0f, 1000.0f };
 	//Toolbar
-	m_toolbar.setPosition({ 700.0f, 1025.f });
-	m_toolbar.setScale({ 400.0f, 50.0f });
+	m_toolbar.setPosition(getQuadCoords(TOOLBAR_STARTING_POSITION, { 500, 48 }));
 	m_toolbar.setTextureRect(toolbarTextCoords);
 	m_toolbar.setActive(true);
 
-	//Selection Box
-	m_selectionBox.setPosition({ 670.0f, 950.0f });
-	m_selectionBox.setScale({ 30.0f, 30.0f });
-	m_selectionBox.setTextureRect(selectionBoxTextCoords);
-	m_selectionBox.setActive(true);
+	////Selection Box
+	//m_selectionBox.setPosition(TOOLBAR_STARTING_POSITION);
+	//m_selectionBox.setTextureRect(selectionBoxTextCoords);
+	//m_selectionBox.setActive(true);
 
 	m_characterIDMap.insert({ '0', 16 });
 	m_characterIDMap.insert({ '1', 17 });
@@ -490,7 +476,7 @@ void Gui::removeItem(eInventoryIndex hotbarIndex)
 
 void Gui::updateSelectionBox(eInventoryIndex selectedItem)
 {
-	m_selectionBox.setPosition(getPositionOnHotbar(selectedItem, { 670.0f, 950.0f }));
+//	m_selectionBox.setPosition(getPositionOnHotbar(selectedItem, { 700.0f, 1025.0f }));
 }
 
 void Gui::updateItemQuantity(eInventoryIndex selectedItem, int quantity)
@@ -514,36 +500,23 @@ void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture, con
 	shaderHandler.switchToShader(eShaderType::UIItem);
 	for (const auto& item : m_items)
 	{
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(item.getPosition(), 0.0f));
-		model = glm::scale(model, glm::vec3(item.getScale(), 1.0f));
-		shaderHandler.setUniformMat4f(eShaderType::UIItem, "uModel", model);
-
 		item.render();
 	}
 
 	shaderHandler.switchToShader(eShaderType::UIToolbar);
-	widgetTexture.bind(0);
+	widgetTexture.bind();
 
-	{
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(m_toolbar.getPosition(), 0.0f));
-		model = glm::scale(model, glm::vec3(m_toolbar.getScale(), 1.0f));
-		shaderHandler.setUniformMat4f(eShaderType::UIToolbar, "uModel", model);
+	m_toolbar.render();
+	
+	//m_selectionBox.render();
 
-		m_toolbar.render();
-	}
-
-	{
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(m_selectionBox.getPosition(), 0.0f));
-		model = glm::scale(model, glm::vec3(m_selectionBox.getScale(), 1.0f));
-		shaderHandler.setUniformMat4f(eShaderType::UIToolbar, "uModel", model);
-
-		m_selectionBox.render();
-	}
-
-	fontTexture.bind(0);
+	glDisable(GL_DEPTH_TEST);
+	fontTexture.bind();
 	shaderHandler.switchToShader(eShaderType::UIFont);
 	for (const auto& text : m_itemQuantityText)
 	{
 		text.render();
 	}
+	
+	glEnable(GL_DEPTH_TEST);
 }

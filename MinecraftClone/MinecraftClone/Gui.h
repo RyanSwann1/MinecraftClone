@@ -12,14 +12,10 @@ class Widget : private NonCopyable
 public:
 	Widget(Widget&&) noexcept;
 	Widget& operator=(Widget&&) noexcept;
-	const glm::vec2& getPosition() const;
-	const glm::vec2& getScale() const;
+
 	bool isActive() const;
 
 	void setActive(bool active);
-	void setTextureRect(const std::array<glm::vec2, 6>& drawableRect);
-	void setPosition(const glm::vec2& position);
-	void setScale(const glm::vec2& scale);
 	virtual void render() const;
 
 protected:
@@ -29,10 +25,7 @@ protected:
 	unsigned int m_ID;
 	unsigned int m_positionsVBO;
 	unsigned int m_textCoordsVBO;
-	int m_vertexSize;
 	bool m_active;
-	glm::vec2 m_position;
-	glm::vec2 m_scale;
 };
 
 class Text : public Widget
@@ -41,11 +34,14 @@ public:
 	Text();
 	Text(const std::array<glm::vec2, 6>& drawableRect);
 
+	void setPosition(const glm::vec2& position);
 	void setText(int number, const std::unordered_map<char, int>& characterIDMap);
 	void render() const override;
 
 private:
-	
+	int m_vertexCount;
+	glm::vec2 m_position;
+
 	void setText(const std::vector<glm::vec2>& positions, const std::vector<glm::vec2>& textCoords);
 };
 
@@ -54,8 +50,9 @@ class Image : public Widget
 public:
 	Image();
 
-	using Widget::setTextureRect;
-	void setTextureRect(const std::array<glm::vec3, 6>& drawableRect);
+	void setPosition(const std::array<glm::vec2, 6>& quadCoords) const;
+	void setTextureRect(const std::array<glm::vec2, 6>& drawableRect) const;
+	void setTextureRect(const std::array<glm::vec3, 6>& drawableRect) const;
 };
 
 class Texture;

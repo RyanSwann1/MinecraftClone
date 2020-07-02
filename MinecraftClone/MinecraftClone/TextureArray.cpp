@@ -86,9 +86,8 @@ Texture::~Texture()
 	glDeleteTextures(1, &m_ID);
 }
 
-void Texture::bind(int ID) const
+void Texture::bind() const
 {
-	//glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_ID);
 }
 

@@ -133,7 +133,7 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create(const glm::ivec2& windowSiz
 	}
 
 	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(windowSize.x),
-		static_cast<float>(windowSize.y), 0.0f, -1.0f, 1.0f);
+		static_cast<float>(windowSize.y), 0.0f);
 
 	shaderHandler->switchToShader(eShaderType::UIItem);
 	shaderHandler->setUniformMat4f(eShaderType::UIItem, "uProjection", projection);

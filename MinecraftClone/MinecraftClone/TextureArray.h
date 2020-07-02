@@ -13,7 +13,7 @@ public:
 	static std::unique_ptr<Texture> create(const std::string& textureName);
 	~Texture();
 
-	void bind(int ID) const;
+	void bind() const;
 	void unbind() const;
 
 private:
