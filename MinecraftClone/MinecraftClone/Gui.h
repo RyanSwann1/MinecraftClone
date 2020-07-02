@@ -7,8 +7,6 @@
 #include <vector>
 #include <unordered_map>
 
-
-
 class Widget : private NonCopyable
 {
 public:
@@ -31,6 +29,7 @@ protected:
 	unsigned int m_ID;
 	unsigned int m_positionsVBO;
 	unsigned int m_textCoordsVBO;
+	int m_vertexSize;
 	bool m_active;
 	glm::vec2 m_position;
 	glm::vec2 m_scale;
@@ -46,7 +45,6 @@ public:
 	void render() const override;
 
 private:
-	int m_size;
 	
 	void setText(const std::vector<glm::vec2>& positions, const std::vector<glm::vec2>& textCoords);
 };

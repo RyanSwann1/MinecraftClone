@@ -196,6 +196,7 @@ Widget::Widget(Widget&& orig) noexcept
 	: m_ID(orig.m_ID),
 	m_positionsVBO(orig.m_positionsVBO),
 	m_textCoordsVBO(orig.m_textCoordsVBO),
+	m_vertexSize(orig.m_vertexSize),
 	m_active(orig.m_active),
 	m_position(orig.m_position),
 	m_scale(orig.m_scale)
@@ -211,6 +212,7 @@ Widget& Widget::operator=(Widget&& orig) noexcept
 	m_ID = orig.m_ID;
 	m_positionsVBO = orig.m_positionsVBO;
 	m_textCoordsVBO = orig.m_textCoordsVBO;
+	m_vertexSize = orig.m_vertexSize;
 	m_active = orig.m_active;
 	m_position = orig.m_position;
 	m_scale = orig.m_scale;
@@ -280,6 +282,7 @@ Widget::Widget()
 	: m_ID(Globals::INVALID_OPENGL_ID),
 	m_positionsVBO(Globals::INVALID_OPENGL_ID),
 	m_textCoordsVBO(Globals::INVALID_OPENGL_ID),
+	m_vertexSize(0),
 	m_active(false),
 	m_position(),
 	m_scale()
@@ -310,13 +313,11 @@ Widget::~Widget()
 
 //Text
 Text::Text()
-	: Widget(),
-	m_size(0)
+	: Widget()
 {}
 
 Text::Text(const std::array<glm::vec2, 6>& drawableRect)
-	: Widget(),
-	m_size(0)
+	: Widget()
 {}
 
 void Text::setText(int number, const std::unordered_map<char, int>& characterIDMap)
@@ -370,10 +371,10 @@ void Text::render() const
 {
 	if (m_active)
 	{
-		assert(m_size > 0);
+		assert(m_vertexSize > 0);
 
 		glBindVertexArray(m_ID);
-		glDrawArrays(GL_TRIANGLES, 0, m_size);
+		glDrawArrays(GL_TRIANGLES, 0, m_vertexSize);
 		glBindVertexArray(0);
 	}
 }
@@ -382,7 +383,7 @@ void Text::setText(const std::vector<glm::vec2>& positions, const std::vector<gl
 {
 	assert(!positions.empty() && !textCoords.empty());
 
-	m_size = positions.size();
+	m_vertexSize = positions.size();
 	glBindVertexArray(m_ID);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_positionsVBO);
@@ -503,6 +504,7 @@ void Gui::updateItemQuantity(eInventoryIndex selectedItem, int quantity)
 	}
 	else
 	{
+		assert(m_itemQuantityText[static_cast<int>(selectedItem)].isActive());
 		m_itemQuantityText[static_cast<int>(selectedItem)].setActive(false);
 	}
 }
