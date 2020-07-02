@@ -190,7 +190,11 @@ int main()
 		Rectangle visibilityRect = Globals::getVisibilityRect(player.getPosition());
 		for (auto pickup = pickUps.begin(); pickup != pickUps.end();)
 		{
-			if (pickup->isInReachOfPlayer(player.getPosition()) || !visibilityRect.contains(pickup->getAABB()))
+			if(!visibilityRect.contains(pickup->getAABB()))
+			{
+				pickup = pickUps.erase(pickup);
+			}
+			else if (pickup->isInReachOfPlayer(player.getPosition()))
 			{
 				player.addToInventory(pickup->getCubeType(), gui);
 				pickup = pickUps.erase(pickup);
