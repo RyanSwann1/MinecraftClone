@@ -68,24 +68,6 @@ namespace
 		};
 	}
 
-	glm::vec2 convertTo2DTextCoord(int i)
-	{
-		assert(i < 8 * 8);
-
-		glm::vec2 position(i % 8, i / 8);
-		return { 8 - position.x, 8 - position.y };
-	}
-
-	constexpr std::array<glm::vec2, 6> QUAD_COORDS =
-	{
-		glm::vec2(0, 0),
-		glm::vec2(1, 0),
-		glm::vec2(1, 1),
-		glm::vec2(1, 1),
-		glm::vec2(0, 1),
-		glm::vec2(0, 0)
-	};
-
 	std::array<glm::vec3, 6> getTextCoords(eTerrainTextureLayer textureLayer) 
 	{
 		return { glm::vec3(0, 0, static_cast<int>(textureLayer)),
