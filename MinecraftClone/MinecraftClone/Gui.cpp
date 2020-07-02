@@ -19,6 +19,10 @@ namespace
 	constexpr glm::vec2 FONT_TEXTURE_SIZE = { 256, 256 };
 	constexpr glm::vec2 ITEM_SIZE = { 36, 36 };
 
+	constexpr glm::vec2 TOOLBAR_STARTING_POSITION = { 700.0f, 1000.0f };
+	constexpr glm::vec2 INITIAL_ITEM_STARTING_POSITION = { 710.0f, 1000.0f };
+	constexpr glm::vec2 ITEM_QUANTITY_STARTING_POSITION = { 720.0f, 975.0f };
+
 	std::array<glm::vec2, 6> getQuadCoords(const glm::vec2& position, const glm::vec2& scale)
 	{
 		return {
@@ -419,8 +423,6 @@ Gui::Gui()
 	m_toolbar(),
 	m_selectionBox()
 {
-	constexpr glm::vec2 INITIAL_ITEM_STARTING_POSITION = { 710.0f, 1000.0f };
-
 	//Items
 	for (int i = 0; i < m_items.size(); ++i)
 	{
@@ -428,7 +430,6 @@ Gui::Gui()
 		m_items[i].setPosition(getQuadCoords(position, ITEM_SIZE));
 	}
 
-	constexpr glm::vec2 ITEM_QUANTITY_STARTING_POSITION = { 720.0f, 975.0f };
 	glm::vec2 position = ITEM_QUANTITY_STARTING_POSITION;
 	//Item Quantity Text
 	for (auto& itemQuantityText : m_itemQuantityText)
@@ -438,16 +439,15 @@ Gui::Gui()
 		position.x += 55.0f;
 	}
 
-	constexpr glm::vec2 TOOLBAR_STARTING_POSITION = { 700.0f, 1000.0f };
 	//Toolbar
 	m_toolbar.setPosition(getQuadCoords(TOOLBAR_STARTING_POSITION, { 500, 48 }));
 	m_toolbar.setTextureRect(toolbarTextCoords);
 	m_toolbar.setActive(true);
 
-	////Selection Box
-	//m_selectionBox.setPosition(TOOLBAR_STARTING_POSITION);
-	//m_selectionBox.setTextureRect(selectionBoxTextCoords);
-	//m_selectionBox.setActive(true);
+	//Selection Box
+	m_selectionBox.setPosition(getQuadCoords(TOOLBAR_STARTING_POSITION, { 52, 48 }));
+	m_selectionBox.setTextureRect(selectionBoxTextCoords);
+	m_selectionBox.setActive(true);
 
 	m_characterIDMap.insert({ '0', 16 });
 	m_characterIDMap.insert({ '1', 17 });
@@ -476,7 +476,8 @@ void Gui::removeItem(eInventoryIndex hotbarIndex)
 
 void Gui::updateSelectionBox(eInventoryIndex selectedItem)
 {
-//	m_selectionBox.setPosition(getPositionOnHotbar(selectedItem, { 700.0f, 1025.0f }));
+	glm::vec2 position = getPositionOnHotbar(selectedItem, TOOLBAR_STARTING_POSITION);
+	m_selectionBox.setPosition(getQuadCoords(position, { 52, 48 }));
 }
 
 void Gui::updateItemQuantity(eInventoryIndex selectedItem, int quantity)
@@ -508,9 +509,10 @@ void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture, con
 
 	m_toolbar.render();
 	
-	//m_selectionBox.render();
-
 	glDisable(GL_DEPTH_TEST);
+	
+	m_selectionBox.render();
+
 	fontTexture.bind();
 	shaderHandler.switchToShader(eShaderType::UIFont);
 	for (const auto& text : m_itemQuantityText)
