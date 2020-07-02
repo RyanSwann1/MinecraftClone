@@ -288,6 +288,25 @@ Text::Text(const std::array<glm::vec2, 6>& drawableRect)
 	m_position()
 {}
 
+Text::Text(Text&& orig) noexcept
+	: Widget(std::move(orig)),
+	m_vertexCount(orig.m_vertexCount),
+	m_position(orig.m_position)
+{
+	orig.m_vertexCount = 0;
+}
+
+Text& Text::operator=(Text&& orig) noexcept
+{
+	Widget::operator=(std::move(orig));
+	m_vertexCount = orig.m_vertexCount;
+	m_position = orig.m_position;
+
+	orig.m_vertexCount = 0;
+
+	return *this;
+}
+
 void Text::setPosition(const glm::vec2& position)
 {
 	m_position = position;

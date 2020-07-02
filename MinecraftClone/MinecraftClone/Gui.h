@@ -33,6 +33,8 @@ class Text : public Widget
 public:	
 	Text();
 	Text(const std::array<glm::vec2, 6>& drawableRect);
+	Text(Text&&) noexcept;
+	Text& operator=(Text&&) noexcept;
 
 	void setPosition(const glm::vec2& position);
 	void setText(int number, const std::unordered_map<char, int>& characterIDMap);
