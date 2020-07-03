@@ -24,7 +24,7 @@ public:
 	Pickup& operator=(Pickup&&) noexcept;
 
 	eCubeType getCubeType() const;
-	bool isInReachOfPlayer(const glm::vec3& playerPosition) const;
+	bool isInReachOfPlayer(const glm::vec3& playerMiddlePosition) const;
 	const Rectangle& getAABB() const;
 
 	void update(const Player& player, float deltaTime, const ChunkManager& chunkManager);

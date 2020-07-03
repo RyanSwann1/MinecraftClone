@@ -72,9 +72,9 @@ eCubeType Pickup::getCubeType() const
 	return m_cubeType;
 }
 
-bool Pickup::isInReachOfPlayer(const glm::vec3& playerPosition) const
+bool Pickup::isInReachOfPlayer(const glm::vec3& playerMiddlePosition) const
 {
-	return glm::distance(m_position, { playerPosition.x, playerPosition.y - 1.0f, playerPosition.z }) <= 0.4f;
+	return glm::distance(m_position, playerMiddlePosition) <= 0.4f;
 }
 
 const Rectangle& Pickup::getAABB() const
@@ -117,10 +117,11 @@ void Pickup::update(const Player& player, float deltaTime, const ChunkManager& c
 		m_position.y += glm::sin(m_timeElasped * 2.5f) * 0.005f;
 	}
 
-	if (!m_discardedByPlayer && glm::distance(m_position, player.getPosition()) <= 2.5f && 
+	glm::vec3 playerMiddlePosition = player.getPosition();
+	if (!m_discardedByPlayer && glm::distance(m_position, playerMiddlePosition) <= 2.5f && 
 		player.getInventory().isItemAddable(m_cubeType))
 	{
-		m_velocity += glm::normalize(glm::vec3(player.getPosition() - m_position)) * 5.0f;
+		m_velocity += glm::normalize(glm::vec3(playerMiddlePosition - m_position)) * 5.0f;
 	}
 
 	m_position += m_velocity * deltaTime;

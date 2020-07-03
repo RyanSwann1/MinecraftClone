@@ -193,7 +193,7 @@ int main()
 			{
 				pickup = pickUps.erase(pickup);
 			}
-			else if (pickup->isInReachOfPlayer(player.getPosition()) && player.getInventory().isItemAddable(pickup->getCubeType()))
+			else if (pickup->isInReachOfPlayer(player.getMiddlePosition()) && player.getInventory().isItemAddable(pickup->getCubeType()))
 			{
 				player.addToInventory(pickup->getCubeType(), gui);
 				pickup = pickUps.erase(pickup);
