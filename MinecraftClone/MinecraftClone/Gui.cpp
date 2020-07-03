@@ -15,6 +15,8 @@ namespace
 	constexpr int TEXT_SIZE = 52;
 	constexpr int CHARACTER_SPACING = TEXT_SIZE / 3;
 	constexpr int FONT_TEXTURE_COLUMNS = 8;
+	constexpr float ITEM_OFFSET_X = 64.0f;
+	constexpr float ITEM_QUANTITY_OFFSET_X = 66.0f;
 	constexpr glm::vec2 FONT_TEXTURE_TILESIZE = { 32, 32 };
 	constexpr glm::vec2 FONT_TEXTURE_SIZE = { 256, 256 };
 	constexpr glm::vec2 ITEM_SIZE = { 36, 36 };
@@ -24,6 +26,8 @@ namespace
 	constexpr glm::vec2 ITEM_QUANTITY_STARTING_POSITION = { 720.0f, 925.0f };
 
 	glm::vec2 initialSelectionBoxPosition;
+	glm::vec2 firstItemPosition;
+	glm::vec2 firstTextPosition;
 
 	std::array<glm::vec2, 6> getQuadCoords(const glm::vec2& position, int width, int height)
 	{
@@ -147,10 +151,9 @@ namespace
 		return textureLayer;
 	}
 
-	glm::vec2 getPositionOnHotbar(eInventoryIndex hotbarIndex, glm::ivec2 basePosition)
+	glm::vec2 getPositionOnHotbar(eInventoryIndex hotbarIndex, glm::ivec2 basePosition, float offsetX)
 	{
 		glm::vec2 position = basePosition;
-		float offsetX = 64.0f;
 		switch (hotbarIndex)
 		{
 		case eInventoryIndex::One:
@@ -328,7 +331,8 @@ void Text::setText(int number, const std::unordered_map<char, int>& characterIDM
 		glm::ivec2 position = m_position;
 		for (auto digit : digits)
 		{
-			std::array<glm::vec2, 6> quadCoords = getQuadCoords(position, { TEXT_SIZE, TEXT_SIZE });
+			std::array<glm::vec2, 6> quadCoords = getQuadCoords(position, TEXT_SIZE, TEXT_SIZE );
+			//std::array<glm::vec2, 6> quadCoords = getQuadCoords(position, { TEXT_SIZE, TEXT_SIZE });
 			positions.insert(positions.begin() + positions.size(), quadCoords.cbegin(), quadCoords.cend());
 
 			auto characterID = characterIDMap.find(convertDigit(digit));
@@ -344,7 +348,8 @@ void Text::setText(int number, const std::unordered_map<char, int>& characterIDM
 	}
 	else
 	{
-		std::array<glm::vec2, 6> quadCoords = getQuadCoords(m_position, { TEXT_SIZE, TEXT_SIZE });
+		std::array<glm::vec2, 6> quadCoords = getQuadCoords(m_position, TEXT_SIZE, TEXT_SIZE);
+		//std::array<glm::vec2, 6> quadCoords = getQuadCoords(m_position, { TEXT_SIZE, TEXT_SIZE });
 		positions.insert(positions.begin() + positions.size(), quadCoords.cbegin(), quadCoords.cend());
 
 		auto characterID = characterIDMap.find(convertDigit(number));
@@ -445,21 +450,16 @@ Gui::Gui(const glm::uvec2& windowSize)
 	m_toolbar(),
 	m_selectionBox()
 {
-
+	firstTextPosition = { (windowSize.x / 2) - 248, windowSize.y - (windowSize.y * 0.065f) };
+	firstItemPosition = { (windowSize.x / 2) - 255, windowSize.y - (windowSize.y * 0.025f) };
 	//Items
 	for (int i = 0; i < m_items.size(); ++i)
 	{
-		glm::vec2 position = getPositionOnHotbar(static_cast<eInventoryIndex>(i), INITIAL_ITEM_STARTING_POSITION);
-		m_items[i].setPosition(getQuadCoords(position, ITEM_SIZE));
-	}
+		glm::vec2 position = getPositionOnHotbar(static_cast<eInventoryIndex>(i), firstItemPosition, ITEM_OFFSET_X);
+		m_items[i].setPosition(getQuadCoords(position, ITEM_SIZE.x, ITEM_SIZE.y));
 
-	glm::vec2 position = ITEM_QUANTITY_STARTING_POSITION;
-	//Item Quantity Text
-	for (auto& itemQuantityText : m_itemQuantityText)
-	{
-		itemQuantityText.setPosition(position);
-
-		position.x += 55.0f;
+		position = getPositionOnHotbar(static_cast<eInventoryIndex>(i), firstTextPosition, ITEM_QUANTITY_OFFSET_X);
+		m_itemQuantityText[i].setPosition(position);
 	}
 
 	//Toolbar
@@ -500,7 +500,7 @@ void Gui::removeItem(eInventoryIndex hotbarIndex)
 
 void Gui::updateSelectionBox(eInventoryIndex selectedItem)
 {
-	glm::vec2 position = getPositionOnHotbar(selectedItem, initialSelectionBoxPosition);
+	glm::vec2 position = getPositionOnHotbar(selectedItem, initialSelectionBoxPosition, ITEM_OFFSET_X);
 	m_selectionBox.setPosition(getQuadCoords(position, SELECTION_BOX_SIZE.x, SELECTION_BOX_SIZE.y));
 }
 
