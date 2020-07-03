@@ -23,14 +23,30 @@ namespace
 	constexpr glm::vec2 INITIAL_ITEM_STARTING_POSITION = { 710.0f, 1000.0f };
 	constexpr glm::vec2 ITEM_QUANTITY_STARTING_POSITION = { 720.0f, 925.0f };
 
-	std::array<glm::vec2, 6> getQuadCoords(const glm::vec2& position, const glm::vec2& scale)
+	glm::vec2 initialSelectionBoxPosition;
+
+	std::array<glm::vec2, 6> getQuadCoords(const glm::vec2& position, int width, int height)
+	{
+		return
+		{
+			glm::vec2(position.x - width / 2, position.y + height / 2),
+			glm::vec2(position.x + width / 2, position.y + height / 2),
+			glm::vec2(position.x + width / 2, position.y - height / 2),
+			glm::vec2(position.x + width / 2, position.y - height / 2),
+			glm::vec2(position.x - width / 2, position.y - height / 2),
+			glm::vec2(position.x - width / 2, position.y + height / 2)
+
+		};
+	};
+
+	std::array<glm::vec2, 6> getQuadCoords(const glm::vec2& position, const glm::vec2& size)
 	{
 		return {
 			position, 
-			glm::vec2(position.x + scale.x, position.y),
-			glm::vec2(position.x + scale.x, position.y + scale.y),
-			glm::vec2(position.x + scale.x, position.y + scale.y),
-			glm::vec2(position.x, position.y + scale.y),
+			glm::vec2(position.x + size.x, position.y),
+			glm::vec2(position.x + size.x, position.y + size.y),
+			glm::vec2(position.x + size.x, position.y + size.y),
+			glm::vec2(position.x, position.y + size.y),
 			glm::vec2(position.x, position.y)
 		};
 	};
@@ -78,24 +94,25 @@ namespace
 			glm::vec3(0, 0, static_cast<int>(textureLayer)) };
 	};
 
+	//0.917
 	constexpr std::array<glm::vec2, 6> toolbarTextCoords =
 	{
-		glm::vec2(0.0f, .92f),
-		glm::vec2(0.71f, .92f),
-		glm::vec2(0.71f, 1.0f),
-		glm::vec2(0.71f, 1.0f),
+		glm::vec2(0.0f, .917f),
+		glm::vec2(0.709f, .917f),
+		glm::vec2(0.709f, 1.0f),
+		glm::vec2(0.709f, 1.0f),
 		glm::vec2(0.0f, 1.0f),
-		glm::vec2(0.0f, .92f)
+		glm::vec2(0.0f, .917f)
 	};
 
 	constexpr std::array<glm::vec2, 6> selectionBoxTextCoords =
 	{
-		glm::vec2(0.0f, .828125f),
-		glm::vec2(0.09f, .828125f),
-		glm::vec2(0.09f, 0.9101f),
-		glm::vec2(0.09f, 0.9101f),
-		glm::vec2(0.0f, 0.9101f),
-		glm::vec2(0.0f, .828125f)
+		glm::vec2(0.0f, .823f),
+		glm::vec2(0.0901f, .823f),
+		glm::vec2(0.0901f, 0.913f),
+		glm::vec2(0.0901f, 0.913f),
+		glm::vec2(0.0f, 0.913f),
+		glm::vec2(0.0f, .823f)
 	};
 
 	eTerrainTextureLayer getTextureLayer(eCubeType cubeType)
@@ -133,7 +150,7 @@ namespace
 	glm::vec2 getPositionOnHotbar(eInventoryIndex hotbarIndex, glm::ivec2 basePosition)
 	{
 		glm::vec2 position = basePosition;
-		float offsetX = 55.0f;
+		float offsetX = 64.0f;
 		switch (hotbarIndex)
 		{
 		case eInventoryIndex::One:
@@ -417,14 +434,18 @@ void Image::setTextureRect(const std::array<glm::vec3, 6>& drawableRect) const
 	glBindVertexArray(0);
 }
 
+constexpr glm::vec2 TOOLBAR_SIZE = { 580, 60 };
+constexpr glm::vec2 SELECTION_BOX_SIZE = { 66, 60 };
+
 //GUI
-Gui::Gui()
+Gui::Gui(const glm::uvec2& windowSize)
 	: m_items(),
 	m_itemQuantityText(),
 	m_characterIDMap(),
 	m_toolbar(),
 	m_selectionBox()
 {
+
 	//Items
 	for (int i = 0; i < m_items.size(); ++i)
 	{
@@ -442,12 +463,13 @@ Gui::Gui()
 	}
 
 	//Toolbar
-	m_toolbar.setPosition(getQuadCoords(TOOLBAR_STARTING_POSITION, { 500, 48 }));
+	m_toolbar.setPosition(getQuadCoords({ windowSize.x / 2, windowSize.y - (windowSize.y * 0.025f) }, TOOLBAR_SIZE.x, TOOLBAR_SIZE.y));
 	m_toolbar.setTextureRect(toolbarTextCoords);
 	m_toolbar.setActive(true);
 
 	//Selection Box
-	m_selectionBox.setPosition(getQuadCoords(TOOLBAR_STARTING_POSITION, { 52, 48 }));
+	initialSelectionBoxPosition = { (windowSize.x / 2) - 257, windowSize.y - (windowSize.y * 0.025f) };
+	m_selectionBox.setPosition(getQuadCoords(initialSelectionBoxPosition, SELECTION_BOX_SIZE.x, SELECTION_BOX_SIZE.y));
 	m_selectionBox.setTextureRect(selectionBoxTextCoords);
 	m_selectionBox.setActive(true);
 
@@ -478,8 +500,8 @@ void Gui::removeItem(eInventoryIndex hotbarIndex)
 
 void Gui::updateSelectionBox(eInventoryIndex selectedItem)
 {
-	glm::vec2 position = getPositionOnHotbar(selectedItem, TOOLBAR_STARTING_POSITION);
-	m_selectionBox.setPosition(getQuadCoords(position, { 52, 48 }));
+	glm::vec2 position = getPositionOnHotbar(selectedItem, initialSelectionBoxPosition);
+	m_selectionBox.setPosition(getQuadCoords(position, SELECTION_BOX_SIZE.x, SELECTION_BOX_SIZE.y));
 }
 
 void Gui::updateItemQuantity(eInventoryIndex selectedItem, int quantity)
