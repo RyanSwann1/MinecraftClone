@@ -5,6 +5,7 @@
 #include "Globals.h"
 #include "VertexArray.h"
 #include "Rectangle.h"
+#include "Timer.h"
 #include <unordered_map>
 
 //One VBO per pick up type
@@ -18,8 +19,8 @@ class Player;
 class Pickup : private NonCopyable
 {
 public:
-	Pickup(eCubeType cubeType, const glm::vec3& destroyedBlockPosition, const glm::vec3& initialVelocity);
-	Pickup(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition);
+	Pickup(eCubeType cubeType, const glm::vec3& position, const glm::vec3& initialVelocity);
+	Pickup(eCubeType cubeType, const glm::ivec3& position);
 	Pickup(Pickup&&) noexcept;
 	Pickup& operator=(Pickup&&) noexcept;
 
@@ -31,13 +32,12 @@ public:
 	void render(const Frustum& frustum, ShaderHandler& shaderHandler);
 
 private:
+	Timer m_collectionTimer;
 	Rectangle m_AABB;
 	eCubeType m_cubeType;
 	glm::vec3 m_position;
 	glm::vec3 m_velocity;
-	float m_movementSpeed;
 	VertexArray m_vertexArray;
 	bool m_onGround;
-	bool m_discardedByPlayer;
 	float m_timeElasped;
 };

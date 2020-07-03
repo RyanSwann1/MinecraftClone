@@ -6,30 +6,35 @@
 #include "ShaderHandler.h"
 #include "Player.h"
 
-//PickUp
-Pickup::Pickup(eCubeType cubeType, const glm::vec3& destroyedBlockPosition, const glm::vec3& initialVelocity)
-	: m_AABB({ destroyedBlockPosition.x + 0.5f, destroyedBlockPosition.z + 0.5f }, 0.5f),
+namespace
+{
+	constexpr float MOVEMENT_SPEED = 5.0f;
+	constexpr float MAXIMUM_DISTANCE_FROM_PLAYER = 2.5f;
+	constexpr float MINIMUM_DISTANCE_FROM_PLAYER = 1.0f;
+	constexpr float MIN_TIME_COLLECTION = 1.0f;
+}
+
+Pickup::Pickup(eCubeType cubeType, const glm::vec3& position, const glm::vec3& initialVelocity)
+	: m_collectionTimer(MIN_TIME_COLLECTION, true),
+	m_AABB({ position.x + 0.5f, position.z + 0.5f }, 0.5f),
 	m_cubeType(cubeType),
-	m_position(destroyedBlockPosition),
+	m_position(position),
 	m_velocity(initialVelocity),
-	m_movementSpeed(5.0f),
 	m_vertexArray(),
 	m_onGround(false),
-	m_discardedByPlayer(true),
 	m_timeElasped(0.0f)
 {
 	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, m_position);
 }
 
-Pickup::Pickup(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
-	: m_AABB({ destroyedBlockPosition.x + 0.5f, destroyedBlockPosition.z + 0.5f }, 0.5f),
+Pickup::Pickup(eCubeType cubeType, const glm::ivec3& position)
+	: m_collectionTimer(),
+	m_AABB({ position.x + 0.5f, position.z + 0.5f }, 0.5f),
 	m_cubeType(cubeType),
-	m_position({ destroyedBlockPosition.x + 0.35f, destroyedBlockPosition.y + 0.35f, destroyedBlockPosition.z + 0.35f}),
+	m_position({ position.x + 0.35f, position.y + 0.35f, position.z + 0.35f}),
 	m_velocity(),
-	m_movementSpeed(5.0f),
 	m_vertexArray(),
 	m_onGround(false),
-	m_discardedByPlayer(false),
 	m_timeElasped(0.0f)
 {
 	glm::vec3 n = glm::normalize(glm::vec3(Globals::getRandomNumber(0, 360), 90, Globals::getRandomNumber(0, 360)));
@@ -41,27 +46,25 @@ Pickup::Pickup(eCubeType cubeType, const glm::ivec3& destroyedBlockPosition)
 }
 
 Pickup::Pickup(Pickup&& orig) noexcept
-	: m_AABB(orig.m_AABB),
+	: m_collectionTimer(orig.m_collectionTimer),
+	m_AABB(orig.m_AABB),
 	m_cubeType(orig.m_cubeType),
 	m_position(orig.m_position),
 	m_velocity(orig.m_velocity),
-	m_movementSpeed(orig.m_movementSpeed),
 	m_vertexArray(std::move(orig.m_vertexArray)),
 	m_onGround(orig.m_onGround),
-	m_discardedByPlayer(orig.m_discardedByPlayer),
 	m_timeElasped(orig.m_timeElasped)
 {}
 
 Pickup& Pickup::operator=(Pickup&& orig) noexcept
 {
+	m_collectionTimer = orig.m_collectionTimer;
 	m_AABB = orig.m_AABB;
 	m_cubeType = orig.m_cubeType;
 	m_position = orig.m_position;
 	m_velocity = orig.m_velocity;
-	m_movementSpeed = orig.m_movementSpeed;
 	m_vertexArray = std::move(orig.m_vertexArray);
 	m_onGround = orig.m_onGround;
-	m_discardedByPlayer = orig.m_discardedByPlayer;
 	m_timeElasped = orig.m_timeElasped;
 
 	return *this;
@@ -74,7 +77,7 @@ eCubeType Pickup::getCubeType() const
 
 bool Pickup::isInReachOfPlayer(const glm::vec3& playerMiddlePosition) const
 {
-	return glm::distance(m_position, playerMiddlePosition) <= 0.4f;
+	return glm::distance(m_position, playerMiddlePosition) <= MINIMUM_DISTANCE_FROM_PLAYER && !m_collectionTimer.isActive();
 }
 
 const Rectangle& Pickup::getAABB() const
@@ -97,7 +100,6 @@ void Pickup::update(const Player& player, float deltaTime, const ChunkManager& c
 	else
 	{
 		m_onGround = true;
-		m_discardedByPlayer = false;
 		m_velocity.y = 0.0f;
 	}
 		
@@ -117,11 +119,15 @@ void Pickup::update(const Player& player, float deltaTime, const ChunkManager& c
 		m_position.y += glm::sin(m_timeElasped * 2.5f) * 0.005f;
 	}
 
-	glm::vec3 playerMiddlePosition = player.getPosition();
-	if (!m_discardedByPlayer && glm::distance(m_position, playerMiddlePosition) <= 2.5f && 
-		player.getInventory().isItemAddable(m_cubeType))
+	m_collectionTimer.update(deltaTime);
+	if (!m_collectionTimer.isActive() || m_collectionTimer.isExpired())
 	{
-		m_velocity += glm::normalize(glm::vec3(playerMiddlePosition - m_position)) * 5.0f;
+		glm::vec3 playerMiddlePosition = player.getMiddlePosition();
+		if (glm::distance(m_position, playerMiddlePosition) <= MAXIMUM_DISTANCE_FROM_PLAYER &&
+			player.getInventory().isItemAddable(m_cubeType))
+		{
+			m_velocity += glm::normalize(glm::vec3(playerMiddlePosition - m_position)) * MOVEMENT_SPEED;
+		}
 	}
 
 	m_position += m_velocity * deltaTime;
