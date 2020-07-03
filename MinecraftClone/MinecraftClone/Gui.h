@@ -64,7 +64,7 @@ class ShaderHandler;
 class Gui : private NonCopyable, private NonMovable
 {
 public:
-	Gui();
+	Gui(const glm::uvec2& windowSize);
 
 	void addItem(eInventoryIndex hotbarIndex, eCubeType cubeType);
 	void removeItem(eInventoryIndex hotbarIndex);

@@ -71,7 +71,7 @@ int main()
 	settings.majorVersion = 3;
 	settings.minorVersion = 3;
 	settings.attributeFlags = sf::ContextSettings::Core;
-	glm::ivec2 windowSize(1980, 1080);
+	glm::uvec2 windowSize(1920, 1080);
 	sf::Window window(sf::VideoMode(windowSize.x, windowSize.y), "Minecraft Clone", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(60);
 	window.setMouseCursorVisible(false);
@@ -123,7 +123,7 @@ int main()
 	}
 
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
-	Gui gui;
+	Gui gui(windowSize);
 	std::vector<Pickup> pickUps;
 	Frustum frustum;
 	Player player;
