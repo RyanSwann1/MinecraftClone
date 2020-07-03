@@ -11,11 +11,12 @@ namespace
 	constexpr float MOVEMENT_SPEED = 5.0f;
 	constexpr float MAXIMUM_DISTANCE_FROM_PLAYER = 2.5f;
 	constexpr float MINIMUM_DISTANCE_FROM_PLAYER = 1.0f;
-	constexpr float MIN_TIME_COLLECTION = 1.0f;
+	constexpr float DESTROYED_CUBE_MIN_TIME_COLLECTION = 0.5f;
+	constexpr float PLAYER_DISGARD_MIN_TIME_COLLECTION = 1.5;
 }
 
 Pickup::Pickup(eCubeType cubeType, const glm::vec3& position, const glm::vec3& initialVelocity)
-	: m_collectionTimer(MIN_TIME_COLLECTION, true),
+	: m_collectionTimer(PLAYER_DISGARD_MIN_TIME_COLLECTION),
 	m_AABB({ position.x + 0.5f, position.z + 0.5f }, 0.5f),
 	m_cubeType(cubeType),
 	m_position(position),
@@ -28,7 +29,7 @@ Pickup::Pickup(eCubeType cubeType, const glm::vec3& position, const glm::vec3& i
 }
 
 Pickup::Pickup(eCubeType cubeType, const glm::ivec3& position)
-	: m_collectionTimer(),
+	: m_collectionTimer(DESTROYED_CUBE_MIN_TIME_COLLECTION),
 	m_AABB({ position.x + 0.5f, position.z + 0.5f }, 0.5f),
 	m_cubeType(cubeType),
 	m_position({ position.x + 0.35f, position.y + 0.35f, position.z + 0.35f}),

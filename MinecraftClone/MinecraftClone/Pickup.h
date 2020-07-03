@@ -19,7 +19,9 @@ class Player;
 class Pickup : private NonCopyable
 {
 public:
+	//On Player disgard
 	Pickup(eCubeType cubeType, const glm::vec3& position, const glm::vec3& initialVelocity);
+	//On destroyed Cube
 	Pickup(eCubeType cubeType, const glm::ivec3& position);
 	Pickup(Pickup&&) noexcept;
 	Pickup& operator=(Pickup&&) noexcept;

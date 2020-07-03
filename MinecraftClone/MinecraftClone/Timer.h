@@ -4,7 +4,7 @@ class Timer
 {
 public:
 	Timer();
-	Timer(float expirationTime, bool active);
+	Timer(float expirationTime, bool active = true);
 
 	bool isActive() const;
 	bool isExpired() const;
