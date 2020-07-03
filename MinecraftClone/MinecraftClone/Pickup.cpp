@@ -4,6 +4,7 @@
 #include "Frustum.h"
 #include "CollisionHandler.h"
 #include "ShaderHandler.h"
+#include "Player.h"
 
 //PickUp
 Pickup::Pickup(eCubeType cubeType, const glm::vec3& destroyedBlockPosition, const glm::vec3& initialVelocity)
@@ -81,7 +82,7 @@ const Rectangle& Pickup::getAABB() const
 	return m_AABB;
 }
 
-void Pickup::update(const glm::vec3& playerPosition, float deltaTime, const ChunkManager& chunkManager)
+void Pickup::update(const Player& player, float deltaTime, const ChunkManager& chunkManager)
 {
 	if (CollisionHandler::isCollision({ m_position.x, m_position.y - 0.10f, m_position.z }, chunkManager))
 	{
@@ -116,9 +117,10 @@ void Pickup::update(const glm::vec3& playerPosition, float deltaTime, const Chun
 		m_position.y += glm::sin(m_timeElasped * 2.5f) * 0.005f;
 	}
 
-	if (!m_discardedByPlayer && glm::distance(m_position, { playerPosition.x, playerPosition.y, playerPosition.z }) <= 2.5f)
+	if (!m_discardedByPlayer && glm::distance(m_position, player.getPosition()) <= 2.5f && 
+		player.getInventory().isItemAddable(m_cubeType))
 	{
-		m_velocity += glm::normalize(glm::vec3(glm::vec3(playerPosition.x, playerPosition.y - 1.0f, playerPosition.z) - m_position)) * 5.0f;
+		m_velocity += glm::normalize(glm::vec3(player.getPosition() - m_position)) * 5.0f;
 	}
 
 	m_position += m_velocity * deltaTime;

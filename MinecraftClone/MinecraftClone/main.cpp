@@ -183,7 +183,6 @@ int main()
 			player.handleInputEvents(pickUps, currentSFMLEvent, *chunkManager, playerMutex, window, gui);
 		}
 
-
 		//Update
 		player.update(deltaTime, playerMutex, *chunkManager.get());
 
@@ -194,14 +193,14 @@ int main()
 			{
 				pickup = pickUps.erase(pickup);
 			}
-			else if (pickup->isInReachOfPlayer(player.getPosition()))
+			else if (pickup->isInReachOfPlayer(player.getPosition()) && player.getInventory().isItemAddable(pickup->getCubeType()))
 			{
 				player.addToInventory(pickup->getCubeType(), gui);
 				pickup = pickUps.erase(pickup);
 			}
 			else
 			{
-				pickup->update(player.getPosition(), deltaTime, *chunkManager);
+				pickup->update(player, deltaTime, *chunkManager);
 				++pickup;
 			}
 		}

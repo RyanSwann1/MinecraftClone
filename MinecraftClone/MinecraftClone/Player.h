@@ -46,6 +46,7 @@ public:
 	const glm::vec3 getMiddlePosition() const;
 	const glm::vec3& getPosition() const;
 	const Camera& getCamera() const;
+	const Inventory& getInventory() const;
 
 	void addToInventory(eCubeType cubeType, Gui& gui);
 	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);

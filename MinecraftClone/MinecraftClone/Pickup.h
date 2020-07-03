@@ -14,6 +14,7 @@
 class ShaderHandler;
 class ChunkManager;
 class Frustum;
+class Player;
 class Pickup : private NonCopyable
 {
 public:
@@ -26,7 +27,7 @@ public:
 	bool isInReachOfPlayer(const glm::vec3& playerPosition) const;
 	const Rectangle& getAABB() const;
 
-	void update(const glm::vec3& playerPosition, float deltaTime, const ChunkManager& chunkManager);
+	void update(const Player& player, float deltaTime, const ChunkManager& chunkManager);
 	void render(const Frustum& frustum, ShaderHandler& shaderHandler);
 
 private:

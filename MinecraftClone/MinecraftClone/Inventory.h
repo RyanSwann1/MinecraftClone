@@ -33,7 +33,8 @@ public:
 	eInventoryIndex getSelectedItemIndex() const;
 	eCubeType getSelectedItemType() const;
 	bool isSelectedItemEmpty() const;
-
+	bool isItemAddable(eCubeType cubeType) const;
+	
 	void reduceSelectedItem(Gui& Gui);
 	void add(eCubeType cubeTypeToAdd, Gui& gui);
 	void handleInputEvents(const sf::Event& currentSFMLEvent, Gui& gui);

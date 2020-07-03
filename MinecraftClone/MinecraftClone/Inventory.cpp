@@ -74,6 +74,19 @@ bool Inventory::isSelectedItemEmpty() const
 	return getSelectedItem().isEmpty();
 }
 
+bool Inventory::isItemAddable(eCubeType cubeType) const
+{
+	for (const auto& item : m_items)
+	{
+		if (item.isEmpty() || (item.getCubeType() == cubeType && !item.isFull()))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void Inventory::reduceSelectedItem(Gui& gui)
 {
 	assert(!isSelectedItemEmpty());

@@ -105,6 +105,11 @@ const Camera& Player::getCamera() const
 	return m_camera;
 }
 
+const Inventory& Player::getInventory() const
+{
+	return m_inventory;
+}
+
 void Player::addToInventory(eCubeType cubeTypeToAdd, Gui& gui)
 {
 	m_inventory.add(cubeTypeToAdd, gui);
