@@ -30,30 +30,125 @@ namespace
 	};
 
 	//Cube Position Coords
-	constexpr std::array<glm::vec3, 4> CUBE_FACE_FRONT = { glm::vec3(0, 0, 1), glm::vec3(1, 0, 1), glm::vec3(1, 1, 1), glm::vec3(0, 1, 1) };
-	constexpr std::array<glm::vec3, 4> CUBE_FACE_BACK = { glm::vec3(1, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 1, 0) };
+	constexpr std::array<glm::vec3, 4> CUBE_FACE_FRONT = 
+	{ 
+		glm::vec3(0, 0, Globals::CUBE_FACE_SIZE), 
+		glm::vec3(Globals::CUBE_FACE_SIZE, 0, Globals::CUBE_FACE_SIZE), 
+		glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE), 
+		glm::vec3(0, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE) 
+	};
+	constexpr std::array<glm::vec3, 4> CUBE_FACE_BACK = 
+	{ 
+		glm::vec3(Globals::CUBE_FACE_SIZE, 0, 0), 
+		glm::vec3(0, 0, 0), 
+		glm::vec3(0, Globals::CUBE_FACE_SIZE, 0), 
+		glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, 0) 
+	};
 
-	constexpr std::array<glm::vec3, 4> CUBE_FACE_LEFT = { glm::vec3(0, 0, 0), glm::vec3(0, 0, 1), glm::vec3(0, 1, 1), glm::vec3(0, 1, 0) };
-	constexpr std::array<glm::vec3, 4> CUBE_FACE_RIGHT = { glm::vec3(1, 0, 1), glm::vec3(1, 0, 0), glm::vec3(1, 1, 0), glm::vec3(1, 1, 1) };
+	constexpr std::array<glm::vec3, 4> CUBE_FACE_LEFT = 
+	{ 
+		glm::vec3(0, 0, 0), 
+		glm::vec3(0, 0, Globals::CUBE_FACE_SIZE), 
+		glm::vec3(0, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE), 
+		glm::vec3(0, Globals::CUBE_FACE_SIZE, 0) 
+	};
+	constexpr std::array<glm::vec3, 4> CUBE_FACE_RIGHT = 
+	{ 
+		glm::vec3(Globals::CUBE_FACE_SIZE, 0, Globals::CUBE_FACE_SIZE), 
+		glm::vec3(Globals::CUBE_FACE_SIZE, 0, 0), 
+		glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, 0), 
+		glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE) 
+	};
 
-	constexpr std::array<glm::vec3, 4> CUBE_FACE_TOP = { glm::vec3(0, 1, 1), glm::vec3(1, 1, 1), glm::vec3(1, 1, 0), glm::vec3(0, 1, 0) };
-	constexpr std::array<glm::vec3, 4> CUBE_FACE_BOTTOM = { glm::vec3(0, 0, 0), glm::vec3(1, 0, 0), glm::vec3(1, 0, 1), glm::vec3(0, 0, 1) };
+	constexpr std::array<glm::vec3, 4> CUBE_FACE_TOP = 
+	{ 
+		glm::vec3(0, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE), 
+		glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE), 
+		glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, 0), 
+		glm::vec3(0, Globals::CUBE_FACE_SIZE, 0) 
+	};
+	constexpr std::array<glm::vec3, 4> CUBE_FACE_BOTTOM = 
+	{ 
+		glm::vec3(0, 0, 0), 
+		glm::vec3(Globals::CUBE_FACE_SIZE, 0, 0), 
+		glm::vec3(Globals::CUBE_FACE_SIZE, 0, Globals::CUBE_FACE_SIZE), 
+		glm::vec3(0, 0, Globals::CUBE_FACE_SIZE) 
+	};
 
-	constexpr std::array<glm::vec3, 4> FIRST_DIAGONAL_FACE = { glm::vec3(0, 0, 0), glm::vec3(1, 0, 1), glm::vec3(1, 1, 1), glm::vec3(0, 1, 0) };
-	constexpr std::array<glm::vec3, 4> SECOND_DIAGONAL_FACE = { glm::vec3(0, 0, 1), glm::vec3(1, 0, 0), glm::vec3(1, 1, 0), glm::vec3(0, 1, 1) };
+	constexpr std::array<glm::vec3, 4> FIRST_DIAGONAL_FACE = 
+	{ 
+		glm::vec3(0, 0, 0), 
+		glm::vec3(Globals::CUBE_FACE_SIZE, 0, Globals::CUBE_FACE_SIZE), 
+		glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE), 
+		glm::vec3(0, Globals::CUBE_FACE_SIZE, 0) 
+	};
+	constexpr std::array<glm::vec3, 4> SECOND_DIAGONAL_FACE = 
+	{ 
+		glm::vec3(0, 0, Globals::CUBE_FACE_SIZE), 
+		glm::vec3(Globals::CUBE_FACE_SIZE, 0, 0), 
+		glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, 0), 
+		glm::vec3(0, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE) 
+	};
 
 	//PickUp Position Coords
-	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_FRONT = { glm::vec3(0, 0, 0.25f), glm::vec3(0.25f, 0, 0.25f), glm::vec3(0.25f, 0.25f, 0.25f), glm::vec3(0, 0.25f, 0.25f) };
-	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_BACK = { glm::vec3(0.25f, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0.25f, 0), glm::vec3(0.25f, 0.25f, 0) };
+	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_FRONT = 
+	{ 
+		glm::vec3(0, 0, Globals::PICKUP_CUBE_FACE_SIZE), 
+		glm::vec3(Globals::PICKUP_CUBE_FACE_SIZE, 0, Globals::PICKUP_CUBE_FACE_SIZE), 
+		glm::vec3(Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE), 
+		glm::vec3(0, Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE) 
+	};
+	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_BACK = 
+	{ 
+		glm::vec3(Globals::PICKUP_CUBE_FACE_SIZE, 0, 0), 
+		glm::vec3(0, 0, 0), 
+		glm::vec3(0, Globals::PICKUP_CUBE_FACE_SIZE, 0), 
+		glm::vec3(Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE, 0) 
+	};
 
-	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_LEFT = { glm::vec3(0, 0, 0), glm::vec3(0, 0, 0.25f), glm::vec3(0, 0.25f, 0.25f), glm::vec3(0, 0.25f, 0) };
-	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_RIGHT = { glm::vec3(0.25f, 0, 0.25f), glm::vec3(0.25f, 0, 0), glm::vec3(0.25f, 0.25f, 0), glm::vec3(0.25f, 0.25f, 0.25f) };
+	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_LEFT = 
+	{ glm::vec3(0, 0, 0), 
+		glm::vec3(0, 0, Globals::PICKUP_CUBE_FACE_SIZE), 
+		glm::vec3(0, Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE), 
+		glm::vec3(0, Globals::PICKUP_CUBE_FACE_SIZE, 0) 
+	};
+	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_RIGHT = 
+	{ 
+		glm::vec3(Globals::PICKUP_CUBE_FACE_SIZE, 0, Globals::PICKUP_CUBE_FACE_SIZE), 
+		glm::vec3(Globals::PICKUP_CUBE_FACE_SIZE, 0, 0), 
+		glm::vec3(Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE, 0), 
+		glm::vec3(Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE) 
+	};
 
-	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_TOP = { glm::vec3(0, 0.25f, 0.25f), glm::vec3(0.25f, 0.25f, 0.25f), glm::vec3(0.25f, 0.25f, 0), glm::vec3(0, 0.25f, 0) };
-	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_BOTTOM = { glm::vec3(0, 0, 0), glm::vec3(0.25f, 0, 0), glm::vec3(0.25f, 0, 0.25f), glm::vec3(0, 0, 0.25f) };
+	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_TOP = 
+	{ 
+		glm::vec3(0, Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE), 
+		glm::vec3(Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE), 
+		glm::vec3(Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE, 0), 
+		glm::vec3(0, Globals::PICKUP_CUBE_FACE_SIZE, 0) 
+	};
+	constexpr std::array<glm::vec3, 4> PICKUP_CUBE_FACE_BOTTOM = 
+	{ 
+		glm::vec3(0, 0, 0), 
+		glm::vec3(Globals::PICKUP_CUBE_FACE_SIZE, 0, 0), 
+		glm::vec3(Globals::PICKUP_CUBE_FACE_SIZE, 0, Globals::PICKUP_CUBE_FACE_SIZE), 
+		glm::vec3(0, 0, Globals::PICKUP_CUBE_FACE_SIZE) 
+	};
 
-	constexpr std::array<glm::vec3, 4> PICKUP_FIRST_DIAGONAL_FACE = { glm::vec3(0, 0, 0), glm::vec3(0.25f, 0, 0.25f), glm::vec3(0.25f, 0.25f, 0.25f), glm::vec3(0, 0.25f, 0) };
-	constexpr std::array<glm::vec3, 4> PICKUP_SECOND_DIAGONAL_FACE = { glm::vec3(0, 0, 0.25f), glm::vec3(0.25f, 0, 0), glm::vec3(0.25f, 0.25f, 0), glm::vec3(0, 0.25f, 0.25f) };
+	constexpr std::array<glm::vec3, 4> PICKUP_FIRST_DIAGONAL_FACE = 
+	{ 
+		glm::vec3(0, 0, 0), 
+		glm::vec3(Globals::PICKUP_CUBE_FACE_SIZE, 0, Globals::PICKUP_CUBE_FACE_SIZE), 
+		glm::vec3(Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE), 
+		glm::vec3(0, Globals::PICKUP_CUBE_FACE_SIZE, 0) 
+	};
+	constexpr std::array<glm::vec3, 4> PICKUP_SECOND_DIAGONAL_FACE = 
+	{ 
+		glm::vec3(0, 0, Globals::PICKUP_CUBE_FACE_SIZE), 
+		glm::vec3(Globals::PICKUP_CUBE_FACE_SIZE, 0, 0), 
+		glm::vec3(Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE, 0), 
+		glm::vec3(0, Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE) 
+	};
 
 	void getTextCoords(std::vector<glm::vec3>& textCoords, eCubeSide cubeSide, eCubeType cubeType)
 	{
@@ -242,7 +337,7 @@ void MeshGenerator::generateChunkMesh(VertexArray& chunkMesh, const Chunk& chunk
 	}
 }
 
-void MeshGenerator::generatePickUpMesh(VertexBuffer& pickUpMesh, eCubeType cubeType, const glm::vec3& position)
+void MeshGenerator::generatePickUpMesh(VertexBuffer& pickUpMesh, eCubeType cubeType)
 {
 	addPickupCubeFace(pickUpMesh, cubeType, eCubeSide::Left);
 	addPickupCubeFace(pickUpMesh, cubeType, eCubeSide::Right);

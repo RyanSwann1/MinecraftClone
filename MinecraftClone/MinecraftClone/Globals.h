@@ -106,6 +106,9 @@ namespace Globals
 	constexpr float TERRAIN_PERSISTENCE = 2.5f;
 	constexpr int TERRAIN_OCTAVES = 8;
 
+	constexpr float PICKUP_CUBE_FACE_SIZE = 0.25f;
+	constexpr float CUBE_FACE_SIZE = 1.0f;
+
 	const CubeTypeComparison TRANSPARENT_CUBE_TYPES =
 	{
 		{eCubeType::Water,

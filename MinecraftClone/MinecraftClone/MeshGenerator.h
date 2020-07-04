@@ -11,5 +11,5 @@ enum class eCubeType;
 namespace MeshGenerator
 {
 	void generateChunkMesh(VertexArray& chunkMesh, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks);
-	void generatePickUpMesh(VertexBuffer& pickUpMesh, eCubeType cubeType, const glm::vec3& position);
+	void generatePickUpMesh(VertexBuffer& pickUpMesh, eCubeType cubeType);
 }
