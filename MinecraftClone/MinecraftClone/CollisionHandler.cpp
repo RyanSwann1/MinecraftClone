@@ -56,14 +56,6 @@ bool CollisionHandler::handleZAxisCollision(float& velocity, float offset, const
 	return false;
 }
 
-bool CollisionHandler::isGroundCollision(const glm::vec3& position, const ChunkManager& chunkManager)
-{
-	eCubeType cubeType = eCubeType::Air;
-
-	return chunkManager.isCubeAtPosition({ std::floor(position.x), std::floor(position.y), std::floor(position.z) }, cubeType) ||
-		Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType);
-}
-
 bool CollisionHandler::isCollision(const glm::vec3& position, const ChunkManager& chunkManager)
 {
 	eCubeType cubeType = eCubeType::Air;
