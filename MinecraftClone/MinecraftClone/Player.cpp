@@ -485,28 +485,11 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			}
 		}
 		
-		if (!CollisionHandler::isGroundCollision({ m_position.x, m_position.y - HEAD_HEIGHT, m_position.z }, chunkManager))
+		if (!CollisionHandler::isCollision({ m_position.x, m_position.y - HEAD_HEIGHT, m_position.z }, chunkManager))
 		{
 			m_currentState = (m_currentState == ePlayerState::Flying ? m_currentState : ePlayerState::InAir);
 		}
 
-		break;
-	default:
-		assert(false);
-	}
-}
-
-void Player::toggleFlying()
-{
-	switch (m_currentState)
-	{
-	case ePlayerState::InAir:
-		m_currentState = ePlayerState::Flying;
-		break;
-	case ePlayerState::Flying:
-		m_currentState = ePlayerState::InAir;
-		break;
-	case ePlayerState::OnGround:
 		break;
 	default:
 		assert(false);

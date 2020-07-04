@@ -66,7 +66,6 @@ private:
 
 	void move(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager);
 	void handleCollisions(const ChunkManager& chunkManager);
-	void toggleFlying();
 	void toggleAutoJump();
 	void discardItem(std::vector<Pickup>& pickUps, Gui& gui);
 	void placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex, Gui& gui);
