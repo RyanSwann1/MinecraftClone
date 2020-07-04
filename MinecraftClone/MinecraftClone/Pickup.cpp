@@ -5,10 +5,11 @@
 #include "CollisionHandler.h"
 #include "ShaderHandler.h"
 #include "Player.h"
+#include <iostream>
 
 namespace
 {
-	constexpr float MOVEMENT_SPEED = 5.0f;
+	constexpr float MOVEMENT_SPEED = 3.0f;
 	constexpr float MAXIMUM_DISTANCE_FROM_PLAYER = 2.5f;
 	constexpr float MINIMUM_DISTANCE_FROM_PLAYER = 1.0f;
 	constexpr float DESTROYED_CUBE_MIN_TIME_COLLECTION = 0.5f;
@@ -20,30 +21,28 @@ Pickup::Pickup(eCubeType cubeType, const glm::vec3& position, const glm::vec3& i
 	m_AABB({ position.x + 0.5f, position.z + 0.5f }, 0.5f),
 	m_cubeType(cubeType),
 	m_position(position),
-	m_velocity(initialVelocity),
 	m_vertexArray(),
 	m_onGround(false),
 	m_timeElasped(0.0f)
 {
-	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, m_position);
+	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType);
 }
 
 Pickup::Pickup(eCubeType cubeType, const glm::ivec3& position)
 	: m_collectionTimer(DESTROYED_CUBE_MIN_TIME_COLLECTION),
 	m_AABB({ position.x + 0.5f, position.z + 0.5f }, 0.5f),
 	m_cubeType(cubeType),
-	m_position({ position.x + 0.35f, position.y + 0.35f, position.z + 0.35f}),
-	m_velocity(),
+	m_position(position),
 	m_vertexArray(),
 	m_onGround(false),
 	m_timeElasped(0.0f)
 {
-	glm::vec3 n = glm::normalize(glm::vec3(Globals::getRandomNumber(0, 360), 90, Globals::getRandomNumber(0, 360)));
-	m_velocity.x += n.x * 1.5f;
-	m_velocity.y += n.y * 1.5f;
-	m_velocity.z += n.z * 1.5f;
+	//glm::vec3 n = glm::normalize(glm::vec3(Globals::getRandomNumber(-360, 360), 90, Globals::getRandomNumber(-360, 360)));
+	//m_velocity.x += n.x * 1.5f;
+	//m_velocity.y += n.y * 1.5f;
+	//m_velocity.z += n.z * 1.5f;
 
-	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType, m_position);
+	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType);
 }
 
 Pickup::Pickup(Pickup&& orig) noexcept
@@ -51,7 +50,6 @@ Pickup::Pickup(Pickup&& orig) noexcept
 	m_AABB(orig.m_AABB),
 	m_cubeType(orig.m_cubeType),
 	m_position(orig.m_position),
-	m_velocity(orig.m_velocity),
 	m_vertexArray(std::move(orig.m_vertexArray)),
 	m_onGround(orig.m_onGround),
 	m_timeElasped(orig.m_timeElasped)
@@ -63,7 +61,6 @@ Pickup& Pickup::operator=(Pickup&& orig) noexcept
 	m_AABB = orig.m_AABB;
 	m_cubeType = orig.m_cubeType;
 	m_position = orig.m_position;
-	m_velocity = orig.m_velocity;
 	m_vertexArray = std::move(orig.m_vertexArray);
 	m_onGround = orig.m_onGround;
 	m_timeElasped = orig.m_timeElasped;
@@ -88,32 +85,32 @@ const Rectangle& Pickup::getAABB() const
 
 void Pickup::update(const Player& player, float deltaTime, const ChunkManager& chunkManager)
 {
-	if (CollisionHandler::isCollision({ m_position.x, m_position.y - 0.10f, m_position.z }, chunkManager))
+	//if (CollisionHandler::isCollision({ m_position.x, m_position.y - Globals::PICKUP_CUBE_FACE_SIZE, m_position.z }, chunkManager))
+	//{
+	//	m_position.y += MOVEMENT_SPEED * deltaTime;
+	//	m_onGround = false;
+	//}
+	if(!m_onGround && !CollisionHandler::isCollision({ m_position.x, m_position.y - Globals::PICKUP_CUBE_FACE_SIZE * 1.5f, m_position.z }, chunkManager))
 	{
-		m_velocity.y += 0.1f;
-		m_onGround = false;
-	}
-	else if(!CollisionHandler::isCollision({ m_position.x, m_position.y - 0.10f - 0.5f, m_position.z }, chunkManager))
-	{
-		m_velocity.y -= 0.1f;
+		m_position.y -= MOVEMENT_SPEED * deltaTime;
 		m_onGround = false;
 	}
 	else
 	{
 		m_onGround = true;
-		m_velocity.y = 0.0f;
+		//m_velocity.y = 0.0f;
 	}
 		
-	if (m_velocity.x != 0)
-	{
-		CollisionHandler::handleXAxisCollision(m_velocity.x, 0.25f, chunkManager, m_position);
-	}
+	//if (m_velocity.x != 0)
+	//{
+	//	CollisionHandler::handleXAxisCollision(m_velocity.x, 0.25f, chunkManager, m_position);
+	//}
 
-	if (m_velocity.z != 0)
-	{
-		CollisionHandler::handleZAxisCollision(m_velocity.z, 0.25f, chunkManager, m_position);
-	}
-	
+	//if (m_velocity.z != 0)
+	//{
+	//	CollisionHandler::handleZAxisCollision(m_velocity.z, 0.25f, chunkManager, m_position);
+	//}
+
 	if (m_onGround)
 	{
 		m_timeElasped += deltaTime;
@@ -127,13 +124,14 @@ void Pickup::update(const Player& player, float deltaTime, const ChunkManager& c
 		if (glm::distance(m_position, playerMiddlePosition) <= MAXIMUM_DISTANCE_FROM_PLAYER &&
 			player.getInventory().isItemAddable(m_cubeType))
 		{
-			m_velocity += glm::normalize(glm::vec3(playerMiddlePosition - m_position)) * MOVEMENT_SPEED;
+			m_position += glm::normalize(glm::vec3(playerMiddlePosition - m_position)) * MOVEMENT_SPEED * deltaTime;
 		}
 	}
 
-	m_position += m_velocity * deltaTime;
+	//m_position += m_velocity * deltaTime;
 
-	CollisionHandler::applyDrag(m_velocity.x, m_velocity.z, 0.95f);
+	//CollisionHandler::applyDrag(m_velocity, 0.95f);
+	//CollisionHandler::applyDrag(m_velocity.x, m_velocity.z, 0.95f);
 }
 
 void Pickup::render(const Frustum& frustum, ShaderHandler& shaderHandler)

@@ -38,7 +38,6 @@ private:
 	Rectangle m_AABB;
 	eCubeType m_cubeType;
 	glm::vec3 m_position;
-	glm::vec3 m_velocity;
 	VertexArray m_vertexArray;
 	bool m_onGround;
 	float m_timeElasped;
