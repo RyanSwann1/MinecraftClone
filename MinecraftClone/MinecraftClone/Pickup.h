@@ -37,6 +37,8 @@ private:
 	Timer m_collectionTimer;
 	eCubeType m_cubeType;
 	glm::vec3 m_position;
+	glm::vec3 m_velocity;
+	float m_yOffset;
 	VertexArray m_vertexArray;
 	bool m_onGround;
 	float m_timeElasped;

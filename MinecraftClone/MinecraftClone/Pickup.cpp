@@ -20,6 +20,8 @@ Pickup::Pickup(eCubeType cubeType, const glm::vec3& position, const glm::vec3& i
 	: m_collectionTimer(PLAYER_DISGARD_MIN_TIME_COLLECTION),
 	m_cubeType(cubeType),
 	m_position(position),
+	m_velocity(),
+	m_yOffset(0.0f),
 	m_vertexArray(),
 	m_onGround(false),
 	m_timeElasped(0.0f)
@@ -31,6 +33,8 @@ Pickup::Pickup(eCubeType cubeType, const glm::ivec3& position)
 	: m_collectionTimer(DESTROYED_CUBE_MIN_TIME_COLLECTION),
 	m_cubeType(cubeType),
 	m_position(position),
+	m_velocity(),
+	m_yOffset(0.0f),
 	m_vertexArray(),
 	m_onGround(false),
 	m_timeElasped(0.0f)
@@ -47,6 +51,8 @@ Pickup::Pickup(Pickup&& orig) noexcept
 	: m_collectionTimer(orig.m_collectionTimer),
 	m_cubeType(orig.m_cubeType),
 	m_position(orig.m_position),
+	m_velocity(orig.m_velocity),
+	m_yOffset(orig.m_yOffset),
 	m_vertexArray(std::move(orig.m_vertexArray)),
 	m_onGround(orig.m_onGround),
 	m_timeElasped(orig.m_timeElasped)
@@ -57,6 +63,8 @@ Pickup& Pickup::operator=(Pickup&& orig) noexcept
 	m_collectionTimer = orig.m_collectionTimer;
 	m_cubeType = orig.m_cubeType;
 	m_position = orig.m_position;
+	m_velocity = orig.m_velocity;
+	m_yOffset = orig.m_yOffset;
 	m_vertexArray = std::move(orig.m_vertexArray);
 	m_onGround = orig.m_onGround;
 	m_timeElasped = orig.m_timeElasped;
@@ -81,36 +89,36 @@ bool Pickup::isInReachOfPlayer(const glm::vec3& playerMiddlePosition) const
 
 void Pickup::update(const Player& player, float deltaTime, const ChunkManager& chunkManager)
 {
-	//if (CollisionHandler::isCollision({ m_position.x, m_position.y - Globals::PICKUP_CUBE_FACE_SIZE, m_position.z }, chunkManager))
-	//{
-	//	m_position.y += MOVEMENT_SPEED * deltaTime;
-	//	m_onGround = false;
-	//}
-	if(!m_onGround && !CollisionHandler::isCollision({ m_position.x, m_position.y - Globals::PICKUP_CUBE_FACE_SIZE * 1.5f, m_position.z }, chunkManager))
+	if (CollisionHandler::isCollision({ m_position.x, m_position.y, m_position.z }, chunkManager))
 	{
-		m_position.y -= MOVEMENT_SPEED * deltaTime;
+		m_velocity.y += MOVEMENT_SPEED;
+		m_onGround = false;
+	}
+	else if(!CollisionHandler::isCollision({ m_position.x, m_position.y - Globals::PICKUP_CUBE_FACE_SIZE * 1.25f, m_position.z }, chunkManager))
+	{
+		m_velocity.y -= MOVEMENT_SPEED;
 		m_onGround = false;
 	}
 	else
 	{
 		m_onGround = true;
-		//m_velocity.y = 0.0f;
+		m_velocity.y = 0.0f;
 	}
 		
-	//if (m_velocity.x != 0)
-	//{
-	//	CollisionHandler::handleXAxisCollision(m_velocity.x, 0.25f, chunkManager, m_position);
-	//}
+	if (m_velocity.x != 0)
+	{
+		CollisionHandler::handleXAxisCollision(m_velocity.x, 0.25f, chunkManager, m_position);
+	}
 
-	//if (m_velocity.z != 0)
-	//{
-	//	CollisionHandler::handleZAxisCollision(m_velocity.z, 0.25f, chunkManager, m_position);
-	//}
+	if (m_velocity.z != 0)
+	{
+		CollisionHandler::handleZAxisCollision(m_velocity.z, 0.25f, chunkManager, m_position);
+	}
 
 	if (m_onGround)
 	{
 		m_timeElasped += deltaTime;
-		m_position.y += glm::sin(m_timeElasped * 2.5f) * 0.005f;
+		m_yOffset += glm::sin(m_timeElasped * 2.5f) * 0.005f;
 	}
 
 	m_collectionTimer.update(deltaTime);
@@ -120,14 +128,13 @@ void Pickup::update(const Player& player, float deltaTime, const ChunkManager& c
 		if (glm::distance(m_position, playerMiddlePosition) <= MAXIMUM_DISTANCE_FROM_PLAYER &&
 			player.getInventory().isItemAddable(m_cubeType))
 		{
-			m_position += glm::normalize(glm::vec3(playerMiddlePosition - m_position)) * MOVEMENT_SPEED * deltaTime;
+			m_velocity += glm::normalize(glm::vec3(playerMiddlePosition - m_position)) * MOVEMENT_SPEED;
 		}
 	}
 
-	//m_position += m_velocity * deltaTime;
+	m_position += m_velocity * deltaTime;
 
-	//CollisionHandler::applyDrag(m_velocity, 0.95f);
-	//CollisionHandler::applyDrag(m_velocity.x, m_velocity.z, 0.95f);
+	CollisionHandler::applyDrag(m_velocity, 0.95f);
 }
 
 void Pickup::render(const Frustum& frustum, ShaderHandler& shaderHandler)
@@ -141,7 +148,8 @@ void Pickup::render(const Frustum& frustum, ShaderHandler& shaderHandler)
 	{
 		m_vertexArray.bindOpaqueVAO();
 
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), m_position);
+		glm::vec3 position = m_position + glm::vec3(0, m_yOffset, 0);
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
 		shaderHandler.setUniformMat4f(eShaderType::Pickup, "uModel", model);
 		glDrawElements(GL_TRIANGLES, m_vertexArray.m_opaqueVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 	}
