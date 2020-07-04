@@ -22,7 +22,7 @@ namespace
 	constexpr int MS_BETWEEN_ATTEMPT_SPAWN = 250;
 	
 	constexpr float JUMP_BREAK = 1.0f;
-	constexpr float TIME_BETWEEN_JUMP = .25f;
+	constexpr float MS_BETWEEN_JUMP = .25f;
 
 	constexpr float DESTROY_BLOCK_RANGE = 5.0f;
 	constexpr float DESTROY_BLOCK_INCREMENT = 0.5f;
@@ -86,6 +86,7 @@ Player::Player()
 	m_position(),
 	m_velocity(),
 	m_autoJump(false),
+	m_requestingJump(false),
 	m_jumpTimer(),
 	m_inventory()
 {
@@ -265,11 +266,7 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 	ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window, Gui& gui)
 {
 	if (currentSFMLEvent.type == sf::Event::KeyPressed)
-	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
-		{
-			toggleFlying();
-		}
+	{	
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::T))
 		{
 			toggleAutoJump();
@@ -283,6 +280,12 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 	}
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
 	{
+		switch (currentSFMLEvent.mouseButton.button)
+		{
+		case sf::Mouse::Button::Left:
+			break;
+
+		}
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 		{
 			destroyFacingBlock(chunkManager, playerMutex, pickUps);
@@ -334,7 +337,7 @@ void Player::move(float deltaTime, std::mutex& playerMutex, const ChunkManager& 
 		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * movementSpeed;
 		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * movementSpeed;
 	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
 		m_velocity.x -= glm::cos(glm::radians(m_camera.rotation.y)) * movementSpeed;
 		m_velocity.z -= glm::sin(glm::radians(m_camera.rotation.y)) * movementSpeed;
@@ -351,6 +354,11 @@ void Player::move(float deltaTime, std::mutex& playerMutex, const ChunkManager& 
 		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y - 90)) * movementSpeed;
 	}
 
+	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+	{
+		m_requestingJump = false;
+	}
+
 	switch (m_currentState)
 	{
 	case ePlayerState::Flying:
@@ -364,13 +372,22 @@ void Player::move(float deltaTime, std::mutex& playerMutex, const ChunkManager& 
 		}
 		break;
 	case ePlayerState::InAir :
-		m_velocity.y -= GRAVITY_AMOUNT;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !m_requestingJump)
+		{
+			m_currentState = ePlayerState::Flying;
+		}
+		else
+		{
+			m_velocity.y -= GRAVITY_AMOUNT;
+		}
 		break;
 	case ePlayerState::OnGround:
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && m_velocity.y == 0 &&
-			m_jumpTimer.getElapsedTime().asSeconds() >= TIME_BETWEEN_JUMP)
+			m_jumpTimer.getElapsedTime().asSeconds() >= MS_BETWEEN_JUMP)
 		{
+			m_requestingJump = true;
 			m_jumpTimer.restart();
+			m_velocity.y += JUMP_SPEED;
 
 			if (m_velocity.x != 0 && m_velocity.z != 0)
 			{
@@ -382,20 +399,12 @@ void Player::move(float deltaTime, std::mutex& playerMutex, const ChunkManager& 
 				std::lock_guard<std::mutex> playerLock(playerMutex);
 				if (CollisionHandler::isCollision(collisionPosition, chunkManager))
 				{
-					m_velocity.y += JUMP_SPEED;
 					m_velocity.x *= JUMP_BREAK;
 					m_velocity.z *= JUMP_BREAK;
 				}
-				else
-				{
-					m_velocity.y += JUMP_SPEED;
-				}
-			}
-			else
-			{
-				m_velocity.y += JUMP_SPEED;
 			}
 		}
+
 		break;
 	default:
 		assert(false);

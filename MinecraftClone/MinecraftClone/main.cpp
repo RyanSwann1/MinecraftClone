@@ -160,8 +160,9 @@ int main()
 			}
 			if (currentSFMLEvent.type == sf::Event::KeyPressed)
 			{
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+				switch (currentSFMLEvent.key.code)
 				{
+				case sf::Keyboard::R:
 					resetGame = true;
 					chunkGenerationThread.join();
 					resetGame = false;
@@ -173,10 +174,10 @@ int main()
 							std::ref(playerMutex), std::ref(renderingMutex)); }, &chunkManager };
 
 					player.spawn(*chunkManager, playerMutex);
-				}
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-				{
+					break;
+				case sf::Keyboard::Escape:
 					window.close();
+					break;
 				}
 			}
 

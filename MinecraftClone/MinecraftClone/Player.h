@@ -60,6 +60,7 @@ private:
 	glm::vec3 m_position;
 	glm::vec3 m_velocity;
 	bool m_autoJump;
+	bool m_requestingJump;
 	sf::Clock m_jumpTimer;
 	Inventory m_inventory;
 
