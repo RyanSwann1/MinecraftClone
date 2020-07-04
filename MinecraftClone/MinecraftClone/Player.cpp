@@ -32,6 +32,8 @@ namespace
 	constexpr float COLLISION_OFFSET = 0.35f;
 	constexpr int BODY_HEIGHT = 2;
 
+	constexpr glm::vec3 DISCARD_ITEM_SPEED = { 10.0f, 5.7f, 10.0f };
+
 	const CubeTypeComparison NON_COLLECTABLE_CUBE_TYPES =
 	{
 		{ eCubeType::Shrub,
@@ -514,17 +516,6 @@ void Player::discardItem(std::vector<Pickup>& pickUps, Gui& gui)
 		return;
 	}
 
-	glm::vec3 initialVelocity = glm::normalize(m_camera.front);
-	initialVelocity *= glm::vec3(10.0f, 7.0f, 10.0);
-	//if(float result = glm::dot(initialVelocity, m_camera.up) >= 0.6f)
-	//{
-	//	initialVelocity *= glm::vec3(10.0f, 4.0f, 10.0f) * result;
-	//}
-	//else
-	//{
-	//	initialVelocity *= glm::vec3(10.0f, 6.0f, 10.0);
-	//}
-
 	eCubeType pickUpType = m_inventory.getSelectedItemType();
 	m_inventory.reduceSelectedItem(gui);
 
@@ -532,5 +523,5 @@ void Player::discardItem(std::vector<Pickup>& pickUps, Gui& gui)
 	spawnPosition.x -= Globals::PICKUP_CUBE_FACE_SIZE / 2.0f;
 	spawnPosition.z -= Globals::PICKUP_CUBE_FACE_SIZE / 2.0f;
 	
-	pickUps.emplace_back(pickUpType, spawnPosition, initialVelocity);
+	pickUps.emplace_back(pickUpType, spawnPosition, glm::normalize(m_camera.front) * DISCARD_ITEM_SPEED);
 }

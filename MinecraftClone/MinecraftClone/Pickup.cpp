@@ -16,7 +16,7 @@ namespace
 	constexpr float DESTROYED_CUBE_MIN_TIME_COLLECTION = 0.5f;
 	constexpr float PLAYER_DISGARD_MIN_TIME_COLLECTION = 1.5;
 	constexpr glm::vec3 STARTING_POSITION_OFFSET = { 0.35f, 0.35f, 0.35f };
-	constexpr glm::vec3 INITIAL_FORCE_AMPLIFIER = { 1.5f, 3.5f, 1.5f };
+	constexpr glm::vec3 INITIAL_FORCE_AMPLIFIER = { 1.5f, 2.8f, 1.5f };
 }
 
 Pickup::Pickup(eCubeType cubeType, const glm::vec3& position, const glm::vec3& initialVelocity)
@@ -135,7 +135,7 @@ void Pickup::update(const Player& player, float deltaTime, const ChunkManager& c
 
 	m_position += m_velocity * deltaTime;
 
-	CollisionHandler::applyDrag(m_velocity, 0.95f);
+	CollisionHandler::applyDrag(m_velocity.x, m_velocity.z, 0.95f);
 }
 
 void Pickup::render(const Frustum& frustum, ShaderHandler& shaderHandler)
