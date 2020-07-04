@@ -515,17 +515,22 @@ void Player::discardItem(std::vector<Pickup>& pickUps, Gui& gui)
 	}
 
 	glm::vec3 initialVelocity = glm::normalize(m_camera.front);
-	if(float result = glm::dot(initialVelocity, m_camera.up) >= 0.6f)
-	{
-		initialVelocity *= glm::vec3(10.0f, 4.0f, 10.0f) * result;
-	}
-	else
-	{
-		initialVelocity *= glm::vec3(10.0f, 6.0f, 10.0);
-	}
+	initialVelocity *= glm::vec3(10.0f, 7.0f, 10.0);
+	//if(float result = glm::dot(initialVelocity, m_camera.up) >= 0.6f)
+	//{
+	//	initialVelocity *= glm::vec3(10.0f, 4.0f, 10.0f) * result;
+	//}
+	//else
+	//{
+	//	initialVelocity *= glm::vec3(10.0f, 6.0f, 10.0);
+	//}
 
 	eCubeType pickUpType = m_inventory.getSelectedItemType();
 	m_inventory.reduceSelectedItem(gui);
 
-	pickUps.emplace_back(pickUpType, m_position, initialVelocity);
+	glm::vec3 spawnPosition = m_position;
+	spawnPosition.x -= Globals::PICKUP_CUBE_FACE_SIZE / 2.0f;
+	spawnPosition.z -= Globals::PICKUP_CUBE_FACE_SIZE / 2.0f;
+	
+	pickUps.emplace_back(pickUpType, spawnPosition, initialVelocity);
 }
