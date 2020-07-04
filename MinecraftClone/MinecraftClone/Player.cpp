@@ -511,7 +511,7 @@ void Player::toggleAutoJump()
 
 void Player::discardItem(std::vector<Pickup>& pickUps, Gui& gui)
 {
-	if (m_inventory.isSelectedItemEmpty())
+	if (m_inventory.isSelectedItemEmpty() || m_currentState == ePlayerState::Flying)
 	{
 		return;
 	}

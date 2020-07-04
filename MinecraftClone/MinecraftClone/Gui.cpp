@@ -21,9 +21,8 @@ namespace
 	constexpr glm::vec2 FONT_TEXTURE_SIZE = { 256, 256 };
 	constexpr glm::vec2 ITEM_SIZE = { 36, 36 };
 
-	constexpr glm::vec2 TOOLBAR_STARTING_POSITION = { 700.0f, 1000.0f };
-	constexpr glm::vec2 INITIAL_ITEM_STARTING_POSITION = { 710.0f, 1000.0f };
-	constexpr glm::vec2 ITEM_QUANTITY_STARTING_POSITION = { 720.0f, 925.0f };
+	constexpr glm::vec2 TOOLBAR_SIZE = { 580, 60 };
+	constexpr glm::vec2 SELECTION_BOX_SIZE = { 66, 60 };
 
 	glm::vec2 initialSelectionBoxPosition;
 	glm::vec2 firstItemPosition;
@@ -332,7 +331,6 @@ void Text::setText(int number, const std::unordered_map<char, int>& characterIDM
 		for (auto digit : digits)
 		{
 			std::array<glm::vec2, 6> quadCoords = getQuadCoords(position, TEXT_SIZE, TEXT_SIZE );
-			//std::array<glm::vec2, 6> quadCoords = getQuadCoords(position, { TEXT_SIZE, TEXT_SIZE });
 			positions.insert(positions.begin() + positions.size(), quadCoords.cbegin(), quadCoords.cend());
 
 			auto characterID = characterIDMap.find(convertDigit(digit));
@@ -349,7 +347,6 @@ void Text::setText(int number, const std::unordered_map<char, int>& characterIDM
 	else
 	{
 		std::array<glm::vec2, 6> quadCoords = getQuadCoords(m_position, TEXT_SIZE, TEXT_SIZE);
-		//std::array<glm::vec2, 6> quadCoords = getQuadCoords(m_position, { TEXT_SIZE, TEXT_SIZE });
 		positions.insert(positions.begin() + positions.size(), quadCoords.cbegin(), quadCoords.cend());
 
 		auto characterID = characterIDMap.find(convertDigit(number));
@@ -438,9 +435,6 @@ void Image::setTextureRect(const std::array<glm::vec3, 6>& drawableRect) const
 
 	glBindVertexArray(0);
 }
-
-constexpr glm::vec2 TOOLBAR_SIZE = { 580, 60 };
-constexpr glm::vec2 SELECTION_BOX_SIZE = { 66, 60 };
 
 //GUI
 Gui::Gui(const glm::uvec2& windowSize)
