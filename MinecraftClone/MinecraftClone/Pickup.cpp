@@ -90,8 +90,7 @@ bool Pickup::isInReachOfPlayer(const glm::vec3& playerMiddlePosition) const
 
 void Pickup::update(const Player& player, float deltaTime, const ChunkManager& chunkManager)
 {
-	if (CollisionHandler::isCollision({ m_position.x, m_position.y, m_position.z }, chunkManager) &&
-		CollisionHandler::isCollision({ m_position.x, m_position.y - Globals::PICKUP_CUBE_FACE_SIZE * 1.25f, m_position.z }, chunkManager))
+	if (CollisionHandler::isCollision({ m_position.x, m_position.y, m_position.z }, chunkManager))
 	{
 		m_velocity.y += COLLISION_ADJUSTMENT_SPEED;
 		m_onGround = false;
