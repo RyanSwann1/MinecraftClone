@@ -189,7 +189,8 @@ int main()
 		Rectangle visibilityRect = Globals::getVisibilityRect(player.getPosition());
 		for (auto pickup = pickUps.begin(); pickup != pickUps.end();)
 		{
-			if(!visibilityRect.contains(pickup->getAABB()))
+			const glm::vec3& pickupPosition = pickup->getPosition();
+			if (!visibilityRect.contains({ pickupPosition.x, pickupPosition.z }))
 			{
 				pickup = pickUps.erase(pickup);
 			}

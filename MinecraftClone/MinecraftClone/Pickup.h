@@ -26,16 +26,15 @@ public:
 	Pickup(Pickup&&) noexcept;
 	Pickup& operator=(Pickup&&) noexcept;
 
+	const glm::vec3& getPosition() const;
 	eCubeType getCubeType() const;
 	bool isInReachOfPlayer(const glm::vec3& playerMiddlePosition) const;
-	const Rectangle& getAABB() const;
 
 	void update(const Player& player, float deltaTime, const ChunkManager& chunkManager);
 	void render(const Frustum& frustum, ShaderHandler& shaderHandler);
 
 private:
 	Timer m_collectionTimer;
-	Rectangle m_AABB;
 	eCubeType m_cubeType;
 	glm::vec3 m_position;
 	VertexArray m_vertexArray;

@@ -18,7 +18,6 @@ namespace
 
 Pickup::Pickup(eCubeType cubeType, const glm::vec3& position, const glm::vec3& initialVelocity)
 	: m_collectionTimer(PLAYER_DISGARD_MIN_TIME_COLLECTION),
-	m_AABB({ position.x + 0.5f, position.z + 0.5f }, 0.5f),
 	m_cubeType(cubeType),
 	m_position(position),
 	m_vertexArray(),
@@ -30,7 +29,6 @@ Pickup::Pickup(eCubeType cubeType, const glm::vec3& position, const glm::vec3& i
 
 Pickup::Pickup(eCubeType cubeType, const glm::ivec3& position)
 	: m_collectionTimer(DESTROYED_CUBE_MIN_TIME_COLLECTION),
-	m_AABB({ position.x + 0.5f, position.z + 0.5f }, 0.5f),
 	m_cubeType(cubeType),
 	m_position(position),
 	m_vertexArray(),
@@ -47,7 +45,6 @@ Pickup::Pickup(eCubeType cubeType, const glm::ivec3& position)
 
 Pickup::Pickup(Pickup&& orig) noexcept
 	: m_collectionTimer(orig.m_collectionTimer),
-	m_AABB(orig.m_AABB),
 	m_cubeType(orig.m_cubeType),
 	m_position(orig.m_position),
 	m_vertexArray(std::move(orig.m_vertexArray)),
@@ -58,7 +55,6 @@ Pickup::Pickup(Pickup&& orig) noexcept
 Pickup& Pickup::operator=(Pickup&& orig) noexcept
 {
 	m_collectionTimer = orig.m_collectionTimer;
-	m_AABB = orig.m_AABB;
 	m_cubeType = orig.m_cubeType;
 	m_position = orig.m_position;
 	m_vertexArray = std::move(orig.m_vertexArray);
@@ -66,6 +62,11 @@ Pickup& Pickup::operator=(Pickup&& orig) noexcept
 	m_timeElasped = orig.m_timeElasped;
 
 	return *this;
+}
+
+const glm::vec3& Pickup::getPosition() const
+{
+	return m_position;
 }
 
 eCubeType Pickup::getCubeType() const
@@ -76,11 +77,6 @@ eCubeType Pickup::getCubeType() const
 bool Pickup::isInReachOfPlayer(const glm::vec3& playerMiddlePosition) const
 {
 	return glm::distance(m_position, playerMiddlePosition) <= MINIMUM_DISTANCE_FROM_PLAYER && !m_collectionTimer.isActive();
-}
-
-const Rectangle& Pickup::getAABB() const
-{
-	return m_AABB;
 }
 
 void Pickup::update(const Player& player, float deltaTime, const ChunkManager& chunkManager)
@@ -141,7 +137,7 @@ void Pickup::render(const Frustum& frustum, ShaderHandler& shaderHandler)
 		m_vertexArray.attachOpaqueVBO();
 	}
 
-	if (m_vertexArray.m_opaqueVertexBuffer.displayable && frustum.isItemInFrustum(m_position))
+	if (m_vertexArray.m_opaqueVertexBuffer.displayable && frustum.isPositionInFrustum(m_position))
 	{
 		m_vertexArray.bindOpaqueVAO();
 
