@@ -45,20 +45,20 @@ void Frustum::update(const glm::mat4& mat)
 	m_planes[ePlaneSide::Near].d = mat[3][3] + mat[3][2];
 }
 
-bool Frustum::isItemInFrustum(const glm::vec3& itemPosition) const
+bool Frustum::isPositionInFrustum(const glm::vec3& position) const
 {
 	for (const auto& plane : m_planes)
 	{
-		if (glm::dot(itemPosition, plane.n) + plane.d >= 0)
+		if (glm::dot(position, plane.n) + plane.d >= 0)
 		{
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
-bool Frustum::isChunkInFustrum(const glm::vec3& chunkStartingPosition) const
+bool Frustum::isChunkInFustrum(const glm::ivec3& chunkStartingPosition) const
 {
 	glm::ivec3 chunkCentrePosition;
 	chunkCentrePosition.x = chunkStartingPosition.x + Globals::CHUNK_WIDTH / 2;

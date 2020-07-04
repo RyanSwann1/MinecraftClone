@@ -31,8 +31,8 @@ public:
 
 	void update(const glm::mat4& mat);
 
-	bool isItemInFrustum(const glm::vec3& itemPosition) const;
-	bool isChunkInFustrum(const glm::vec3& chunkStartingPosition) const;
+	bool isPositionInFrustum(const glm::vec3& position) const;
+	bool isChunkInFustrum(const glm::ivec3& chunkStartingPosition) const;
 	
 private:
 	std::array<Plane, static_cast<int>(ePlaneSide::Max) + 1> m_planes;

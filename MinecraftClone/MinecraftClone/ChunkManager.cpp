@@ -284,7 +284,8 @@ void ChunkManager::renderOpaque(const Frustum& frustum) const
 			chunkMesh.second.getObject()->attachOpaqueVBO();
 		}
 
-		if (chunkMesh.second.getObject()->m_opaqueVertexBuffer.displayable && frustum.isChunkInFustrum(chunkMesh.first))
+		if (chunkMesh.second.getObject()->m_opaqueVertexBuffer.displayable && 
+			frustum.isChunkInFustrum(chunkMesh.first))
 		{
 			chunkMesh.second.getObject()->bindOpaqueVAO();
 			glDrawElements(GL_TRIANGLES, chunkMesh.second.getObject()->m_opaqueVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
@@ -301,7 +302,8 @@ void ChunkManager::renderTransparent(const Frustum& frustum) const
 			chunkMesh.second.getObject()->attachTransparentVBO();
 		}
 
-		if (chunkMesh.second.getObject()->m_transparentVertexBuffer.displayable && frustum.isChunkInFustrum(chunkMesh.first))
+		if (chunkMesh.second.getObject()->m_transparentVertexBuffer.displayable && 
+			frustum.isChunkInFustrum(chunkMesh.first))
 		{
 			chunkMesh.second.getObject()->bindTransparentVAO();
 			glDrawElements(GL_TRIANGLES, chunkMesh.second.getObject()->m_transparentVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
