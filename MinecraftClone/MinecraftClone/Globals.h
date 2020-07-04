@@ -174,7 +174,7 @@ namespace Globals
 
 	constexpr int CUBE_SIZE = 1;
 	//384 dev distance
-	constexpr int VISIBILITY_DISTANCE = 384;
+	constexpr int VISIBILITY_DISTANCE = 800;
 	constexpr int MAP_SIZE = 8000;
 	const std::string TEXTURE_DIRECTORY = "Textures/";
 	const std::string FONTS_DIRECTORY = "Fonts/";

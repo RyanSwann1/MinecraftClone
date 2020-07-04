@@ -20,6 +20,7 @@ namespace
 	constexpr float RIGHT_FACE_LIGHTING_INTENSITY = 0.75f;
 	constexpr float SHADOW_INTENSITY = 0.4f;
 	constexpr float BOTTOM_FACE_LIGHTING_INTENSITY = 0.4f;
+	constexpr float WATER_OFFSET_Y = 0.2f;
 
 	constexpr std::array<glm::vec2, 4> TEXT_COORDS =
 	{
@@ -311,15 +312,13 @@ void generateInnerChunkMesh(VertexArray& chunkMesh, const Chunk& chunk);
 void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, eCubeType cubeType, VertexArray& chunkMesh);
 void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks,
 	eCubeType cubeType, VertexArray& chunkMesh);
-void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition,
+void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide, const glm::vec3& cubePosition,
 	bool transparent, bool shadow = false);
 void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const glm::ivec3& cubePosition,
 	const std::array<glm::vec3, 4>& diagonalFace, bool shadow = false);
 
 bool isFacingTransparentCube(const glm::ivec3& cubePosition, const Chunk& chunk);
 bool isFacingOpaqueCube(const glm::ivec3& cubePosition, const Chunk& chunk);
-
-
 
 void MeshGenerator::generateChunkMesh(VertexArray& chunkMesh, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks)
 {
@@ -440,7 +439,7 @@ void generateChunkInnerCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 
 		if(isFacingOpaqueCube({ position.x, position.y + 1, position.z }, chunk))
 		{
-			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
+			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Top, { position.x, position.y - WATER_OFFSET_Y, position.z }, true);
 		}
 
 		break;
@@ -542,7 +541,7 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 	case eCubeType::Water:
 		if (isFacingOpaqueCube({ position.x, position.y + 1, position.z }, chunk))
 		{
-			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Top, position, true);
+			addCubeFace(chunkMesh.m_transparentVertexBuffer, cubeType, eCubeSide::Top, { position.x, position.y - WATER_OFFSET_Y, position.z }, true);
 		}
 		break;
 	case eCubeType::Leaves:
@@ -711,13 +710,13 @@ void generateChunkOuterCubeMesh(const glm::ivec3& position, const Chunk& chunk, 
 	}
 }
 
-void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide, const glm::ivec3& cubePosition, bool transparent, bool shadow)
+void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide, const glm::vec3& cubePosition, bool transparent, bool shadow)
 {
-	glm::ivec3 position = cubePosition;
+	glm::vec3 position = cubePosition;
 	switch (cubeSide)
 	{
 	case eCubeSide::Front:
-		for (const glm::ivec3& i : CUBE_FACE_FRONT)
+		for (const glm::vec3& i : CUBE_FACE_FRONT)
 		{
 			position += i;
 			vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
@@ -739,7 +738,7 @@ void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeS
 
 		break;
 	case eCubeSide::Back:
-		for (const glm::ivec3& i : CUBE_FACE_BACK)
+		for (const glm::vec3& i : CUBE_FACE_BACK)
 		{
 			position += i;
 			vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
@@ -761,7 +760,7 @@ void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeS
 
 		break;
 	case eCubeSide::Left:
-		for (const glm::ivec3& i : CUBE_FACE_LEFT)
+		for (const glm::vec3& i : CUBE_FACE_LEFT)
 		{
 			position += i;
 			vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
@@ -783,7 +782,7 @@ void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeS
 
 		break;
 	case eCubeSide::Right:
-		for (const glm::ivec3& i : CUBE_FACE_RIGHT)
+		for (const glm::vec3& i : CUBE_FACE_RIGHT)
 		{
 			position += i;
 			vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
@@ -805,7 +804,7 @@ void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeS
 
 		break;
 	case eCubeSide::Top:
-		for (const glm::ivec3& i : CUBE_FACE_TOP)
+		for (const glm::vec3& i : CUBE_FACE_TOP)
 		{
 			position += i;
 			vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
@@ -828,7 +827,7 @@ void addCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeS
 
 		break;
 	case eCubeSide::Bottom:
-		for (const glm::ivec3& i : CUBE_FACE_BOTTOM)
+		for (const glm::vec3& i : CUBE_FACE_BOTTOM)
 		{
 			position += i;
 			vertexBuffer.positions.emplace_back(position.x, position.y, position.z);
