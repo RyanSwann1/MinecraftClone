@@ -10,17 +10,20 @@
 namespace
 {
 	constexpr float MOVEMENT_SPEED = 3.0f;
+	constexpr float COLLISION_ADJUSTMENT_SPEED = 0.15f;
 	constexpr float MAXIMUM_DISTANCE_FROM_PLAYER = 2.5f;
 	constexpr float MINIMUM_DISTANCE_FROM_PLAYER = 1.0f;
 	constexpr float DESTROYED_CUBE_MIN_TIME_COLLECTION = 0.5f;
 	constexpr float PLAYER_DISGARD_MIN_TIME_COLLECTION = 1.5;
+	constexpr glm::vec3 STARTING_POSITION_OFFSET = { 0.35f, 0.35f, 0.35f };
+	constexpr glm::vec3 INITIAL_FORCE_AMPLIFIER = { 1.5f, 3.5f, 1.5f };
 }
 
 Pickup::Pickup(eCubeType cubeType, const glm::vec3& position, const glm::vec3& initialVelocity)
 	: m_collectionTimer(PLAYER_DISGARD_MIN_TIME_COLLECTION),
 	m_cubeType(cubeType),
 	m_position(position),
-	m_velocity(),
+	m_velocity(initialVelocity),
 	m_yOffset(0.0f),
 	m_vertexArray(),
 	m_onGround(false),
@@ -29,20 +32,18 @@ Pickup::Pickup(eCubeType cubeType, const glm::vec3& position, const glm::vec3& i
 	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType);
 }
 
-Pickup::Pickup(eCubeType cubeType, const glm::ivec3& position)
+Pickup::Pickup(eCubeType cubeType, const glm::vec3& position)
 	: m_collectionTimer(DESTROYED_CUBE_MIN_TIME_COLLECTION),
 	m_cubeType(cubeType),
-	m_position(position),
+	m_position(position + STARTING_POSITION_OFFSET),
 	m_velocity(),
 	m_yOffset(0.0f),
 	m_vertexArray(),
 	m_onGround(false),
 	m_timeElasped(0.0f)
 {
-	//glm::vec3 n = glm::normalize(glm::vec3(Globals::getRandomNumber(-360, 360), 90, Globals::getRandomNumber(-360, 360)));
-	//m_velocity.x += n.x * 1.5f;
-	//m_velocity.y += n.y * 1.5f;
-	//m_velocity.z += n.z * 1.5f;
+	glm::vec2 n = glm::normalize(glm::vec2(Globals::getRandomNumber(-360, 360), Globals::getRandomNumber(-360, 360)));
+	m_velocity += glm::vec3(INITIAL_FORCE_AMPLIFIER.x * n.x, INITIAL_FORCE_AMPLIFIER.y, INITIAL_FORCE_AMPLIFIER.z * n.y);
 
 	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType);
 }
@@ -89,14 +90,15 @@ bool Pickup::isInReachOfPlayer(const glm::vec3& playerMiddlePosition) const
 
 void Pickup::update(const Player& player, float deltaTime, const ChunkManager& chunkManager)
 {
-	if (CollisionHandler::isCollision({ m_position.x, m_position.y, m_position.z }, chunkManager))
+	if (CollisionHandler::isCollision({ m_position.x, m_position.y, m_position.z }, chunkManager) &&
+		CollisionHandler::isCollision({ m_position.x, m_position.y - Globals::PICKUP_CUBE_FACE_SIZE * 1.25f, m_position.z }, chunkManager))
 	{
-		m_velocity.y += MOVEMENT_SPEED;
+		m_velocity.y += COLLISION_ADJUSTMENT_SPEED;
 		m_onGround = false;
 	}
 	else if(!CollisionHandler::isCollision({ m_position.x, m_position.y - Globals::PICKUP_CUBE_FACE_SIZE * 1.25f, m_position.z }, chunkManager))
 	{
-		m_velocity.y -= MOVEMENT_SPEED;
+		m_velocity.y -= COLLISION_ADJUSTMENT_SPEED;
 		m_onGround = false;
 	}
 	else
