@@ -31,7 +31,6 @@ namespace
 	constexpr float PLACE_BLOCK_INCREMENT = 0.1f;
 
 	constexpr float COLLISION_OFFSET = 0.35f;
-	constexpr int BODY_HEIGHT = 2;
 
 	constexpr glm::vec3 DISCARD_ITEM_SPEED = { 10.0f, 5.7f, 10.0f };
 
@@ -140,7 +139,7 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex, Gui
 				if (!chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }))
 				{
 					bool availablePostion = true;
-					for (float y = -BODY_HEIGHT; y <= 0; y++)
+					for (float y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
 					{
 						if (glm::vec3(std::floor(m_position.x), std::floor(m_position.y - 2.0f), std::floor(m_position.z)) == 
 						glm::vec3(std::floor(rayPosition.x), std::floor(rayPosition.y + y), std::floor(rayPosition.z) ))
@@ -237,10 +236,10 @@ void Player::handleAutoJump(const ChunkManager& chunkManager)
 		m_position.z + glm::normalize(glm::vec2(m_velocity.x, m_velocity.z)).y);
 
 	bool autoJumpAllowed = false;
-	if (CollisionHandler::isCollision({ collisionPosition.x, collisionPosition.y - BODY_HEIGHT, collisionPosition.z }, chunkManager))
+	if (CollisionHandler::isCollision({ collisionPosition.x, collisionPosition.y - HEAD_HEIGHT, collisionPosition.z }, chunkManager))
 	{
 		autoJumpAllowed = true;
-		for (int y = -BODY_HEIGHT + 1; y <= 1; y++)
+		for (int y = -static_cast<int>(HEAD_HEIGHT) + 1; y <= 1; y++)
 		{
 			if (CollisionHandler::isCollision({ collisionPosition.x, collisionPosition.y + y, collisionPosition.z }, chunkManager))
 			{
@@ -389,7 +388,7 @@ void Player::move(float deltaTime, const ChunkManager& chunkManager)
 			{
 				glm::vec3 collisionPosition(
 					m_position.x + glm::normalize(glm::vec2(m_velocity.x, m_velocity.z)).x,
-					m_position.y - BODY_HEIGHT,
+					m_position.y - HEAD_HEIGHT,
 					m_position.z + glm::normalize(glm::vec2(m_velocity.x, m_velocity.z)).y);
 
 				if (CollisionHandler::isCollision(collisionPosition, chunkManager))
@@ -430,7 +429,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 
 		if (m_velocity.x != 0)
 		{
-			for (int y = -BODY_HEIGHT; y <= 0; y++)
+			for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
 			{
 				if (CollisionHandler::handleXAxisCollision(m_velocity.x, COLLISION_OFFSET, chunkManager, 
 					{ m_position.x, m_position.y + y, m_position.z }))
@@ -442,7 +441,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 
 		if (m_velocity.z != 0)
 		{
-			for (int y = -BODY_HEIGHT; y <= 0; y++)
+			for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
 			{
 				if (CollisionHandler::handleZAxisCollision(m_velocity.z, COLLISION_OFFSET, chunkManager,
 					{ m_position.x, m_position.y + y, m_position.z }))
@@ -458,7 +457,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 
 		if (m_velocity.x != 0)
 		{
-			for (int y = -BODY_HEIGHT; y <= 0; y++)
+			for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
 			{
 				if(CollisionHandler::handleXAxisCollision(m_velocity.x, COLLISION_OFFSET, chunkManager, 
 					{ m_position.x, m_position.y + y, m_position.z }))
@@ -470,7 +469,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 
 		if (m_velocity.z != 0)
 		{
-			for (int y = -BODY_HEIGHT; y <= 0; y++)
+			for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
 			{
 				if (CollisionHandler::handleZAxisCollision(m_velocity.z, COLLISION_OFFSET, chunkManager, 
 					{ m_position.x, m_position.y + y, m_position.z }))
