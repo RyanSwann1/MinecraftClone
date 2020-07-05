@@ -13,6 +13,7 @@ namespace
 {
 	constexpr float WALKING_MOVEMENT_SPEED = 0.55f;
 	constexpr float FLYING_MOVEMENT_SPEED = 5.0f;
+	constexpr float WATER_MOVEMENT_SPEED = 0.1f;
 	constexpr glm::vec3 MAX_VELOCITY = { 50.f, 50.0f, 50.0 };
 	constexpr float JUMP_SPEED = 12.0f;
 
@@ -222,11 +223,6 @@ void Player::spawn(const ChunkManager& chunkManager, std::mutex& playerMutex)
 	}
 }
 
-void Player::moveCamera(const sf::Window& window)
-{
-	m_camera.move(window);
-}
-
 void Player::handleAutoJump(const ChunkManager& chunkManager)
 {
 	if (!m_autoJump || m_velocity.y != 0 || glm::distance(m_position + m_velocity, m_position) < 0.5f)
@@ -269,7 +265,7 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 	{	
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::T))
 		{
-			toggleAutoJump();
+			m_autoJump = !m_autoJump;
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
 		{
@@ -297,7 +293,7 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 	}
 	if (currentSFMLEvent.MouseMoved)
 	{
-		moveCamera(window);
+		m_camera.move(window);
 	}
 	if (currentSFMLEvent.type == currentSFMLEvent.MouseWheelScrolled)
 	{
@@ -494,11 +490,6 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 	default:
 		assert(false);
 	}
-}
-
-void Player::toggleAutoJump()
-{
-	m_autoJump = !m_autoJump;
 }
 
 void Player::discardItem(std::vector<Pickup>& pickUps, Gui& gui)
