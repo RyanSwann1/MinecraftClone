@@ -303,11 +303,11 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 
 void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager)
 {
-	move(deltaTime, playerMutex, chunkManager);
-	
-	std::lock_guard<std::mutex> playerLock(playerMutex);
+	std::unique_lock<std::mutex> playerLock(playerMutex);
+	move(deltaTime, chunkManager);
 	handleCollisions(chunkManager);
-	
+	playerLock.unlock();
+
 	m_position += m_velocity * deltaTime;
 	
 	switch (m_currentState)
@@ -324,7 +324,7 @@ void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager
 	}
 }
 
-void Player::move(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager)
+void Player::move(float deltaTime, const ChunkManager& chunkManager)
 {
 	float movementSpeed = (m_currentState == ePlayerState::Flying ? FLYING_MOVEMENT_SPEED : WALKING_MOVEMENT_SPEED);
 
@@ -392,7 +392,6 @@ void Player::move(float deltaTime, std::mutex& playerMutex, const ChunkManager& 
 					m_position.y - BODY_HEIGHT,
 					m_position.z + glm::normalize(glm::vec2(m_velocity.x, m_velocity.z)).y);
 
-				std::lock_guard<std::mutex> playerLock(playerMutex);
 				if (CollisionHandler::isCollision(collisionPosition, chunkManager))
 				{
 					m_velocity.x *= JUMP_BREAK;

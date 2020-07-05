@@ -64,7 +64,7 @@ private:
 	sf::Clock m_jumpTimer;
 	Inventory m_inventory;
 
-	void move(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager);
+	void move(float deltaTime, const ChunkManager& chunkManager);
 	void handleCollisions(const ChunkManager& chunkManager);
 	void discardItem(std::vector<Pickup>& pickUps, Gui& gui);
 	void placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex, Gui& gui);
