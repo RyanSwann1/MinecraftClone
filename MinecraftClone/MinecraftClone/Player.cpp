@@ -11,9 +11,9 @@
 
 namespace 
 {
-	constexpr float WATER_MOVEMENT_SPEED = 0.15f;
+	constexpr float WATER_MOVEMENT_SPEED = 0.2f;
 	constexpr float WATER_GRAVITY = 0.1f;
-	constexpr float WATER_JUMP_SPEED = 0.11f;
+	constexpr float WATER_JUMP_SPEED = 0.1f;
 
 	constexpr float WALKING_MOVEMENT_SPEED = 0.55f;
 	constexpr float FLYING_MOVEMENT_SPEED = 5.0f;
@@ -461,19 +461,19 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 	case ePlayerState::InAir:
 		if (m_velocity.y > 0.0f && CollisionHandler::isCollision({ m_position.x, m_position.y + COLLISION_OFFSET, m_position.z }, chunkManager))
 		{
-			m_velocity.y = 0;
+			m_velocity.y = 0.0f;
 			m_position.y -= std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT)));
 		}
 		else if(m_velocity.y < 0.0f && CollisionHandler::isCollision({ m_position.x, m_position.y - HEAD_HEIGHT, m_position.z }, chunkManager))
 		{
-			m_velocity.y = 0;
+			m_velocity.y = 0.0f;
 			m_position.y += std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT) + 1));
 			m_position.y = std::floor(m_position.y);
 
 			m_currentState = ePlayerState::OnGround;	
 		}
 
-		if (m_velocity.x != 0)
+		if (m_velocity.x != 0.0f)
 		{
 			for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
 			{
@@ -485,7 +485,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			}
 		}
 
-		if (m_velocity.z != 0)
+		if (m_velocity.z != 0.0f)
 		{
 			for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
 			{
@@ -501,7 +501,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 	case ePlayerState::OnGround:
 		handleAutoJump(chunkManager);
 
-		if (m_velocity.x != 0)
+		if (m_velocity.x != 0.0f)
 		{
 			for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
 			{
@@ -513,7 +513,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			}
 		}
 
-		if (m_velocity.z != 0)
+		if (m_velocity.z != 0.0f)
 		{
 			for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
 			{
@@ -534,17 +534,17 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 	case ePlayerState::InWater:
 		if (m_velocity.y > 0.0f && CollisionHandler::isCollision({ m_position.x, m_position.y + COLLISION_OFFSET, m_position.z }, chunkManager))
 		{
-			m_velocity.y = 0;
+			m_velocity.y = 0.0f;
 			m_position.y -= std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT)));
 		}
 		else if (m_velocity.y < 0 && (CollisionHandler::isCollision({ m_position.x, m_position.y - HEAD_HEIGHT, m_position.z }, chunkManager)))
 		{
-			m_velocity.y = 0;
+			m_velocity.y = 0.0f;
 			m_position.y += std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT) + 1));
 			//m_position.y = std::floor(m_position.y);
 		}
 
-		if (m_velocity.x != 0)
+		if (m_velocity.x != 0.0f)
 		{
 			for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
 			{
@@ -556,7 +556,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			}
 		}
 
-		if (m_velocity.z != 0)
+		if (m_velocity.z != 0.0f)
 		{
 			for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
 			{
