@@ -541,7 +541,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 		{
 			m_velocity.y = 0;
 			m_position.y += std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT) + 1));
-			m_position.y = std::floor(m_position.y);
+			//m_position.y = std::floor(m_position.y);
 		}
 
 		if (m_velocity.x != 0)
@@ -568,7 +568,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 			}
 		}
 
-		if (!CollisionHandler::isCollision({ m_position.x, m_position.y - HEAD_HEIGHT, m_position.z }, chunkManager))
+		if (!CollisionHandler::isCollision({ m_position.x, m_position.y - (HEAD_HEIGHT + 1.5f), m_position.z }, chunkManager))
 		{
 			m_currentState = ePlayerState::InAir;
 		}
