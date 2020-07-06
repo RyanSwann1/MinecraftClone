@@ -12,7 +12,7 @@
 namespace 
 {
 	constexpr float WATER_MOVEMENT_SPEED = 0.2f;
-	constexpr float WATER_GRAVITY = 0.1f;
+	constexpr float WATER_GRAVITY = 0.02f;
 	constexpr float WATER_JUMP_SPEED = 0.1f;
 
 	constexpr float WALKING_MOVEMENT_SPEED = 0.55f;
