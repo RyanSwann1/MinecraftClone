@@ -64,6 +64,17 @@ bool CollisionHandler::isCollision(const glm::vec3& position, const ChunkManager
 		!Globals::NON_COLLIDABLE_CUBE_TYPES.isMatch(cubeType);
 }
 
+bool CollisionHandler::isCollision(const glm::vec3& position, const ChunkManager& chunkManager, eCubeType collidedCubeType)
+{
+	eCubeType cubeType;
+	if (chunkManager.isCubeAtPosition({ std::floor(position.x), std::floor(position.y), std::floor(position.z) }, cubeType))
+	{
+		return cubeType == collidedCubeType;
+	}
+	
+	return false;
+}
+
 void CollisionHandler::applyDrag(glm::vec3& velocity, float resistence)
 {
 	velocity *= resistence;
