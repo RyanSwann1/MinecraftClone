@@ -32,6 +32,7 @@ enum class ePlayerState
 {
 	Flying = 0,
 	InAir,
+	InWater,
 	OnGround,
 };
 

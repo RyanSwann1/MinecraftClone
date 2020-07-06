@@ -11,9 +11,12 @@
 
 namespace 
 {
+	constexpr float WATER_MOVEMENT_SPEED = 0.15f;
+	constexpr float WATER_GRAVITY = 0.1f;
+	constexpr float WATER_JUMP_SPEED = 0.11f;
+
 	constexpr float WALKING_MOVEMENT_SPEED = 0.55f;
 	constexpr float FLYING_MOVEMENT_SPEED = 5.0f;
-	constexpr float WATER_MOVEMENT_SPEED = 0.1f;
 	constexpr glm::vec3 MAX_VELOCITY = { 50.f, 50.0f, 50.0 };
 	constexpr float JUMP_SPEED = 12.0f;
 
@@ -303,6 +306,16 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager)
 {
 	std::unique_lock<std::mutex> playerLock(playerMutex);
+	for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
+	{
+		if (CollisionHandler::isCollision({ std::floor(m_position.x), std::floor(m_position.y + y), std::floor(m_position.z) },
+			chunkManager, eCubeType::Water))
+		{
+			m_currentState = ePlayerState::InWater;
+			break;
+		}
+	}
+
 	move(deltaTime, chunkManager);
 	handleCollisions(chunkManager);
 	playerLock.unlock();
@@ -316,6 +329,7 @@ void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager
 		break;
 	case ePlayerState::InAir:
 	case ePlayerState::OnGround:
+	case ePlayerState::InWater:
 		CollisionHandler::applyDrag(m_velocity.x, m_velocity.z, RESISTENCE);
 		break;
 	default:
@@ -325,7 +339,27 @@ void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager
 
 void Player::move(float deltaTime, const ChunkManager& chunkManager)
 {
-	float movementSpeed = (m_currentState == ePlayerState::Flying ? FLYING_MOVEMENT_SPEED : WALKING_MOVEMENT_SPEED);
+	float movementSpeed = 0.0f;
+	float jumpSpeed = 0.0f;
+	float gravity = 0.0f;
+
+	switch (m_currentState)
+	{
+	case ePlayerState::Flying:
+		movementSpeed = FLYING_MOVEMENT_SPEED;
+		break;
+	case ePlayerState::InAir:
+	case ePlayerState::OnGround:
+		movementSpeed = WALKING_MOVEMENT_SPEED;
+		gravity = GRAVITY_AMOUNT;
+		jumpSpeed = JUMP_SPEED;
+		break;
+	case ePlayerState::InWater:
+		movementSpeed = WATER_MOVEMENT_SPEED;
+		jumpSpeed = WATER_JUMP_SPEED;
+		gravity = WATER_GRAVITY;
+		break;
+	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
@@ -373,7 +407,7 @@ void Player::move(float deltaTime, const ChunkManager& chunkManager)
 		}
 		else
 		{
-			m_velocity.y -= GRAVITY_AMOUNT;
+			m_velocity.y -= gravity;
 		}
 		break;
 	case ePlayerState::OnGround:
@@ -382,7 +416,7 @@ void Player::move(float deltaTime, const ChunkManager& chunkManager)
 		{
 			m_requestingJump = true;
 			m_jumpTimer.restart();
-			m_velocity.y += JUMP_SPEED;
+			m_velocity.y += jumpSpeed;
 
 			if (m_velocity.x != 0 && m_velocity.z != 0)
 			{
@@ -397,6 +431,18 @@ void Player::move(float deltaTime, const ChunkManager& chunkManager)
 					m_velocity.z *= JUMP_BREAK;
 				}
 			}
+		}
+
+		break;
+	case ePlayerState::InWater:
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		{
+			m_requestingJump = true;
+			m_velocity.y += jumpSpeed;
+		}
+		else
+		{
+			m_velocity.y -= gravity;
 		}
 
 		break;
@@ -482,6 +528,49 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 		if (!CollisionHandler::isCollision({ m_position.x, m_position.y - HEAD_HEIGHT, m_position.z }, chunkManager))
 		{
 			m_currentState = (m_currentState == ePlayerState::Flying ? m_currentState : ePlayerState::InAir);
+		}
+
+		break;
+	case ePlayerState::InWater:
+		if (CollisionHandler::isCollision({ m_position.x, m_position.y + COLLISION_OFFSET, m_position.z }, chunkManager))
+		{
+			m_velocity.y = 0;
+			m_position.y -= std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT)));
+		}
+		else if (m_velocity.y < 0 && (CollisionHandler::isCollision({ m_position.x, m_position.y - HEAD_HEIGHT, m_position.z }, chunkManager)))
+		{
+			m_velocity.y = 0;
+			m_position.y += std::abs(m_position.y - HEAD_HEIGHT - (std::floor(m_position.y - HEAD_HEIGHT) + 1));
+			m_position.y = std::floor(m_position.y);
+		}
+
+		if (m_velocity.x != 0)
+		{
+			for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
+			{
+				if (CollisionHandler::handleXAxisCollision(m_velocity.x, COLLISION_OFFSET, chunkManager,
+					{ m_position.x, m_position.y + y, m_position.z }))
+				{
+					break;
+				}
+			}
+		}
+
+		if (m_velocity.z != 0)
+		{
+			for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
+			{
+				if (CollisionHandler::handleZAxisCollision(m_velocity.z, COLLISION_OFFSET, chunkManager,
+					{ m_position.x, m_position.y + y, m_position.z }))
+				{
+					break;
+				}
+			}
+		}
+
+		if (!CollisionHandler::isCollision({ m_position.x, m_position.y - HEAD_HEIGHT, m_position.z }, chunkManager))
+		{
+			m_currentState = ePlayerState::InAir;
 		}
 
 		break;
