@@ -25,12 +25,14 @@ bool DestroyBlockVisual::isCompleted() const
 
 void DestroyBlockVisual::setPosition(const glm::ivec3& position)
 {
-	if (m_currentCubePosition != position)
+	if (m_currentCubePosition != position || !m_timer.isActive())
 	{
 		m_index = eDestroyCubeIndex::One;
 		m_timer.resetElaspedTime();
 		m_timer.setActive(true);
 		m_currentCubePosition = position;
+		m_mesh.m_transparentVertexBuffer.clear();
+		MeshGenerator::generateDestroyBlockMesh(m_mesh.m_transparentVertexBuffer, m_index, m_currentCubePosition);
 	}
 }
 
@@ -39,6 +41,7 @@ void DestroyBlockVisual::reset()
 	m_index = eDestroyCubeIndex::One;
 	m_timer.resetElaspedTime();
 	m_timer.setActive(false);
+	m_mesh.m_transparentVertexBuffer.clear();
 }
 
 void DestroyBlockVisual::update(float deltaTime)
@@ -50,8 +53,8 @@ void DestroyBlockVisual::update(float deltaTime)
 		{
 			m_timer.setActive(true);
 			m_index = static_cast<eDestroyCubeIndex>(static_cast<int>(m_index) + 1); 
-			//m_mesh.m_transparentVertexBuffer.clear();
-			//MeshGenerator::generateDestroyBlockMesh(m_mesh.m_transparentVertexBuffer, m_index, m_currentCubePosition);
+			m_mesh.m_transparentVertexBuffer.clear();
+			MeshGenerator::generateDestroyBlockMesh(m_mesh.m_transparentVertexBuffer, m_index, m_currentCubePosition);
 		
 			if (m_index == eDestroyCubeIndex::Max)
 			{

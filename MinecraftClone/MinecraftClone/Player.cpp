@@ -40,6 +40,11 @@ namespace
 
 	constexpr glm::vec3 DISCARD_ITEM_SPEED = { 10.0f, 5.7f, 10.0f };
 
+	const CubeTypeComparison NON_DESTROYABLE_CUBE_TYPES =
+	{
+		{eCubeType::Water}
+	};
+
 	const CubeTypeComparison NON_COLLECTABLE_CUBE_TYPES =
 	{
 		{ eCubeType::Shrub,
@@ -195,9 +200,13 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager, std::vector<Pickup>&
 	if (destroyBlockVisual.isCompleted() && chunkManager.destroyCubeAtPosition(m_cubeToDestroyPosition, cubeTypeToDestroy))
 	{
 		assert(cubeTypeToDestroy != eCubeType::Air &&
-			!NON_COLLECTABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy));
+			!NON_DESTROYABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy));
 
-		pickUps.emplace_back(cubeTypeToDestroy, m_cubeToDestroyPosition);
+		if (!NON_COLLECTABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
+		{
+			pickUps.emplace_back(cubeTypeToDestroy, m_cubeToDestroyPosition);
+		}
+		
 		destroyBlockVisual.reset();
 	}
 	
@@ -205,10 +214,18 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager, std::vector<Pickup>&
 	{
 		glm::vec3 rayPosition = m_camera.front * i + m_position;
 		if (chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToDestroy) &&
-			!NON_COLLECTABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
+			!NON_DESTROYABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
 		{
 			m_cubeToDestroyPosition = { std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) };
-			destroyBlockVisual.setPosition(m_cubeToDestroyPosition);
+			if (!NON_COLLECTABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
+			{
+				destroyBlockVisual.setPosition(m_cubeToDestroyPosition);
+			}
+			else
+			{
+				chunkManager.destroyCubeAtPosition(m_cubeToDestroyPosition, cubeTypeToDestroy);
+			}
+
 			break;
 		}
 	}

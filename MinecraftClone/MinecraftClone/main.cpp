@@ -262,6 +262,7 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
 		chunkManager->renderTransparent(frustum);
 
+		destroyBlockTexture->bind();
 		shaderHandler->switchToShader(eShaderType::DestroyBlock);
 		shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uProjection", projection);
