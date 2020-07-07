@@ -40,7 +40,7 @@ void Timer::update(float deltaTime)
 	}
 }
 
-void Timer::reset()
+void Timer::resetElaspedTime()
 {
 	m_elaspedTime = 0.0f;
 }

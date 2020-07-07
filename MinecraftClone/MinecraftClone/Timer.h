@@ -11,7 +11,7 @@ public:
 	float getElaspedTime() const;
 
 	void update(float deltaTime);
-	void reset();
+	void resetElaspedTime();
 	void setActive(bool active);
 	void setNewExpirationTime(float newExpirationTime);
 

@@ -24,7 +24,6 @@ namespace
 		while (getline(stream, line))
 		{
 			stringStream << line << "\n";
-			std::cout << line << "\n";
 		}
 
 		shaderSource = stringStream.str();
@@ -126,6 +125,9 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create(const glm::ivec2& windowSiz
 			break;
 		case eShaderType::UIFont:
 			shaderLoaded = createShaderProgram(shader.getID(), "UIFontVertexShader.glsl", "UIFontFragmentShader.glsl");
+			break;
+		case eShaderType::DestroyBlock:
+			shaderLoaded = createShaderProgram(shader.getID(), "DestroyBlockVertexShader.glsl", "DestroyBlockFragmentShader.glsl");
 			break;
 		default:
 			assert(false);

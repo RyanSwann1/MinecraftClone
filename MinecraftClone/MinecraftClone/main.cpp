@@ -13,6 +13,7 @@
 #include "Frustum.h"
 #include "Gui.h"
 #include "Pickup.h"
+#include "DestroyBlockVisual.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -122,7 +123,16 @@ int main()
 		return -1;
 	}
 
+	std::unique_ptr<Texture> destroyBlockTexture = Texture::create("blockDestroy.png");
+	assert(destroyBlockTexture);
+	if (!destroyBlockTexture)
+	{
+		std::cout << "Couldn't load blockDestroy texture\n";
+		return -1;
+	}
+
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
+	DestroyBlockVisual destroyBlockVisual;
 	Gui gui(windowSize);
 	std::vector<Pickup> pickUps;
 	Frustum frustum;
@@ -141,6 +151,8 @@ int main()
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
+
+	std::cout << "\n\n";
 
 	float deltaTime = 0.0f;
 	sf::Clock deltaClock;
@@ -180,12 +192,17 @@ int main()
 					break;
 				}
 			}
+			if (currentSFMLEvent.type == sf::Event::MouseButtonReleased)
+			{
+				destroyBlockVisual.reset();
+			}
 
 			player.handleInputEvents(pickUps, currentSFMLEvent, *chunkManager, playerMutex, window, gui);
 		}
 
 		//Update
-		player.update(deltaTime, playerMutex, *chunkManager.get());
+		player.update(deltaTime, playerMutex, *chunkManager.get(), destroyBlockVisual, pickUps);
+		destroyBlockVisual.update(deltaTime);
 
 		Rectangle visibilityRect = Globals::getVisibilityRect(player.getPosition());
 		for (auto pickup = pickUps.begin(); pickup != pickUps.end();)
@@ -244,6 +261,11 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
 		chunkManager->renderTransparent(frustum);
+
+		shaderHandler->switchToShader(eShaderType::DestroyBlock);
+		shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uView", view);
+		shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uProjection", projection);
+		destroyBlockVisual.render();
 			
 		glDisable(GL_BLEND);
 
