@@ -136,6 +136,7 @@
     <ClCompile Include="GeneratedChunkQueue.cpp" />
     <ClCompile Include="Gui.cpp" />
     <ClCompile Include="Inventory.cpp" />
+    <ClCompile Include="DestroyBlockVisual.cpp" />
     <ClCompile Include="Pickup.cpp" />
     <ClCompile Include="NeighbouringChunks.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="GeneratedChunkQueue.h" />
     <ClInclude Include="Gui.h" />
     <ClInclude Include="Inventory.h" />
+    <ClInclude Include="DestroyBlockVisual.h" />
     <ClInclude Include="Pickup.h" />
     <ClInclude Include="NeighbouringChunks.h" />
     <ClInclude Include="Notes.h" />
@@ -214,6 +216,8 @@
   <ItemGroup>
     <None Include="OpenGLShaders\ChunkFragmentShader.glsl" />
     <None Include="OpenGLShaders\ChunkVertexShader.glsl" />
+    <None Include="OpenGLShaders\DestroyBlockFragmentShader.glsl" />
+    <None Include="OpenGLShaders\DestroyBlockVertexShader.glsl" />
     <None Include="OpenGLShaders\PickupFragmentShader.glsl" />
     <None Include="OpenGLShaders\PickupVertexShader.glsl" />
     <None Include="OpenGLShaders\SkyboxFragmentShader.glsl" />

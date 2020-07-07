@@ -84,6 +84,9 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DestroyBlockVisual.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glad.h">
@@ -254,6 +257,9 @@
     <ClInclude Include="Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DestroyBlockVisual.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\ChunkFragmentShader.glsl" />
@@ -271,5 +277,7 @@
     <None Include="OpenGLShaders\PickupFragmentShader.glsl" />
     <None Include="OpenGLShaders\UIFontVertexShader.glsl" />
     <None Include="OpenGLShaders\UIFontFragmentShader.glsl" />
+    <None Include="OpenGLShaders\DestroyBlockVertexShader.glsl" />
+    <None Include="OpenGLShaders\DestroyBlockFragmentShader.glsl" />
   </ItemGroup>
 </Project>
