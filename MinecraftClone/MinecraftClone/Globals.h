@@ -7,6 +7,21 @@
 #include <array>
 #include <random>
 
+enum class eDestroyCubeIndex
+{
+	One = 0,
+	Two,
+	Three,
+	Four,
+	Five,
+	Six,
+	Seven,
+	Eight,
+	Nine,
+	Ten,
+	Max = Ten
+};
+
 enum class eInventoryIndex
 {
 	One = 0,
@@ -173,7 +188,9 @@ namespace Globals
 	}
 
 	constexpr int CUBE_SIZE = 1;
-	//384 dev distance
+	//384 Dev Distance
+	//Normal Distance = 800
+	//Far Distance = 1024
 	constexpr int VISIBILITY_DISTANCE = 384;
 	constexpr int MAP_SIZE = 8000;
 	const std::string TEXTURE_DIRECTORY = "Textures/";
