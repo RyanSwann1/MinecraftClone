@@ -30,6 +30,22 @@ namespace
 		glm::vec2(0.0f, 1.0f)
 	};
 
+	std::array<glm::vec3, 4> getDestroyBlockTextCoords(const glm::vec2& startingPosition, const glm::vec2& endingPosition)
+	{
+		//assert(endingPosition.x > startingPosition.x);
+		float x = endingPosition.x - startingPosition.x;
+		assert(endingPosition.y > startingPosition.y);
+		float y = endingPosition.y - startingPosition.y;
+
+		return
+		{
+			glm::vec3(startingPosition.x, startingPosition.y, 0.0f),
+			glm::vec3(startingPosition.x + x, startingPosition.y, 0.0f),
+			glm::vec3(startingPosition.x + x, startingPosition.y + y, 0.0f),
+			glm::vec3(startingPosition.x, startingPosition.y + y, 0.0f)
+		};
+	};
+
 	//Cube Position Coords
 	constexpr std::array<glm::vec3, 4> CUBE_FACE_FRONT = 
 	{ 
@@ -151,6 +167,62 @@ namespace
 		glm::vec3(0, Globals::PICKUP_CUBE_FACE_SIZE, Globals::PICKUP_CUBE_FACE_SIZE) 
 	};
 
+	void getTextCoords(std::vector<glm::vec3>& textCoords, eDestroyCubeIndex destroyCubeIndex)
+	{
+		glm::vec2 startingPosition = { 0.0f, 0.0f };
+		glm::vec2 endingPosition = { 0.0f, 1.0f };
+		constexpr float xOffset = 0.1f;
+
+		switch (destroyCubeIndex)
+		{
+		case eDestroyCubeIndex::One:
+			startingPosition.x = 0.0f;
+			endingPosition.x = xOffset;
+			break;
+		case eDestroyCubeIndex::Two:
+			startingPosition.x = xOffset;
+			endingPosition.x = xOffset * 2;
+			break;
+		case eDestroyCubeIndex::Three:
+			startingPosition.x = xOffset * 2;
+			endingPosition.x = xOffset * 3;
+			break;
+		case eDestroyCubeIndex::Four:
+			startingPosition.x = xOffset * 3;
+			endingPosition.x = xOffset * 4;
+			break;
+		case eDestroyCubeIndex::Five:
+			startingPosition.x = xOffset * 4;
+			endingPosition.x = xOffset * 5;
+			break;
+		case eDestroyCubeIndex::Six:
+			startingPosition.x = xOffset * 5;
+			endingPosition.x = xOffset * 6;
+			break;
+		case eDestroyCubeIndex::Seven:
+			startingPosition.x = xOffset * 6;
+			endingPosition.x = xOffset * 7;
+			break;
+		case eDestroyCubeIndex::Eight:
+			startingPosition.x = xOffset * 7;
+			endingPosition.x = xOffset * 8;
+			break;
+		case eDestroyCubeIndex::Nine:
+			startingPosition.x = xOffset * 8;
+			endingPosition.x = xOffset * 9;
+			break;
+		case eDestroyCubeIndex::Ten:
+			startingPosition.x = xOffset * 9;
+			endingPosition.x = xOffset * 10;
+			break;
+		default:
+			assert(false);
+		}
+
+		std::array<glm::vec3, 4> t = getDestroyBlockTextCoords(startingPosition, endingPosition);
+		textCoords.insert(textCoords.end(), t.begin(), t.end());
+	}
+
 	void getTextCoords(std::vector<glm::vec3>& textCoords, eCubeSide cubeSide, eCubeType cubeType)
 	{
 		eTerrainTextureLayer textureLayer;
@@ -242,6 +314,61 @@ namespace
 		}
 	}
 
+	void addDestroyBlockCubeFace(VertexBuffer& vertexBuffer, eCubeSide cubeSide, eDestroyCubeIndex destroyCubeIndex, glm::vec3 cubePosition)
+	{
+		constexpr float offset = 0.01f;
+		switch (cubeSide)
+		{
+		case eCubeSide::Front:
+			for (const glm::vec3& position : CUBE_FACE_FRONT)
+			{
+				vertexBuffer.positions.push_back(cubePosition + glm::vec3(position.x, position.y, position.z + offset));
+			}
+			break;
+		case eCubeSide::Back:
+			for (const glm::vec3& position : CUBE_FACE_BACK)
+			{
+				vertexBuffer.positions.push_back(cubePosition + glm::vec3(position.x, position.y, position.z - offset));
+			}
+			break;
+		case eCubeSide::Left:
+			for (const glm::vec3& position : CUBE_FACE_LEFT)
+			{
+				vertexBuffer.positions.push_back(cubePosition + glm::vec3(position.x - offset, position.y, position.z));
+			}
+			break;
+		case eCubeSide::Right:
+			for (const glm::vec3& position : CUBE_FACE_RIGHT)
+			{
+				vertexBuffer.positions.push_back(cubePosition + glm::vec3(position.x + offset, position.y, position.z + offset));
+			}
+			break;
+		case eCubeSide::Top:
+			for (const glm::vec3& position : CUBE_FACE_TOP)
+			{
+				vertexBuffer.positions.push_back(cubePosition + glm::vec3(position.x, position.y + offset, position.z + offset));
+			}
+			break;
+		case eCubeSide::Bottom:
+			for (const glm::vec3& position : CUBE_FACE_BOTTOM)
+			{
+				vertexBuffer.positions.push_back(cubePosition + glm::vec3(position.x, position.y - offset, position.z + offset));
+			}
+			break;
+		default:
+			assert(false);
+		}
+
+		getTextCoords(vertexBuffer.textCoords, destroyCubeIndex);
+
+		for (unsigned int i : CUBE_FACE_INDICIES)
+		{
+			vertexBuffer.indicies.emplace_back(i + vertexBuffer.elementBufferIndex);
+		}
+
+		vertexBuffer.elementBufferIndex += CUBE_FACE_INDICIE_COUNT;
+	}
+
 	void addPickupCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, eCubeSide cubeSide)
 	{
 		switch (cubeSide)
@@ -319,6 +446,18 @@ void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const g
 
 bool isFacingTransparentCube(const glm::ivec3& cubePosition, const Chunk& chunk);
 bool isFacingOpaqueCube(const glm::ivec3& cubePosition, const Chunk& chunk);
+
+void MeshGenerator::generateDestroyBlockMesh(VertexBuffer& destroyBlockMesh, eDestroyCubeIndex destroyCubeIndex, const glm::vec3& position)
+{
+	addDestroyBlockCubeFace(destroyBlockMesh, eCubeSide::Left, destroyCubeIndex, position);
+	addDestroyBlockCubeFace(destroyBlockMesh, eCubeSide::Right, destroyCubeIndex, position);
+	addDestroyBlockCubeFace(destroyBlockMesh, eCubeSide::Top, destroyCubeIndex, position);
+	addDestroyBlockCubeFace(destroyBlockMesh, eCubeSide::Bottom, destroyCubeIndex, position);
+	addDestroyBlockCubeFace(destroyBlockMesh, eCubeSide::Front, destroyCubeIndex, position);
+	addDestroyBlockCubeFace(destroyBlockMesh, eCubeSide::Back, destroyCubeIndex, position);
+
+	destroyBlockMesh.bindToVAO = true;
+}
 
 void MeshGenerator::generateChunkMesh(VertexArray& chunkMesh, const Chunk& chunk, const NeighbouringChunks& neighbouringChunks)
 {
