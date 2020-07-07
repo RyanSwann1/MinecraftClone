@@ -95,23 +95,32 @@ void VertexBuffer::bind()
 	bindToVAO = false;
 	displayable = true;
 
-	glBindBuffer(GL_ARRAY_BUFFER, positionsID);
-	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(glm::vec3), positions.data(), GL_STATIC_DRAW);
+	if (!positions.empty())
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, positionsID);
+		glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(glm::vec3), positions.data(), GL_STATIC_DRAW);
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (const void*)0);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (const void*)0);
+	}
 
-	glBindBuffer(GL_ARRAY_BUFFER, textCoordsID);
-	glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(glm::vec3), textCoords.data(), GL_STATIC_DRAW);
+	if (!textCoords.empty())
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, textCoordsID);
+		glBufferData(GL_ARRAY_BUFFER, textCoords.size() * sizeof(glm::vec3), textCoords.data(), GL_STATIC_DRAW);
 
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (const void*)(0));
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (const void*)(0));
+	}
 
-	glBindBuffer(GL_ARRAY_BUFFER, lightIntensityID);
-	glBufferData(GL_ARRAY_BUFFER, lightIntensityVertices.size() * sizeof(float), lightIntensityVertices.data(), GL_STATIC_DRAW);
+	if (!lightIntensityVertices.empty())
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, lightIntensityID);
+		glBufferData(GL_ARRAY_BUFFER, lightIntensityVertices.size() * sizeof(float), lightIntensityVertices.data(), GL_STATIC_DRAW);
 
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(float), (const void*)(0));
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(float), (const void*)(0));
+	}
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies.size() * sizeof(unsigned int), indicies.data(), GL_STATIC_DRAW);
