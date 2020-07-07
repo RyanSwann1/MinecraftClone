@@ -8,6 +8,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "Globals.h"
 #include "Inventory.h"
+#include "Timer.h"
 #include <mutex>
 #include <SFML/Graphics.hpp>
 #include <vector>
@@ -36,6 +37,7 @@ enum class ePlayerState
 	OnGround,
 };
 
+class DestroyBlockVisual;
 class Gui;
 class Pickup;
 class ChunkManager;
@@ -53,7 +55,8 @@ public:
 	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
 	void handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& currentSFMLEvent,
 		ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window, Gui& gui);
-	void update(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager);
+	void update(float deltaTime, std::mutex& playerMutex, ChunkManager& chunkManager, 
+		DestroyBlockVisual& destroyBlockVisual, std::vector<Pickup>& pickUps);
 
 private:
 	Camera m_camera;
@@ -64,11 +67,12 @@ private:
 	bool m_requestingJump;
 	sf::Clock m_jumpTimer;
 	Inventory m_inventory;
+	glm::ivec3 m_cubeToDestroyPosition;
 
 	void move(float deltaTime, const ChunkManager& chunkManager);
 	void handleCollisions(const ChunkManager& chunkManager);
 	void discardItem(std::vector<Pickup>& pickUps, Gui& gui);
 	void placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex, Gui& gui);
-	void destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, std::vector<Pickup>& pickUps) const;
+	void destroyFacingBlock(ChunkManager& chunkManager, std::vector<Pickup>& pickUps, DestroyBlockVisual& destroyBlockVisual);
 	void handleAutoJump(const ChunkManager& chunkManager);
 };

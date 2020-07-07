@@ -7,10 +7,13 @@
 #include "PickUp.h"
 #include "CollisionHandler.h"
 #include "Gui.h"
+#include "DestroyBlockVisual.h"
 #include <memory>
 
 namespace 
 {
+	constexpr float MS_BLOCK_DESTROY = 0.5f;
+
 	constexpr float WATER_MOVEMENT_SPEED = 0.2f;
 	constexpr float WATER_GRAVITY = 0.02f;
 	constexpr float WATER_JUMP_SPEED = 0.1f;
@@ -28,7 +31,7 @@ namespace
 	constexpr float JUMP_BREAK = 1.0f;
 	constexpr float MS_BETWEEN_JUMP = .25f;
 
-	constexpr float DESTROY_BLOCK_RANGE = 5.0f;
+	constexpr float DESTROY_BLOCK_MAX_DISTANCE = 5.0f;
 	constexpr float DESTROY_BLOCK_INCREMENT = 0.5f;
 	constexpr float PLACE_BLOCK_RANGE = 5.0f;
 	constexpr float PLACE_BLOCK_INCREMENT = 0.1f;
@@ -91,7 +94,8 @@ Player::Player()
 	m_autoJump(false),
 	m_requestingJump(false),
 	m_jumpTimer(),
-	m_inventory()
+	m_inventory(),
+	m_cubeToDestroyPosition()
 {
 	m_jumpTimer.restart();
 }
@@ -185,22 +189,26 @@ void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex, Gui
 	}
 }
 
-void Player::destroyFacingBlock(ChunkManager& chunkManager, std::mutex& playerMutex, std::vector<Pickup>& pickUps) const
+void Player::destroyFacingBlock(ChunkManager& chunkManager, std::vector<Pickup>& pickUps, DestroyBlockVisual& destroyBlockVisual)
 {
-	std::lock_guard<std::mutex> playerLock(playerMutex);
-	for (float i = 0; i <= DESTROY_BLOCK_RANGE; i += DESTROY_BLOCK_INCREMENT)
+	eCubeType cubeTypeToDestroy;
+	if (destroyBlockVisual.isCompleted() && chunkManager.destroyCubeAtPosition(m_cubeToDestroyPosition, cubeTypeToDestroy))
+	{
+		assert(cubeTypeToDestroy != eCubeType::Air &&
+			!NON_COLLECTABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy));
+
+		pickUps.emplace_back(cubeTypeToDestroy, m_cubeToDestroyPosition);
+		destroyBlockVisual.reset();
+	}
+	
+	for (float i = 0; i <= DESTROY_BLOCK_MAX_DISTANCE; i += DESTROY_BLOCK_INCREMENT)
 	{
 		glm::vec3 rayPosition = m_camera.front * i + m_position;
-		eCubeType destroyedCubeType;
-		if (chunkManager.destroyCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, destroyedCubeType))
+		if (chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToDestroy) &&
+			!NON_COLLECTABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
 		{
-			assert(destroyedCubeType != eCubeType::Air);
-			if (!NON_COLLECTABLE_CUBE_TYPES.isMatch(destroyedCubeType))
-			{
-				pickUps.emplace_back(destroyedCubeType,
-					glm::ivec3(std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z)));
-			}
-
+			m_cubeToDestroyPosition = { std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) };
+			destroyBlockVisual.setPosition(m_cubeToDestroyPosition);
 			break;
 		}
 	}
@@ -278,16 +286,6 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 	}
 	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
 	{
-		switch (currentSFMLEvent.mouseButton.button)
-		{
-		case sf::Mouse::Button::Left:
-			break;
-
-		}
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-		{
-			destroyFacingBlock(chunkManager, playerMutex, pickUps);
-		}
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
 		{
 			placeBlock(chunkManager, playerMutex, gui);
@@ -303,9 +301,15 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 	}
 }
 
-void Player::update(float deltaTime, std::mutex& playerMutex, const ChunkManager& chunkManager)
+void Player::update(float deltaTime, std::mutex& playerMutex, ChunkManager& chunkManager, DestroyBlockVisual& destroyBlockVisual,
+	std::vector<Pickup>& pickUps)
 {
 	std::unique_lock<std::mutex> playerLock(playerMutex);
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+	{
+		destroyFacingBlock(chunkManager, pickUps, destroyBlockVisual);
+	}
+
 	for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
 	{
 		if (CollisionHandler::isCollision({ std::floor(m_position.x), std::floor(m_position.y + y), std::floor(m_position.z) },
