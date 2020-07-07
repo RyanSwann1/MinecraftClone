@@ -201,7 +201,7 @@ int main()
 		}
 
 		//Update
-		player.update(deltaTime, playerMutex, *chunkManager.get(), destroyBlockVisual, pickUps);
+		player.update(deltaTime, playerMutex, *chunkManager.get(), destroyBlockVisual, pickUps, gui);
 		destroyBlockVisual.update(deltaTime);
 
 		Rectangle visibilityRect = Globals::getVisibilityRect(player.getPosition());

@@ -56,7 +56,7 @@ public:
 	void handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& currentSFMLEvent,
 		ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window, Gui& gui);
 	void update(float deltaTime, std::mutex& playerMutex, ChunkManager& chunkManager, 
-		DestroyBlockVisual& destroyBlockVisual, std::vector<Pickup>& pickUps);
+		DestroyBlockVisual& destroyBlockVisual, std::vector<Pickup>& pickUps, Gui& gui);
 
 private:
 	Camera m_camera;
@@ -68,11 +68,12 @@ private:
 	sf::Clock m_jumpTimer;
 	Inventory m_inventory;
 	glm::ivec3 m_cubeToDestroyPosition;
+	Timer m_placeCubeTimer;
 
 	void move(float deltaTime, const ChunkManager& chunkManager);
 	void handleCollisions(const ChunkManager& chunkManager);
 	void discardItem(std::vector<Pickup>& pickUps, Gui& gui);
-	void placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex, Gui& gui);
+	void placeBlock(ChunkManager& chunkManager, Gui& gui);
 	void destroyFacingBlock(ChunkManager& chunkManager, std::vector<Pickup>& pickUps, DestroyBlockVisual& destroyBlockVisual);
 	void handleAutoJump(const ChunkManager& chunkManager);
 };

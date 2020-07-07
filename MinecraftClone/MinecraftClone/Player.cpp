@@ -37,6 +37,8 @@ namespace
 	constexpr float PLACE_BLOCK_INCREMENT = 0.1f;
 
 	constexpr float COLLISION_OFFSET = 0.35f;
+	
+	constexpr float MS_BETWEEN_PLACE_CUBE = 0.25f;
 
 	constexpr glm::vec3 DISCARD_ITEM_SPEED = { 10.0f, 5.7f, 10.0f };
 
@@ -100,7 +102,8 @@ Player::Player()
 	m_requestingJump(false),
 	m_jumpTimer(),
 	m_inventory(),
-	m_cubeToDestroyPosition()
+	m_cubeToDestroyPosition(),
+	m_placeCubeTimer(MS_BETWEEN_PLACE_CUBE, true)
 {
 	m_jumpTimer.restart();
 }
@@ -130,14 +133,12 @@ void Player::addToInventory(eCubeType cubeTypeToAdd, Gui& gui)
 	m_inventory.add(cubeTypeToAdd, gui);
 }
 
-void Player::placeBlock(ChunkManager& chunkManager, std::mutex& playerMutex, Gui& gui)
+void Player::placeBlock(ChunkManager& chunkManager, Gui& gui)
 {
 	if (m_inventory.isSelectedItemEmpty())
 	{
 		return;
 	}
-
-	std::lock_guard<std::mutex> playerLock(playerMutex);
 	
 	bool blockPlaced = false;
 	for (float i = 0; i <= PLACE_BLOCK_RANGE; i += PLACE_BLOCK_INCREMENT)
@@ -301,13 +302,13 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 
 		m_inventory.handleInputEvents(currentSFMLEvent, gui);
 	}
-	if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
-	{
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
-		{
-			placeBlock(chunkManager, playerMutex, gui);
-		}
-	}
+	//if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
+	//{
+	//	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
+	//	{
+	//		placeBlock(chunkManager, playerMutex, gui);
+	//	}
+	//}
 	if (currentSFMLEvent.MouseMoved)
 	{
 		m_camera.move(window);
@@ -319,12 +320,20 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 }
 
 void Player::update(float deltaTime, std::mutex& playerMutex, ChunkManager& chunkManager, DestroyBlockVisual& destroyBlockVisual,
-	std::vector<Pickup>& pickUps)
+	std::vector<Pickup>& pickUps, Gui& gui)
 {
+	m_placeCubeTimer.update(deltaTime);
+
 	std::unique_lock<std::mutex> playerLock(playerMutex);
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
 		destroyFacingBlock(chunkManager, pickUps, destroyBlockVisual);
+	}
+	else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right) && m_placeCubeTimer.isExpired())
+	{
+		placeBlock(chunkManager, gui);
+		m_placeCubeTimer.resetElaspedTime();
+		m_placeCubeTimer.setActive(true);
 	}
 
 	for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
