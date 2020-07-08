@@ -52,6 +52,7 @@ public:
 	const Camera& getCamera() const;
 	const Inventory& getInventory() const;
 
+	void resetDestroyCubeTimer();
 	void addToInventory(eCubeType cubeType, Gui& gui);
 	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
 	void handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& currentSFMLEvent,
@@ -71,6 +72,7 @@ private:
 	Inventory m_inventory;
 	glm::ivec3 m_cubeToDestroyPosition;
 	Timer m_placeCubeTimer;
+	Timer m_destroyCubeTimer;
 
 	void move(float deltaTime, const ChunkManager& chunkManager);
 	void handleCollisions(const ChunkManager& chunkManager);

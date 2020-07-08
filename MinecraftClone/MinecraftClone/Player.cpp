@@ -104,7 +104,8 @@ Player::Player()
 	m_jumpTimer(),
 	m_inventory(),
 	m_cubeToDestroyPosition(),
-	m_placeCubeTimer(MS_BETWEEN_PLACE_CUBE, true)
+	m_placeCubeTimer(MS_BETWEEN_PLACE_CUBE, true),
+	m_destroyCubeTimer()
 {
 	m_jumpTimer.restart();
 }
@@ -127,6 +128,12 @@ const Camera& Player::getCamera() const
 const Inventory& Player::getInventory() const
 {
 	return m_inventory;
+}
+
+void Player::resetDestroyCubeTimer()
+{
+	m_destroyCubeTimer.resetElaspedTime();
+	m_destroyCubeTimer.setActive(false);
 }
 
 void Player::addToInventory(eCubeType cubeTypeToAdd, Gui& gui)
@@ -196,11 +203,16 @@ void Player::placeBlock(ChunkManager& chunkManager, Gui& gui)
 	}
 }
 
+constexpr float MS_BETWEEN_DESTROY_CUBE = 0.5f;
 void Player::destroyFacingBlock(ChunkManager& chunkManager, std::vector<Pickup>& pickUps, DestroyBlockVisual& destroyBlockVisual)
 {
 	eCubeType cubeTypeToDestroy;
-	if (destroyBlockVisual.isCompleted() && chunkManager.destroyCubeAtPosition(m_cubeToDestroyPosition, cubeTypeToDestroy))
+	if (m_destroyCubeTimer.isActive() && m_destroyCubeTimer.isExpired() && 
+		chunkManager.destroyCubeAtPosition(m_cubeToDestroyPosition, cubeTypeToDestroy))
 	{
+		m_destroyCubeTimer.resetElaspedTime();
+		m_destroyCubeTimer.setActive(false);
+
 		assert(cubeTypeToDestroy != eCubeType::Air &&
 			!NON_DESTROYABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy));
 
@@ -218,10 +230,19 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager, std::vector<Pickup>&
 		if (chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToDestroy) &&
 			!NON_DESTROYABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
 		{
-			m_cubeToDestroyPosition = { std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) };
+			if (glm::ivec3(std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z)) !=
+				m_cubeToDestroyPosition)
+			{
+				m_destroyCubeTimer.resetElaspedTime();
+				m_cubeToDestroyPosition = { std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) };
+			}
+			
 			if (!NON_COLLECTABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
 			{
-				destroyBlockVisual.setPosition(m_cubeToDestroyPosition);
+				m_destroyCubeTimer.setNewExpirationTime(MS_BETWEEN_DESTROY_CUBE);
+				m_destroyCubeTimer.setActive(true);
+
+				destroyBlockVisual.setPosition(m_cubeToDestroyPosition, m_destroyCubeTimer);
 			}
 			else
 			{
@@ -339,17 +360,17 @@ void Player::update(float deltaTime, std::mutex& playerMutex, ChunkManager& chun
 	std::vector<Pickup>& pickUps, Gui& gui)
 {
 	m_placeCubeTimer.update(deltaTime);
+	m_destroyCubeTimer.update(deltaTime);
 
 	std::unique_lock<std::mutex> playerLock(playerMutex);
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
 		destroyFacingBlock(chunkManager, pickUps, destroyBlockVisual);
 	}
-	else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right) && m_placeCubeTimer.isExpired())
+	else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right) && m_placeCubeTimer.isActive() && m_placeCubeTimer.isExpired())
 	{
 		placeBlock(chunkManager, gui);
 		m_placeCubeTimer.resetElaspedTime();
-		m_placeCubeTimer.setActive(true);
 	}
 
 	for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
