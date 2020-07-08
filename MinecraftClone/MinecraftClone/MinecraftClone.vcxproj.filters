@@ -87,6 +87,9 @@
     <ClCompile Include="DestroyBlockVisual.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SelectedVoxelVisual.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glad.h">
@@ -260,6 +263,9 @@
     <ClInclude Include="DestroyBlockVisual.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SelectedVoxelVisual.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\ChunkFragmentShader.glsl" />
@@ -279,5 +285,7 @@
     <None Include="OpenGLShaders\UIFontFragmentShader.glsl" />
     <None Include="OpenGLShaders\DestroyBlockVertexShader.glsl" />
     <None Include="OpenGLShaders\DestroyBlockFragmentShader.glsl" />
+    <None Include="OpenGLShaders\SelectedVoxelVertexShader.glsl" />
+    <None Include="OpenGLShaders\SelectedVoxelFragmentShader.glsl" />
   </ItemGroup>
 </Project>

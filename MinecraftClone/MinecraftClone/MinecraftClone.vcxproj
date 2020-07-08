@@ -144,6 +144,7 @@
     <ClCompile Include="ChunkManager.cpp" />
     <ClCompile Include="MeshGenerator.cpp" />
     <ClCompile Include="Frustum.cpp" />
+    <ClCompile Include="SelectedVoxelVisual.cpp" />
     <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="CubeType.h" />
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="ObjectQueue.h" />
+    <ClInclude Include="SelectedVoxelVisual.h" />
     <ClInclude Include="SkyBox.h" />
     <ClInclude Include="glad.h" />
     <ClInclude Include="glm\common.hpp" />
@@ -220,6 +222,8 @@
     <None Include="OpenGLShaders\DestroyBlockVertexShader.glsl" />
     <None Include="OpenGLShaders\PickupFragmentShader.glsl" />
     <None Include="OpenGLShaders\PickupVertexShader.glsl" />
+    <None Include="OpenGLShaders\SelectedVoxelFragmentShader.glsl" />
+    <None Include="OpenGLShaders\SelectedVoxelVertexShader.glsl" />
     <None Include="OpenGLShaders\SkyboxFragmentShader.glsl" />
     <None Include="OpenGLShaders\SkyboxVertexShader.glsl" />
     <None Include="OpenGLShaders\UIFontFragmentShader.glsl" />
