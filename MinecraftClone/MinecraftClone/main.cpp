@@ -204,6 +204,7 @@ int main()
 			}
 			if (currentSFMLEvent.type == sf::Event::MouseButtonReleased)
 			{
+				player.resetDestroyCubeTimer();
 				destroyBlockVisual.reset();
 			}
 
@@ -278,12 +279,13 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uProjection", projection);
 		destroyBlockVisual.render();
 
+		//glDisable(GL_DEPTH_TEST);
 		voxelSelectionTexture->bind();
 		shaderHandler->switchToShader(eShaderType::SelectedVoxel);
 		shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel , "uProjection", projection);
 		selectedVoxelVisual.render();
-
+		//glEnable(GL_DEPTH_TEST);
 			
 		glDisable(GL_BLEND);
 
