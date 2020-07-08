@@ -9,6 +9,7 @@ public:
 	bool isActive() const;
 	bool isExpired() const;
 	float getElaspedTime() const;
+	float getExpirationTime() const;
 
 	void update(float deltaTime);
 	void resetElaspedTime();

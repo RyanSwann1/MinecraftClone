@@ -27,16 +27,16 @@ float Timer::getElaspedTime() const
 	return m_elaspedTime;
 }
 
+float Timer::getExpirationTime() const
+{
+	return m_expirationTime;
+}
+
 void Timer::update(float deltaTime)
 {
 	if (m_active)
 	{
 		m_elaspedTime += deltaTime;
-
-		if (isExpired())
-		{
-			m_active = false;
-		}
 	}
 }
 
