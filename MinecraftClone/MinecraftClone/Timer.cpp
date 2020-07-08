@@ -19,7 +19,7 @@ bool Timer::isActive() const
 
 bool Timer::isExpired() const
 {
-	return m_elaspedTime >= m_expirationTime;
+	return m_active && m_elaspedTime >= m_expirationTime;
 }
 
 float Timer::getElaspedTime() const

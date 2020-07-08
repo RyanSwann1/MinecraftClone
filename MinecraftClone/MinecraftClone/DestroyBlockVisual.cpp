@@ -41,7 +41,7 @@ void DestroyBlockVisual::reset()
 void DestroyBlockVisual::update(float deltaTime)
 {
 	m_timer.update(deltaTime);
-	if (m_timer.isActive() && m_timer.isExpired())
+	if (m_timer.isExpired())
 	{
 		if (static_cast<int>(m_index) < static_cast<int>(eDestroyCubeIndex::Max))
 		{

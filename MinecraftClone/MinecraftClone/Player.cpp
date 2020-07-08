@@ -241,7 +241,7 @@ void Player::placeBlock(ChunkManager& chunkManager, Gui& gui)
 void Player::destroyFacingBlock(ChunkManager& chunkManager, std::vector<Pickup>& pickUps, DestroyBlockVisual& destroyBlockVisual)
 {
 	eCubeType cubeTypeToDestroy;
-	if (m_destroyCubeTimer.isActive() && m_destroyCubeTimer.isExpired() && 
+	if (m_destroyCubeTimer.isExpired() && 
 		chunkManager.destroyCubeAtPosition(m_cubeToDestroyPosition, cubeTypeToDestroy))
 	{
 		assert(cubeTypeToDestroy != eCubeType::Air &&
@@ -419,7 +419,7 @@ void Player::update(float deltaTime, std::mutex& playerMutex, ChunkManager& chun
 	{
 		destroyFacingBlock(chunkManager, pickUps, destroyBlockVisual);
 	}
-	else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right) && m_placeCubeTimer.isActive() && m_placeCubeTimer.isExpired())
+	else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right) && m_placeCubeTimer.isExpired())
 	{
 		placeBlock(chunkManager, gui);
 		m_placeCubeTimer.resetElaspedTime();
