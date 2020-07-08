@@ -230,23 +230,24 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager, std::vector<Pickup>&
 		if (chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToDestroy) &&
 			!NON_DESTROYABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
 		{
-			if (glm::ivec3(std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z)) !=
-				m_cubeToDestroyPosition)
-			{
-				m_destroyCubeTimer.resetElaspedTime();
-				m_cubeToDestroyPosition = { std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) };
-			}
-			
 			if (!NON_COLLECTABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
 			{
-				m_destroyCubeTimer.setNewExpirationTime(MS_BETWEEN_DESTROY_CUBE);
-				m_destroyCubeTimer.setActive(true);
-
-				destroyBlockVisual.setPosition(m_cubeToDestroyPosition, m_destroyCubeTimer);
+				if (!m_destroyCubeTimer.isActive() || glm::ivec3(std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z)) !=
+						m_cubeToDestroyPosition)
+				{
+					m_destroyCubeTimer.resetElaspedTime();
+					m_cubeToDestroyPosition = { std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) };
+					m_destroyCubeTimer.setNewExpirationTime(MS_BETWEEN_DESTROY_CUBE);
+					m_destroyCubeTimer.setActive(true);
+					
+					destroyBlockVisual.reset();
+					destroyBlockVisual.setPosition(m_cubeToDestroyPosition, m_destroyCubeTimer);
+				}
 			}
 			else
 			{
-				chunkManager.destroyCubeAtPosition(m_cubeToDestroyPosition, cubeTypeToDestroy);
+				chunkManager.destroyCubeAtPosition(
+					{ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToDestroy);
 			}
 
 			break;

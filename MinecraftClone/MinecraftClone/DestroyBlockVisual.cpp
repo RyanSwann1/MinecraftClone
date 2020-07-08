@@ -18,20 +18,16 @@ bool DestroyBlockVisual::isCompleted() const
 
 void DestroyBlockVisual::setPosition(const glm::ivec3& position, const Timer& playerDestroyCubeTimer)
 {
-	assert(playerDestroyCubeTimer.getExpirationTime() > 0.0f);//&&
-		//playerDestroyCubeTimer.getElaspedTime() == 0.0f);
+	assert(playerDestroyCubeTimer.isActive());
 
-	if (m_currentCubePosition != position)
-	{
-		m_timer.resetElaspedTime();
-		m_timer.setActive(true);
-		m_timer.setNewExpirationTime(playerDestroyCubeTimer.getExpirationTime() / (static_cast<float>(eDestroyCubeIndex::Max) + 1.0f));
-		m_currentCubePosition = position;
+	m_timer.resetElaspedTime();
+	m_timer.setActive(true);
+	m_timer.setNewExpirationTime(playerDestroyCubeTimer.getExpirationTime() / (static_cast<float>(eDestroyCubeIndex::Max) + 1.0f));
+	m_currentCubePosition = position;
 
-		m_index = eDestroyCubeIndex::One;
-		m_mesh.m_transparentVertexBuffer.clear();
-		MeshGenerator::generateDestroyBlockMesh(m_mesh.m_transparentVertexBuffer, m_index, m_currentCubePosition);
-	}
+	m_index = eDestroyCubeIndex::One;
+	m_mesh.m_transparentVertexBuffer.clear();
+	MeshGenerator::generateDestroyBlockMesh(m_mesh.m_transparentVertexBuffer, m_index, m_currentCubePosition);
 }
 
 void DestroyBlockVisual::reset()
