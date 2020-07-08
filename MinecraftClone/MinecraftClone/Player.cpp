@@ -43,6 +43,36 @@ namespace
 
 	constexpr glm::vec3 DISCARD_ITEM_SPEED = { 10.0f, 5.7f, 10.0f };
 
+	constexpr float SLOW_DESTROY_TIME = 4.0f;
+	const CubeTypeComparison SLOW_DESTROYABLE_CUBE_TYPES =
+	{
+		{eCubeType::Stone,
+		eCubeType::Log,
+		eCubeType::LogTop}
+	};
+
+	constexpr float NORMAL_DESTROY_TIME = 0.75f;
+	const CubeTypeComparison NORMAL_DESTROYABLE_CUBE_TYPES =
+	{
+		{eCubeType::Grass, 
+		eCubeType::Dirt}
+	};
+
+	constexpr float FAST_DESTROY_TIME = 0.35f;
+	const CubeTypeComparison FAST_DESTROYABLE_CUBE_TYPES =
+	{
+		{eCubeType::Sand,
+		eCubeType::Leaves,
+		eCubeType::Cactus,
+		eCubeType::CactusTop}
+	};
+
+	const CubeTypeComparison INSTANT_DESTROYABLE_CUBE_TYPES =
+	{
+		{eCubeType::TallGrass,
+		eCubeType::Shrub}
+	};
+
 	const CubeTypeComparison NON_DESTROYABLE_CUBE_TYPES =
 	{
 		{eCubeType::Water}
@@ -203,18 +233,17 @@ void Player::placeBlock(ChunkManager& chunkManager, Gui& gui)
 	}
 }
 
-constexpr float MS_BETWEEN_DESTROY_CUBE = 0.5f;
 void Player::destroyFacingBlock(ChunkManager& chunkManager, std::vector<Pickup>& pickUps, DestroyBlockVisual& destroyBlockVisual)
 {
 	eCubeType cubeTypeToDestroy;
 	if (m_destroyCubeTimer.isActive() && m_destroyCubeTimer.isExpired() && 
 		chunkManager.destroyCubeAtPosition(m_cubeToDestroyPosition, cubeTypeToDestroy))
 	{
-		m_destroyCubeTimer.resetElaspedTime();
-		m_destroyCubeTimer.setActive(false);
-
 		assert(cubeTypeToDestroy != eCubeType::Air &&
 			!NON_DESTROYABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy));
+
+		m_destroyCubeTimer.resetElaspedTime();
+		m_destroyCubeTimer.setActive(false);
 
 		if (!NON_COLLECTABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
 		{
@@ -230,14 +259,29 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager, std::vector<Pickup>&
 		if (chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToDestroy) &&
 			!NON_DESTROYABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
 		{
-			if (!NON_COLLECTABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
+			if (!INSTANT_DESTROYABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
 			{
 				if (!m_destroyCubeTimer.isActive() || glm::ivec3(std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z)) !=
 						m_cubeToDestroyPosition)
 				{
+					float destroyTime = 0.0f;
+					if (SLOW_DESTROYABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
+					{
+						destroyTime = SLOW_DESTROY_TIME;
+					}
+					else if (NORMAL_DESTROYABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
+					{
+						destroyTime = NORMAL_DESTROY_TIME;
+					}
+					else if (FAST_DESTROYABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
+					{
+						destroyTime = FAST_DESTROY_TIME;
+					}
+					assert(destroyTime != 0.0f);
+
 					m_destroyCubeTimer.resetElaspedTime();
 					m_cubeToDestroyPosition = { std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) };
-					m_destroyCubeTimer.setNewExpirationTime(MS_BETWEEN_DESTROY_CUBE);
+					m_destroyCubeTimer.setNewExpirationTime(destroyTime);
 					m_destroyCubeTimer.setActive(true);
 					
 					destroyBlockVisual.reset();
