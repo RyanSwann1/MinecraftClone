@@ -8,6 +8,7 @@
 #include "CollisionHandler.h"
 #include "Gui.h"
 #include "DestroyBlockVisual.h"
+#include "SelectedVoxelVisual.h"
 #include <memory>
 
 namespace 
@@ -286,8 +287,29 @@ void Player::handleAutoJump(const ChunkManager& chunkManager)
 	}
 }
 
+void Player::handleSelectedCube(const ChunkManager& chunkManager, SelectedVoxelVisual& selectedVoxel)
+{
+	bool selectedCubeFound = false;
+	for (float i = 0; i <= DESTROY_BLOCK_MAX_DISTANCE; i += DESTROY_BLOCK_INCREMENT)
+	{
+		glm::vec3 rayPosition = m_camera.front * i + m_position;
+		if (chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }))
+		{
+			selectedVoxel.setPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) });
+			selectedCubeFound = true;
+			break;
+		}
+	}
+
+	if (!selectedCubeFound)
+	{
+		selectedVoxel.setActive(false);
+	}
+}
+
 void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& currentSFMLEvent,
-	ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window, Gui& gui)
+	ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window, Gui& gui,
+	SelectedVoxelVisual& selectedVoxel)
 {
 	if (currentSFMLEvent.type == sf::Event::KeyPressed)
 	{	
@@ -302,16 +324,10 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 
 		m_inventory.handleInputEvents(currentSFMLEvent, gui);
 	}
-	//if (currentSFMLEvent.type == sf::Event::MouseButtonPressed)
-	//{
-	//	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
-	//	{
-	//		placeBlock(chunkManager, playerMutex, gui);
-	//	}
-	//}
 	if (currentSFMLEvent.MouseMoved)
 	{
 		m_camera.move(window);
+		handleSelectedCube(chunkManager, selectedVoxel);
 	}
 	if (currentSFMLEvent.type == currentSFMLEvent.MouseWheelScrolled)
 	{

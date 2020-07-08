@@ -37,6 +37,7 @@ enum class ePlayerState
 	OnGround,
 };
 
+class SelectedVoxelVisual;
 class DestroyBlockVisual;
 class Gui;
 class Pickup;
@@ -54,7 +55,8 @@ public:
 	void addToInventory(eCubeType cubeType, Gui& gui);
 	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
 	void handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& currentSFMLEvent,
-		ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window, Gui& gui);
+		ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window, Gui& gui,
+		SelectedVoxelVisual& selectedVoxel);
 	void update(float deltaTime, std::mutex& playerMutex, ChunkManager& chunkManager, 
 		DestroyBlockVisual& destroyBlockVisual, std::vector<Pickup>& pickUps, Gui& gui);
 
@@ -76,4 +78,5 @@ private:
 	void placeBlock(ChunkManager& chunkManager, Gui& gui);
 	void destroyFacingBlock(ChunkManager& chunkManager, std::vector<Pickup>& pickUps, DestroyBlockVisual& destroyBlockVisual);
 	void handleAutoJump(const ChunkManager& chunkManager);
+	void handleSelectedCube(const ChunkManager& chunkManager, SelectedVoxelVisual& selectedVoxel);
 };
