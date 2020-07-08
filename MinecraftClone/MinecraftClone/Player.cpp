@@ -84,6 +84,11 @@ namespace
 		eCubeType::TallGrass,
 		eCubeType::Leaves}
 	};
+
+	const CubeTypeComparison NON_SELECTABLE_CUBE_TYPES =
+	{
+		{eCubeType::Water}
+	};
 }
 
 //Camera
@@ -356,10 +361,12 @@ void Player::handleAutoJump(const ChunkManager& chunkManager)
 void Player::handleSelectedCube(const ChunkManager& chunkManager, SelectedVoxelVisual& selectedVoxel)
 {
 	bool selectedCubeFound = false;
+	eCubeType selectedCubeType;
 	for (float i = 0; i <= DESTROY_BLOCK_MAX_DISTANCE; i += DESTROY_BLOCK_INCREMENT)
 	{
 		glm::vec3 rayPosition = m_camera.front * i + m_position;
-		if (chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }))
+		if (chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, selectedCubeType) &&
+			!NON_SELECTABLE_CUBE_TYPES.isMatch(selectedCubeType))
 		{
 			selectedVoxel.setPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) });
 			selectedCubeFound = true;
