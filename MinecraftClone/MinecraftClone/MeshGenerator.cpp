@@ -314,6 +314,64 @@ namespace
 		}
 	}
 
+	void addVoxelSelectionCubeFace(VertexBuffer& vertexBuffer, eCubeSide cubeSide, glm::vec3 cubePosition)
+	{
+		constexpr float offset = 0.005f;
+		switch (cubeSide)
+		{
+		case eCubeSide::Front:
+			for (const glm::vec3& position : CUBE_FACE_FRONT)
+			{
+				vertexBuffer.positions.push_back(cubePosition + glm::vec3(position.x, position.y, position.z + offset));
+			}
+			break;
+		case eCubeSide::Back:
+			for (const glm::vec3& position : CUBE_FACE_BACK)
+			{
+				vertexBuffer.positions.push_back(cubePosition + glm::vec3(position.x, position.y, position.z - offset));
+			}
+			break;
+		case eCubeSide::Left:
+			for (const glm::vec3& position : CUBE_FACE_LEFT)
+			{
+				vertexBuffer.positions.push_back(cubePosition + glm::vec3(position.x - offset, position.y, position.z));
+			}
+			break;
+		case eCubeSide::Right:
+			for (const glm::vec3& position : CUBE_FACE_RIGHT)
+			{
+				vertexBuffer.positions.push_back(cubePosition + glm::vec3(position.x + offset, position.y, position.z));
+			}
+			break;
+		case eCubeSide::Top:
+			for (const glm::vec3& position : CUBE_FACE_TOP)
+			{
+				vertexBuffer.positions.push_back(cubePosition + glm::vec3(position.x, position.y + offset, position.z));
+			}
+			break;
+		case eCubeSide::Bottom:
+			for (const glm::vec3& position : CUBE_FACE_BOTTOM)
+			{
+				vertexBuffer.positions.push_back(cubePosition + glm::vec3(position.x, position.y - offset, position.z));
+			}
+			break;
+		default:
+			assert(false);
+		}
+
+		for (const auto& i : TEXT_COORDS)
+		{
+			vertexBuffer.textCoords.emplace_back(i.x, i.y, 0.0f);
+		}
+
+		for (unsigned int i : CUBE_FACE_INDICIES)
+		{
+			vertexBuffer.indicies.emplace_back(i + vertexBuffer.elementBufferIndex);
+		}
+
+		vertexBuffer.elementBufferIndex += CUBE_FACE_INDICIE_COUNT;
+	}
+
 	void addDestroyBlockCubeFace(VertexBuffer& vertexBuffer, eCubeSide cubeSide, eDestroyCubeIndex destroyCubeIndex, glm::vec3 cubePosition)
 	{
 		constexpr float offset = 0.01f;
@@ -446,6 +504,18 @@ void addDiagonalCubeFace(VertexBuffer& vertexBuffer, eCubeType cubeType, const g
 
 bool isFacingTransparentCube(const glm::ivec3& cubePosition, const Chunk& chunk);
 bool isFacingOpaqueCube(const glm::ivec3& cubePosition, const Chunk& chunk);
+
+void MeshGenerator::generateVoxelSelectionMesh(VertexBuffer& mesh, const glm::vec3& position)
+{
+	addVoxelSelectionCubeFace(mesh, eCubeSide::Left, position);
+	addVoxelSelectionCubeFace(mesh, eCubeSide::Right, position);
+	addVoxelSelectionCubeFace(mesh, eCubeSide::Top, position);
+	addVoxelSelectionCubeFace(mesh, eCubeSide::Bottom, position);
+	addVoxelSelectionCubeFace(mesh, eCubeSide::Front, position);
+	addVoxelSelectionCubeFace(mesh, eCubeSide::Back, position);
+
+	mesh.bindToVAO = true;
+}
 
 void MeshGenerator::generateDestroyBlockMesh(VertexBuffer& destroyBlockMesh, eDestroyCubeIndex destroyCubeIndex, const glm::vec3& position)
 {
