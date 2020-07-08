@@ -14,6 +14,7 @@
 #include "Gui.h"
 #include "Pickup.h"
 #include "DestroyBlockVisual.h"
+#include "SelectedVoxelVisual.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -131,7 +132,16 @@ int main()
 		return -1;
 	}
 
+	std::unique_ptr<Texture> voxelSelectionTexture = Texture::create("voxelSelection.png");
+	assert(voxelSelectionTexture);
+	if (!voxelSelectionTexture)
+	{
+		std::cout << "Couldn't load voxel selection texture\n"; 
+		return -1;
+	}
+
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
+	SelectedVoxelVisual selectedVoxelVisual;
 	DestroyBlockVisual destroyBlockVisual;
 	Gui gui(windowSize);
 	std::vector<Pickup> pickUps;
@@ -197,7 +207,7 @@ int main()
 				destroyBlockVisual.reset();
 			}
 
-			player.handleInputEvents(pickUps, currentSFMLEvent, *chunkManager, playerMutex, window, gui);
+			player.handleInputEvents(pickUps, currentSFMLEvent, *chunkManager, playerMutex, window, gui, selectedVoxelVisual);
 		}
 
 		//Update
@@ -267,6 +277,13 @@ int main()
 		shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uProjection", projection);
 		destroyBlockVisual.render();
+
+		voxelSelectionTexture->bind();
+		shaderHandler->switchToShader(eShaderType::SelectedVoxel);
+		shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uView", view);
+		shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel , "uProjection", projection);
+		selectedVoxelVisual.render();
+
 			
 		glDisable(GL_BLEND);
 

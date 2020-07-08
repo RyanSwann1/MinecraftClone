@@ -15,6 +15,7 @@ enum class eShaderType
 	Pickup,
 	Skybox,
 	DestroyBlock,
+	SelectedVoxel,
 	UIItem,
 	UIToolbar,
 	UIFont,
@@ -58,6 +59,7 @@ private:
 		eShaderType::Pickup,
 		eShaderType::Skybox,
 		eShaderType::DestroyBlock,
+		eShaderType::SelectedVoxel,
 		eShaderType::UIItem,
 		eShaderType::UIToolbar,
 		eShaderType::UIFont

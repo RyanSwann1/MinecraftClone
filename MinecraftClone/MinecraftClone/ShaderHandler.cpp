@@ -129,6 +129,9 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create(const glm::ivec2& windowSiz
 		case eShaderType::DestroyBlock:
 			shaderLoaded = createShaderProgram(shader.getID(), "DestroyBlockVertexShader.glsl", "DestroyBlockFragmentShader.glsl");
 			break;
+		case eShaderType::SelectedVoxel:
+			shaderLoaded = createShaderProgram(shader.getID(), "SelectedVoxelVertexShader.glsl", "SelectedVoxelFragmentShader.glsl");
+			break;
 		default:
 			assert(false);
 		}
