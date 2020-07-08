@@ -14,7 +14,7 @@ public:
 
 	bool isCompleted() const;
 
-	void setPosition(const glm::ivec3& position);
+	void setPosition(const glm::ivec3& position, const Timer& playerDestroyCubeTimer);
 	
 	void reset();
 	void update(float deltaTime);
