@@ -123,7 +123,12 @@ void Pickup::update(const Player& player, float deltaTime, const ChunkManager& c
 	}
 
 	m_collectionTimer.update(deltaTime);
-	if (!m_collectionTimer.isActive() || m_collectionTimer.isExpired())
+	if (m_collectionTimer.isExpired())
+	{
+		m_collectionTimer.setActive(false);
+	}
+	
+	if (!m_collectionTimer.isActive())
 	{
 		glm::vec3 playerMiddlePosition = player.getMiddlePosition();
 		if (glm::distance(m_position, playerMiddlePosition) <= MAXIMUM_DISTANCE_FROM_PLAYER &&
