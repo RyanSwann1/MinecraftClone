@@ -119,6 +119,10 @@ namespace Globals
 
 	constexpr float TERRAIN_LACUNARITY = 8.0f;
 	constexpr float TERRAIN_PERSISTENCE = 2.5f;
+
+	constexpr float TERRAIN_LACUNARITY = 8.0f;
+	constexpr float TERRAIN_PERSISTENCE = 0.1f;
+	//constexpr float TERRAIN_PERSISTENCE = 2.5f;
 	constexpr int TERRAIN_OCTAVES = 8;
 
 	constexpr float PICKUP_CUBE_FACE_SIZE = 0.25f;
