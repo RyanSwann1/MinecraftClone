@@ -19,7 +19,8 @@ enum class eShaderType
 	UIItem,
 	UIToolbar,
 	UIFont,
-	Max = UIFont
+	PostProcessing,
+	Max = PostProcessing
 };
 
 class ShaderHandler : private NonCopyable, private NonMovable
@@ -47,6 +48,7 @@ public:
 
 	void setUniformMat4f(eShaderType shaderType, const std::string& uniformName, const glm::mat4& matrix);
 	void setUniform1i(eShaderType shaderType, const std::string& uniformName, int value);
+	void setUniform1f(eShaderType shaderType, const std::string& uniformName, float value);
 	void switchToShader(eShaderType shaderType);
 
 private:
@@ -62,6 +64,7 @@ private:
 		eShaderType::SelectedVoxel,
 		eShaderType::UIItem,
 		eShaderType::UIToolbar,
-		eShaderType::UIFont
+		eShaderType::UIFont,
+		eShaderType::PostProcessing
 	};
 };

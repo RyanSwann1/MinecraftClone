@@ -132,6 +132,9 @@ std::unique_ptr<ShaderHandler> ShaderHandler::create(const glm::ivec2& windowSiz
 		case eShaderType::SelectedVoxel:
 			shaderLoaded = createShaderProgram(shader.getID(), "SelectedVoxelVertexShader.glsl", "SelectedVoxelFragmentShader.glsl");
 			break;
+		case eShaderType::PostProcessing:
+			shaderLoaded = createShaderProgram(shader.getID(), "PostProcessingVertexShader.glsl", "PostProcessingFragmentShader.glsl");
+			break;
 		default:
 			assert(false);
 		}
@@ -167,6 +170,14 @@ void ShaderHandler::setUniform1i(eShaderType shaderType, const std::string& unif
 	int uniformLocation = m_shader[static_cast<int>(shaderType)].getUniformLocation(uniformName);
 	assert(uniformLocation != INVALID_UNIFORM_LOCATION);
 	glUniform1i(uniformLocation, value);
+}
+
+void ShaderHandler::setUniform1f(eShaderType shaderType, const std::string& uniformName, float value)
+{
+	assert(shaderType == m_currentShaderType);
+	int uniformLocation = m_shader[static_cast<int>(shaderType)].getUniformLocation(uniformName);
+	assert(uniformLocation != INVALID_UNIFORM_LOCATION);
+	glUniform1f(uniformLocation, value);
 }
 
 void ShaderHandler::switchToShader(eShaderType shaderType)

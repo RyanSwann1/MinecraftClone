@@ -15,6 +15,7 @@
 #include "Pickup.h"
 #include "DestroyBlockVisual.h"
 #include "SelectedVoxelVisual.h"
+#include "FrameBuffer.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -141,6 +142,7 @@ int main()
 	}
 
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
+	FrameBuffer frameBuffer(windowSize);
 	SelectedVoxelVisual selectedVoxelVisual;
 	DestroyBlockVisual destroyBlockVisual;
 	Gui gui(windowSize);
@@ -241,67 +243,147 @@ int main()
 
 		frustum.update(projection * view);
 		
-		//Render
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		shaderHandler->switchToShader(eShaderType::Chunk);
-		shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
-		shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
-
-		std::lock_guard<std::mutex> renderingLock(renderingMutex);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-			
-		textureArray->bind();
-		chunkManager->renderOpaque(frustum);
-		
-		//Draw Pickups
-		shaderHandler->switchToShader(eShaderType::Pickup);
-		shaderHandler->setUniformMat4f(eShaderType::Pickup, "uView", view);
-		shaderHandler->setUniformMat4f(eShaderType::Pickup, "uProjection", projection);
-		for (auto& pickUp : pickUps)
+		if (player.isUnderWater(*chunkManager, playerMutex))
 		{
-			pickUp.render(frustum, *shaderHandler);
+			//Render
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			shaderHandler->switchToShader(eShaderType::Chunk);
+			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
+			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
+
+			std::lock_guard<std::mutex> renderingLock(renderingMutex);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
+
+
+			glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.getID());
+			glEnable(GL_DEPTH_TEST);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+			textureArray->bind();
+			chunkManager->renderOpaque(frustum);
+
+			//Draw Pickups
+			shaderHandler->switchToShader(eShaderType::Pickup);
+			shaderHandler->setUniformMat4f(eShaderType::Pickup, "uView", view);
+			shaderHandler->setUniformMat4f(eShaderType::Pickup, "uProjection", projection);
+			for (auto& pickUp : pickUps)
+			{
+				pickUp.render(frustum, *shaderHandler);
+			}
+
+			glDisable(GL_CULL_FACE);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+			shaderHandler->switchToShader(eShaderType::Chunk);
+			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
+			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
+			chunkManager->renderTransparent(frustum);
+
+			destroyBlockTexture->bind();
+			shaderHandler->switchToShader(eShaderType::DestroyBlock);
+			shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uView", view);
+			shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uProjection", projection);
+			destroyBlockVisual.render();
+
+			voxelSelectionTexture->bind();
+			shaderHandler->switchToShader(eShaderType::SelectedVoxel);
+			shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uView", view);
+			shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uProjection", projection);
+			selectedVoxelVisual.render();
+
+			glDisable(GL_BLEND);
+
+			//Draw Skybox
+			glDepthFunc(GL_LEQUAL);
+			shaderHandler->switchToShader(eShaderType::Skybox);
+			shaderHandler->setUniformMat4f(eShaderType::Skybox, "uView", glm::mat4(glm::mat3(view)));
+			shaderHandler->setUniformMat4f(eShaderType::Skybox, "uProjection", projection);
+
+			skybox->render();
+			glDepthFunc(GL_LESS);
+
+			// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+			// clear all relevant buffers
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			shaderHandler->switchToShader(eShaderType::PostProcessing);
+
+			glBindVertexArray(frameBuffer.getVAOID());
+			glBindTexture(GL_TEXTURE_2D, frameBuffer.getTextureID());	// use the color attachment texture as the texture of the quad plane
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+
+			//Draw GUI
+			textureArray->bind();
+			gui.render(*shaderHandler, *widjetsTexture, *fontTexture);
+		}
+		else
+		{
+			//Render
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			shaderHandler->switchToShader(eShaderType::Chunk);
+			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
+			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
+
+			std::lock_guard<std::mutex> renderingLock(renderingMutex);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
+
+			textureArray->bind();
+			chunkManager->renderOpaque(frustum);
+
+			//Draw Pickups
+			shaderHandler->switchToShader(eShaderType::Pickup);
+			shaderHandler->setUniformMat4f(eShaderType::Pickup, "uView", view);
+			shaderHandler->setUniformMat4f(eShaderType::Pickup, "uProjection", projection);
+			for (auto& pickUp : pickUps)
+			{
+				pickUp.render(frustum, *shaderHandler);
+			}
+
+			glDisable(GL_CULL_FACE);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+			shaderHandler->switchToShader(eShaderType::Chunk);
+			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
+			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
+			chunkManager->renderTransparent(frustum);
+
+			destroyBlockTexture->bind();
+			shaderHandler->switchToShader(eShaderType::DestroyBlock);
+			shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uView", view);
+			shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uProjection", projection);
+			destroyBlockVisual.render();
+
+			voxelSelectionTexture->bind();
+			shaderHandler->switchToShader(eShaderType::SelectedVoxel);
+			shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uView", view);
+			shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uProjection", projection);
+			selectedVoxelVisual.render();
+
+			glDisable(GL_BLEND);
+
+			//Draw Skybox
+			glDepthFunc(GL_LEQUAL);
+			shaderHandler->switchToShader(eShaderType::Skybox);
+			shaderHandler->setUniformMat4f(eShaderType::Skybox, "uView", glm::mat4(glm::mat3(view)));
+			shaderHandler->setUniformMat4f(eShaderType::Skybox, "uProjection", projection);
+
+			skybox->render();
+			glDepthFunc(GL_LESS);
+
+			//Draw GUI
+			textureArray->bind();
+			gui.render(*shaderHandler, *widjetsTexture, *fontTexture);
 		}
 
-		glDisable(GL_CULL_FACE);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			
-		shaderHandler->switchToShader(eShaderType::Chunk);
-		shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
-		shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
-		chunkManager->renderTransparent(frustum);
-
-		destroyBlockTexture->bind();
-		shaderHandler->switchToShader(eShaderType::DestroyBlock);
-		shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uView", view);
-		shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uProjection", projection);
-		destroyBlockVisual.render();
-
-		//glDisable(GL_DEPTH_TEST);
-		voxelSelectionTexture->bind();
-		shaderHandler->switchToShader(eShaderType::SelectedVoxel);
-		shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uView", view);
-		shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel , "uProjection", projection);
-		selectedVoxelVisual.render();
-		//glEnable(GL_DEPTH_TEST);
-			
-		glDisable(GL_BLEND);
-
-		//Draw Skybox
-		glDepthFunc(GL_LEQUAL);
-		shaderHandler->switchToShader(eShaderType::Skybox);
-		shaderHandler->setUniformMat4f(eShaderType::Skybox, "uView", glm::mat4(glm::mat3(view)));
-		shaderHandler->setUniformMat4f(eShaderType::Skybox, "uProjection", projection);
-
-		skybox->render();
-		glDepthFunc(GL_LESS);
-		
-		//Draw GUI
-		textureArray->bind();
-		gui.render(*shaderHandler, *widjetsTexture, *fontTexture);
-		
 		window.display();
 	}
 

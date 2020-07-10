@@ -49,12 +49,10 @@ void DestroyBlockVisual::update(float deltaTime)
 			m_mesh.m_transparentVertexBuffer.clear();
 			MeshGenerator::generateDestroyBlockMesh(m_mesh.m_transparentVertexBuffer, m_index, m_currentCubePosition);
 		
-			if (m_index == eDestroyCubeIndex::Max)
+			if (m_index != eDestroyCubeIndex::Max)
 			{
-				m_timer.setActive(false);
+				m_timer.resetElaspedTime();
 			}
-
-			m_timer.resetElaspedTime();
 		}
 	}
 }
