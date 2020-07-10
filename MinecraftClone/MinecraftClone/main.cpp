@@ -284,11 +284,15 @@ int main()
 			shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uProjection", projection);
 			destroyBlockVisual.render();
 
-			voxelSelectionTexture->bind();
-			shaderHandler->switchToShader(eShaderType::SelectedVoxel);
-			shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uView", view);
-			shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uProjection", projection);
-			selectedVoxelVisual.render();
+			if (!player.getDestroyCubeTimer().isActive())
+			{
+				voxelSelectionTexture->bind();
+				shaderHandler->switchToShader(eShaderType::SelectedVoxel);
+				shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uView", view);
+				shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uProjection", projection);
+				selectedVoxelVisual.render();
+			}
+
 
 			glDisable(GL_BLEND);
 
@@ -357,11 +361,14 @@ int main()
 			shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uProjection", projection);
 			destroyBlockVisual.render();
 
-			voxelSelectionTexture->bind();
-			shaderHandler->switchToShader(eShaderType::SelectedVoxel);
-			shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uView", view);
-			shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uProjection", projection);
-			selectedVoxelVisual.render();
+			if (!player.getDestroyCubeTimer().isActive())
+			{
+				voxelSelectionTexture->bind();
+				shaderHandler->switchToShader(eShaderType::SelectedVoxel);
+				shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uView", view);
+				shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uProjection", projection);
+				selectedVoxelVisual.render();
+			}
 
 			glDisable(GL_BLEND);
 

@@ -47,6 +47,7 @@ class Player : private NonCopyable, private NonMovable
 public:
 	Player();
 
+	const Timer& getDestroyCubeTimer() const;
 	bool isUnderWater(const ChunkManager& chunkManager, std::mutex& playerMutex) const;
 	const glm::vec3 getMiddlePosition() const;
 	const glm::vec3& getPosition() const;

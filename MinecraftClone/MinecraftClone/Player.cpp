@@ -145,6 +145,11 @@ Player::Player()
 	m_jumpTimer.restart();
 }
 
+const Timer& Player::getDestroyCubeTimer() const
+{
+	return m_destroyCubeTimer;
+}
+
 bool Player::isUnderWater(const ChunkManager& chunkManager, std::mutex& playerMutex) const
 {
 	if (m_currentState != ePlayerState::InWater)
@@ -388,7 +393,7 @@ void Player::handleSelectedCube(const ChunkManager& chunkManager, SelectedVoxelV
 		if (chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, selectedCubeType) &&
 			!NON_SELECTABLE_CUBE_TYPES.isMatch(selectedCubeType))
 		{
-			selectedVoxel.setPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) });
+			selectedVoxel.setPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, chunkManager);
 			selectedCubeFound = true;
 			break;
 		}
