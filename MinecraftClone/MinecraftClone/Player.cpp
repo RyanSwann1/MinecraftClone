@@ -145,6 +145,26 @@ Player::Player()
 	m_jumpTimer.restart();
 }
 
+bool Player::isUnderWater(const ChunkManager& chunkManager, std::mutex& playerMutex) const
+{
+	if (m_currentState != ePlayerState::InWater)
+	{
+		return false;
+	}
+
+	std::unique_lock<std::mutex> playerLock(playerMutex);
+	eCubeType cubeAtHeadPosition;
+	if (chunkManager.isCubeAtPosition( { std::floor(m_position.x), std::floor(m_position.y) + 0.35f, std::floor(m_position.z) }, cubeAtHeadPosition))
+	{
+		playerLock.unlock();
+		assert(cubeAtHeadPosition != eCubeType::Air);
+		
+		return cubeAtHeadPosition == eCubeType::Water;
+	}
+
+	return false;
+}
+
 const glm::vec3 Player::getMiddlePosition() const
 {
 	return { m_position.x, m_position.y - 1, m_position.z };
