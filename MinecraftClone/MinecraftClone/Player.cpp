@@ -422,10 +422,6 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 		m_camera.move(window);
 		handleSelectedCube(chunkManager, selectedVoxel);
 	}
-	if (currentSFMLEvent.type == currentSFMLEvent.MouseWheelScrolled)
-	{
-		m_inventory.handleInputEvents(currentSFMLEvent, gui);
-	}
 }
 
 void Player::update(float deltaTime, std::mutex& playerMutex, ChunkManager& chunkManager, DestroyBlockVisual& destroyBlockVisual,

@@ -134,8 +134,7 @@ void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
 
 void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent, Gui& gui)
 {
-	assert(currentSFMLEvent.type == sf::Event::MouseWheelScrolled ||
-		currentSFMLEvent.type == sf::Event::KeyPressed);
+	assert(currentSFMLEvent.type == sf::Event::KeyPressed);
 
 	if (currentSFMLEvent.type == sf::Event::KeyPressed)
 	{
@@ -168,30 +167,6 @@ void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent, Gui& gui)
 		case sf::Keyboard::Num9:
 			m_currentSelectedItem = eInventoryIndex::Nine;
 			break;
-		}
-	}
-	else
-	{
-		int currentSelectedItem = static_cast<int>(m_currentSelectedItem);
-
-		if (currentSFMLEvent.mouseWheel.delta > 0)
-		{
-			--currentSelectedItem;
-		}
-		else if (currentSFMLEvent.mouseWheel.delta < 0)
-		{
-			++currentSelectedItem;
-		}
-
-		m_currentSelectedItem = static_cast<eInventoryIndex>(currentSelectedItem);
-
-		if (static_cast<int>(m_currentSelectedItem) < static_cast<int>(eInventoryIndex::One))
-		{
-			m_currentSelectedItem = eInventoryIndex::Max;
-		}
-		else if (static_cast<int>(m_currentSelectedItem) > static_cast<int>(eInventoryIndex::Max))
-		{
-			m_currentSelectedItem = eInventoryIndex::One;
 		}
 	}
 
