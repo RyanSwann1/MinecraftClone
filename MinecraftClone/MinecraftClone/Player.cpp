@@ -393,7 +393,7 @@ void Player::handleSelectedCube(const ChunkManager& chunkManager, SelectedVoxelV
 		if (chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, selectedCubeType) &&
 			!NON_SELECTABLE_CUBE_TYPES.isMatch(selectedCubeType))
 		{
-			selectedVoxel.setPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, chunkManager);
+			selectedVoxel.setPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) });
 			selectedCubeFound = true;
 			break;
 		}
