@@ -137,8 +137,10 @@ namespace
 			textureLayer = eTerrainTextureLayer::Sand;
 			break;
 		case eCubeType::Log:
-		case eCubeType::LogTop:
 			textureLayer = eTerrainTextureLayer::Log;
+			break;
+		case eCubeType::LogTop:
+			textureLayer = eTerrainTextureLayer::LogTop;
 			break;
 		case eCubeType::Stone:
 			textureLayer = eTerrainTextureLayer::Stone;

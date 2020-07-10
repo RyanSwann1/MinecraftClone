@@ -5,7 +5,31 @@
 namespace
 {
 	constexpr int MAX_ITEM_CAPACITY = 64;
-}
+
+	eCubeType convertCubeType(eCubeType cubeType)
+	{
+		switch (cubeType)
+		{
+		case eCubeType::Grass:
+			return eCubeType::Grass;
+		case eCubeType::Dirt:
+			return eCubeType::Dirt;
+		case eCubeType::Cactus:
+		case eCubeType::CactusTop:
+		 	return eCubeType::Cactus;
+		case eCubeType::Sand:
+			return eCubeType::Sand;
+		case eCubeType::Log:
+			return eCubeType::Log;
+		case eCubeType::LogTop:
+			return eCubeType::LogTop;
+		case eCubeType::Stone:
+			return eCubeType::Stone;
+		default:
+			assert(false);
+		}
+	};
+};
 
 //Item
 Item::Item()	
@@ -102,13 +126,14 @@ void Inventory::reduceSelectedItem(Gui& gui)
 
 void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
 {
+	eCubeType convertedCubeType = convertCubeType(cubeTypeToAdd);
 	//Add to existing item in Inventory
 	bool itemAdded = false;
 	for (int i = 0; i < static_cast<int>(eInventoryIndex::Max) + 1; ++i)
 	{
 		if (!m_items[i].isEmpty() && 
 			!m_items[i].isFull() && 
-			m_items[i].getCubeType() == cubeTypeToAdd)
+			m_items[i].getCubeType() == convertedCubeType)
 		{
 			m_items[i].incrementQuantity();
 			gui.updateItemQuantity(static_cast<eInventoryIndex>(i), m_items[i].getSize());
@@ -122,10 +147,10 @@ void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
 	{
 		if (m_items[i].isEmpty())
 		{
-			m_items[i].reset(cubeTypeToAdd);
+			m_items[i].reset(convertedCubeType);
 			m_items[i].incrementQuantity();
 
-			gui.addItem(static_cast<eInventoryIndex>(i), cubeTypeToAdd);
+			gui.addItem(static_cast<eInventoryIndex>(i), convertedCubeType);
 			gui.updateItemQuantity(static_cast<eInventoryIndex>(i), m_items[i].getSize());
 			break;
 		}
