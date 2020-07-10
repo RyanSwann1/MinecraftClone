@@ -132,6 +132,7 @@
     <ClCompile Include="ChunkMeshesToGenerateQueue.cpp" />
     <ClCompile Include="ChunkMeshRegenerationQueue.cpp" />
     <ClCompile Include="CollisionHandler.cpp" />
+    <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="GeneratedChunkMeshQueue.cpp" />
     <ClCompile Include="GeneratedChunkQueue.cpp" />
     <ClCompile Include="Gui.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="ChunkMeshesToGenerateQueue.h" />
     <ClInclude Include="ChunkMeshRegenerationQueue.h" />
     <ClInclude Include="CollisionHandler.h" />
+    <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="GeneratedChunkMeshQueue.h" />
     <ClInclude Include="GeneratedChunkQueue.h" />
     <ClInclude Include="Gui.h" />
@@ -222,6 +224,8 @@
     <None Include="OpenGLShaders\DestroyBlockVertexShader.glsl" />
     <None Include="OpenGLShaders\PickupFragmentShader.glsl" />
     <None Include="OpenGLShaders\PickupVertexShader.glsl" />
+    <None Include="OpenGLShaders\PostProcessingFragmentShader.glsl" />
+    <None Include="OpenGLShaders\PostProcessingVertexShader.glsl" />
     <None Include="OpenGLShaders\SelectedVoxelFragmentShader.glsl" />
     <None Include="OpenGLShaders\SelectedVoxelVertexShader.glsl" />
     <None Include="OpenGLShaders\SkyboxFragmentShader.glsl" />
