@@ -245,9 +245,6 @@ int main()
 		
 		if (player.isUnderWater(*chunkManager, playerMutex))
 		{
-			//Render
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 			shaderHandler->switchToShader(eShaderType::Chunk);
 			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);
 			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uProjection", projection);
@@ -256,11 +253,9 @@ int main()
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK);
 
-
 			glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer.getID());
 			glEnable(GL_DEPTH_TEST);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
 			textureArray->bind();
 			chunkManager->renderOpaque(frustum);
@@ -272,7 +267,7 @@ int main()
 			for (auto& pickUp : pickUps)
 			{
 				pickUp.render(frustum, *shaderHandler);
-			}
+			} 
 
 			glDisable(GL_CULL_FACE);
 			glEnable(GL_BLEND);

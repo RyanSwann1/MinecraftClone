@@ -26,6 +26,7 @@ public:
 	glm::ivec3 getHighestCubeAtPosition(const glm::vec3& playerPosition) const;
 	bool isCubeAtPosition(const glm::vec3& playerPosition) const;
 	bool isCubeAtPosition(const glm::vec3& playerPosition, eCubeType& cubeType) const;
+
 	bool isChunkAtPosition(const glm::vec3& position) const;
 
 	bool placeCubeAtPosition(const glm::ivec3& placementPosition, eCubeType cubeType);
