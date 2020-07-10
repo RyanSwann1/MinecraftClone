@@ -609,7 +609,7 @@ eBiomeType Chunk::getBiomeType(int x, int z) const
 	biomeType /= total;
 	biomeType = (biomeType + 1) / 2;
 
-	if (biomeType >= 0.35f)
+	if (biomeType >= 0.4f)
 	{
 		return eBiomeType::Plains;
 	}
