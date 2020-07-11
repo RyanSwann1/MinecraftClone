@@ -213,10 +213,8 @@ ShaderHandler::Shader& ShaderHandler::Shader::operator=(Shader&& orig) noexcept
 
 ShaderHandler::Shader::~Shader()
 {
-	if (m_itemID != Globals::INVALID_OPENGL_ID)
-	{
-		glDeleteProgram(m_itemID);
-	}
+	assert(m_itemID != Globals::INVALID_OPENGL_ID);
+	glDeleteProgram(m_itemID);
 }
 
 unsigned int ShaderHandler::Shader::getID() const
