@@ -1,5 +1,4 @@
 #include "GameEventMessenger.h"
-#include <assert.h>
 
 namespace
 {
@@ -8,18 +7,23 @@ namespace
 		assert(!listeners.empty() || ownerAddress != nullptr);
 
 		auto iter = listeners.find(gameEventType);
-		assert(iter != listeners.cend());
-
-		auto result = std::find_if(iter->second.cbegin(), iter->second.cend(), [ownerAddress](const auto& listener) 
+		if (iter != listeners.cend())
 		{
-			return listener.m_ownerAddress == ownerAddress;
-		});
+			auto result = std::find_if(iter->second.cbegin(), iter->second.cend(), [ownerAddress](const auto& listener)
+			{
+				return listener.m_ownerAddress == ownerAddress;
+			});
 
-		return result != iter->second.cend();
+			return result != iter->second.cend();
+		}
+		else
+		{
+			return false;
+		}
 	}
 };
 
-Listener::Listener(const std::function<void(GameEvent)>& fp, const void* ownerAddress)
+Listener::Listener(const std::function<void(const void*)>& fp, const void* ownerAddress)
 	: m_listener(fp),
 	m_ownerAddress(ownerAddress)
 {
@@ -45,7 +49,7 @@ Listener& Listener::operator=(Listener&& orig) noexcept
 	return *this;
 }
 
-void GameEventMessenger::subscribe(const std::function<void(GameEvent)>& fp, eGameEventType gameEventType, const void* ownerAddress)
+void GameEventMessenger::subscribe(eGameEventType gameEventType, const std::function<void(const void*)>& fp, const void* ownerAddress)
 {
 	assert(!isOwnerAlreadyRegistered(m_listeners, gameEventType, ownerAddress));
 	
@@ -59,17 +63,6 @@ void GameEventMessenger::subscribe(const std::function<void(GameEvent)>& fp, eGa
 		assert(ownerAddress != nullptr);
 
 		m_listeners.emplace(gameEventType, std::vector<Listener>{}).first->second.emplace_back(fp, ownerAddress);
-	}
-}
-
-void GameEventMessenger::broadcast(GameEvent message, eGameEventType gameEventType)
-{
-	auto iter = m_listeners.find(gameEventType);
-	assert(iter != m_listeners.cend());
-
-	for (const auto& listener : iter->second)
-	{
-		listener.m_listener(message);
 	}
 }
 

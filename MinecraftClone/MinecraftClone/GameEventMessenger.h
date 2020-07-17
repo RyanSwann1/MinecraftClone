@@ -5,28 +5,20 @@
 #include <unordered_map>
 #include <functional>
 #include <vector>
+#include <assert.h>
 
 enum class eGameEventType
 {
-	NeedMoarEvents = 0
-};
-
-struct GameEvent
-{
-	GameEvent(const void* data = nullptr)
-		: data(data)
-	{}
-
-	const void* data;
+	SpawnPickup = 0
 };
 
 struct Listener : private NonCopyable
 {
-	Listener(const std::function<void(GameEvent)>& fp, const void* ownerAddress);
+	Listener(const std::function<void(const void*)>& fp, const void* ownerAddress);
 	Listener(Listener&&) noexcept;
 	Listener& operator=(Listener&&) noexcept;
 
-	std::function<void(GameEvent)> m_listener;
+	std::function<void(const void*)> m_listener;
 	const void* m_ownerAddress;
 };
 
@@ -39,11 +31,22 @@ public:
 		return instance;
 	}
 
-	void subscribe(const std::function<void(GameEvent)>& fp, eGameEventType message, const void* ownerAddress);
-	void broadcast(GameEvent message, eGameEventType gameEventType);
-	void unsubscribe(eGameEventType message, const void* ownerAddress);
+	void subscribe(eGameEventType gameEventType, const std::function<void(const void*)>& fp, const void* ownerAddress);
+	void unsubscribe(eGameEventType gameEventType, const void* ownerAddress);
+
+	template <typename GameEvent>
+	void broadcast(eGameEventType gameEventType, GameEvent gameEvent)
+	{
+		auto iter = m_listeners.find(gameEventType);
+		assert(iter != m_listeners.cend());
+
+		for (const auto& listener : iter->second)
+		{
+			listener.m_listener(&gameEvent);
+		}
+	}
 
 private:
-	GameEventMessenger();
+	GameEventMessenger() {}
 	std::unordered_map<eGameEventType, std::vector<Listener>> m_listeners;
 };
