@@ -133,6 +133,7 @@
     <ClCompile Include="ChunkMeshRegenerationQueue.cpp" />
     <ClCompile Include="CollisionHandler.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
+    <ClCompile Include="GameEventMessenger.cpp" />
     <ClCompile Include="GeneratedChunkMeshQueue.cpp" />
     <ClCompile Include="GeneratedChunkQueue.cpp" />
     <ClCompile Include="Gui.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="ChunkMeshRegenerationQueue.h" />
     <ClInclude Include="CollisionHandler.h" />
     <ClInclude Include="FrameBuffer.h" />
+    <ClInclude Include="GameEventMessenger.h" />
     <ClInclude Include="GeneratedChunkMeshQueue.h" />
     <ClInclude Include="GeneratedChunkQueue.h" />
     <ClInclude Include="Gui.h" />
