@@ -17,7 +17,6 @@ struct VertexArray : private NonCopyable
 	void attachOpaqueVBO();
 	void bindOpaqueVAO() const;
 	void bindTransparentVAO() const;
-	void unbind() const;
 	
 	VertexBuffer m_opaqueVertexBuffer;
 	VertexBuffer m_transparentVertexBuffer;

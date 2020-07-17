@@ -1,5 +1,15 @@
 #pragma once
 
+//What I did
+//Impact it had
+//How I can add value - Value I bring
+//How to simplify, integrate with co workers
+//Perforce - Industry standard
+
+//Impact statements - emphasise what I did - how I contributed
+//What feature would I add to minecraft?
+//Internships/Placements 
+
 //Another MC clone
 //https://www.youtube.com/watch?v=65_LIdnd6Ek
 //Math

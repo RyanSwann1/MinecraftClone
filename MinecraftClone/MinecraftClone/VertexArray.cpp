@@ -61,14 +61,12 @@ void VertexArray::attachOpaqueVBO()
 {
 	bindOpaqueVAO();
 	m_opaqueVertexBuffer.bind();
-	unbind();
 }
 
 void VertexArray::attachTransparentVBO()
 {	
 	bindTransparentVAO();
 	m_transparentVertexBuffer.bind();
-	unbind();
 }
 
 void VertexArray::bindOpaqueVAO() const
@@ -79,9 +77,4 @@ void VertexArray::bindOpaqueVAO() const
 void VertexArray::bindTransparentVAO() const
 {
 	glBindVertexArray(m_transparentID);
-}
-
-void VertexArray::unbind() const
-{
-	glBindVertexArray(0);
 }
