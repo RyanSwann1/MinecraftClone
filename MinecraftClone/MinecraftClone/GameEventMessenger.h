@@ -2,14 +2,16 @@
 
 #include "NonCopyable.h"
 #include "NonMovable.h"
-#include <unordered_map>
 #include <functional>
 #include <vector>
 #include <assert.h>
+#include <array>
 
 enum class eGameEventType
 {
-	SpawnPickup = 0
+	SpawnPickup = 0,
+	AddToPlayerInventory,
+	Max = AddToPlayerInventory
 };
 
 struct Listener : private NonCopyable
@@ -37,10 +39,8 @@ public:
 	template <typename GameEvent>
 	void broadcast(eGameEventType gameEventType, GameEvent gameEvent)
 	{
-		auto iter = m_listeners.find(gameEventType);
-		assert(iter != m_listeners.cend());
-
-		for (const auto& listener : iter->second)
+		const auto& listeners = m_listeners[static_cast<int>(gameEventType)];
+		for (const auto& listener : listeners)
 		{
 			listener.m_listener(&gameEvent);
 		}
@@ -48,5 +48,5 @@ public:
 
 private:
 	GameEventMessenger() {}
-	std::unordered_map<eGameEventType, std::vector<Listener>> m_listeners;
+	std::array<std::vector<Listener>, static_cast<size_t>(eGameEventType::Max) + 1> m_listeners;
 };

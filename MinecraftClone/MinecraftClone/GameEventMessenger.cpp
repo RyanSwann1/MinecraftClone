@@ -2,19 +2,18 @@
 
 namespace
 {
-	bool isOwnerAlreadyRegistered(const std::unordered_map<eGameEventType, std::vector<Listener>>& listeners, eGameEventType gameEventType, const void* ownerAddress)
+	bool isOwnerAlreadyRegistered(const std::vector<Listener>& listeners, eGameEventType gameEventType, const void* ownerAddress)
 	{
-		assert(!listeners.empty() || ownerAddress != nullptr);
+		assert(ownerAddress != nullptr);
 
-		auto iter = listeners.find(gameEventType);
-		if (iter != listeners.cend())
+		if (!listeners.empty())
 		{
-			auto result = std::find_if(iter->second.cbegin(), iter->second.cend(), [ownerAddress](const auto& listener)
+			auto result = std::find_if(listeners.cbegin(), listeners.cend(), [ownerAddress](const auto& listener)
 			{
 				return listener.m_ownerAddress == ownerAddress;
 			});
 
-			return result != iter->second.cend();
+			return result != listeners.cend();
 		}
 		else
 		{
@@ -51,34 +50,23 @@ Listener& Listener::operator=(Listener&& orig) noexcept
 
 void GameEventMessenger::subscribe(eGameEventType gameEventType, const std::function<void(const void*)>& fp, const void* ownerAddress)
 {
-	assert(!isOwnerAlreadyRegistered(m_listeners, gameEventType, ownerAddress));
+	auto& listeners = m_listeners[static_cast<int>(gameEventType)];
+	assert(!isOwnerAlreadyRegistered(listeners, gameEventType, ownerAddress));
 	
-	auto iter = m_listeners.find(gameEventType);
-	if (iter != m_listeners.cend())
-	{
-		iter->second.emplace_back(fp, ownerAddress);
-	}
-	else
-	{
-		assert(ownerAddress != nullptr);
-
-		m_listeners.emplace(gameEventType, std::vector<Listener>{}).first->second.emplace_back(fp, ownerAddress);
-	}
+	listeners.emplace_back(fp, ownerAddress);
 }
 
 void GameEventMessenger::unsubscribe(eGameEventType gameEventType, const void* ownerAddress)
 {
+	auto& listeners = m_listeners[static_cast<int>(gameEventType)];
 	assert(ownerAddress != nullptr &&
-		isOwnerAlreadyRegistered(m_listeners, gameEventType, ownerAddress));
+		isOwnerAlreadyRegistered(listeners, gameEventType, ownerAddress));
 
-	auto iter = m_listeners.find(gameEventType);
-	assert(iter != m_listeners.cend());
-
-	auto listener = std::find_if(iter->second.begin(), iter->second.end(), [ownerAddress](const auto& listener)
+	auto iter = std::find_if(listeners.begin(), listeners.end(), [ownerAddress](const auto& listener)
 	{
 		return listener.m_ownerAddress == ownerAddress;
 	});
 
-	assert(listener != iter->second.end());
-	iter->second.erase(listener);
+	assert(iter != listeners.end());
+	listeners.erase(iter);
 }
