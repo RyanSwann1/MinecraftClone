@@ -12,10 +12,10 @@
 #include "ShaderHandler.h"
 #include "Frustum.h"
 #include "Gui.h"
-#include "Pickup.h"
 #include "DestroyBlockVisual.h"
 #include "SelectedVoxelVisual.h"
 #include "FrameBuffer.h"
+#include "PickupManager.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -142,6 +142,7 @@ int main()
 	}
 
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
+	PickupManager pickupManager;
 	FrameBuffer frameBuffer(windowSize);
 	SelectedVoxelVisual selectedVoxelVisual;
 	DestroyBlockVisual destroyBlockVisual;
@@ -216,26 +217,7 @@ int main()
 		//Update
 		player.update(deltaTime, playerMutex, *chunkManager.get(), destroyBlockVisual, pickUps, gui);
 		destroyBlockVisual.update(deltaTime);
-
-		Rectangle visibilityRect = Globals::getVisibilityRect(player.getPosition());
-		for (auto pickup = pickUps.begin(); pickup != pickUps.end();)
-		{
-			const glm::vec3& pickupPosition = pickup->getPosition();
-			if (!visibilityRect.contains({ pickupPosition.x, pickupPosition.z }))
-			{
-				pickup = pickUps.erase(pickup);
-			}
-			else if (pickup->isInReachOfPlayer(player.getMiddlePosition()) && player.getInventory().isItemAddable(pickup->getCubeType()))
-			{
-				player.addToInventory(pickup->getCubeType(), gui);
-				pickup = pickUps.erase(pickup);
-			}
-			else
-			{
-				pickup->update(player, deltaTime, *chunkManager);
-				++pickup;
-			}
-		}
+		pickupManager.update(deltaTime, player, playerMutex, *chunkManager);
 
 		glm::mat4 view = glm::lookAt(player.getPosition(), player.getPosition() + player.getCamera().front, player.getCamera().up);
 		glm::mat4 projection = glm::perspective(glm::radians(player.getCamera().FOV),
@@ -260,14 +242,7 @@ int main()
 			textureArray->bind();
 			chunkManager->renderOpaque(frustum);
 
-			//Draw Pickups
-			shaderHandler->switchToShader(eShaderType::Pickup);
-			shaderHandler->setUniformMat4f(eShaderType::Pickup, "uView", view);
-			shaderHandler->setUniformMat4f(eShaderType::Pickup, "uProjection", projection);
-			for (auto& pickUp : pickUps)
-			{
-				pickUp.render(frustum, *shaderHandler);
-			} 
+			pickupManager.render(frustum, *shaderHandler, view, projection);
 
 			glDisable(GL_CULL_FACE);
 			glEnable(GL_BLEND);
@@ -337,14 +312,7 @@ int main()
 			textureArray->bind();
 			chunkManager->renderOpaque(frustum);
 
-			//Draw Pickups
-			shaderHandler->switchToShader(eShaderType::Pickup);
-			shaderHandler->setUniformMat4f(eShaderType::Pickup, "uView", view);
-			shaderHandler->setUniformMat4f(eShaderType::Pickup, "uProjection", projection);
-			for (auto& pickUp : pickUps)
-			{
-				pickUp.render(frustum, *shaderHandler);
-			}
+			pickupManager.render(frustum, *shaderHandler, view, projection);
 
 			glDisable(GL_CULL_FACE);
 			glEnable(GL_BLEND);

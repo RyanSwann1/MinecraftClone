@@ -192,7 +192,7 @@ namespace Globals
 	//384 Dev Distance
 	//Normal Distance = 800
 	//Far Distance = 1024
-	constexpr int VISIBILITY_DISTANCE = 864;
+	constexpr int VISIBILITY_DISTANCE = 480;
 	constexpr int MAP_SIZE = 8000;
 	const std::string TEXTURE_DIRECTORY = "Textures/";
 	const std::string FONTS_DIRECTORY = "Fonts/";

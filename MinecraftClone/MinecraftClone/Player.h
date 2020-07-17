@@ -80,7 +80,7 @@ private:
 	void handleCollisions(const ChunkManager& chunkManager);
 	void discardItem(std::vector<Pickup>& pickUps, Gui& gui);
 	void placeBlock(ChunkManager& chunkManager, Gui& gui);
-	void destroyFacingBlock(ChunkManager& chunkManager, std::vector<Pickup>& pickUps, DestroyBlockVisual& destroyBlockVisual);
+	void destroyFacingBlock(ChunkManager& chunkManager, DestroyBlockVisual& destroyBlockVisual);
 	void handleAutoJump(const ChunkManager& chunkManager);
 	void handleSelectedCube(const ChunkManager& chunkManager, SelectedVoxelVisual& selectedVoxel);
 };

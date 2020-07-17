@@ -157,6 +157,7 @@ void Pickup::render(const Frustum& frustum, ShaderHandler& shaderHandler)
 		glm::vec3 position = m_position + glm::vec3(0, m_yOffset, 0);
 		glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
 		shaderHandler.setUniformMat4f(eShaderType::Pickup, "uModel", model);
+
 		glDrawElements(GL_TRIANGLES, m_vertexArray.m_opaqueVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 	}
 }

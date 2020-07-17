@@ -9,6 +9,8 @@
 #include "Gui.h"
 #include "DestroyBlockVisual.h"
 #include "SelectedVoxelVisual.h"
+#include "GameEventMessenger.h"
+#include "GameEvents.h"
 #include <memory>
 
 namespace 
@@ -263,7 +265,7 @@ void Player::placeBlock(ChunkManager& chunkManager, Gui& gui)
 	}
 }
 
-void Player::destroyFacingBlock(ChunkManager& chunkManager, std::vector<Pickup>& pickUps, DestroyBlockVisual& destroyBlockVisual)
+void Player::destroyFacingBlock(ChunkManager& chunkManager, DestroyBlockVisual& destroyBlockVisual)
 {
 	eCubeType cubeTypeToDestroy;
 	if (m_destroyCubeTimer.isExpired() && 
@@ -277,7 +279,8 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager, std::vector<Pickup>&
 
 		if (!NON_COLLECTABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
 		{
-			pickUps.emplace_back(cubeTypeToDestroy, m_cubeToDestroyPosition);
+			GameEventMessenger::getInstance().broadcast<GameEvents::SpawnPickUp>(
+				eGameEventType::SpawnPickup, { cubeTypeToDestroy, m_cubeToDestroyPosition });
 		}
 		
 		destroyBlockVisual.reset();
@@ -438,7 +441,7 @@ void Player::update(float deltaTime, std::mutex& playerMutex, ChunkManager& chun
 	std::unique_lock<std::mutex> playerLock(playerMutex);
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
-		destroyFacingBlock(chunkManager, pickUps, destroyBlockVisual);
+		destroyFacingBlock(chunkManager, destroyBlockVisual);
 	}
 	else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right) && m_placeCubeTimer.isExpired())
 	{
