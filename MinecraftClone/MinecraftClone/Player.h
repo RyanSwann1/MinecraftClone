@@ -46,6 +46,7 @@ class Player : private NonCopyable, private NonMovable
 {
 public:
 	Player();
+	~Player();
 
 	const Timer& getDestroyCubeTimer() const;
 	bool isUnderWater(const ChunkManager& chunkManager, std::mutex& playerMutex) const;
@@ -55,7 +56,6 @@ public:
 	const Inventory& getInventory() const;
 
 	void resetDestroyCubeTimer();
-	void addToInventory(eCubeType cubeType, Gui& gui);
 	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
 	void handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& currentSFMLEvent,
 		ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window, Gui& gui,
@@ -83,4 +83,6 @@ private:
 	void destroyFacingBlock(ChunkManager& chunkManager, DestroyBlockVisual& destroyBlockVisual);
 	void handleAutoJump(const ChunkManager& chunkManager);
 	void handleSelectedCube(const ChunkManager& chunkManager, SelectedVoxelVisual& selectedVoxel);
+
+	void onAddToInventory(const void* gameEvent);
 };

@@ -14,4 +14,13 @@ namespace GameEvents
 		eCubeType type;
 		glm::vec3 position;
 	};
+
+	struct AddToInventory
+	{
+		AddToInventory(eCubeType type)
+			: type(type)
+		{}
+
+		eCubeType type;
+	};
 }

@@ -145,6 +145,14 @@ Player::Player()
 	m_destroyCubeTimer()
 {
 	m_jumpTimer.restart();
+
+	GameEventMessenger::getInstance().subscribe(eGameEventType::AddToPlayerInventory, 
+		std::bind(&Player::onAddToInventory, this, std::placeholders::_1), this);
+}
+
+Player::~Player()
+{
+	GameEventMessenger::getInstance().unsubscribe(eGameEventType::AddToPlayerInventory, this);
 }
 
 const Timer& Player::getDestroyCubeTimer() const
@@ -196,11 +204,6 @@ void Player::resetDestroyCubeTimer()
 {
 	m_destroyCubeTimer.resetElaspedTime();
 	m_destroyCubeTimer.setActive(false);
-}
-
-void Player::addToInventory(eCubeType cubeTypeToAdd, Gui& gui)
-{
-	m_inventory.add(cubeTypeToAdd, gui);
 }
 
 void Player::placeBlock(ChunkManager& chunkManager, Gui& gui)
@@ -406,6 +409,12 @@ void Player::handleSelectedCube(const ChunkManager& chunkManager, SelectedVoxelV
 	{
 		selectedVoxel.setActive(false);
 	}
+}
+
+void Player::onAddToInventory(const void* gameEvent)
+{
+	assert(gameEvent);
+	m_inventory.add(static_cast<const GameEvents::AddToInventory*>(gameEvent)->type);
 }
 
 void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& currentSFMLEvent,
