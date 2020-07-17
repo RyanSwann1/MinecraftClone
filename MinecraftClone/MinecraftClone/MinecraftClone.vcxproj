@@ -141,6 +141,7 @@
     <ClCompile Include="DestroyBlockVisual.cpp" />
     <ClCompile Include="Pickup.cpp" />
     <ClCompile Include="NeighbouringChunks.cpp" />
+    <ClCompile Include="PickupManager.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="ChunkManager.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="CollisionHandler.h" />
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="GameEventMessenger.h" />
+    <ClInclude Include="GameEvents.h" />
     <ClInclude Include="GeneratedChunkMeshQueue.h" />
     <ClInclude Include="GeneratedChunkQueue.h" />
     <ClInclude Include="Gui.h" />
@@ -173,6 +175,7 @@
     <ClInclude Include="NeighbouringChunks.h" />
     <ClInclude Include="Notes.h" />
     <ClInclude Include="OpenGLShaders\UIToolbarVertexShader.glsl" />
+    <ClInclude Include="PickupManager.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Chunk.h" />
     <ClInclude Include="ChunkManager.h" />
