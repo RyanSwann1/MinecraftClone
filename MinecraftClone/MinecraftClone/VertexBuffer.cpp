@@ -125,7 +125,7 @@ void VertexBuffer::bind()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies.size() * sizeof(unsigned int), indicies.data(), GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	std::vector<glm::vec3> newPositions;
 	positions.swap(newPositions);
