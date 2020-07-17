@@ -36,7 +36,7 @@ public:
 	bool isItemAddable(eCubeType cubeType) const;
 	
 	void reduceSelectedItem(Gui& Gui);
-	void add(eCubeType cubeTypeToAdd, Gui& gui);
+	void add(eCubeType cubeTypeToAdd);
 	void handleInputEvents(const sf::Event& currentSFMLEvent, Gui& gui);
 
 private:

@@ -27,9 +27,9 @@ void PickupManager::update(float deltaTime, const Player& player, std::mutex& pl
 		{
 			pickup = m_pickUps.erase(pickup);
 		}
-		else if (pickup->isInReachOfPlayer(player.getMiddlePosition()) && player.getInventory().isItemAddable(pickup->getCubeType()))
+		else if (pickup->isInReachOfPlayer(player.getMiddlePosition()))
 		{
-			//player.addToInventory(pickup->getCubeType(), gui);
+			GameEventMessenger::getInstance().broadcast<GameEvents::AddToInventory>(eGameEventType::AddToPlayerInventory, { pickup->getCubeType() });
 			pickup = m_pickUps.erase(pickup);
 		}
 		else

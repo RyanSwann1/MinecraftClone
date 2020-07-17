@@ -116,15 +116,15 @@ void Inventory::reduceSelectedItem(Gui& gui)
 	assert(!isSelectedItemEmpty());
 
 	getSelectedItem().reduce();
-	gui.updateItemQuantity(m_currentSelectedItem, getSelectedItem().getSize());
+	//gui.updateItemQuantity(m_currentSelectedItem, getSelectedItem().getSize());
 	
 	if (getSelectedItem().isEmpty())
 	{
-		gui.removeItem(m_currentSelectedItem);
+		//gui.removeItem(m_currentSelectedItem);
 	}
 }
 
-void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
+void Inventory::add(eCubeType cubeTypeToAdd)
 {
 	eCubeType convertedCubeType = convertCubeType(cubeTypeToAdd);
 	//Add to existing item in Inventory
@@ -136,7 +136,7 @@ void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
 			m_items[i].getCubeType() == convertedCubeType)
 		{
 			m_items[i].incrementQuantity();
-			gui.updateItemQuantity(static_cast<eInventoryIndex>(i), m_items[i].getSize());
+			//gui.updateItemQuantity(static_cast<eInventoryIndex>(i), m_items[i].getSize());
 			itemAdded = true;
 			break;
 		}
@@ -150,8 +150,8 @@ void Inventory::add(eCubeType cubeTypeToAdd, Gui& gui)
 			m_items[i].reset(convertedCubeType);
 			m_items[i].incrementQuantity();
 
-			gui.addItem(static_cast<eInventoryIndex>(i), convertedCubeType);
-			gui.updateItemQuantity(static_cast<eInventoryIndex>(i), m_items[i].getSize());
+			//gui.addItem(static_cast<eInventoryIndex>(i), convertedCubeType);
+			//gui.updateItemQuantity(static_cast<eInventoryIndex>(i), m_items[i].getSize());
 			break;
 		}
 	}
