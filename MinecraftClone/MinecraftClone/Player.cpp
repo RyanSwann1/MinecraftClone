@@ -350,7 +350,7 @@ void Player::spawn(const ChunkManager& chunkManager, std::mutex& playerMutex)
 
 void Player::handleAutoJump(const ChunkManager& chunkManager)
 {
-	if (!m_autoJump || m_velocity.y != 0 || glm::distance(m_position + m_velocity, m_position) < 0.5f)
+	if (!m_autoJump || m_velocity.y != 0 || glm::distance(m_position + m_velocity, m_position) <= 0.25f)
 	{
 		return;
 	}
@@ -362,7 +362,7 @@ void Player::handleAutoJump(const ChunkManager& chunkManager)
 		m_position.z + glm::normalize(glm::vec2(m_velocity.x, m_velocity.z)).y);
 
 	bool autoJumpAllowed = false;
-	if (CollisionHandler::isCollision({ collisionPosition.x, collisionPosition.y - HEAD_HEIGHT, collisionPosition.z }, chunkManager))
+	if (CollisionHandler::isCollision({ collisionPosition.x, collisionPosition.y - HEAD_HEIGHT + (HEAD_HEIGHT / 2.0f), collisionPosition.z }, chunkManager))
 	{
 		autoJumpAllowed = true;
 		for (int y = -static_cast<int>(HEAD_HEIGHT) + 1; y <= 1; y++)
