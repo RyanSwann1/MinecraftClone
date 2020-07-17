@@ -100,7 +100,7 @@ Camera::Camera()
 	front(),
 	right(),
 	up(),
-	rotation(0.f, -90.f)
+	rotation(0.f, 5.f)
 {
 	front = { 0.0f, -1.0f, 0.0f };
 	right = glm::normalize(glm::cross({ 0.0f, 1.0f, 0.0f }, front));
