@@ -316,7 +316,7 @@ namespace
 
 	void addVoxelSelectionCubeFace(VertexBuffer& vertexBuffer, eCubeSide cubeSide, glm::vec3 cubePosition)
 	{
-		constexpr float offset = 0.005f;
+		constexpr float offset = 0.00f;
 		switch (cubeSide)
 		{
 		case eCubeSide::Front:

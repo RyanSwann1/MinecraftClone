@@ -327,11 +327,15 @@ int main()
 
 			if (!player.getDestroyCubeTimer().isActive())
 			{
+				glPolygonOffset(-1.f, -2.f);
+				glEnable(GL_POLYGON_OFFSET_FILL);
+				//https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glPolygonOffset.xml
 				voxelSelectionTexture->bind();
 				shaderHandler->switchToShader(eShaderType::SelectedVoxel);
 				shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uView", view);
 				shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uProjection", projection);
 				selectedVoxelVisual.render();
+				glDisable(GL_POLYGON_OFFSET_FILL);
 			}
 
 			glDisable(GL_BLEND);
