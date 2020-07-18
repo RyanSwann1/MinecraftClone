@@ -13,6 +13,8 @@ enum class eGameEventType
 	RemoveItemGUI,
 	UpdateSelectionBoxGUI,
 	UpdateItemQuantityGUI,
+	SelectedCubeSetPosition,
+	SelectedCubeSetActive,
 	SpawnPickup,
 	AddToPlayerInventory,
 	Max = AddToPlayerInventory

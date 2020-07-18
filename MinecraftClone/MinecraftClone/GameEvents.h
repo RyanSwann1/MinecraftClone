@@ -24,6 +24,24 @@ namespace GameEvents
 		eCubeType type;
 	};
 
+	struct SelectedCubeSetPosition
+	{
+		SelectedCubeSetPosition(const glm::vec3& position)
+			: position(position)
+		{}
+
+		glm::vec3 position;
+	};
+
+	struct SelectedCubeSetActive
+	{
+		SelectedCubeSetActive(bool active)
+			: active(active)
+		{}
+
+		bool active;
+	};
+
 	struct AddItemGUI
 	{
 		AddItemGUI(eCubeType type, eInventoryIndex index)
