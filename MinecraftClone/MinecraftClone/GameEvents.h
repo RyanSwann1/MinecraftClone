@@ -15,6 +15,19 @@ namespace GameEvents
 		glm::vec3 position;
 	};
 
+	struct PlayerDisgardPickup
+	{
+		PlayerDisgardPickup(eCubeType cubeType, const glm::vec3& position, const glm::vec3& initialVelocity)
+			: cubeType(cubeType),
+			position(position),
+			initialVelocity(initialVelocity)
+		{}
+		
+		eCubeType cubeType;
+		glm::vec3 position;
+		glm::vec3 initialVelocity;
+	};
+
 	struct AddToInventory
 	{
 		AddToInventory(eCubeType type)

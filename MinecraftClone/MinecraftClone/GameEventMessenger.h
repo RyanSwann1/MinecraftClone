@@ -16,6 +16,7 @@ enum class eGameEventType
 	SelectedCubeSetPosition,
 	SelectedCubeSetActive,
 	SpawnPickup,
+	PlayerDisgardPickup,
 	AddToPlayerInventory,
 	Max = AddToPlayerInventory
 };

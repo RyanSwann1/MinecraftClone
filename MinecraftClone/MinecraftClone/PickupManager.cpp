@@ -8,12 +8,17 @@
 PickupManager::PickupManager()
 	: m_pickUps()
 {
-	GameEventMessenger::getInstance().subscribe(eGameEventType::SpawnPickup, std::bind(&PickupManager::onSpawnPickUp, this, std::placeholders::_1), this);
+	GameEventMessenger::getInstance().subscribe(eGameEventType::SpawnPickup, std::bind(
+		&PickupManager::onSpawnPickUp, this, std::placeholders::_1), this);
+	
+	GameEventMessenger::getInstance().subscribe(eGameEventType::PlayerDisgardPickup, std::bind(
+		&PickupManager::onPlayerDisgardPickup, this, std::placeholders::_1), this);
 }
 
 PickupManager::~PickupManager()
 {
 	GameEventMessenger::getInstance().unsubscribe(eGameEventType::SpawnPickup, this);
+	GameEventMessenger::getInstance().unsubscribe(eGameEventType::PlayerDisgardPickup, this);
 }
 
 void PickupManager::update(float deltaTime, const Player& player, std::mutex& playerMutex, const ChunkManager& chunkManager)
@@ -52,10 +57,18 @@ void PickupManager::render(const Frustum& frustum, ShaderHandler& shaderHandler,
 	}
 }
 
+void PickupManager::onPlayerDisgardPickup(const void* gameEvent)
+{
+	assert(gameEvent);
+	const GameEvents::PlayerDisgardPickup* event = static_cast<const GameEvents::PlayerDisgardPickup*>(gameEvent);
+
+	m_pickUps.emplace_back(event->cubeType, event->position, event->initialVelocity);
+}
+
 void PickupManager::onSpawnPickUp(const void* gameEvent)
 {
+	assert(gameEvent);
 	const GameEvents::SpawnPickUp* spawnPickup = static_cast<const GameEvents::SpawnPickUp*>(gameEvent);
-	assert(spawnPickup);
 	
 	m_pickUps.emplace_back(spawnPickup->type, spawnPickup->position);
 }
