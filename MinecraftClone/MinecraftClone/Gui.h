@@ -65,11 +65,7 @@ class Gui : private NonCopyable, private NonMovable
 {
 public:
 	Gui(const glm::uvec2& windowSize);
-
-	void addItem(eInventoryIndex hotbarIndex, eCubeType cubeType);
-	void removeItem(eInventoryIndex hotbarIndex);
-	void updateSelectionBox(eInventoryIndex selectedItemIndex);
-	void updateItemQuantity(eInventoryIndex selectedItem, int quantity);
+	~Gui();
 
 	void render(ShaderHandler& shaderHandler, const Texture& widgetTexture, const Texture& fontTexture) const;
 
@@ -80,4 +76,9 @@ private:
 
 	Image m_toolbar;
 	Image m_selectionBox;
+
+	void onAddItem(const void* gameEvent);
+	void onRemoveItem(const void* gameEvent);
+	void onUpdateSelectionBox(const void* gameEvent);
+	void onUpdateItemQuantity(const void* gameEvent);
 };
