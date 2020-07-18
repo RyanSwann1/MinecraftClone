@@ -419,8 +419,8 @@ void Player::onAddToInventory(const void* gameEvent)
 	m_inventory.add(static_cast<const GameEvents::AddToInventory*>(gameEvent)->type);
 }
 
-void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& currentSFMLEvent,
-	ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window)
+void Player::handleInputEvents(const sf::Event& currentSFMLEvent,
+	ChunkManager& chunkManager, std::mutex& playerMutex, const sf::Window& window)
 {
 	if (currentSFMLEvent.type == sf::Event::KeyPressed)
 	{	
@@ -430,7 +430,7 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
 		{
-			discardItem(pickUps);
+			discardItem();
 		}
 
 		m_inventory.handleInputEvents(currentSFMLEvent);
@@ -442,8 +442,7 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 	}
 }
 
-void Player::update(float deltaTime, std::mutex& playerMutex, ChunkManager& chunkManager, DestroyBlockVisual& destroyBlockVisual,
-	std::vector<Pickup>& pickUps)
+void Player::update(float deltaTime, std::mutex& playerMutex, ChunkManager& chunkManager, DestroyBlockVisual& destroyBlockVisual)
 {
 	m_placeCubeTimer.update(deltaTime);
 	m_destroyCubeTimer.update(deltaTime);
@@ -732,7 +731,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 	}
 }
 
-void Player::discardItem(std::vector<Pickup>& pickUps)
+void Player::discardItem()
 {
 	if (m_inventory.isSelectedItemEmpty() || m_currentState == ePlayerState::Flying)
 	{
@@ -746,5 +745,6 @@ void Player::discardItem(std::vector<Pickup>& pickUps)
 	spawnPosition.x -= Globals::PICKUP_CUBE_FACE_SIZE / 2.0f;
 	spawnPosition.z -= Globals::PICKUP_CUBE_FACE_SIZE / 2.0f;
 	
-	pickUps.emplace_back(pickUpType, spawnPosition, glm::normalize(m_camera.front) * DISCARD_ITEM_SPEED);
+	GameEventMessenger::getInstance().broadcast<GameEvents::PlayerDisgardPickup>(
+		eGameEventType::PlayerDisgardPickup, { pickUpType, spawnPosition, glm::normalize(m_camera.front) * DISCARD_ITEM_SPEED });
 }

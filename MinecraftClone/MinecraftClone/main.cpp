@@ -147,12 +147,14 @@ int main()
 	SelectedVoxelVisual selectedVoxelVisual;
 	DestroyBlockVisual destroyBlockVisual;
 	Gui gui(windowSize);
-	std::vector<Pickup> pickUps;
 	Frustum frustum;
 	Player player;
 	std::atomic<bool> resetGame = false;
 	std::mutex renderingMutex;
 	std::mutex playerMutex;
+	float deltaTime = 0.0f;
+	sf::Clock deltaClock;
+	deltaClock.restart();
 
 	std::thread chunkGenerationThread([&](std::unique_ptr<ChunkManager>* chunkGenerator)
 		{chunkGenerator->get()->update(std::ref(player), std::ref(window), std::ref(resetGame), 
@@ -163,13 +165,7 @@ int main()
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
-	std::cout << glGetError() << "\n";
-
-	std::cout << "\n\n";
-
-	float deltaTime = 0.0f;
-	sf::Clock deltaClock;
-	deltaClock.restart();
+	std::cout << glGetError() << "\n\n\n";
 
 	while (window.isOpen())
 	{
@@ -211,11 +207,11 @@ int main()
 				destroyBlockVisual.reset();
 			}
 
-			player.handleInputEvents(pickUps, currentSFMLEvent, *chunkManager, playerMutex, window);
+			player.handleInputEvents(currentSFMLEvent, *chunkManager, playerMutex, window);
 		}
 
 		//Update
-		player.update(deltaTime, playerMutex, *chunkManager.get(), destroyBlockVisual, pickUps);
+		player.update(deltaTime, playerMutex, *chunkManager.get(), destroyBlockVisual);
 		destroyBlockVisual.update(deltaTime);
 		pickupManager.update(deltaTime, player, playerMutex, *chunkManager);
 
