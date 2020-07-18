@@ -9,7 +9,11 @@
 
 enum class eGameEventType
 {
-	SpawnPickup = 0,
+	AddItemGUI = 0,
+	RemoveItemGUI,
+	UpdateSelectionBoxGUI,
+	UpdateItemQuantityGUI,
+	SpawnPickup,
 	AddToPlayerInventory,
 	Max = AddToPlayerInventory
 };

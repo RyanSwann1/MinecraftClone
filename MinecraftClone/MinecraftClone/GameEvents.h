@@ -23,4 +23,44 @@ namespace GameEvents
 
 		eCubeType type;
 	};
+
+	struct AddItemGUI
+	{
+		AddItemGUI(eCubeType type, eInventoryIndex index)
+			: type(type),
+			index(index)
+		{}
+
+		eCubeType type;
+		eInventoryIndex index;
+	};
+
+	struct RemoveItemGUI
+	{
+		RemoveItemGUI(eInventoryIndex index)
+			: index(index)
+		{}
+
+		eInventoryIndex index;
+	};
+
+	struct UpdateSelectionBoxGUI
+	{
+		UpdateSelectionBoxGUI(eInventoryIndex index)
+			: index(index)
+		{}
+
+		eInventoryIndex index;
+	};
+
+	struct UpdateItemQuantityGUI
+	{
+		UpdateItemQuantityGUI(eInventoryIndex index, int quantity)
+			:index(index),
+			quantity(quantity)
+		{}
+
+		eInventoryIndex index;
+		int quantity;
+	};
 }
