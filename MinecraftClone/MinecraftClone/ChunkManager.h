@@ -49,7 +49,7 @@ private:
 	GeneratedChunkQueue m_generatedChunkQueue;
 	ChunkMeshRegenerationQueue m_chunkMeshRegenerationQueue;
 	
-	void deleteChunks(const glm::ivec3& playerPosition, std::mutex& renderingMutex, const Rectangle& visibilityRect);
+	void deleteChunks(const glm::ivec3& playerPosition, const Rectangle& visibilityRect);
 	void addChunks(const glm::ivec3& playerPosition);
 	void clearQueues(const glm::ivec3& playerPosition, const Rectangle& visibilityRect);
 };
