@@ -11,8 +11,8 @@ namespace GameEvents
 			position(position)
 		{}
 
-		eCubeType type;
-		glm::vec3 position;
+		const eCubeType type;
+		const glm::vec3 position;
 	};
 
 	struct PlayerDisgardPickup
@@ -23,9 +23,9 @@ namespace GameEvents
 			initialVelocity(initialVelocity)
 		{}
 		
-		eCubeType cubeType;
-		glm::vec3 position;
-		glm::vec3 initialVelocity;
+		const eCubeType cubeType;
+		const glm::vec3 position;
+		const glm::vec3 initialVelocity;
 	};
 
 	struct AddToInventory
@@ -34,7 +34,7 @@ namespace GameEvents
 			: type(type)
 		{}
 
-		eCubeType type;
+		const eCubeType type;
 	};
 
 	struct SelectedCubeSetPosition
@@ -43,7 +43,7 @@ namespace GameEvents
 			: position(position)
 		{}
 
-		glm::vec3 position;
+		const glm::vec3 position;
 	};
 
 	struct SelectedCubeSetActive
@@ -52,8 +52,8 @@ namespace GameEvents
 			: active(active)
 		{}
 
-		bool active;
-	};
+		const bool active;
+	}; 
 
 	struct AddItemGUI
 	{
@@ -62,8 +62,8 @@ namespace GameEvents
 			index(index)
 		{}
 
-		eCubeType type;
-		eInventoryIndex index;
+		const eCubeType type;
+		const eInventoryIndex index;
 	};
 
 	struct RemoveItemGUI
@@ -72,7 +72,7 @@ namespace GameEvents
 			: index(index)
 		{}
 
-		eInventoryIndex index;
+		const eInventoryIndex index;
 	};
 
 	struct UpdateSelectionBoxGUI
@@ -81,7 +81,7 @@ namespace GameEvents
 			: index(index)
 		{}
 
-		eInventoryIndex index;
+		const eInventoryIndex index;
 	};
 
 	struct UpdateItemQuantityGUI
@@ -91,7 +91,7 @@ namespace GameEvents
 			quantity(quantity)
 		{}
 
-		eInventoryIndex index;
-		int quantity;
+		const eInventoryIndex index;
+		const int quantity;
 	};
 }
