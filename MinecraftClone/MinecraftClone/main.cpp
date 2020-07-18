@@ -211,7 +211,7 @@ int main()
 				destroyBlockVisual.reset();
 			}
 
-			player.handleInputEvents(pickUps, currentSFMLEvent, *chunkManager, playerMutex, window, selectedVoxelVisual);
+			player.handleInputEvents(pickUps, currentSFMLEvent, *chunkManager, playerMutex, window);
 		}
 
 		//Update

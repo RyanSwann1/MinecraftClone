@@ -389,7 +389,7 @@ void Player::handleAutoJump(const ChunkManager& chunkManager)
 	}
 }
 
-void Player::handleSelectedCube(const ChunkManager& chunkManager, SelectedVoxelVisual& selectedVoxel)
+void Player::handleSelectedCube(const ChunkManager& chunkManager)
 {
 	bool selectedCubeFound = false;
 	eCubeType selectedCubeType;
@@ -420,8 +420,7 @@ void Player::onAddToInventory(const void* gameEvent)
 }
 
 void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& currentSFMLEvent,
-	ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window,
-	SelectedVoxelVisual& selectedVoxel)
+	ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window)
 {
 	if (currentSFMLEvent.type == sf::Event::KeyPressed)
 	{	
@@ -439,7 +438,7 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 	if (currentSFMLEvent.MouseMoved)
 	{
 		m_camera.move(window);
-		handleSelectedCube(chunkManager, selectedVoxel);
+		handleSelectedCube(chunkManager);
 	}
 }
 
