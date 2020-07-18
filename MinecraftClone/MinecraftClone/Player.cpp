@@ -206,7 +206,7 @@ void Player::resetDestroyCubeTimer()
 	m_destroyCubeTimer.setActive(false);
 }
 
-void Player::placeBlock(ChunkManager& chunkManager, Gui& gui)
+void Player::placeBlock(ChunkManager& chunkManager)
 {
 	if (m_inventory.isSelectedItemEmpty())
 	{
@@ -240,7 +240,7 @@ void Player::placeBlock(ChunkManager& chunkManager, Gui& gui)
 						eCubeType cubeTypeToPlace = m_inventory.getSelectedItemType();
 						if (chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToPlace))
 						{
-							m_inventory.reduceSelectedItem(gui);
+							m_inventory.reduceSelectedItem();
 						}
 					}
 					
@@ -261,7 +261,7 @@ void Player::placeBlock(ChunkManager& chunkManager, Gui& gui)
 			eCubeType cubeTypeToPlace = m_inventory.getSelectedItemType();
 			if (chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToPlace))
 			{
-				m_inventory.reduceSelectedItem(gui);
+				m_inventory.reduceSelectedItem();
 				break;
 			}
 		}
@@ -418,7 +418,7 @@ void Player::onAddToInventory(const void* gameEvent)
 }
 
 void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& currentSFMLEvent,
-	ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window, Gui& gui,
+	ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window,
 	SelectedVoxelVisual& selectedVoxel)
 {
 	if (currentSFMLEvent.type == sf::Event::KeyPressed)
@@ -429,10 +429,10 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
 		{
-			discardItem(pickUps, gui);
+			discardItem(pickUps);
 		}
 
-		m_inventory.handleInputEvents(currentSFMLEvent, gui);
+		m_inventory.handleInputEvents(currentSFMLEvent);
 	}
 	if (currentSFMLEvent.MouseMoved)
 	{
@@ -442,7 +442,7 @@ void Player::handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& cu
 }
 
 void Player::update(float deltaTime, std::mutex& playerMutex, ChunkManager& chunkManager, DestroyBlockVisual& destroyBlockVisual,
-	std::vector<Pickup>& pickUps, Gui& gui)
+	std::vector<Pickup>& pickUps)
 {
 	m_placeCubeTimer.update(deltaTime);
 	m_destroyCubeTimer.update(deltaTime);
@@ -454,7 +454,7 @@ void Player::update(float deltaTime, std::mutex& playerMutex, ChunkManager& chun
 	}
 	else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right) && m_placeCubeTimer.isExpired())
 	{
-		placeBlock(chunkManager, gui);
+		placeBlock(chunkManager);
 		m_placeCubeTimer.resetElaspedTime();
 	}
 
@@ -731,7 +731,7 @@ void Player::handleCollisions(const ChunkManager& chunkManager)
 	}
 }
 
-void Player::discardItem(std::vector<Pickup>& pickUps, Gui& gui)
+void Player::discardItem(std::vector<Pickup>& pickUps)
 {
 	if (m_inventory.isSelectedItemEmpty() || m_currentState == ePlayerState::Flying)
 	{
@@ -739,7 +739,7 @@ void Player::discardItem(std::vector<Pickup>& pickUps, Gui& gui)
 	}
 
 	eCubeType pickUpType = m_inventory.getSelectedItemType();
-	m_inventory.reduceSelectedItem(gui);
+	m_inventory.reduceSelectedItem();
 
 	glm::vec3 spawnPosition = m_position;
 	spawnPosition.x -= Globals::PICKUP_CUBE_FACE_SIZE / 2.0f;

@@ -24,7 +24,6 @@ private:
 	int m_currentAmount;
 };
 
-class Gui;
 class Inventory : private NonCopyable, private NonMovable
 {
 public:
@@ -35,9 +34,9 @@ public:
 	bool isSelectedItemEmpty() const;
 	bool isItemAddable(eCubeType cubeType) const;
 	
-	void reduceSelectedItem(Gui& Gui);
+	void reduceSelectedItem();
 	void add(eCubeType cubeTypeToAdd);
-	void handleInputEvents(const sf::Event& currentSFMLEvent, Gui& gui);
+	void handleInputEvents(const sf::Event& currentSFMLEvent);
 
 private:
 	std::array<Item, static_cast<size_t>(eInventoryIndex::Max) + 1> m_items;

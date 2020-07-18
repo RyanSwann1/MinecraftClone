@@ -211,11 +211,11 @@ int main()
 				destroyBlockVisual.reset();
 			}
 
-			player.handleInputEvents(pickUps, currentSFMLEvent, *chunkManager, playerMutex, window, gui, selectedVoxelVisual);
+			player.handleInputEvents(pickUps, currentSFMLEvent, *chunkManager, playerMutex, window, selectedVoxelVisual);
 		}
 
 		//Update
-		player.update(deltaTime, playerMutex, *chunkManager.get(), destroyBlockVisual, pickUps, gui);
+		player.update(deltaTime, playerMutex, *chunkManager.get(), destroyBlockVisual, pickUps);
 		destroyBlockVisual.update(deltaTime);
 		pickupManager.update(deltaTime, player, playerMutex, *chunkManager);
 

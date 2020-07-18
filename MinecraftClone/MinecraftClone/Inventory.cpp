@@ -113,7 +113,7 @@ bool Inventory::isItemAddable(eCubeType cubeType) const
 	return false;
 }
 
-void Inventory::reduceSelectedItem(Gui& gui)
+void Inventory::reduceSelectedItem()
 {
 	assert(!isSelectedItemEmpty());
 
@@ -168,7 +168,7 @@ void Inventory::add(eCubeType cubeTypeToAdd)
 	}
 }
 
-void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent, Gui& gui)
+void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
 {
 	assert(currentSFMLEvent.type == sf::Event::KeyPressed);
 

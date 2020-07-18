@@ -39,7 +39,6 @@ enum class ePlayerState
 
 class SelectedVoxelVisual;
 class DestroyBlockVisual;
-class Gui;
 class Pickup;
 class ChunkManager;
 class Player : private NonCopyable, private NonMovable
@@ -58,10 +57,9 @@ public:
 	void resetDestroyCubeTimer();
 	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
 	void handleInputEvents(std::vector<Pickup>& pickUps, const sf::Event& currentSFMLEvent,
-		ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window, Gui& gui,
-		SelectedVoxelVisual& selectedVoxel);
+		ChunkManager& chunkManager, std::mutex& playerMutex, sf::Window& window, SelectedVoxelVisual& selectedVoxel);
 	void update(float deltaTime, std::mutex& playerMutex, ChunkManager& chunkManager, 
-		DestroyBlockVisual& destroyBlockVisual, std::vector<Pickup>& pickUps, Gui& gui);
+		DestroyBlockVisual& destroyBlockVisual, std::vector<Pickup>& pickUps);
 
 private:
 	Camera m_camera;
@@ -78,8 +76,8 @@ private:
 
 	void move(float deltaTime, const ChunkManager& chunkManager);
 	void handleCollisions(const ChunkManager& chunkManager);
-	void discardItem(std::vector<Pickup>& pickUps, Gui& gui);
-	void placeBlock(ChunkManager& chunkManager, Gui& gui);
+	void discardItem(std::vector<Pickup>& pickUps);
+	void placeBlock(ChunkManager& chunkManager);
 	void destroyFacingBlock(ChunkManager& chunkManager, DestroyBlockVisual& destroyBlockVisual);
 	void handleAutoJump(const ChunkManager& chunkManager);
 	void handleSelectedCube(const ChunkManager& chunkManager, SelectedVoxelVisual& selectedVoxel);
