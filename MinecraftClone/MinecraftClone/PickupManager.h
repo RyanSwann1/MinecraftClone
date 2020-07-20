@@ -9,6 +9,11 @@
 class Frustum;
 class ShaderHandler;
 class Player;
+namespace GameEvents
+{
+	struct PlayerDisgardPickup;
+	struct SpawnPickUp;
+}
 class PickupManager : private NonCopyable, private NonMovable
 {
 public:
@@ -21,6 +26,6 @@ public:
 private:
 	std::vector<Pickup> m_pickUps;
 
-	void onPlayerDisgardPickup(const void* gameEvent);
-	void onSpawnPickUp(const void* gameEvent);
+	void onPlayerDisgardPickup(const GameEvents::PlayerDisgardPickup& gameEvent);
+	void onSpawnPickUp(const GameEvents::SpawnPickUp& gameEvent);
 };
