@@ -21,10 +21,10 @@ PickupManager::~PickupManager()
 	GameEventMessenger::getInstance().unsubscribe<GameEvents::PlayerDisgardPickup>(this);
 }
 
-void PickupManager::update(float deltaTime, const Player& player, std::mutex& playerMutex, const ChunkManager& chunkManager)
+void PickupManager::update(float deltaTime, const Player& player, std::mutex& chunkInteractionMutex, const ChunkManager& chunkManager)
 {
 	Rectangle visibilityRect = Globals::getVisibilityRect(player.getPosition());
-	std::lock_guard<std::mutex> playerLock(playerMutex);
+	std::lock_guard<std::mutex> playerLock(chunkInteractionMutex);
 	for (auto pickup = m_pickUps.begin(); pickup != m_pickUps.end();)
 	{
 		const glm::vec3& pickupPosition = pickup->getPosition();

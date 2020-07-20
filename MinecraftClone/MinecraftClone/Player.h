@@ -50,17 +50,17 @@ public:
 	~Player();
 
 	const Timer& getDestroyCubeTimer() const;
-	bool isUnderWater(const ChunkManager& chunkManager, std::mutex& playerMutex) const;
+	bool isUnderWater(const ChunkManager& chunkManager, std::mutex& chunkInteractionMutex) const;
 	const glm::vec3 getMiddlePosition() const;
 	const glm::vec3& getPosition() const;
 	const Camera& getCamera() const;
 	const Inventory& getInventory() const;
 
 	void resetDestroyCubeTimer();
-	void spawn(const ChunkManager& chunkManager, std::mutex& playerMutex);
+	void spawn(const ChunkManager& chunkManager, std::mutex& chunkInteractionMutex);
 	void handleInputEvents(const sf::Event& currentSFMLEvent,
-		ChunkManager& chunkManager, std::mutex& playerMutex, const sf::Window& window);
-	void update(float deltaTime, std::mutex& playerMutex, ChunkManager& chunkManager, 
+		ChunkManager& chunkManager, std::mutex& chunkInteractionMutex, const sf::Window& window);
+	void update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkManager& chunkManager, 
 		DestroyBlockVisual& destroyBlockVisual);
 
 private:

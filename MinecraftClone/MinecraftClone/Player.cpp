@@ -159,7 +159,7 @@ const Timer& Player::getDestroyCubeTimer() const
 	return m_destroyCubeTimer;
 }
 
-bool Player::isUnderWater(const ChunkManager& chunkManager, std::mutex& playerMutex) const
+bool Player::isUnderWater(const ChunkManager& chunkManager, std::mutex& chunkInteractionMutex) const
 {
 	if (m_currentState != ePlayerState::InWater)
 	{
@@ -167,7 +167,7 @@ bool Player::isUnderWater(const ChunkManager& chunkManager, std::mutex& playerMu
 	}
 
 	eCubeType cubeAtHeadPosition;
-	std::lock_guard<std::mutex> playerLock(playerMutex);
+	std::lock_guard<std::mutex> playerLock(chunkInteractionMutex);
 	if (chunkManager.isCubeAtPosition( { std::floor(m_position.x), std::floor(m_position.y) + 0.35f, std::floor(m_position.z) }, cubeAtHeadPosition))
 	{
 		assert(cubeAtHeadPosition != eCubeType::Air);
@@ -333,14 +333,14 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager, DestroyBlockVisual& 
 	}
 }
 
-void Player::spawn(const ChunkManager& chunkManager, std::mutex& playerMutex)
+void Player::spawn(const ChunkManager& chunkManager, std::mutex& chunkInteractionMutex)
 {
 	bool spawned = false;
 	while (!spawned)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(MS_BETWEEN_ATTEMPT_SPAWN));
 
-		std::lock_guard<std::mutex> playerLock(playerMutex);
+		std::lock_guard<std::mutex> playerLock(chunkInteractionMutex);
 		if (chunkManager.isChunkAtPosition(Globals::PLAYER_STARTING_POSITION))
 		{
 			m_position = chunkManager.getHighestCubeAtPosition(Globals::PLAYER_STARTING_POSITION);
@@ -416,7 +416,7 @@ void Player::onAddToInventory(const GameEvents::AddToInventory& gameEvent)
 }
 
 void Player::handleInputEvents(const sf::Event& currentSFMLEvent,
-	ChunkManager& chunkManager, std::mutex& playerMutex, const sf::Window& window)
+	ChunkManager& chunkManager, std::mutex& chunkInteractionMutex, const sf::Window& window)
 {
 	if (currentSFMLEvent.type == sf::Event::KeyPressed)
 	{	
@@ -438,12 +438,12 @@ void Player::handleInputEvents(const sf::Event& currentSFMLEvent,
 	}
 }
 
-void Player::update(float deltaTime, std::mutex& playerMutex, ChunkManager& chunkManager, DestroyBlockVisual& destroyBlockVisual)
+void Player::update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkManager& chunkManager, DestroyBlockVisual& destroyBlockVisual)
 {
 	m_placeCubeTimer.update(deltaTime);
 	m_destroyCubeTimer.update(deltaTime);
 
-	std::unique_lock<std::mutex> playerLock(playerMutex);
+	std::unique_lock<std::mutex> playerLock(chunkInteractionMutex);
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
 		destroyFacingBlock(chunkManager, destroyBlockVisual);

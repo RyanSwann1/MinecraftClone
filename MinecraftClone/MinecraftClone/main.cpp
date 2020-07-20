@@ -151,16 +151,16 @@ int main()
 	Player player;
 	std::atomic<bool> resetGame = false;
 	std::mutex renderingMutex;
-	std::mutex playerMutex;
+	std::mutex chunkInteractionMutex;
 	float deltaTime = 0.0f;
 	sf::Clock deltaClock;
 	deltaClock.restart();
 
 	std::thread chunkGenerationThread([&](std::unique_ptr<ChunkManager>* chunkGenerator)
 		{chunkGenerator->get()->update(std::ref(player), std::ref(window), std::ref(resetGame), 
-			std::ref(playerMutex), std::ref(renderingMutex)); }, &chunkManager );
+			std::ref(chunkInteractionMutex), std::ref(renderingMutex)); }, &chunkManager );
 
-	player.spawn(*chunkManager, playerMutex);
+	player.spawn(*chunkManager, chunkInteractionMutex);
 
 	std::cout << glGetError() << "\n";
 	std::cout << glGetError() << "\n";
@@ -192,9 +192,9 @@ int main()
 
 					chunkGenerationThread = std::thread{ [&](std::unique_ptr<ChunkManager>* chunkManager)
 						{chunkManager->get()->update(std::ref(player), std::ref(window), std::ref(resetGame),
-							std::ref(playerMutex), std::ref(renderingMutex)); }, &chunkManager };
+							std::ref(chunkInteractionMutex), std::ref(renderingMutex)); }, &chunkManager };
 
-					player.spawn(*chunkManager, playerMutex);
+					player.spawn(*chunkManager, chunkInteractionMutex);
 					break;
 				case sf::Keyboard::Escape:
 					window.close();
@@ -207,13 +207,13 @@ int main()
 				destroyBlockVisual.reset();
 			}
 
-			player.handleInputEvents(currentSFMLEvent, *chunkManager, playerMutex, window);
+			player.handleInputEvents(currentSFMLEvent, *chunkManager, chunkInteractionMutex, window);
 		}
 
 		//Update
-		player.update(deltaTime, playerMutex, *chunkManager.get(), destroyBlockVisual);
+		player.update(deltaTime, chunkInteractionMutex, *chunkManager.get(), destroyBlockVisual);
 		destroyBlockVisual.update(deltaTime);
-		pickupManager.update(deltaTime, player, playerMutex, *chunkManager);
+		pickupManager.update(deltaTime, player, chunkInteractionMutex, *chunkManager);
 
 		glm::mat4 view = glm::lookAt(player.getPosition(), player.getPosition() + player.getCamera().front, player.getCamera().up);
 		glm::mat4 projection = glm::perspective(glm::radians(player.getCamera().FOV),
@@ -221,7 +221,7 @@ int main()
 
 		frustum.update(projection * view);
 		
-		if (player.isUnderWater(*chunkManager, playerMutex))
+		if (player.isUnderWater(*chunkManager, chunkInteractionMutex))
 		{
 			shaderHandler->switchToShader(eShaderType::Chunk);
 			shaderHandler->setUniformMat4f(eShaderType::Chunk, "uView", view);

@@ -33,7 +33,7 @@ public:
 	bool destroyCubeAtPosition(const glm::ivec3& blockToDestroy, eCubeType& destroyedCubeType);
 
 	void update(const Player& player, const sf::Window& window, std::atomic<bool>& resetGame, 
-		std::mutex& playerMutex, std::mutex& renderingMutex);
+		std::mutex& chunkInteractionMutex, std::mutex& renderingMutex);
 
 	void renderOpaque(const Frustum& frustum) const;
 	void renderTransparent(const Frustum& frustum) const;

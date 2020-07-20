@@ -20,7 +20,7 @@ public:
 	PickupManager();
 	~PickupManager();
 
-	void update(float deltaTime, const Player& player, std::mutex& playerMutex, const ChunkManager& chunkManager);
+	void update(float deltaTime, const Player& player, std::mutex& chunkInteractionMutex, const ChunkManager& chunkManager);
 	void render(const Frustum& frustum, ShaderHandler& shaderHandler, const glm::mat4& view, const glm::mat4& projection);
 
 private:
