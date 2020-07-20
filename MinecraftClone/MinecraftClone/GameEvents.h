@@ -2,9 +2,17 @@
 
 #include "Globals.h"
 
+enum class eGameEventType;
 namespace GameEvents
 {
-	struct SpawnPickUp
+	//CRTP - C++
+	template <eGameEventType T>
+	struct BaseEvent
+	{		
+		static eGameEventType getType() { return T; };
+	};
+
+	struct SpawnPickUp : public BaseEvent<eGameEventType::SpawnPickup>
 	{
 		SpawnPickUp(eCubeType type, const glm::vec3& position)
 			: type(type),
@@ -15,7 +23,7 @@ namespace GameEvents
 		const glm::vec3 position;
 	};
 
-	struct PlayerDisgardPickup
+	struct PlayerDisgardPickup : public BaseEvent<eGameEventType::PlayerDisgardPickup>
 	{
 		PlayerDisgardPickup(eCubeType cubeType, const glm::vec3& position, const glm::vec3& initialVelocity)
 			: cubeType(cubeType),
@@ -28,7 +36,7 @@ namespace GameEvents
 		const glm::vec3 initialVelocity;
 	};
 
-	struct AddToInventory
+	struct AddToInventory : public BaseEvent<eGameEventType::AddToPlayerInventory>
 	{
 		AddToInventory(eCubeType type)
 			: type(type)
@@ -37,7 +45,7 @@ namespace GameEvents
 		const eCubeType type;
 	};
 
-	struct SelectedCubeSetPosition
+	struct SelectedCubeSetPosition : public BaseEvent<eGameEventType::SelectedCubeSetPosition>
 	{
 		SelectedCubeSetPosition(const glm::vec3& position)
 			: position(position)
@@ -46,7 +54,7 @@ namespace GameEvents
 		const glm::vec3 position;
 	};
 
-	struct SelectedCubeSetActive
+	struct SelectedCubeSetActive : public BaseEvent<eGameEventType::SelectedCubeSetActive>
 	{
 		SelectedCubeSetActive(bool active)
 			: active(active)
@@ -55,7 +63,7 @@ namespace GameEvents
 		const bool active;
 	}; 
 
-	struct AddItemGUI
+	struct AddItemGUI : public BaseEvent<eGameEventType::AddItemGUI>
 	{
 		AddItemGUI(eCubeType type, eInventoryIndex index)
 			: type(type),
@@ -66,7 +74,7 @@ namespace GameEvents
 		const eInventoryIndex index;
 	};
 
-	struct RemoveItemGUI
+	struct RemoveItemGUI : public BaseEvent<eGameEventType::RemoveItemGUI>
 	{
 		RemoveItemGUI(eInventoryIndex index)
 			: index(index)
@@ -75,7 +83,7 @@ namespace GameEvents
 		const eInventoryIndex index;
 	};
 
-	struct UpdateSelectionBoxGUI
+	struct UpdateSelectionBoxGUI : public BaseEvent<eGameEventType::UpdateSelectionBoxGUI>
 	{
 		UpdateSelectionBoxGUI(eInventoryIndex index)
 			: index(index)
@@ -84,7 +92,7 @@ namespace GameEvents
 		const eInventoryIndex index;
 	};
 
-	struct UpdateItemQuantityGUI
+	struct UpdateItemQuantityGUI : public BaseEvent<eGameEventType::UpdateItemQuantityGUI>
 	{
 		UpdateItemQuantityGUI(eInventoryIndex index, int quantity)
 			:index(index),
