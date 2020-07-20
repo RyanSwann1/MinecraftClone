@@ -118,13 +118,11 @@ void Inventory::reduceSelectedItem()
 	assert(!isSelectedItemEmpty());
 
 	getSelectedItem().reduce();
-	GameEventMessenger::getInstance().broadcast<GameEvents::UpdateItemQuantityGUI>(
-		eGameEventType::UpdateItemQuantityGUI, { m_currentSelectedItem, getSelectedItem().getSize() });
+	GameEventMessenger::getInstance().broadcast<GameEvents::UpdateItemQuantityGUI>({ m_currentSelectedItem, getSelectedItem().getSize() });
 	
 	if (getSelectedItem().isEmpty())
 	{
-		GameEventMessenger::getInstance().broadcast<GameEvents::RemoveItemGUI>(
-			eGameEventType::RemoveItemGUI, { m_currentSelectedItem });
+		GameEventMessenger::getInstance().broadcast<GameEvents::RemoveItemGUI>({ m_currentSelectedItem });
 	}
 }
 
@@ -142,8 +140,7 @@ void Inventory::add(eCubeType cubeTypeToAdd)
 			m_items[i].incrementQuantity();
 			itemAdded = true;
 			
-			GameEventMessenger::getInstance().broadcast<GameEvents::UpdateItemQuantityGUI>(
-				eGameEventType::UpdateItemQuantityGUI, { static_cast<eInventoryIndex>(i), m_items[i].getSize() });
+			GameEventMessenger::getInstance().broadcast<GameEvents::UpdateItemQuantityGUI>({ static_cast<eInventoryIndex>(i), m_items[i].getSize() });
 
 			break;
 		}
@@ -157,11 +154,9 @@ void Inventory::add(eCubeType cubeTypeToAdd)
 			m_items[i].reset(convertedCubeType);
 			m_items[i].incrementQuantity();
 
-			GameEventMessenger::getInstance().broadcast<GameEvents::AddItemGUI>(
-				eGameEventType::AddItemGUI, { convertedCubeType, static_cast<eInventoryIndex>(i) });
+			GameEventMessenger::getInstance().broadcast<GameEvents::AddItemGUI>({ convertedCubeType, static_cast<eInventoryIndex>(i) });
 
-			GameEventMessenger::getInstance().broadcast<GameEvents::UpdateItemQuantityGUI>(
-				eGameEventType::UpdateItemQuantityGUI, { static_cast<eInventoryIndex>(i), m_items[i].getSize() });
+			GameEventMessenger::getInstance().broadcast<GameEvents::UpdateItemQuantityGUI>({ static_cast<eInventoryIndex>(i), m_items[i].getSize() });
 			
 			break;
 		}
@@ -206,7 +201,7 @@ void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
 		}
 	}
 
-	GameEventMessenger::getInstance().broadcast<GameEvents::UpdateSelectionBoxGUI>(eGameEventType::UpdateSelectionBoxGUI, { m_currentSelectedItem });
+	GameEventMessenger::getInstance().broadcast<GameEvents::UpdateSelectionBoxGUI>({ m_currentSelectedItem });
 }
 
 const Item& Inventory::getSelectedItem() const
