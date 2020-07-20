@@ -4,6 +4,11 @@
 #include "VertexArray.h"
 #include "glm/glm.hpp"
 
+namespace GameEvents
+{
+	struct SelectedCubeSetPosition;
+	struct SelectedCubeSetActive;
+};
 class SelectedVoxelVisual : private NonCopyable, private NonMovable
 {
 public:
@@ -17,6 +22,6 @@ private:
 	glm::vec3 m_position;
 	bool m_active;
 
-	void onSetPosition(const void* gameEvent);
-	void onSetActive(const void* gameEvent);
+	void onSetPosition(const GameEvents::SelectedCubeSetPosition& gameEvent);
+	void onSetActive(const GameEvents::SelectedCubeSetActive& gameEvent);
 };
