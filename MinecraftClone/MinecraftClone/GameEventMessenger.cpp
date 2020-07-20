@@ -1,27 +1,5 @@
 #include "GameEventMessenger.h"
 
-namespace
-{
-	bool isOwnerAlreadyRegistered(const std::vector<Listener>& listeners, eGameEventType gameEventType, const void* ownerAddress)
-	{
-		assert(ownerAddress != nullptr);
-
-		if (!listeners.empty())
-		{
-			auto result = std::find_if(listeners.cbegin(), listeners.cend(), [ownerAddress](const auto& listener)
-			{
-				return listener.m_ownerAddress == ownerAddress;
-			});
-
-			return result != listeners.cend();
-		}
-		else
-		{
-			return false;
-		}
-	}
-};
-
 Listener::Listener(const std::function<void(const void*)>& fp, const void* ownerAddress)
 	: m_listener(fp),
 	m_ownerAddress(ownerAddress)
@@ -48,25 +26,21 @@ Listener& Listener::operator=(Listener&& orig) noexcept
 	return *this;
 }
 
-void GameEventMessenger::subscribe(eGameEventType gameEventType, const std::function<void(const void*)>& fp, const void* ownerAddress)
+bool GameEventMessenger::isOwnerAlreadyRegistered(const std::vector<Listener>& listeners, eGameEventType gameEventType, const void* ownerAddress) const
 {
-	auto& listeners = m_listeners[static_cast<int>(gameEventType)];
-	assert(!isOwnerAlreadyRegistered(listeners, gameEventType, ownerAddress));
-	
-	listeners.emplace_back(fp, ownerAddress);
-}
+	assert(ownerAddress != nullptr);
 
-void GameEventMessenger::unsubscribe(eGameEventType gameEventType, const void* ownerAddress)
-{
-	auto& listeners = m_listeners[static_cast<int>(gameEventType)];
-	assert(ownerAddress != nullptr &&
-		isOwnerAlreadyRegistered(listeners, gameEventType, ownerAddress));
-
-	auto iter = std::find_if(listeners.begin(), listeners.end(), [ownerAddress](const auto& listener)
+	if (!listeners.empty())
 	{
-		return listener.m_ownerAddress == ownerAddress;
-	});
+		auto result = std::find_if(listeners.cbegin(), listeners.cend(), [ownerAddress](const auto& listener)
+		{
+			return listener.m_ownerAddress == ownerAddress;
+		});
 
-	assert(iter != listeners.end());
-	listeners.erase(iter);
+		return result != listeners.cend();
+	}
+	else
+	{
+		return false;
+	}
 }
