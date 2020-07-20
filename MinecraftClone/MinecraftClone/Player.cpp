@@ -146,13 +146,12 @@ Player::Player()
 {
 	m_jumpTimer.restart();
 
-	GameEventMessenger::getInstance().subscribe(eGameEventType::AddToPlayerInventory, 
-		std::bind(&Player::onAddToInventory, this, std::placeholders::_1), this);
+	GameEventMessenger::getInstance().subscribe<GameEvents::AddToInventory>(std::bind(&Player::onAddToInventory, this, std::placeholders::_1), this);
 }
 
 Player::~Player()
 {
-	GameEventMessenger::getInstance().unsubscribe(eGameEventType::AddToPlayerInventory, this);
+	GameEventMessenger::getInstance().unsubscribe<GameEvents::AddToInventory>(this);
 }
 
 const Timer& Player::getDestroyCubeTimer() const
@@ -167,11 +166,10 @@ bool Player::isUnderWater(const ChunkManager& chunkManager, std::mutex& playerMu
 		return false;
 	}
 
-	std::unique_lock<std::mutex> playerLock(playerMutex);
 	eCubeType cubeAtHeadPosition;
+	std::lock_guard<std::mutex> playerLock(playerMutex);
 	if (chunkManager.isCubeAtPosition( { std::floor(m_position.x), std::floor(m_position.y) + 0.35f, std::floor(m_position.z) }, cubeAtHeadPosition))
 	{
-		playerLock.unlock();
 		assert(cubeAtHeadPosition != eCubeType::Air);
 		
 		return cubeAtHeadPosition == eCubeType::Water;
@@ -283,7 +281,7 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager, DestroyBlockVisual& 
 		if (!NON_COLLECTABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
 		{
 			GameEventMessenger::getInstance().broadcast<GameEvents::SpawnPickUp>(
-				eGameEventType::SpawnPickup, { cubeTypeToDestroy, m_cubeToDestroyPosition });
+				{ cubeTypeToDestroy, m_cubeToDestroyPosition });
 		}
 		
 		destroyBlockVisual.reset();
@@ -400,7 +398,7 @@ void Player::handleSelectedCube(const ChunkManager& chunkManager)
 			!NON_SELECTABLE_CUBE_TYPES.isMatch(selectedCubeType))
 		{
 			GameEventMessenger::getInstance().broadcast<GameEvents::SelectedCubeSetPosition>(
-				eGameEventType::SelectedCubeSetPosition, { { std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) } });
+				{ { std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) } });
 			selectedCubeFound = true;
 			break;
 		}
@@ -408,15 +406,13 @@ void Player::handleSelectedCube(const ChunkManager& chunkManager)
 
 	if (!selectedCubeFound)
 	{
-		GameEventMessenger::getInstance().broadcast<GameEvents::SelectedCubeSetActive>(
-			eGameEventType::SelectedCubeSetActive, { false });
+		GameEventMessenger::getInstance().broadcast<GameEvents::SelectedCubeSetActive>({ false });
 	}
 }
 
-void Player::onAddToInventory(const void* gameEvent)
+void Player::onAddToInventory(const GameEvents::AddToInventory& gameEvent)
 {
-	assert(gameEvent);
-	m_inventory.add(static_cast<const GameEvents::AddToInventory*>(gameEvent)->type);
+	m_inventory.add(gameEvent.type);
 }
 
 void Player::handleInputEvents(const sf::Event& currentSFMLEvent,
@@ -746,5 +742,5 @@ void Player::discardItem()
 	spawnPosition.z -= Globals::PICKUP_CUBE_FACE_SIZE / 2.0f;
 	
 	GameEventMessenger::getInstance().broadcast<GameEvents::PlayerDisgardPickup>(
-		eGameEventType::PlayerDisgardPickup, { pickUpType, spawnPosition, glm::normalize(m_camera.front) * DISCARD_ITEM_SPEED });
+		{ pickUpType, spawnPosition, glm::normalize(m_camera.front) * DISCARD_ITEM_SPEED });
 }

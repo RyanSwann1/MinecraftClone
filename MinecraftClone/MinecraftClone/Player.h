@@ -39,6 +39,10 @@ enum class ePlayerState
 
 class DestroyBlockVisual;
 class ChunkManager;
+namespace GameEvents
+{
+	struct AddToInventory;
+}
 class Player : private NonCopyable, private NonMovable
 {
 public:
@@ -80,5 +84,5 @@ private:
 	void handleAutoJump(const ChunkManager& chunkManager);
 	void handleSelectedCube(const ChunkManager& chunkManager);
 
-	void onAddToInventory(const void* gameEvent);
+	void onAddToInventory(const GameEvents::AddToInventory& gameEvent);
 };
