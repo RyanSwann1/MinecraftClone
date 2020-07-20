@@ -241,10 +241,10 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 		glm::ivec3 startingPosition = Globals::getClosestMiddlePosition(playerPosition);
 		Rectangle visibilityRect(glm::vec2(startingPosition.x, startingPosition.z), Globals::VISIBILITY_DISTANCE);
 
+		clearQueues(playerPosition, visibilityRect);
 		deleteChunks(playerPosition, visibilityRect);
 		addChunks(playerPosition);
 		m_chunkMeshesToGenerateQueue.update(m_chunkMeshPool, m_chunks, m_generatedChunkMeshesQueue);
-		clearQueues(playerPosition, visibilityRect);
 
 		playerLock.lock();
 		std::lock_guard<std::mutex> renderingLock(renderingMutex); 
@@ -382,4 +382,5 @@ void ChunkManager::clearQueues(const glm::ivec3& playerPosition, const Rectangle
 	m_chunkMeshesToGenerateQueue.removeOutOfBoundsElements(visibilityRect);
 	m_generatedChunkMeshesQueue.removeOutOfBoundsElements(visibilityRect);
 	m_generatedChunkQueue.removeOutOfBoundsElements(visibilityRect);
+	m_chunkMeshRegenerationQueue.removeOutOfBoundsElements(visibilityRect);
 }
