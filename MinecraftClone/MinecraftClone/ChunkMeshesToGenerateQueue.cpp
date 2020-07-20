@@ -27,13 +27,19 @@ void ChunkMeshesToGenerateQueue::update(ObjectPool<VertexArray>& chunkMeshPool, 
 			if (chunkMeshFromPool.getObject())
 			{
 				auto chunk = chunks.find(chunkStartingPosition);
-				assert(chunk != chunks.cend());
+				if (chunk != chunks.cend())
+				{
+					MeshGenerator::generateChunkMesh(*chunkMeshFromPool.getObject(), *chunk->second.getObject(),
+						getAllNeighbouringChunks(chunks, chunkStartingPosition));
 
-				MeshGenerator::generateChunkMesh(*chunkMeshFromPool.getObject(), *chunk->second.getObject(),
-					getAllNeighbouringChunks(chunks, chunkStartingPosition));
+					generatedChunkMeshQueue.add({ chunkStartingPosition, std::move(chunkMeshFromPool) });
 
-				generatedChunkMeshQueue.add({ chunkStartingPosition, std::move(chunkMeshFromPool) });
-				chunkMeshToGenerate = remove(chunkMeshToGenerate);
+					chunkMeshToGenerate = remove(chunkMeshToGenerate);
+				}
+				else
+				{
+					chunkMeshToGenerate = next(chunkMeshToGenerate);
+				}
 			}
 			else
 			{
