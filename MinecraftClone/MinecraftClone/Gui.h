@@ -57,6 +57,13 @@ public:
 	void setTextureRect(const std::array<glm::vec3, 6>& drawableRect) const;
 };
 
+namespace GameEvents
+{
+	struct AddItemGUI;
+	struct RemoveItemGUI;
+	struct UpdateSelectionBoxGUI;
+	struct UpdateItemQuantityGUI;
+};
 class Texture;
 enum class eCubeType;
 enum class eInventoryIndex;
@@ -77,8 +84,8 @@ private:
 	Image m_toolbar;
 	Image m_selectionBox;
 
-	void onAddItem(const void* gameEvent);
-	void onRemoveItem(const void* gameEvent);
-	void onUpdateSelectionBox(const void* gameEvent);
-	void onUpdateItemQuantity(const void* gameEvent);
+	void onAddItem(const GameEvents::AddItemGUI& gameEvent);
+	void onRemoveItem(const GameEvents::RemoveItemGUI& gameEvent);
+	void onUpdateSelectionBox(const GameEvents::UpdateSelectionBoxGUI& gameEvent);
+	void onUpdateItemQuantity(const GameEvents::UpdateItemQuantityGUI& gameEvent);
 };

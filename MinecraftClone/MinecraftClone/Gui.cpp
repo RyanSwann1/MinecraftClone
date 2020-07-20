@@ -482,18 +482,18 @@ Gui::Gui(const glm::uvec2& windowSize)
 	m_characterIDMap.insert({ '8', 24 });
 	m_characterIDMap.insert({ '9', 25 });
 
-	GameEventMessenger::getInstance().subscribe(eGameEventType::AddItemGUI, std::bind(&Gui::onAddItem, this, std::placeholders::_1), this);
-	GameEventMessenger::getInstance().subscribe(eGameEventType::RemoveItemGUI, std::bind(&Gui::onRemoveItem, this, std::placeholders::_1), this);
-	GameEventMessenger::getInstance().subscribe(eGameEventType::UpdateSelectionBoxGUI, std::bind(&Gui::onUpdateSelectionBox, this, std::placeholders::_1), this);
-	GameEventMessenger::getInstance().subscribe(eGameEventType::UpdateItemQuantityGUI, std::bind(&Gui::onUpdateItemQuantity, this, std::placeholders::_1), this);
+	GameEventMessenger::getInstance().subscribe<GameEvents::AddItemGUI>(std::bind(&Gui::onAddItem, this, std::placeholders::_1), this);
+	GameEventMessenger::getInstance().subscribe<GameEvents::RemoveItemGUI>(std::bind(&Gui::onRemoveItem, this, std::placeholders::_1), this);
+	GameEventMessenger::getInstance().subscribe<GameEvents::UpdateSelectionBoxGUI>(std::bind(&Gui::onUpdateSelectionBox, this, std::placeholders::_1), this);
+	GameEventMessenger::getInstance().subscribe<GameEvents::UpdateItemQuantityGUI>(std::bind(&Gui::onUpdateItemQuantity, this, std::placeholders::_1), this);
 }
 
 Gui::~Gui()
 {
-	GameEventMessenger::getInstance().unsubscribe(eGameEventType::AddItemGUI, this);
-	GameEventMessenger::getInstance().unsubscribe(eGameEventType::RemoveItemGUI, this);
-	GameEventMessenger::getInstance().unsubscribe(eGameEventType::UpdateSelectionBoxGUI, this);
-	GameEventMessenger::getInstance().unsubscribe(eGameEventType::UpdateItemQuantityGUI, this);
+	GameEventMessenger::getInstance().unsubscribe<GameEvents::AddItemGUI>(this);
+	GameEventMessenger::getInstance().unsubscribe<GameEvents::RemoveItemGUI>(this);
+	GameEventMessenger::getInstance().unsubscribe<GameEvents::UpdateSelectionBoxGUI>(this);
+	GameEventMessenger::getInstance().unsubscribe<GameEvents::UpdateItemQuantityGUI>(this);
 }
 
 void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture, const Texture& fontTexture) const
@@ -523,45 +523,37 @@ void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture, con
 	glEnable(GL_DEPTH_TEST);
 }
 
-void Gui::onAddItem(const void* gameEvent)
+void Gui::onAddItem(const GameEvents::AddItemGUI& gameEvent)
 {
-	const auto* addItemEvent = static_cast<const GameEvents::AddItemGUI*>(gameEvent);
-
-	assert(!m_items[static_cast<int>(addItemEvent->index)].isActive());
-	m_items[static_cast<int>(addItemEvent->index)].setTextureRect(getTextCoords(getTextureLayer(addItemEvent->type)));
-	m_items[static_cast<int>(addItemEvent->index)].setActive(true);
+	assert(!m_items[static_cast<int>(gameEvent.index)].isActive());
+	m_items[static_cast<int>(gameEvent.index)].setTextureRect(getTextCoords(getTextureLayer(gameEvent.type)));
+	m_items[static_cast<int>(gameEvent.index)].setActive(true);
 }
 
-void Gui::onRemoveItem(const void* gameEvent)
+void Gui::onRemoveItem(const GameEvents::RemoveItemGUI& gameEvent)
 {
-	const auto* removeItemEvent = static_cast<const GameEvents::RemoveItemGUI*>(gameEvent);
-	
-	assert(m_items[static_cast<int>(removeItemEvent->index)].isActive());
-	m_items[static_cast<int>(removeItemEvent->index)].setActive(false);
+	assert(m_items[static_cast<int>(gameEvent.index)].isActive());
+	m_items[static_cast<int>(gameEvent.index)].setActive(false);
 }
 
-void Gui::onUpdateSelectionBox(const void* gameEvent)
+void Gui::onUpdateSelectionBox(const GameEvents::UpdateSelectionBoxGUI& gameEvent)
 {
-	const auto* updateSelectionBoxEvent = static_cast<const GameEvents::UpdateSelectionBoxGUI*>(gameEvent);
-
-	glm::vec2 position = getPositionOnHotbar(updateSelectionBoxEvent->index, initialSelectionBoxPosition, ITEM_OFFSET_X);
+	glm::vec2 position = getPositionOnHotbar(gameEvent.index, initialSelectionBoxPosition, ITEM_OFFSET_X);
 	m_selectionBox.setPosition(getQuadCoords(position, SELECTION_BOX_SIZE.x, SELECTION_BOX_SIZE.y));
 }
 
-void Gui::onUpdateItemQuantity(const void* gameEvent)
+void Gui::onUpdateItemQuantity(const GameEvents::UpdateItemQuantityGUI& gameEvent)
 {
-	const auto* updateItemQuantityEvent = static_cast<const GameEvents::UpdateItemQuantityGUI*>(gameEvent);
+	assert(m_items[static_cast<int>(gameEvent.index)].isActive());
 
-	assert(m_items[static_cast<int>(updateItemQuantityEvent->index)].isActive());
-
-	if (updateItemQuantityEvent->quantity > 0)
+	if (gameEvent.quantity > 0)
 	{
-		m_itemQuantityText[static_cast<int>(updateItemQuantityEvent->index)].setText(updateItemQuantityEvent->quantity, m_characterIDMap);
-		m_itemQuantityText[static_cast<int>(updateItemQuantityEvent->index)].setActive(true);
+		m_itemQuantityText[static_cast<int>(gameEvent.index)].setText(gameEvent.quantity, m_characterIDMap);
+		m_itemQuantityText[static_cast<int>(gameEvent.index)].setActive(true);
 	}
 	else
 	{
-		assert(m_itemQuantityText[static_cast<int>(updateItemQuantityEvent->index)].isActive());
-		m_itemQuantityText[static_cast<int>(updateItemQuantityEvent->index)].setActive(false);
+		assert(m_itemQuantityText[static_cast<int>(gameEvent.index)].isActive());
+		m_itemQuantityText[static_cast<int>(gameEvent.index)].setActive(false);
 	}
 }
