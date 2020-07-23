@@ -354,8 +354,6 @@ int main()
 			gui.render(*shaderHandler, *widjetsTexture, *fontTexture);
 		}
 
-
-		std::cout << glGetError() << "\n";
 		window.display();
 	}
 
