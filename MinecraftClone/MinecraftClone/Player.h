@@ -61,7 +61,7 @@ public:
 	void handleInputEvents(const sf::Event& currentSFMLEvent,
 		ChunkManager& chunkManager, std::mutex& chunkInteractionMutex, const sf::Window& window);
 	void update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkManager& chunkManager, 
-		DestroyBlockVisual& destroyBlockVisual);
+		DestroyBlockVisual& destroyBlockVisual, const sf::Window& window);
 
 private:
 	Camera m_camera;

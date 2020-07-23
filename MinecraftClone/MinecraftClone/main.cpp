@@ -211,7 +211,7 @@ int main()
 		}
 
 		//Update
-		player.update(deltaTime, chunkInteractionMutex, *chunkManager.get(), destroyBlockVisual);
+		player.update(deltaTime, chunkInteractionMutex, *chunkManager.get(), destroyBlockVisual, window);
 		destroyBlockVisual.update(deltaTime);
 		pickupManager.update(deltaTime, player, chunkInteractionMutex, *chunkManager);
 
@@ -354,6 +354,8 @@ int main()
 			gui.render(*shaderHandler, *widjetsTexture, *fontTexture);
 		}
 
+
+		std::cout << glGetError() << "\n";
 		window.display();
 	}
 

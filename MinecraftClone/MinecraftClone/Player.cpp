@@ -431,15 +431,16 @@ void Player::handleInputEvents(const sf::Event& currentSFMLEvent,
 
 		m_inventory.handleInputEvents(currentSFMLEvent);
 	}
-	if (currentSFMLEvent.MouseMoved)
+	if (currentSFMLEvent.type == sf::Event::MouseMoved)
 	{
-		m_camera.move(window);
 		handleSelectedCube(chunkManager);
 	}
 }
 
-void Player::update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkManager& chunkManager, DestroyBlockVisual& destroyBlockVisual)
+void Player::update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkManager& chunkManager, 
+	DestroyBlockVisual& destroyBlockVisual, const sf::Window& window)
 {
+	m_camera.move(window);
 	m_placeCubeTimer.update(deltaTime);
 	m_destroyCubeTimer.update(deltaTime);
 
