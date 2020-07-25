@@ -557,7 +557,7 @@ int Chunk::getElevationAtPosition(int x, int z) const
 	float lacunarity = Globals::TERRAIN_LACUNARITY;
 	for (int i = 0; i < Globals::TERRAIN_OCTAVES; ++i)
 	{
-		elevation += persistence * glm::perlin(glm::vec2(ex * lacunarity, ey * lacunarity));
+		elevation += persistence * glm::perlin(glm::vec2((ex * 1.5f)* lacunarity, (ey * 1.5f) * lacunarity));
 
 		persistence /= 2.0f;
 		lacunarity *= 2.0f;
