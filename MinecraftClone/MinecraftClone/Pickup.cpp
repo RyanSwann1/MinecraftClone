@@ -42,7 +42,7 @@ Pickup::Pickup(eCubeType cubeType, const glm::vec3& position)
 	m_onGround(false),
 	m_timeElasped(0.0f)
 {
-	glm::vec2 n = glm::normalize(glm::vec2(Globals::getRandomNumber(-360, 360), Globals::getRandomNumber(-360, 360)));
+	glm::vec2 n = glm::normalize(glm::vec2(Globals::getRandomNumber(-1.0f, 1.0f), Globals::getRandomNumber(-1.0f, 1.0f)));
 	m_velocity += glm::vec3(INITIAL_FORCE_AMPLIFIER.x * n.x, INITIAL_FORCE_AMPLIFIER.y, INITIAL_FORCE_AMPLIFIER.z * n.y);
 
 	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType);

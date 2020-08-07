@@ -161,6 +161,15 @@ namespace Globals
 		return dis(gen);
 	}
 
+	inline float getRandomNumber(float min, float max)
+	{
+		static std::random_device rd;  //Will be used to obtain a seed for the random number engine
+		static std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+		std::uniform_real_distribution<float> dis(min, max);
+		
+		return dis(gen);
+	}
+
 	inline glm::ivec3 getClosestMiddlePosition(const glm::ivec3& position)
 	{
 		glm::ivec3 middlePosition = position;
@@ -190,7 +199,7 @@ namespace Globals
 
 	constexpr int CUBE_SIZE = 1;
 	//384 Dev Distance
-	//Normal Distance = 800
+	//Normal Distance = 864
 	//Far Distance = 1024
 	constexpr int VISIBILITY_DISTANCE = 864;
 	constexpr int MAP_SIZE = 8000;
