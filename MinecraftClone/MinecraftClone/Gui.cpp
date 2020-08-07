@@ -44,18 +44,6 @@ namespace
 		};
 	};
 
-	std::array<glm::vec2, 6> getQuadCoords(const glm::vec2& position, const glm::vec2& size)
-	{
-		return {
-			position, 
-			glm::vec2(position.x + size.x, position.y),
-			glm::vec2(position.x + size.x, position.y + size.y),
-			glm::vec2(position.x + size.x, position.y + size.y),
-			glm::vec2(position.x, position.y + size.y),
-			glm::vec2(position.x, position.y)
-		};
-	};
-
 	char convertDigit(int i)
 	{
 		return static_cast<char>('0' + i);
@@ -247,7 +235,6 @@ void Widget::render() const
 	{
 		glBindVertexArray(m_ID);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glBindVertexArray(0);
 	}
 }
 
@@ -373,7 +360,6 @@ void Text::render() const
 
 		glBindVertexArray(m_ID);
 		glDrawArrays(GL_TRIANGLES, 0, m_vertexCount);
-		glBindVertexArray(0);
 	}
 }
 
@@ -395,8 +381,6 @@ void Text::setText(const std::vector<glm::vec2>& positions, const std::vector<gl
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)(0));
-
-	glBindVertexArray(0);
 }
 
 //Image
@@ -412,8 +396,6 @@ void Image::setPosition(const std::array<glm::vec2, 6>& quadCoords) const
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)(0));
-
-	glBindVertexArray(0);
 }
 
 void Image::setTextureRect(const std::array<glm::vec2, 6>& drawableRect) const
@@ -424,8 +406,6 @@ void Image::setTextureRect(const std::array<glm::vec2, 6>& drawableRect) const
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (const void*)(0));	
-
-	glBindVertexArray(0);
 }
 
 void Image::setTextureRect(const std::array<glm::vec3, 6>& drawableRect) const
@@ -436,8 +416,6 @@ void Image::setTextureRect(const std::array<glm::vec3, 6>& drawableRect) const
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (const void*)(0));
-
-	glBindVertexArray(0);
 }
 
 //GUI
