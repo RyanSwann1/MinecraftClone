@@ -96,7 +96,7 @@ namespace
 //Camera
 Camera::Camera()
 	: FOV(50.0f),
-	sensitivity(0.1f),
+	sensitivity(4.0f),
 	nearPlaneDistance(0.1f),
 	farPlaneDistance(1750.f),
 	front(),
@@ -109,10 +109,10 @@ Camera::Camera()
 	up = { 0.0f, 1.0f, 0.0f };
 }
 
-void Camera::move(const sf::Window& window)
+void Camera::move(const sf::Window& window, float deltaTime)
 {
-	rotation.x += (static_cast<int>(window.getSize().y / 2) - sf::Mouse::getPosition(window).y) * sensitivity;
-	rotation.y += (sf::Mouse::getPosition(window).x - static_cast<int>(window.getSize().x / 2)) * sensitivity;
+	rotation.x += (static_cast<int>(window.getSize().y / 2) - sf::Mouse::getPosition(window).y) * sensitivity * deltaTime;
+	rotation.y += (sf::Mouse::getPosition(window).x - static_cast<int>(window.getSize().x / 2)) * sensitivity * deltaTime;
 
 	//Reset mouse position to centre of screen
 	sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
@@ -440,7 +440,7 @@ void Player::handleInputEvents(const sf::Event& currentSFMLEvent,
 void Player::update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkManager& chunkManager, 
 	DestroyBlockVisual& destroyBlockVisual, const sf::Window& window)
 {
-	m_camera.move(window);
+	m_camera.move(window, deltaTime);
 	m_placeCubeTimer.update(deltaTime);
 	m_destroyCubeTimer.update(deltaTime);
 
