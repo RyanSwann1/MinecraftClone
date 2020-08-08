@@ -1,7 +1,8 @@
 #include "DestroyBlockVisual.h"
 #include "MeshGenerator.h"
+#include "GameEventMessenger.h"
+#include "GameEvents.h"
 #include <assert.h>
-#include <iostream>
 #include <SFML/Graphics.hpp>
 
 DestroyBlockVisual::DestroyBlockVisual()
@@ -9,33 +10,18 @@ DestroyBlockVisual::DestroyBlockVisual()
 	m_timer(),
 	m_index(eDestroyCubeIndex::One),
 	m_currentCubePosition()
-{}
-
-bool DestroyBlockVisual::isCompleted() const
 {
-	return m_index == eDestroyCubeIndex::Max;
+	GameEventMessenger::getInstance().subscribe<GameEvents::DestroyCubeSetPosition>(
+		std::bind(&DestroyBlockVisual::onSetPosition, this, std::placeholders::_1), this);
+
+	GameEventMessenger::getInstance().subscribe<GameEvents::DestroyCubeReset>(
+		std::bind(&DestroyBlockVisual::onReset , this, std::placeholders::_1), this);
 }
 
-void DestroyBlockVisual::setPosition(const glm::ivec3& position, const Timer& playerDestroyCubeTimer)
+DestroyBlockVisual::~DestroyBlockVisual()
 {
-	assert(playerDestroyCubeTimer.isActive());
-
-	m_timer.resetElaspedTime();
-	m_timer.setActive(true);
-	m_timer.setNewExpirationTime(playerDestroyCubeTimer.getExpirationTime() / (static_cast<float>(eDestroyCubeIndex::Max) + 1.0f));
-	m_currentCubePosition = position;
-
-	m_index = eDestroyCubeIndex::One;
-	m_mesh.m_transparentVertexBuffer.clear();
-	MeshGenerator::generateDestroyBlockMesh(m_mesh.m_transparentVertexBuffer, m_index, m_currentCubePosition);
-}
-
-void DestroyBlockVisual::reset()
-{
-	m_index = eDestroyCubeIndex::One;
-	m_timer.resetElaspedTime();
-	m_timer.setActive(false);
-	m_mesh.m_transparentVertexBuffer.clear();
+	GameEventMessenger::getInstance().unsubscribe<GameEvents::DestroyCubeSetPosition>(this);
+	GameEventMessenger::getInstance().unsubscribe<GameEvents::DestroyCubeReset>(this);
 }
 
 void DestroyBlockVisual::update(float deltaTime)
@@ -72,4 +58,27 @@ void DestroyBlockVisual::render()
 			glDrawElements(GL_TRIANGLES, m_mesh.m_transparentVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 		}
 	}
+}
+
+void DestroyBlockVisual::onSetPosition(const GameEvents::DestroyCubeSetPosition& gameEvent)
+{
+	reset();
+	m_timer.setActive(true);
+	m_timer.setNewExpirationTime(gameEvent.destroyCubeTimerExpire / ((static_cast<float>(eDestroyCubeIndex::Max) + 1.0f)));
+	m_currentCubePosition = gameEvent.position;
+
+	MeshGenerator::generateDestroyBlockMesh(m_mesh.m_transparentVertexBuffer, m_index, m_currentCubePosition);
+}
+
+void DestroyBlockVisual::onReset(const GameEvents::DestroyCubeReset& gameEvent)
+{
+	reset();
+}
+
+void DestroyBlockVisual::reset()
+{
+	m_index = eDestroyCubeIndex::One;
+	m_timer.resetElaspedTime();
+	m_timer.setActive(false);
+	m_mesh.m_transparentVertexBuffer.clear();
 }

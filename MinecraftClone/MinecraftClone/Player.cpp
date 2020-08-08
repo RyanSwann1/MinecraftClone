@@ -266,10 +266,10 @@ void Player::placeBlock(ChunkManager& chunkManager)
 	}
 }
 
-void Player::destroyFacingBlock(ChunkManager& chunkManager, DestroyBlockVisual& destroyBlockVisual)
+void Player::destroyFacingBlock(ChunkManager& chunkManager)
 {
 	eCubeType cubeTypeToDestroy;
-	if (m_destroyCubeTimer.isExpired() && 
+	if (m_destroyCubeTimer.isExpired() &&
 		chunkManager.destroyCubeAtPosition(m_cubeToDestroyPosition, cubeTypeToDestroy))
 	{
 		assert(cubeTypeToDestroy != eCubeType::Air &&
@@ -283,8 +283,8 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager, DestroyBlockVisual& 
 			GameEventMessenger::getInstance().broadcast<GameEvents::SpawnPickUp>(
 				{ cubeTypeToDestroy, m_cubeToDestroyPosition });
 		}
-		
-		destroyBlockVisual.reset();
+
+		GameEventMessenger::getInstance().broadcast<GameEvents::DestroyCubeReset>({});
 	}
 	
 	for (float i = 0; i <= DESTROY_BLOCK_MAX_DISTANCE; i += DESTROY_BLOCK_INCREMENT)
@@ -318,8 +318,8 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager, DestroyBlockVisual& 
 					m_destroyCubeTimer.setNewExpirationTime(destroyTime);
 					m_destroyCubeTimer.setActive(true);
 					
-					destroyBlockVisual.reset();
-					destroyBlockVisual.setPosition(m_cubeToDestroyPosition, m_destroyCubeTimer);
+					GameEventMessenger::getInstance().broadcast<GameEvents::DestroyCubeSetPosition>(
+						{ m_cubeToDestroyPosition, m_destroyCubeTimer.getExpirationTime() });
 				}
 			}
 			else
@@ -437,8 +437,7 @@ void Player::handleInputEvents(const sf::Event& currentSFMLEvent,
 	}
 }
 
-void Player::update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkManager& chunkManager, 
-	DestroyBlockVisual& destroyBlockVisual, const sf::Window& window)
+void Player::update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkManager& chunkManager, const sf::Window& window)
 {
 	m_camera.move(window, deltaTime);
 	m_placeCubeTimer.update(deltaTime);
@@ -447,7 +446,7 @@ void Player::update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkMan
 	std::unique_lock<std::mutex> playerLock(chunkInteractionMutex);
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
-		destroyFacingBlock(chunkManager, destroyBlockVisual);
+		destroyFacingBlock(chunkManager);
 	}
 	else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right) && m_placeCubeTimer.isExpired())
 	{

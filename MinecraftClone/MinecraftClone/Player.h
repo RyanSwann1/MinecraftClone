@@ -37,7 +37,6 @@ enum class ePlayerState
 	OnGround,
 };
 
-class DestroyBlockVisual;
 class ChunkManager;
 namespace GameEvents
 {
@@ -60,8 +59,7 @@ public:
 	void spawn(const ChunkManager& chunkManager, std::mutex& chunkInteractionMutex);
 	void handleInputEvents(const sf::Event& currentSFMLEvent,
 		ChunkManager& chunkManager, std::mutex& chunkInteractionMutex, const sf::Window& window);
-	void update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkManager& chunkManager, 
-		DestroyBlockVisual& destroyBlockVisual, const sf::Window& window);
+	void update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkManager& chunkManager, const sf::Window& window);
 
 private:
 	Camera m_camera;
@@ -80,7 +78,7 @@ private:
 	void handleCollisions(const ChunkManager& chunkManager);
 	void discardItem();
 	void placeBlock(ChunkManager& chunkManager);
-	void destroyFacingBlock(ChunkManager& chunkManager, DestroyBlockVisual& destroyBlockVisual);
+	void destroyFacingBlock(ChunkManager& chunkManager);
 	void handleAutoJump(const ChunkManager& chunkManager);
 	void handleSelectedCube(const ChunkManager& chunkManager);
 

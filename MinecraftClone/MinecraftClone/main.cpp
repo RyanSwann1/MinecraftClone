@@ -204,6 +204,7 @@ int main()
 			if (currentSFMLEvent.type == sf::Event::MouseButtonReleased)
 			{
 				player.resetDestroyCubeTimer();
+
 				destroyBlockVisual.reset();
 			}
 
@@ -211,7 +212,7 @@ int main()
 		}
 
 		//Update
-		player.update(deltaTime, chunkInteractionMutex, *chunkManager.get(), destroyBlockVisual, window);
+		player.update(deltaTime, chunkInteractionMutex, *chunkManager.get(), window);
 		destroyBlockVisual.update(deltaTime);
 		pickupManager.update(deltaTime, player, chunkInteractionMutex, *chunkManager);
 

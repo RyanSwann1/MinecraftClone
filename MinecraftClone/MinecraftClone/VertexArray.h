@@ -22,4 +22,4 @@ struct VertexArray : private NonCopyable
 	VertexBuffer m_transparentVertexBuffer;
 	unsigned int m_opaqueID;
 	unsigned int m_transparentID;
-};
+}; 
