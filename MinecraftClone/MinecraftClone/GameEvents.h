@@ -45,6 +45,20 @@ namespace GameEvents
 		const eCubeType type;
 	};
 
+	struct DestroyCubeReset : public BaseEvent<eGameEventType::DestroyCubeReset>
+	{};
+
+	struct DestroyCubeSetPosition : public BaseEvent<eGameEventType::DestroyCubeSetPosition>
+	{
+		DestroyCubeSetPosition(const glm::vec3& position, float destroyCubeTimerExpire)
+			: position(position),
+			destroyCubeTimerExpire(destroyCubeTimerExpire)
+		{}
+
+		const glm::vec3 position;
+		const float destroyCubeTimerExpire;
+	};
+
 	struct SelectedCubeSetPosition : public BaseEvent<eGameEventType::SelectedCubeSetPosition>
 	{
 		SelectedCubeSetPosition(const glm::vec3& position)

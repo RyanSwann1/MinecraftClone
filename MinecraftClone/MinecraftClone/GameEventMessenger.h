@@ -13,6 +13,8 @@ enum class eGameEventType
 	RemoveItemGUI,
 	UpdateSelectionBoxGUI,
 	UpdateItemQuantityGUI,
+	DestroyCubeSetPosition, 
+	DestroyCubeReset,
 	SelectedCubeSetPosition,
 	SelectedCubeSetActive,
 	SpawnPickup,
