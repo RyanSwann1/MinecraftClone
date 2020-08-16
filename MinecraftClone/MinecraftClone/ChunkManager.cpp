@@ -337,7 +337,7 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 		glm::ivec3 startingPosition;
 	};
 
-	std::vector<ChunkToAdd> chunksToAdd;
+	static std::vector<ChunkToAdd> chunksToAdd;
 	glm::ivec3 startPosition = Globals::getClosestMiddlePosition(playerPosition);
 	startPosition = getClosestChunkStartingPosition(startPosition);
 	for (int z = startPosition.z - Globals::VISIBILITY_DISTANCE; z <= startPosition.z + Globals::VISIBILITY_DISTANCE; z += Globals::CHUNK_DEPTH)
@@ -374,6 +374,8 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 				m_chunkMeshesToGenerateQueue.add({ chunkToAdd.startingPosition });
 			}
 		}
+
+		chunksToAdd.clear();
 	}
 }
 
