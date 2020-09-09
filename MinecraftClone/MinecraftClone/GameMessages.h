@@ -2,17 +2,17 @@
 
 #include "Globals.h"
 
-enum class eGameEventType;
-namespace GameEvents
+enum class eGameMessageType;
+namespace GameMessages
 {
 	//CRTP - C++
-	template <eGameEventType T>
-	struct BaseEvent
+	template <eGameMessageType T>
+	struct BaseMessage
 	{		
-		static eGameEventType getType() { return T; };
+		static eGameMessageType getType() { return T; };
 	};
 
-	struct SpawnPickUp : public BaseEvent<eGameEventType::SpawnPickup>
+	struct SpawnPickUp : public BaseMessage<eGameMessageType::SpawnPickup>
 	{
 		SpawnPickUp(eCubeType type, const glm::vec3& position)
 			: type(type),
@@ -23,7 +23,7 @@ namespace GameEvents
 		const glm::vec3 position;
 	};
 
-	struct PlayerDisgardPickup : public BaseEvent<eGameEventType::PlayerDisgardPickup>
+	struct PlayerDisgardPickup : public BaseMessage<eGameMessageType::PlayerDisgardPickup>
 	{
 		PlayerDisgardPickup(eCubeType cubeType, const glm::vec3& position, const glm::vec3& initialVelocity)
 			: cubeType(cubeType),
@@ -36,7 +36,7 @@ namespace GameEvents
 		const glm::vec3 initialVelocity;
 	};
 
-	struct AddToInventory : public BaseEvent<eGameEventType::AddToPlayerInventory>
+	struct AddToInventory : public BaseMessage<eGameMessageType::AddToPlayerInventory>
 	{
 		AddToInventory(eCubeType type)
 			: type(type)
@@ -45,10 +45,10 @@ namespace GameEvents
 		const eCubeType type;
 	};
 
-	struct DestroyCubeReset : public BaseEvent<eGameEventType::DestroyCubeReset>
+	struct DestroyCubeReset : public BaseMessage<eGameMessageType::DestroyCubeReset>
 	{};
 
-	struct DestroyCubeSetPosition : public BaseEvent<eGameEventType::DestroyCubeSetPosition>
+	struct DestroyCubeSetPosition : public BaseMessage<eGameMessageType::DestroyCubeSetPosition>
 	{
 		DestroyCubeSetPosition(const glm::vec3& position, float destroyCubeTimerExpire)
 			: position(position),
@@ -59,7 +59,7 @@ namespace GameEvents
 		const float destroyCubeTimerExpire;
 	};
 
-	struct SelectedCubeSetPosition : public BaseEvent<eGameEventType::SelectedCubeSetPosition>
+	struct SelectedCubeSetPosition : public BaseMessage<eGameMessageType::SelectedCubeSetPosition>
 	{
 		SelectedCubeSetPosition(const glm::vec3& position)
 			: position(position)
@@ -68,7 +68,7 @@ namespace GameEvents
 		const glm::vec3 position;
 	};
 
-	struct SelectedCubeSetActive : public BaseEvent<eGameEventType::SelectedCubeSetActive>
+	struct SelectedCubeSetActive : public BaseMessage<eGameMessageType::SelectedCubeSetActive>
 	{
 		SelectedCubeSetActive(bool active)
 			: active(active)
@@ -77,7 +77,7 @@ namespace GameEvents
 		const bool active;
 	}; 
 
-	struct AddItemGUI : public BaseEvent<eGameEventType::AddItemGUI>
+	struct AddItemGUI : public BaseMessage<eGameMessageType::AddItemGUI>
 	{
 		AddItemGUI(eCubeType type, eInventoryIndex index)
 			: type(type),
@@ -88,7 +88,7 @@ namespace GameEvents
 		const eInventoryIndex index;
 	};
 
-	struct RemoveItemGUI : public BaseEvent<eGameEventType::RemoveItemGUI>
+	struct RemoveItemGUI : public BaseMessage<eGameMessageType::RemoveItemGUI>
 	{
 		RemoveItemGUI(eInventoryIndex index)
 			: index(index)
@@ -97,7 +97,7 @@ namespace GameEvents
 		const eInventoryIndex index;
 	};
 
-	struct UpdateSelectionBoxGUI : public BaseEvent<eGameEventType::UpdateSelectionBoxGUI>
+	struct UpdateSelectionBoxGUI : public BaseMessage<eGameMessageType::UpdateSelectionBoxGUI>
 	{
 		UpdateSelectionBoxGUI(eInventoryIndex index)
 			: index(index)
@@ -106,7 +106,7 @@ namespace GameEvents
 		const eInventoryIndex index;
 	};
 
-	struct UpdateItemQuantityGUI : public BaseEvent<eGameEventType::UpdateItemQuantityGUI>
+	struct UpdateItemQuantityGUI : public BaseMessage<eGameMessageType::UpdateItemQuantityGUI>
 	{
 		UpdateItemQuantityGUI(eInventoryIndex index, int quantity)
 			:index(index),
