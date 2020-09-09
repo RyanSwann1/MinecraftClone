@@ -57,12 +57,12 @@ void PickupManager::render(const Frustum& frustum, ShaderHandler& shaderHandler,
 	}
 }
 
-void PickupManager::onPlayerDisgardPickup(const GameMessages::PlayerDisgardPickup& gameEvent)
+void PickupManager::onPlayerDisgardPickup(const GameMessages::PlayerDisgardPickup& gameMessage)
 {
-	m_pickUps.emplace_back(gameEvent.cubeType, gameEvent.position, gameEvent.initialVelocity);
+	m_pickUps.emplace_back(gameMessage.cubeType, gameMessage.position, gameMessage.initialVelocity);
 }
 
-void PickupManager::onSpawnPickUp(const GameMessages::SpawnPickUp& gameEvent)
+void PickupManager::onSpawnPickUp(const GameMessages::SpawnPickUp& gameMessage)
 {
-	m_pickUps.emplace_back(gameEvent.type, gameEvent.position);
+	m_pickUps.emplace_back(gameMessage.type, gameMessage.position);
 }

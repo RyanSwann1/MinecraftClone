@@ -410,9 +410,9 @@ void Player::handleSelectedCube(const ChunkManager& chunkManager)
 	}
 }
 
-void Player::onAddToInventory(const GameMessages::AddToInventory& gameEvent)
+void Player::onAddToInventory(const GameMessages::AddToInventory& gameMessage)
 {
-	m_inventory.add(gameEvent.type);
+	m_inventory.add(gameMessage.type);
 }
 
 void Player::handleInputEvents(const sf::Event& currentSFMLEvent,

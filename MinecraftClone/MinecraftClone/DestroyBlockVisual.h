@@ -28,6 +28,6 @@ private:
 	eDestroyCubeIndex m_index;
 	glm::ivec3 m_currentCubePosition;
 
-	void onSetPosition(const GameMessages::DestroyCubeSetPosition& gameEvent);
-	void onReset(const GameMessages::DestroyCubeReset& gameEvent);
+	void onSetPosition(const GameMessages::DestroyCubeSetPosition& gameMessage);
+	void onReset(const GameMessages::DestroyCubeReset& gameMessage);
 };

@@ -82,5 +82,5 @@ private:
 	void handleAutoJump(const ChunkManager& chunkManager);
 	void handleSelectedCube(const ChunkManager& chunkManager);
 
-	void onAddToInventory(const GameMessages::AddToInventory& gameEvent);
+	void onAddToInventory(const GameMessages::AddToInventory& gameMessage);
 };

@@ -84,8 +84,8 @@ private:
 	Image m_toolbar;
 	Image m_selectionBox;
 
-	void onAddItem(const GameMessages::AddItemGUI& gameEvent);
-	void onRemoveItem(const GameMessages::RemoveItemGUI& gameEvent);
-	void onUpdateSelectionBox(const GameMessages::UpdateSelectionBoxGUI& gameEvent);
-	void onUpdateItemQuantity(const GameMessages::UpdateItemQuantityGUI& gameEvent);
+	void onAddItem(const GameMessages::AddItemGUI& gameMessage);
+	void onRemoveItem(const GameMessages::RemoveItemGUI& gameMessage);
+	void onUpdateSelectionBox(const GameMessages::UpdateSelectionBoxGUI& gameMessage);
+	void onUpdateItemQuantity(const GameMessages::UpdateItemQuantityGUI& gameMessage);
 };

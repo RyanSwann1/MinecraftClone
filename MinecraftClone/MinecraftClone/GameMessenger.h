@@ -43,12 +43,12 @@ public:
 	}
 
 	template <typename GameMessage>
-	void subscribe(const std::function<void(const GameMessage&)>& gameEvent, const void* ownerAddress)
+	void subscribe(const std::function<void(const GameMessage&)>& gameMessage, const void* ownerAddress)
 	{
 		auto& listeners = m_listeners[static_cast<int>(GameMessage::getType())];
 		assert(!isOwnerAlreadyRegistered(listeners, GameMessage::getType(), ownerAddress));
 
-		listeners.emplace_back(reinterpret_cast<std::function<void(const void*)> const&>(gameEvent), ownerAddress);
+		listeners.emplace_back(reinterpret_cast<std::function<void(const void*)> const&>(gameMessage), ownerAddress);
 	}
 
 	template <typename GameMessage>
@@ -67,12 +67,12 @@ public:
 	}
 
 	template <typename GameMessage>
-	void broadcast(GameMessage gameEvent)
+	void broadcast(GameMessage gameMessage)
 	{
 		const auto& listeners = m_listeners[static_cast<int>(GameMessage::getType())];
 		for (const auto& listener : listeners)
 		{
-			reinterpret_cast<std::function<void(const GameMessage&)> const&>(listener.m_listener)(gameEvent);
+			reinterpret_cast<std::function<void(const GameMessage&)> const&>(listener.m_listener)(gameMessage);
 		}
 	}
 
@@ -80,5 +80,5 @@ private:
 	GameMessenger() {}
 	std::array<std::vector<Listener>, static_cast<size_t>(eGameMessageType::Max) + 1> m_listeners;
 
-	bool isOwnerAlreadyRegistered(const std::vector<Listener>& listeners, eGameMessageType gameEventType, const void* ownerAddress) const;
+	bool isOwnerAlreadyRegistered(const std::vector<Listener>& listeners, eGameMessageType gameMessageType, const void* ownerAddress) const;
 };

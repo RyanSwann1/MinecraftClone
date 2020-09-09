@@ -501,37 +501,37 @@ void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture, con
 	glEnable(GL_DEPTH_TEST);
 }
 
-void Gui::onAddItem(const GameMessages::AddItemGUI& gameEvent)
+void Gui::onAddItem(const GameMessages::AddItemGUI& gameMessage)
 {
-	assert(!m_items[static_cast<int>(gameEvent.index)].isActive());
-	m_items[static_cast<int>(gameEvent.index)].setTextureRect(getTextCoords(getTextureLayer(gameEvent.type)));
-	m_items[static_cast<int>(gameEvent.index)].setActive(true);
+	assert(!m_items[static_cast<int>(gameMessage.index)].isActive());
+	m_items[static_cast<int>(gameMessage.index)].setTextureRect(getTextCoords(getTextureLayer(gameMessage.type)));
+	m_items[static_cast<int>(gameMessage.index)].setActive(true);
 }
 
-void Gui::onRemoveItem(const GameMessages::RemoveItemGUI& gameEvent)
+void Gui::onRemoveItem(const GameMessages::RemoveItemGUI& gameMessage)
 {
-	assert(m_items[static_cast<int>(gameEvent.index)].isActive());
-	m_items[static_cast<int>(gameEvent.index)].setActive(false);
+	assert(m_items[static_cast<int>(gameMessage.index)].isActive());
+	m_items[static_cast<int>(gameMessage.index)].setActive(false);
 }
 
-void Gui::onUpdateSelectionBox(const GameMessages::UpdateSelectionBoxGUI& gameEvent)
+void Gui::onUpdateSelectionBox(const GameMessages::UpdateSelectionBoxGUI& gameMessage)
 {
-	glm::vec2 position = getPositionOnHotbar(gameEvent.index, initialSelectionBoxPosition, ITEM_OFFSET_X);
+	glm::vec2 position = getPositionOnHotbar(gameMessage.index, initialSelectionBoxPosition, ITEM_OFFSET_X);
 	m_selectionBox.setPosition(getQuadCoords(position, SELECTION_BOX_SIZE.x, SELECTION_BOX_SIZE.y));
 }
 
-void Gui::onUpdateItemQuantity(const GameMessages::UpdateItemQuantityGUI& gameEvent)
+void Gui::onUpdateItemQuantity(const GameMessages::UpdateItemQuantityGUI& gameMessage)
 {
-	assert(m_items[static_cast<int>(gameEvent.index)].isActive());
+	assert(m_items[static_cast<int>(gameMessage.index)].isActive());
 
-	if (gameEvent.quantity > 0)
+	if (gameMessage.quantity > 0)
 	{
-		m_itemQuantityText[static_cast<int>(gameEvent.index)].setText(gameEvent.quantity, m_characterIDMap);
-		m_itemQuantityText[static_cast<int>(gameEvent.index)].setActive(true);
+		m_itemQuantityText[static_cast<int>(gameMessage.index)].setText(gameMessage.quantity, m_characterIDMap);
+		m_itemQuantityText[static_cast<int>(gameMessage.index)].setActive(true);
 	}
 	else
 	{
-		assert(m_itemQuantityText[static_cast<int>(gameEvent.index)].isActive());
-		m_itemQuantityText[static_cast<int>(gameEvent.index)].setActive(false);
+		assert(m_itemQuantityText[static_cast<int>(gameMessage.index)].isActive());
+		m_itemQuantityText[static_cast<int>(gameMessage.index)].setActive(false);
 	}
 }

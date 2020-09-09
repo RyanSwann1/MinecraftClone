@@ -38,11 +38,11 @@ void SelectedVoxelVisual::render()
 	}
 }
 
-void SelectedVoxelVisual::onSetPosition(const GameMessages::SelectedCubeSetPosition& gameEvent)
+void SelectedVoxelVisual::onSetPosition(const GameMessages::SelectedCubeSetPosition& gameMessage)
 {
-	if (m_position != gameEvent.position || !m_active)
+	if (m_position != gameMessage.position || !m_active)
 	{
-		m_position = gameEvent.position;
+		m_position = gameMessage.position;
 		m_mesh.m_transparentVertexBuffer.clear();
 		MeshGenerator::generateVoxelSelectionMesh(m_mesh.m_transparentVertexBuffer, m_position);
 
@@ -50,7 +50,7 @@ void SelectedVoxelVisual::onSetPosition(const GameMessages::SelectedCubeSetPosit
 	}
 }
 
-void SelectedVoxelVisual::onSetActive(const GameMessages::SelectedCubeSetActive& gameEvent)
+void SelectedVoxelVisual::onSetActive(const GameMessages::SelectedCubeSetActive& gameMessage)
 {
-	m_active = gameEvent.active;
+	m_active = gameMessage.active;
 }

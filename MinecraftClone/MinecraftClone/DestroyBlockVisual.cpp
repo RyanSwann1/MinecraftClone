@@ -60,17 +60,17 @@ void DestroyBlockVisual::render()
 	}
 }
 
-void DestroyBlockVisual::onSetPosition(const GameMessages::DestroyCubeSetPosition& gameEvent)
+void DestroyBlockVisual::onSetPosition(const GameMessages::DestroyCubeSetPosition& gameMessage)
 {
 	reset();
 	m_timer.setActive(true);
-	m_timer.setNewExpirationTime(gameEvent.destroyCubeTimerExpire / ((static_cast<float>(eDestroyCubeIndex::Max) + 1.0f)));
-	m_currentCubePosition = gameEvent.position;
+	m_timer.setNewExpirationTime(gameMessage.destroyCubeTimerExpire / ((static_cast<float>(eDestroyCubeIndex::Max) + 1.0f)));
+	m_currentCubePosition = gameMessage.position;
 
 	MeshGenerator::generateDestroyBlockMesh(m_mesh.m_transparentVertexBuffer, m_index, m_currentCubePosition);
 }
 
-void DestroyBlockVisual::onReset(const GameMessages::DestroyCubeReset& gameEvent)
+void DestroyBlockVisual::onReset(const GameMessages::DestroyCubeReset& gameMessage)
 {
 	reset();
 }

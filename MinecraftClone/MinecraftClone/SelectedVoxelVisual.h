@@ -22,6 +22,6 @@ private:
 	glm::vec3 m_position;
 	bool m_active;
 
-	void onSetPosition(const GameMessages::SelectedCubeSetPosition& gameEvent);
-	void onSetActive(const GameMessages::SelectedCubeSetActive& gameEvent);
+	void onSetPosition(const GameMessages::SelectedCubeSetPosition& gameMessage);
+	void onSetActive(const GameMessages::SelectedCubeSetActive& gameMessage);
 };

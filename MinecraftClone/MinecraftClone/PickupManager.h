@@ -26,6 +26,6 @@ public:
 private:
 	std::vector<Pickup> m_pickUps;
 
-	void onPlayerDisgardPickup(const GameMessages::PlayerDisgardPickup& gameEvent);
-	void onSpawnPickUp(const GameMessages::SpawnPickUp& gameEvent);
+	void onPlayerDisgardPickup(const GameMessages::PlayerDisgardPickup& gameMessage);
+	void onSpawnPickUp(const GameMessages::SpawnPickUp& gameMessage);
 };
