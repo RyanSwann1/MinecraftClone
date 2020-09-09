@@ -212,18 +212,18 @@ void Player::placeBlock(ChunkManager& chunkManager)
 	}
 	
 	bool blockPlaced = false;
-	for (float i = 0; i <= PLACE_BLOCK_RANGE; i += PLACE_BLOCK_INCREMENT)
+	for (int i = 0; i <= std::ceil(PLACE_BLOCK_RANGE / PLACE_BLOCK_INCREMENT); ++i)
 	{
-		glm::vec3 rayPosition = m_camera.front * i + m_position;
+		glm::vec3 rayPosition = m_camera.front * (static_cast<float>(i) * PLACE_BLOCK_INCREMENT) + m_position;
 		if (chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }))
 		{
-			for (float j = i - PLACE_BLOCK_INCREMENT; j >= 0; j -= PLACE_BLOCK_INCREMENT)
+			for (int j = i; j >= 0; --j)
 			{
-				rayPosition = m_camera.front * j + m_position;
+				rayPosition = m_camera.front * (static_cast<float>(j) * PLACE_BLOCK_INCREMENT) + m_position;
 				if (!chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }))
 				{
 					bool availablePostion = true;
-					for (float y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
+					for (int y = -static_cast<int>(HEAD_HEIGHT); y <= 0; y++)
 					{
 						if (glm::vec3(std::floor(m_position.x), std::floor(m_position.y - 2.0f), std::floor(m_position.z)) == 
 						glm::vec3(std::floor(rayPosition.x), std::floor(rayPosition.y + y), std::floor(rayPosition.z) ))
@@ -253,9 +253,9 @@ void Player::placeBlock(ChunkManager& chunkManager)
 
 	if (!blockPlaced)
 	{
-		for (float i = PLACE_BLOCK_RANGE; i >= 0; i -= PLACE_BLOCK_INCREMENT)
+		for (int i = std::ceil(PLACE_BLOCK_RANGE / PLACE_BLOCK_INCREMENT); i >= 0; --i)
 		{
-			glm::vec3 rayPosition = m_camera.front * i + m_position;
+			glm::vec3 rayPosition = m_camera.front * (static_cast<float>(i) * PLACE_BLOCK_INCREMENT) + m_position;
 			eCubeType cubeTypeToPlace = m_inventory.getSelectedItemType();
 			if (chunkManager.placeCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToPlace))
 			{
@@ -287,9 +287,9 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager)
 		GameEventMessenger::getInstance().broadcast<GameEvents::DestroyCubeReset>({});
 	}
 	
-	for (float i = 0; i <= DESTROY_BLOCK_MAX_DISTANCE; i += DESTROY_BLOCK_INCREMENT)
+	for (int i = 0; i <= std::ceil(DESTROY_BLOCK_MAX_DISTANCE / DESTROY_BLOCK_INCREMENT); ++i)
 	{
-		glm::vec3 rayPosition = m_camera.front * i + m_position;
+		glm::vec3 rayPosition = m_camera.front * (static_cast<float>(i) * DESTROY_BLOCK_INCREMENT) + m_position;
 		if (chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, cubeTypeToDestroy) &&
 			!NON_DESTROYABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
 		{
@@ -391,9 +391,9 @@ void Player::handleSelectedCube(const ChunkManager& chunkManager)
 {
 	bool selectedCubeFound = false;
 	eCubeType selectedCubeType;
-	for (float i = 0; i <= DESTROY_BLOCK_MAX_DISTANCE; i += DESTROY_BLOCK_INCREMENT)
+	for (int i = 0; i <= std::ceil(DESTROY_BLOCK_MAX_DISTANCE / DESTROY_BLOCK_INCREMENT); ++i)
 	{
-		glm::vec3 rayPosition = m_camera.front * i + m_position;
+		glm::vec3 rayPosition = m_camera.front * (static_cast<float>(i) * DESTROY_BLOCK_INCREMENT) + m_position;
 		if (chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, selectedCubeType) &&
 			!NON_SELECTABLE_CUBE_TYPES.isMatch(selectedCubeType))
 		{

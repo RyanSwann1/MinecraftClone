@@ -50,8 +50,6 @@ private:
 	std::function<void(Object*)> onDestroyFunction;
 };
 
-using std::placeholders::_1;
-
 //Object Pool
 template <class Object>
 class ObjectPool : private NonCopyable, private NonMovable
