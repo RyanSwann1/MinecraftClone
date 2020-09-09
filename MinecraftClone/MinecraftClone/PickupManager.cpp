@@ -24,7 +24,7 @@ PickupManager::~PickupManager()
 void PickupManager::update(float deltaTime, const Player& player, std::mutex& chunkInteractionMutex, const ChunkManager& chunkManager)
 {
 	Rectangle visibilityRect = Globals::getVisibilityRect(player.getPosition());
-	std::lock_guard<std::mutex> playerLock(chunkInteractionMutex);
+	std::lock_guard<std::mutex> chunkInteractionLock(chunkInteractionMutex);
 	for (auto pickup = m_pickUps.begin(); pickup != m_pickUps.end();)
 	{
 		const glm::vec3& pickupPosition = pickup->getPosition();

@@ -14,10 +14,10 @@ namespace
 
 	constexpr float DEFAULT_LIGHTING_INTENSITY = 1.0f;
 	constexpr float TOP_LIGHTING_INTENSITY = 1.0f;
-	constexpr float FRONT_FACE_LIGHTING_INTENSITY = 0.8f;
-	constexpr float BACK_FACE_LIGHTING_INTENSITY = 0.8f;
-	constexpr float LEFT_FACE_LIGHTING_INTENSITY = 0.75f;
-	constexpr float RIGHT_FACE_LIGHTING_INTENSITY = 0.75f;
+	constexpr float FRONT_FACE_LIGHTING_INTENSITY = 0.75f;
+	constexpr float BACK_FACE_LIGHTING_INTENSITY = 0.75f;
+	constexpr float LEFT_FACE_LIGHTING_INTENSITY = 0.7f;
+	constexpr float RIGHT_FACE_LIGHTING_INTENSITY = 0.7f;
 	constexpr float SHADOW_INTENSITY = 0.4f;
 	constexpr float BOTTOM_FACE_LIGHTING_INTENSITY = 0.4f;
 	constexpr float WATER_OFFSET_Y = 0.2f;
@@ -46,51 +46,51 @@ namespace
 		};
 	};
 
-	//Cube Position Coords
-	constexpr std::array<glm::vec3, 4> CUBE_FACE_FRONT = 
-	{ 
-		glm::vec3(0, 0, Globals::CUBE_FACE_SIZE), 
-		glm::vec3(Globals::CUBE_FACE_SIZE, 0, Globals::CUBE_FACE_SIZE), 
-		glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE), 
-		glm::vec3(0, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE) 
-	};
-	constexpr std::array<glm::vec3, 4> CUBE_FACE_BACK = 
-	{ 
-		glm::vec3(Globals::CUBE_FACE_SIZE, 0, 0), 
-		glm::vec3(0, 0, 0), 
-		glm::vec3(0, Globals::CUBE_FACE_SIZE, 0), 
-		glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, 0) 
-	};
+		//Cube Position Coords
+		constexpr std::array<glm::vec3, 4> CUBE_FACE_FRONT = 
+		{ 
+			glm::vec3(0, 0, Globals::CUBE_FACE_SIZE), 
+			glm::vec3(Globals::CUBE_FACE_SIZE, 0, Globals::CUBE_FACE_SIZE), 
+			glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE), 
+			glm::vec3(0, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE) 
+		};
+		constexpr std::array<glm::vec3, 4> CUBE_FACE_BACK = 
+		{ 
+			glm::vec3(Globals::CUBE_FACE_SIZE, 0, 0), 
+			glm::vec3(0, 0, 0), 
+			glm::vec3(0, Globals::CUBE_FACE_SIZE, 0), 
+			glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, 0) 
+		};
 
-	constexpr std::array<glm::vec3, 4> CUBE_FACE_LEFT = 
-	{ 
-		glm::vec3(0, 0, 0), 
-		glm::vec3(0, 0, Globals::CUBE_FACE_SIZE), 
-		glm::vec3(0, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE), 
-		glm::vec3(0, Globals::CUBE_FACE_SIZE, 0) 
-	};
-	constexpr std::array<glm::vec3, 4> CUBE_FACE_RIGHT = 
-	{ 
-		glm::vec3(Globals::CUBE_FACE_SIZE, 0, Globals::CUBE_FACE_SIZE), 
-		glm::vec3(Globals::CUBE_FACE_SIZE, 0, 0), 
-		glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, 0), 
-		glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE) 
-	};
+		constexpr std::array<glm::vec3, 4> CUBE_FACE_LEFT = 
+		{ 
+			glm::vec3(0, 0, 0), 
+			glm::vec3(0, 0, Globals::CUBE_FACE_SIZE), 
+			glm::vec3(0, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE), 
+			glm::vec3(0, Globals::CUBE_FACE_SIZE, 0) 
+		};
+		constexpr std::array<glm::vec3, 4> CUBE_FACE_RIGHT = 
+		{ 
+			glm::vec3(Globals::CUBE_FACE_SIZE, 0, Globals::CUBE_FACE_SIZE), 
+			glm::vec3(Globals::CUBE_FACE_SIZE, 0, 0), 
+			glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, 0), 
+			glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE) 
+		};
 
-	constexpr std::array<glm::vec3, 4> CUBE_FACE_TOP = 
-	{ 
-		glm::vec3(0, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE), 
-		glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE), 
-		glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, 0), 
-		glm::vec3(0, Globals::CUBE_FACE_SIZE, 0) 
-	};
-	constexpr std::array<glm::vec3, 4> CUBE_FACE_BOTTOM = 
-	{ 
-		glm::vec3(0, 0, 0), 
-		glm::vec3(Globals::CUBE_FACE_SIZE, 0, 0), 
-		glm::vec3(Globals::CUBE_FACE_SIZE, 0, Globals::CUBE_FACE_SIZE), 
-		glm::vec3(0, 0, Globals::CUBE_FACE_SIZE) 
-	};
+		constexpr std::array<glm::vec3, 4> CUBE_FACE_TOP = 
+		{ 
+			glm::vec3(0, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE), 
+			glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE), 
+			glm::vec3(Globals::CUBE_FACE_SIZE, Globals::CUBE_FACE_SIZE, 0), 
+			glm::vec3(0, Globals::CUBE_FACE_SIZE, 0) 
+		};
+		constexpr std::array<glm::vec3, 4> CUBE_FACE_BOTTOM = 
+		{ 
+			glm::vec3(0, 0, 0), 
+			glm::vec3(Globals::CUBE_FACE_SIZE, 0, 0), 
+			glm::vec3(Globals::CUBE_FACE_SIZE, 0, Globals::CUBE_FACE_SIZE), 
+			glm::vec3(0, 0, Globals::CUBE_FACE_SIZE) 
+		};
 
 	constexpr std::array<glm::vec3, 4> FIRST_DIAGONAL_FACE = 
 	{ 

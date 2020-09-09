@@ -82,7 +82,10 @@ public:
 			Object* objectInPool = m_availableObjects.top();
 			assert(objectInPool);
 			m_availableObjects.pop();
-			return ObjectFromPool<Object>(objectInPool, std::bind(&ObjectPool<Object>::releaseObject, this, _1));
+			return ObjectFromPool<Object>(objectInPool, [this](Object* objectInPool)
+			{
+				return releaseObject(objectInPool);
+			});
 		}
 		else
 		{
