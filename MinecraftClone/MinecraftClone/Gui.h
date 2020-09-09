@@ -57,7 +57,7 @@ public:
 	void setTextureRect(const std::array<glm::vec3, 6>& drawableRect) const;
 };
 
-namespace GameEvents
+namespace GameMessages
 {
 	struct AddItemGUI;
 	struct RemoveItemGUI;
@@ -84,8 +84,8 @@ private:
 	Image m_toolbar;
 	Image m_selectionBox;
 
-	void onAddItem(const GameEvents::AddItemGUI& gameEvent);
-	void onRemoveItem(const GameEvents::RemoveItemGUI& gameEvent);
-	void onUpdateSelectionBox(const GameEvents::UpdateSelectionBoxGUI& gameEvent);
-	void onUpdateItemQuantity(const GameEvents::UpdateItemQuantityGUI& gameEvent);
+	void onAddItem(const GameMessages::AddItemGUI& gameEvent);
+	void onRemoveItem(const GameMessages::RemoveItemGUI& gameEvent);
+	void onUpdateSelectionBox(const GameMessages::UpdateSelectionBoxGUI& gameEvent);
+	void onUpdateItemQuantity(const GameMessages::UpdateItemQuantityGUI& gameEvent);
 };

@@ -4,7 +4,7 @@
 #include "VertexArray.h"
 #include "glm/glm.hpp"
 
-namespace GameEvents
+namespace GameMessages
 {
 	struct SelectedCubeSetPosition;
 	struct SelectedCubeSetActive;
@@ -22,6 +22,6 @@ private:
 	glm::vec3 m_position;
 	bool m_active;
 
-	void onSetPosition(const GameEvents::SelectedCubeSetPosition& gameEvent);
-	void onSetActive(const GameEvents::SelectedCubeSetActive& gameEvent);
+	void onSetPosition(const GameMessages::SelectedCubeSetPosition& gameEvent);
+	void onSetActive(const GameMessages::SelectedCubeSetActive& gameEvent);
 };

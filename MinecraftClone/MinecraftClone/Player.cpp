@@ -9,8 +9,8 @@
 #include "Gui.h"
 #include "DestroyBlockVisual.h"
 #include "SelectedVoxelVisual.h"
-#include "GameEventMessenger.h"
-#include "GameEvents.h"
+#include "GameMessenger.h"
+#include "GameMessages.h"
 #include <memory>
 
 namespace 
@@ -146,12 +146,12 @@ Player::Player()
 {
 	m_jumpTimer.restart();
 
-	GameEventMessenger::getInstance().subscribe<GameEvents::AddToInventory>(std::bind(&Player::onAddToInventory, this, std::placeholders::_1), this);
+	GameMessenger::getInstance().subscribe<GameMessages::AddToInventory>(std::bind(&Player::onAddToInventory, this, std::placeholders::_1), this);
 }
 
 Player::~Player()
 {
-	GameEventMessenger::getInstance().unsubscribe<GameEvents::AddToInventory>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::AddToInventory>(this);
 }
 
 const Timer& Player::getDestroyCubeTimer() const
@@ -280,11 +280,11 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager)
 
 		if (!NON_COLLECTABLE_CUBE_TYPES.isMatch(cubeTypeToDestroy))
 		{
-			GameEventMessenger::getInstance().broadcast<GameEvents::SpawnPickUp>(
+			GameMessenger::getInstance().broadcast<GameMessages::SpawnPickUp>(
 				{ cubeTypeToDestroy, m_cubeToDestroyPosition });
 		}
 
-		GameEventMessenger::getInstance().broadcast<GameEvents::DestroyCubeReset>({});
+		GameMessenger::getInstance().broadcast<GameMessages::DestroyCubeReset>({});
 	}
 	
 	for (int i = 0; i <= std::ceil(DESTROY_BLOCK_MAX_DISTANCE / DESTROY_BLOCK_INCREMENT); ++i)
@@ -318,7 +318,7 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager)
 					m_destroyCubeTimer.setNewExpirationTime(destroyTime);
 					m_destroyCubeTimer.setActive(true);
 					
-					GameEventMessenger::getInstance().broadcast<GameEvents::DestroyCubeSetPosition>(
+					GameMessenger::getInstance().broadcast<GameMessages::DestroyCubeSetPosition>(
 						{ m_cubeToDestroyPosition, m_destroyCubeTimer.getExpirationTime() });
 				}
 			}
@@ -397,7 +397,7 @@ void Player::handleSelectedCube(const ChunkManager& chunkManager)
 		if (chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, selectedCubeType) &&
 			!NON_SELECTABLE_CUBE_TYPES.isMatch(selectedCubeType))
 		{
-			GameEventMessenger::getInstance().broadcast<GameEvents::SelectedCubeSetPosition>(
+			GameMessenger::getInstance().broadcast<GameMessages::SelectedCubeSetPosition>(
 				{ { std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) } });
 			selectedCubeFound = true;
 			break;
@@ -406,11 +406,11 @@ void Player::handleSelectedCube(const ChunkManager& chunkManager)
 
 	if (!selectedCubeFound)
 	{
-		GameEventMessenger::getInstance().broadcast<GameEvents::SelectedCubeSetActive>({ false });
+		GameMessenger::getInstance().broadcast<GameMessages::SelectedCubeSetActive>({ false });
 	}
 }
 
-void Player::onAddToInventory(const GameEvents::AddToInventory& gameEvent)
+void Player::onAddToInventory(const GameMessages::AddToInventory& gameEvent)
 {
 	m_inventory.add(gameEvent.type);
 }
@@ -741,6 +741,6 @@ void Player::discardItem()
 	spawnPosition.x -= Globals::PICKUP_CUBE_FACE_SIZE / 2.0f;
 	spawnPosition.z -= Globals::PICKUP_CUBE_FACE_SIZE / 2.0f;
 	
-	GameEventMessenger::getInstance().broadcast<GameEvents::PlayerDisgardPickup>(
+	GameMessenger::getInstance().broadcast<GameMessages::PlayerDisgardPickup>(
 		{ pickUpType, spawnPosition, glm::normalize(m_camera.front) * DISCARD_ITEM_SPEED });
 }

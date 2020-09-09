@@ -5,8 +5,8 @@
 #include "Inventory.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "TextureArray.h"
-#include "GameEventMessenger.h"
-#include "GameEvents.h"
+#include "GameMessenger.h"
+#include "GameMessages.h"
 #include <assert.h>
 #include <array>
 #include <iostream>
@@ -460,18 +460,18 @@ Gui::Gui(const glm::uvec2& windowSize)
 	m_characterIDMap.insert({ '8', 24 });
 	m_characterIDMap.insert({ '9', 25 });
 
-	GameEventMessenger::getInstance().subscribe<GameEvents::AddItemGUI>(std::bind(&Gui::onAddItem, this, std::placeholders::_1), this);
-	GameEventMessenger::getInstance().subscribe<GameEvents::RemoveItemGUI>(std::bind(&Gui::onRemoveItem, this, std::placeholders::_1), this);
-	GameEventMessenger::getInstance().subscribe<GameEvents::UpdateSelectionBoxGUI>(std::bind(&Gui::onUpdateSelectionBox, this, std::placeholders::_1), this);
-	GameEventMessenger::getInstance().subscribe<GameEvents::UpdateItemQuantityGUI>(std::bind(&Gui::onUpdateItemQuantity, this, std::placeholders::_1), this);
+	GameMessenger::getInstance().subscribe<GameMessages::AddItemGUI>(std::bind(&Gui::onAddItem, this, std::placeholders::_1), this);
+	GameMessenger::getInstance().subscribe<GameMessages::RemoveItemGUI>(std::bind(&Gui::onRemoveItem, this, std::placeholders::_1), this);
+	GameMessenger::getInstance().subscribe<GameMessages::UpdateSelectionBoxGUI>(std::bind(&Gui::onUpdateSelectionBox, this, std::placeholders::_1), this);
+	GameMessenger::getInstance().subscribe<GameMessages::UpdateItemQuantityGUI>(std::bind(&Gui::onUpdateItemQuantity, this, std::placeholders::_1), this);
 }
 
 Gui::~Gui()
 {
-	GameEventMessenger::getInstance().unsubscribe<GameEvents::AddItemGUI>(this);
-	GameEventMessenger::getInstance().unsubscribe<GameEvents::RemoveItemGUI>(this);
-	GameEventMessenger::getInstance().unsubscribe<GameEvents::UpdateSelectionBoxGUI>(this);
-	GameEventMessenger::getInstance().unsubscribe<GameEvents::UpdateItemQuantityGUI>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::AddItemGUI>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::RemoveItemGUI>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::UpdateSelectionBoxGUI>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::UpdateItemQuantityGUI>(this);
 }
 
 void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture, const Texture& fontTexture) const
@@ -501,26 +501,26 @@ void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture, con
 	glEnable(GL_DEPTH_TEST);
 }
 
-void Gui::onAddItem(const GameEvents::AddItemGUI& gameEvent)
+void Gui::onAddItem(const GameMessages::AddItemGUI& gameEvent)
 {
 	assert(!m_items[static_cast<int>(gameEvent.index)].isActive());
 	m_items[static_cast<int>(gameEvent.index)].setTextureRect(getTextCoords(getTextureLayer(gameEvent.type)));
 	m_items[static_cast<int>(gameEvent.index)].setActive(true);
 }
 
-void Gui::onRemoveItem(const GameEvents::RemoveItemGUI& gameEvent)
+void Gui::onRemoveItem(const GameMessages::RemoveItemGUI& gameEvent)
 {
 	assert(m_items[static_cast<int>(gameEvent.index)].isActive());
 	m_items[static_cast<int>(gameEvent.index)].setActive(false);
 }
 
-void Gui::onUpdateSelectionBox(const GameEvents::UpdateSelectionBoxGUI& gameEvent)
+void Gui::onUpdateSelectionBox(const GameMessages::UpdateSelectionBoxGUI& gameEvent)
 {
 	glm::vec2 position = getPositionOnHotbar(gameEvent.index, initialSelectionBoxPosition, ITEM_OFFSET_X);
 	m_selectionBox.setPosition(getQuadCoords(position, SELECTION_BOX_SIZE.x, SELECTION_BOX_SIZE.y));
 }
 
-void Gui::onUpdateItemQuantity(const GameEvents::UpdateItemQuantityGUI& gameEvent)
+void Gui::onUpdateItemQuantity(const GameMessages::UpdateItemQuantityGUI& gameEvent)
 {
 	assert(m_items[static_cast<int>(gameEvent.index)].isActive());
 

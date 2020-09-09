@@ -38,7 +38,7 @@ enum class ePlayerState
 };
 
 class ChunkManager;
-namespace GameEvents
+namespace GameMessages
 {
 	struct AddToInventory;
 }
@@ -82,5 +82,5 @@ private:
 	void handleAutoJump(const ChunkManager& chunkManager);
 	void handleSelectedCube(const ChunkManager& chunkManager);
 
-	void onAddToInventory(const GameEvents::AddToInventory& gameEvent);
+	void onAddToInventory(const GameMessages::AddToInventory& gameEvent);
 };

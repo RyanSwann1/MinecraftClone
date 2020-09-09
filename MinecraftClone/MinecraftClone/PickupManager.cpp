@@ -2,23 +2,23 @@
 #include "Player.h"
 #include "Globals.h"
 #include "ShaderHandler.h"
-#include "GameEventMessenger.h"
-#include "GameEvents.h"
+#include "GameMessenger.h"
+#include "GameMessages.h"
 
 PickupManager::PickupManager()
 	: m_pickUps()
 {
-	GameEventMessenger::getInstance().subscribe<GameEvents::SpawnPickUp>(std::bind(
+	GameMessenger::getInstance().subscribe<GameMessages::SpawnPickUp>(std::bind(
 		&PickupManager::onSpawnPickUp, this, std::placeholders::_1), this);
 	
-	GameEventMessenger::getInstance().subscribe<GameEvents::PlayerDisgardPickup>(std::bind(
+	GameMessenger::getInstance().subscribe<GameMessages::PlayerDisgardPickup>(std::bind(
 		&PickupManager::onPlayerDisgardPickup, this, std::placeholders::_1), this);
 }
 
 PickupManager::~PickupManager()
 {
-	GameEventMessenger::getInstance().unsubscribe<GameEvents::SpawnPickUp>(this);
-	GameEventMessenger::getInstance().unsubscribe<GameEvents::PlayerDisgardPickup>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::SpawnPickUp>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::PlayerDisgardPickup>(this);
 }
 
 void PickupManager::update(float deltaTime, const Player& player, std::mutex& chunkInteractionMutex, const ChunkManager& chunkManager)
@@ -34,7 +34,7 @@ void PickupManager::update(float deltaTime, const Player& player, std::mutex& ch
 		}
 		else if (pickup->isInReachOfPlayer(player.getMiddlePosition()))
 		{
-			GameEventMessenger::getInstance().broadcast<GameEvents::AddToInventory>({ pickup->getCubeType() });
+			GameMessenger::getInstance().broadcast<GameMessages::AddToInventory>({ pickup->getCubeType() });
 			pickup = m_pickUps.erase(pickup);
 		}
 		else
@@ -57,12 +57,12 @@ void PickupManager::render(const Frustum& frustum, ShaderHandler& shaderHandler,
 	}
 }
 
-void PickupManager::onPlayerDisgardPickup(const GameEvents::PlayerDisgardPickup& gameEvent)
+void PickupManager::onPlayerDisgardPickup(const GameMessages::PlayerDisgardPickup& gameEvent)
 {
 	m_pickUps.emplace_back(gameEvent.cubeType, gameEvent.position, gameEvent.initialVelocity);
 }
 
-void PickupManager::onSpawnPickUp(const GameEvents::SpawnPickUp& gameEvent)
+void PickupManager::onSpawnPickUp(const GameMessages::SpawnPickUp& gameEvent)
 {
 	m_pickUps.emplace_back(gameEvent.type, gameEvent.position);
 }

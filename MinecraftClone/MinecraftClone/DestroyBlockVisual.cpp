@@ -1,7 +1,7 @@
 #include "DestroyBlockVisual.h"
 #include "MeshGenerator.h"
-#include "GameEventMessenger.h"
-#include "GameEvents.h"
+#include "GameMessenger.h"
+#include "GameMessages.h"
 #include <assert.h>
 #include <SFML/Graphics.hpp>
 
@@ -11,17 +11,17 @@ DestroyBlockVisual::DestroyBlockVisual()
 	m_index(eDestroyCubeIndex::One),
 	m_currentCubePosition()
 {
-	GameEventMessenger::getInstance().subscribe<GameEvents::DestroyCubeSetPosition>(
+	GameMessenger::getInstance().subscribe<GameMessages::DestroyCubeSetPosition>(
 		std::bind(&DestroyBlockVisual::onSetPosition, this, std::placeholders::_1), this);
 
-	GameEventMessenger::getInstance().subscribe<GameEvents::DestroyCubeReset>(
+	GameMessenger::getInstance().subscribe<GameMessages::DestroyCubeReset>(
 		std::bind(&DestroyBlockVisual::onReset , this, std::placeholders::_1), this);
 }
 
 DestroyBlockVisual::~DestroyBlockVisual()
 {
-	GameEventMessenger::getInstance().unsubscribe<GameEvents::DestroyCubeSetPosition>(this);
-	GameEventMessenger::getInstance().unsubscribe<GameEvents::DestroyCubeReset>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::DestroyCubeSetPosition>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::DestroyCubeReset>(this);
 }
 
 void DestroyBlockVisual::update(float deltaTime)
@@ -60,7 +60,7 @@ void DestroyBlockVisual::render()
 	}
 }
 
-void DestroyBlockVisual::onSetPosition(const GameEvents::DestroyCubeSetPosition& gameEvent)
+void DestroyBlockVisual::onSetPosition(const GameMessages::DestroyCubeSetPosition& gameEvent)
 {
 	reset();
 	m_timer.setActive(true);
@@ -70,7 +70,7 @@ void DestroyBlockVisual::onSetPosition(const GameEvents::DestroyCubeSetPosition&
 	MeshGenerator::generateDestroyBlockMesh(m_mesh.m_transparentVertexBuffer, m_index, m_currentCubePosition);
 }
 
-void DestroyBlockVisual::onReset(const GameEvents::DestroyCubeReset& gameEvent)
+void DestroyBlockVisual::onReset(const GameMessages::DestroyCubeReset& gameEvent)
 {
 	reset();
 }

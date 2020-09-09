@@ -9,7 +9,7 @@
 class Frustum;
 class ShaderHandler;
 class Player;
-namespace GameEvents
+namespace GameMessages
 {
 	struct PlayerDisgardPickup;
 	struct SpawnPickUp;
@@ -26,6 +26,6 @@ public:
 private:
 	std::vector<Pickup> m_pickUps;
 
-	void onPlayerDisgardPickup(const GameEvents::PlayerDisgardPickup& gameEvent);
-	void onSpawnPickUp(const GameEvents::SpawnPickUp& gameEvent);
+	void onPlayerDisgardPickup(const GameMessages::PlayerDisgardPickup& gameEvent);
+	void onSpawnPickUp(const GameMessages::SpawnPickUp& gameEvent);
 };

@@ -1,24 +1,24 @@
 #include "SelectedVoxelVisual.h"
 #include "MeshGenerator.h"
-#include "GameEventMessenger.h"
-#include "GameEvents.h"
+#include "GameMessenger.h"
+#include "GameMessages.h"
 
 SelectedVoxelVisual::SelectedVoxelVisual()
 	: m_mesh(),
 	m_position(),
 	m_active(false)
 {
-	GameEventMessenger::getInstance().subscribe<GameEvents::SelectedCubeSetActive>(std::bind(
+	GameMessenger::getInstance().subscribe<GameMessages::SelectedCubeSetActive>(std::bind(
 		&SelectedVoxelVisual::onSetActive, this, std::placeholders::_1), this);
 
-	GameEventMessenger::getInstance().subscribe<GameEvents::SelectedCubeSetPosition>(std::bind(
+	GameMessenger::getInstance().subscribe<GameMessages::SelectedCubeSetPosition>(std::bind(
 		&SelectedVoxelVisual::onSetPosition, this, std::placeholders::_1), this);
 }
 
 SelectedVoxelVisual::~SelectedVoxelVisual()
 {
-	GameEventMessenger::getInstance().unsubscribe<GameEvents::SelectedCubeSetActive>(this);
-	GameEventMessenger::getInstance().unsubscribe<GameEvents::SelectedCubeSetPosition>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::SelectedCubeSetActive>(this);
+	GameMessenger::getInstance().unsubscribe<GameMessages::SelectedCubeSetPosition>(this);
 }
 
 void SelectedVoxelVisual::render()
@@ -38,7 +38,7 @@ void SelectedVoxelVisual::render()
 	}
 }
 
-void SelectedVoxelVisual::onSetPosition(const GameEvents::SelectedCubeSetPosition& gameEvent)
+void SelectedVoxelVisual::onSetPosition(const GameMessages::SelectedCubeSetPosition& gameEvent)
 {
 	if (m_position != gameEvent.position || !m_active)
 	{
@@ -50,7 +50,7 @@ void SelectedVoxelVisual::onSetPosition(const GameEvents::SelectedCubeSetPositio
 	}
 }
 
-void SelectedVoxelVisual::onSetActive(const GameEvents::SelectedCubeSetActive& gameEvent)
+void SelectedVoxelVisual::onSetActive(const GameMessages::SelectedCubeSetActive& gameEvent)
 {
 	m_active = gameEvent.active;
 }

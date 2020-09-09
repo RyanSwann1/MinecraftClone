@@ -6,7 +6,7 @@
 #include "Timer.h"
 #include "glm/glm.hpp"
 
-namespace GameEvents
+namespace GameMessages
 {
 	struct DestroyCubeReset;
 	struct DestroyCubeSetPosition;
@@ -28,6 +28,6 @@ private:
 	eDestroyCubeIndex m_index;
 	glm::ivec3 m_currentCubePosition;
 
-	void onSetPosition(const GameEvents::DestroyCubeSetPosition& gameEvent);
-	void onReset(const GameEvents::DestroyCubeReset& gameEvent);
+	void onSetPosition(const GameMessages::DestroyCubeSetPosition& gameEvent);
+	void onReset(const GameMessages::DestroyCubeReset& gameEvent);
 };
