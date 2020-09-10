@@ -85,7 +85,8 @@ eCubeType Pickup::getCubeType() const
 
 bool Pickup::isInReachOfPlayer(const glm::vec3& playerMiddlePosition) const
 {
-	return glm::distance(m_position, playerMiddlePosition) <= MINIMUM_DISTANCE_FROM_PLAYER && !m_collectionTimer.isActive();
+	return Globals::getSqrMagnitude(m_position, playerMiddlePosition) <= MINIMUM_DISTANCE_FROM_PLAYER * MINIMUM_DISTANCE_FROM_PLAYER &&
+		!m_collectionTimer.isActive();
 }
 
 void Pickup::update(const Player& player, float deltaTime, const ChunkManager& chunkManager)
@@ -131,7 +132,7 @@ void Pickup::update(const Player& player, float deltaTime, const ChunkManager& c
 	if (!m_collectionTimer.isActive())
 	{
 		glm::vec3 playerMiddlePosition = player.getMiddlePosition();
-		if (glm::distance(m_position, playerMiddlePosition) <= MAXIMUM_DISTANCE_FROM_PLAYER &&
+		if (Globals::getSqrMagnitude(m_position, playerMiddlePosition) <= MAXIMUM_DISTANCE_FROM_PLAYER * MAXIMUM_DISTANCE_FROM_PLAYER &&
 			player.getInventory().isItemAddable(m_cubeType))
 		{
 			m_velocity += glm::normalize(glm::vec3(playerMiddlePosition - m_position)) * MOVEMENT_SPEED;

@@ -47,13 +47,6 @@ namespace
 
 		return { closestChunkStartingPosition.x, 0, closestChunkStartingPosition.z };
 	}
-
-	float getSqrMagnitude(const glm::ivec3& positionA, const glm::ivec3& positionB)
-	{
-		return glm::pow(positionA.x - positionB.x, 2) +
-			glm::pow(positionA.y - positionB.y, 2) +
-			glm::pow(positionA.z - positionB.z, 2);
-	}
 }
 
 //ChunkGenerator
@@ -351,7 +344,7 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 				!m_generatedChunkMeshesQueue.contains(chunkStartingPosition) && 
 				!m_generatedChunkQueue.contains(chunkStartingPosition))
 			{
-				chunksToAdd.emplace_back(getSqrMagnitude(chunkStartingPosition, playerPosition), chunkStartingPosition);
+				chunksToAdd.emplace_back(Globals::getSqrMagnitude(chunkStartingPosition, playerPosition), chunkStartingPosition);
 			}
 		}
 	}

@@ -197,6 +197,13 @@ namespace Globals
 		return { middlePosition.x, 0, middlePosition.z };
 	}
 
+	inline float getSqrMagnitude(const glm::ivec3& positionB, const glm::ivec3& positionA)
+	{
+		return glm::pow(positionB.x - positionA.x, 2) +
+			glm::pow(positionB.y - positionA.y, 2) +
+			glm::pow(positionB.z - positionA.z, 2);
+	}
+
 	constexpr int CUBE_SIZE = 1;
 	//384 Dev Distance
 	//Normal Distance = 864

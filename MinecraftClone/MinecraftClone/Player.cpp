@@ -355,7 +355,7 @@ void Player::spawn(const ChunkManager& chunkManager, std::mutex& chunkInteractio
 
 void Player::handleAutoJump(const ChunkManager& chunkManager)
 {
-	if (!m_autoJump || m_velocity.y != 0 || glm::distance(m_position + m_velocity, m_position) <= 0.25f)
+	if (!m_autoJump || m_velocity.y != 0 || Globals::getSqrMagnitude(m_position + m_velocity, m_position) <= 0.25f / 0.25f)
 	{
 		return;
 	}
