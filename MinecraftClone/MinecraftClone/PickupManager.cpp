@@ -8,11 +8,10 @@
 PickupManager::PickupManager()
 	: m_pickUps()
 {
-	GameMessenger::getInstance().subscribe<GameMessages::SpawnPickUp>(std::bind(
-		&PickupManager::onSpawnPickUp, this, std::placeholders::_1), this);
-	
-	GameMessenger::getInstance().subscribe<GameMessages::PlayerDisgardPickup>(std::bind(
-		&PickupManager::onPlayerDisgardPickup, this, std::placeholders::_1), this);
+	GameMessenger::getInstance().subscribe<GameMessages::SpawnPickUp>(
+		[this](const GameMessages::SpawnPickUp& gameMessage) { return onSpawnPickUp(gameMessage); }, this);
+	GameMessenger::getInstance().subscribe<GameMessages::PlayerDisgardPickup>(
+		[this](const GameMessages::PlayerDisgardPickup& gameMessage) { return onPlayerDisgardPickup(gameMessage); }, this);
 }
 
 PickupManager::~PickupManager()

@@ -146,7 +146,8 @@ Player::Player()
 {
 	m_jumpTimer.restart();
 
-	GameMessenger::getInstance().subscribe<GameMessages::AddToInventory>(std::bind(&Player::onAddToInventory, this, std::placeholders::_1), this);
+	GameMessenger::getInstance().subscribe<GameMessages::AddToInventory>(
+		[this](const GameMessages::AddToInventory& gameMessage) { return onAddToInventory(gameMessage); }, this);
 }
 
 Player::~Player()

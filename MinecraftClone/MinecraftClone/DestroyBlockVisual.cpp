@@ -12,10 +12,10 @@ DestroyBlockVisual::DestroyBlockVisual()
 	m_currentCubePosition()
 {
 	GameMessenger::getInstance().subscribe<GameMessages::DestroyCubeSetPosition>(
-		std::bind(&DestroyBlockVisual::onSetPosition, this, std::placeholders::_1), this);
+		[this](const GameMessages::DestroyCubeSetPosition& gameMessage) { return onSetPosition(gameMessage); }, this);
 
 	GameMessenger::getInstance().subscribe<GameMessages::DestroyCubeReset>(
-		std::bind(&DestroyBlockVisual::onReset , this, std::placeholders::_1), this);
+		[this](const GameMessages::DestroyCubeReset& gameMessage) { return onReset(gameMessage); }, this);
 }
 
 DestroyBlockVisual::~DestroyBlockVisual()

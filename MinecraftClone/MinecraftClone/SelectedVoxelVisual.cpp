@@ -8,11 +8,11 @@ SelectedVoxelVisual::SelectedVoxelVisual()
 	m_position(),
 	m_active(false)
 {
-	GameMessenger::getInstance().subscribe<GameMessages::SelectedCubeSetActive>(std::bind(
-		&SelectedVoxelVisual::onSetActive, this, std::placeholders::_1), this);
+	GameMessenger::getInstance().subscribe<GameMessages::SelectedCubeSetActive>(
+		[this](const GameMessages::SelectedCubeSetActive& gameMessage) { return onSetActive(gameMessage); }, this);
 
-	GameMessenger::getInstance().subscribe<GameMessages::SelectedCubeSetPosition>(std::bind(
-		&SelectedVoxelVisual::onSetPosition, this, std::placeholders::_1), this);
+	GameMessenger::getInstance().subscribe<GameMessages::SelectedCubeSetPosition>(
+		[this](const GameMessages::SelectedCubeSetPosition& gameMessage) { return onSetPosition(gameMessage); }, this);
 }
 
 SelectedVoxelVisual::~SelectedVoxelVisual()
