@@ -101,12 +101,12 @@ Camera::Camera()
 	farPlaneDistance(1750.f),
 	front(),
 	right(),
-	up(),
-	rotation(0.f, 5.f)
+	up({ 0.0f, 1.0f, 0.0f }),
+	rotation(0.f, -20.f)
 {
-	front = { 0.0f, -1.0f, 0.0f };
-	right = glm::normalize(glm::cross({ 0.0f, 1.0f, 0.0f }, front));
-	up = { 0.0f, 1.0f, 0.0f };
+	setFront();
+	right = glm::normalize(glm::cross(front, up));
+	up = glm::normalize(glm::cross(right, front));
 }
 
 void Camera::move(const sf::Window& window, float deltaTime)
@@ -116,7 +116,11 @@ void Camera::move(const sf::Window& window, float deltaTime)
 
 	//Reset mouse position to centre of screen
 	sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
+	setFront();
+}
 
+void Camera::setFront()
+{
 	// make sure that when pitch is out of bounds, screen doesn't get flipped
 	if (rotation.x > 89.0f)
 		rotation.x = 89.0f;

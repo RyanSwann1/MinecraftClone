@@ -18,6 +18,7 @@ struct Camera : private NonCopyable, private NonMovable
 	Camera();
 
 	void move(const sf::Window& window, float deltaTime);
+	void setFront();
 
 	const float FOV;
 	const float sensitivity;
