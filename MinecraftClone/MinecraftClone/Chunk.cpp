@@ -64,6 +64,8 @@ namespace
 		eCubeType::Shrub,
 		eCubeType::TallGrass}
 	};
+
+	static int SEED = Globals::getRandomNumber(0, Globals::MAP_SIZE);
 }
 
 Chunk::Chunk()
@@ -548,8 +550,8 @@ bool Chunk::isCubeAtLocalPosition(const glm::ivec3& localPosition, eCubeType cub
 
 int Chunk::getElevationAtPosition(int x, int z) const
 {
-	double ex = x / static_cast<float>(Globals::MAP_SIZE);
-	double ey = z / static_cast<float>(Globals::MAP_SIZE);
+	double ex = (x + SEED) / static_cast<float>(Globals::MAP_SIZE);
+	double ey = (z + SEED) / static_cast<float>(Globals::MAP_SIZE);
 
 	float elevation = 0.0f;
 
