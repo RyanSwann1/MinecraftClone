@@ -85,6 +85,7 @@ enum class eDirection
 
 namespace Globals
 {
+	constexpr int CHUNK_SIZE = 32;
 	constexpr int CHUNK_WIDTH = 32;
 	constexpr int CHUNK_HEIGHT = 320;
 	constexpr int CHUNK_DEPTH = 32;

@@ -14,6 +14,17 @@
 #include <SFML/Graphics.hpp>
 #include <atomic>
 
+struct ChunkToAdd
+{
+	ChunkToAdd(float distanceFromCamera, const glm::ivec3& startingPosition)
+		: distanceFromCamera(distanceFromCamera),
+		startingPosition(startingPosition)
+	{}
+
+	float distanceFromCamera;
+	glm::ivec3 startingPosition;
+};
+
 struct Rectangle;
 class Player;
 struct Frustum;
@@ -43,6 +54,7 @@ private:
 	ObjectPool<VertexArray> m_chunkMeshPool;
 	std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>> m_chunks;
 	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_chunkMeshes;
+	std::vector<ChunkToAdd> m_chunksToAdd;
 	ChunkMeshesToGenerateQueue m_chunkMeshesToGenerateQueue;
 	ObjectQueue<PositionNode> m_deletionQueue;
 	GeneratedChunkMeshQueue m_generatedChunkMeshesQueue;

@@ -15,7 +15,7 @@ namespace
 {
 	constexpr int THREAD_TRANSFER_PER_FRAME = 8;
 
-	int getObjectPoolSize()
+	int getMaxChunksSize()
 	{
 		int x = 2 * Globals::VISIBILITY_DISTANCE / Globals::CHUNK_WIDTH + 1;
 		int z = 2 * Globals::VISIBILITY_DISTANCE / Globals::CHUNK_DEPTH + 1;
@@ -51,16 +51,18 @@ namespace
 
 //ChunkGenerator
 ChunkManager::ChunkManager()
-	: m_chunkPool(getObjectPoolSize()),
-	m_chunkMeshPool(getObjectPoolSize()),
+	: m_chunkPool(getMaxChunksSize()),
+	m_chunkMeshPool(getMaxChunksSize()),
 	m_chunks(),
 	m_chunkMeshes(),
+	m_chunksToAdd(),
 	m_chunkMeshesToGenerateQueue(),
 	m_deletionQueue(),
 	m_generatedChunkMeshesQueue(),
 	m_generatedChunkQueue(),
 	m_chunkMeshRegenerationQueue()
 {
+	m_chunksToAdd.reserve(getMaxChunksSize());
 	addChunks(Globals::PLAYER_STARTING_POSITION);
 }
 
@@ -319,18 +321,7 @@ void ChunkManager::deleteChunks(const glm::ivec3& playerPosition, const Rectangl
 
 void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 {
-	struct ChunkToAdd
-	{
-		ChunkToAdd(float distanceFromCamera, const glm::ivec3& startingPosition)
-			: distanceFromCamera(distanceFromCamera),
-			startingPosition(startingPosition)
-		{}
-
-		float distanceFromCamera;
-		glm::ivec3 startingPosition;
-	};
-
-	static std::vector<ChunkToAdd> chunksToAdd;
+	assert(m_chunksToAdd.empty());
 	glm::ivec3 startPosition = Globals::getClosestMiddlePosition(playerPosition);
 	startPosition = getClosestChunkStartingPosition(startPosition);
 	for (int z = startPosition.z - Globals::VISIBILITY_DISTANCE; z <= startPosition.z + Globals::VISIBILITY_DISTANCE; z += Globals::CHUNK_DEPTH)
@@ -344,19 +335,19 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 				!m_generatedChunkMeshesQueue.contains(chunkStartingPosition) && 
 				!m_generatedChunkQueue.contains(chunkStartingPosition))
 			{
-				chunksToAdd.emplace_back(Globals::getSqrMagnitude(chunkStartingPosition, playerPosition), chunkStartingPosition);
+				m_chunksToAdd.emplace_back(Globals::getSqrMagnitude(chunkStartingPosition, playerPosition), chunkStartingPosition);
 			}
 		}
 	}
 
-	if (!chunksToAdd.empty())
+	if (!m_chunksToAdd.empty())
 	{
-		std::sort(chunksToAdd.begin(), chunksToAdd.end(), [](const auto& a, const auto& b)
+		std::sort(m_chunksToAdd.begin(), m_chunksToAdd.end(), [](const auto& a, const auto& b)
 		{
 			return a.distanceFromCamera < b.distanceFromCamera;
 		});
 
-		for (const auto& chunkToAdd : chunksToAdd)
+		for (const auto& chunkToAdd : m_chunksToAdd)
 		{
 			ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
 			if (chunkFromPool.getObject())
@@ -368,7 +359,7 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 			}
 		}
 
-		chunksToAdd.clear();
+		m_chunksToAdd.clear();
 	}
 }
 
