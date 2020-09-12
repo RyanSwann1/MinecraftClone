@@ -165,7 +165,8 @@ void Inventory::add(eCubeType cubeTypeToAdd)
 
 void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
 {
-	assert(currentSFMLEvent.type == sf::Event::KeyPressed);
+	assert(currentSFMLEvent.type == sf::Event::KeyPressed ||
+		currentSFMLEvent.type == sf::Event::MouseWheelMoved);
 
 	if (currentSFMLEvent.type == sf::Event::KeyPressed)
 	{
@@ -199,6 +200,28 @@ void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
 			m_currentSelectedItem = eInventoryIndex::Nine;
 			break;
 		}
+	}
+	else if (currentSFMLEvent.type == sf::Event::MouseWheelMoved)
+	{
+		int rawCurrentSelectedItem = static_cast<int>(m_currentSelectedItem);
+		if (currentSFMLEvent.mouseWheel.delta > 0)
+		{
+			++rawCurrentSelectedItem;
+			if (rawCurrentSelectedItem > static_cast<int>(eInventoryIndex::Max))
+			{
+				rawCurrentSelectedItem = 0;
+			}
+		}		
+		else
+		{
+			--rawCurrentSelectedItem;
+			if (rawCurrentSelectedItem < 0)
+			{
+				rawCurrentSelectedItem = static_cast<int>(eInventoryIndex::Max);
+			}
+		}
+
+		m_currentSelectedItem = static_cast<eInventoryIndex>(rawCurrentSelectedItem);
 	}
 
 	GameMessenger::getInstance().broadcast<GameMessages::UpdateSelectionBoxGUI>({ m_currentSelectedItem });

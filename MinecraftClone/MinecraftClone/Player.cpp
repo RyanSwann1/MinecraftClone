@@ -423,8 +423,9 @@ void Player::onAddToInventory(const GameMessages::AddToInventory& gameMessage)
 void Player::handleInputEvents(const sf::Event& currentSFMLEvent,
 	ChunkManager& chunkManager, std::mutex& chunkInteractionMutex, const sf::Window& window)
 {
-	if (currentSFMLEvent.type == sf::Event::KeyPressed)
-	{	
+	switch (currentSFMLEvent.type)
+	{
+	case sf::Event::KeyPressed:
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::T))
 		{
 			m_autoJump = !m_autoJump;
@@ -435,10 +436,13 @@ void Player::handleInputEvents(const sf::Event& currentSFMLEvent,
 		}
 
 		m_inventory.handleInputEvents(currentSFMLEvent);
-	}
-	if (currentSFMLEvent.type == sf::Event::MouseMoved)
-	{
+		break;
+	case sf::Event::MouseMoved:
 		handleSelectedCube(chunkManager);
+		break;
+	case sf::Event::MouseWheelMoved:
+		m_inventory.handleInputEvents(currentSFMLEvent);
+		break;
 	}
 }
 
