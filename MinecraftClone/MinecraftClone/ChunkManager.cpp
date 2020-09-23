@@ -223,7 +223,6 @@ bool ChunkManager::destroyCubeAtPosition(const glm::ivec3& blockToDestroy, eCube
 	return false;
 }
 
-//Two threads acquire two locks in different order
 void ChunkManager::update(const Player& player, const sf::Window& window, std::atomic<bool>& resetGame,
 	std::mutex& chunkInteractionMutex, std::mutex& renderingMutex)	
 {

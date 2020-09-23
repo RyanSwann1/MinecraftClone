@@ -452,7 +452,7 @@ void Player::update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkMan
 	m_placeCubeTimer.update(deltaTime);
 	m_destroyCubeTimer.update(deltaTime);
 
-	std::unique_lock<std::mutex> playerLock(chunkInteractionMutex);
+	std::unique_lock<std::mutex> chunkInteractionLock(chunkInteractionMutex);
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
 		destroyFacingBlock(chunkManager);
@@ -475,7 +475,7 @@ void Player::update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkMan
 
 	move(deltaTime, chunkManager);
 	handleCollisions(chunkManager);
-	playerLock.unlock();
+	chunkInteractionLock.unlock();
 
 	m_position += m_velocity * deltaTime;
 	
