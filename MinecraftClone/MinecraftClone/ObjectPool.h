@@ -10,7 +10,7 @@
 template <class Object>
 struct ObjectFromPool : private NonCopyable
 {
-	ObjectFromPool(Object* objectInPool = nullptr, std::function<void(Object*)> onDestroyFunction = nullptr)
+	ObjectFromPool(Object* objectInPool = nullptr, std::function<void(Object&)> onDestroyFunction = nullptr)
 		: objectInPool(objectInPool),
 		onDestroyFunction(onDestroyFunction)
 	{
@@ -21,13 +21,14 @@ struct ObjectFromPool : private NonCopyable
 		if (objectInPool)
 		{
 			objectInPool->reset();
-			onDestroyFunction(objectInPool);
+			onDestroyFunction(*objectInPool);
 		}
 	}
 	ObjectFromPool(ObjectFromPool&& orig) noexcept
 		: objectInPool(orig.objectInPool),
 		onDestroyFunction(orig.onDestroyFunction)
 	{
+		orig.onDestroyFunction = nullptr;
 		orig.objectInPool = nullptr;
 	}
 	ObjectFromPool& operator=(ObjectFromPool&& orig) noexcept
@@ -35,6 +36,7 @@ struct ObjectFromPool : private NonCopyable
 		objectInPool = orig.objectInPool;
 		onDestroyFunction = orig.onDestroyFunction;
 
+		orig.onDestroyFunction = nullptr;
 		orig.objectInPool = nullptr;
 
 		return *this;
@@ -47,7 +49,7 @@ struct ObjectFromPool : private NonCopyable
 
 private:
 	Object* objectInPool;
-	std::function<void(Object*)> onDestroyFunction;
+	std::function<void(Object&)> onDestroyFunction;
 };
 
 //Object Pool
@@ -80,7 +82,7 @@ public:
 			Object* objectInPool = m_availableObjects.top();
 			assert(objectInPool);
 			m_availableObjects.pop();
-			return ObjectFromPool<Object>(objectInPool, [this](Object* objectInPool)
+			return ObjectFromPool<Object>(objectInPool, [this](Object& objectInPool)
 			{
 				return releaseObject(objectInPool);
 			});
@@ -96,9 +98,8 @@ private:
 	std::stack<Object*> m_availableObjects;
 	std::vector<Object> m_objectPool;
 
-	void releaseObject(Object* objectInPool)
+	void releaseObject(Object& objectInPool)
 	{
-		assert(objectInPool);
-		m_availableObjects.push(objectInPool);
+		m_availableObjects.push(&objectInPool);
 	}
 };
