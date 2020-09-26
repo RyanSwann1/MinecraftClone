@@ -65,7 +65,7 @@ public:
 		m_objectPool.resize(size);
 		for (auto& object : m_objectPool)
 		{
-			m_availableObjects.push(&object);
+			m_availableObjects.push(object);
 		}
 	}
 	~ObjectPool()
@@ -79,10 +79,9 @@ public:
 		{
 			assert(!m_objectPool.empty());
 			
-			Object* objectInPool = m_availableObjects.top();
-			assert(objectInPool);
+			Object& objectInPool = m_availableObjects.top();
 			m_availableObjects.pop();
-			return ObjectFromPool<Object>(objectInPool, [this](Object& objectInPool)
+			return ObjectFromPool<Object>(&objectInPool, [this](Object& objectInPool)
 			{
 				return releaseObject(objectInPool);
 			});
@@ -95,11 +94,11 @@ public:
 
 private:
 	const size_t m_maxSize;
-	std::stack<Object*> m_availableObjects;
+	std::stack<std::reference_wrapper<Object>> m_availableObjects;
 	std::vector<Object> m_objectPool;
 
 	void releaseObject(Object& objectInPool)
 	{
-		m_availableObjects.push(&objectInPool);
+		m_availableObjects.push(objectInPool);
 	}
 };
