@@ -258,7 +258,7 @@ void Player::placeBlock(ChunkManager& chunkManager)
 
 	if (!blockPlaced)
 	{
-		for (int i = std::ceil(PLACE_BLOCK_RANGE / PLACE_BLOCK_INCREMENT); i >= 0; --i)
+		for (int i = static_cast<int>(std::ceil(PLACE_BLOCK_RANGE / PLACE_BLOCK_INCREMENT)); i >= 0; --i)
 		{
 			glm::vec3 rayPosition = m_camera.front * (static_cast<float>(i) * PLACE_BLOCK_INCREMENT) + m_position;
 			eCubeType cubeTypeToPlace = m_inventory.getSelectedItemType();

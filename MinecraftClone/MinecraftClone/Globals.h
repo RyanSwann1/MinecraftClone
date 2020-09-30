@@ -195,21 +195,21 @@ namespace Globals
 			middlePosition.z += Globals::CHUNK_DEPTH / 2;
 		}
 
-		return { middlePosition.x, 0, middlePosition.z };
+		return { middlePosition.x, 0, middlePosition.z }; 
 	}
 
-	inline float getSqrMagnitude(const glm::ivec3& positionB, const glm::ivec3& positionA)
+	inline float getSqrMagnitude(const glm::vec3& positionB, const glm::vec3& positionA)
 	{
-		return glm::pow(positionB.x - positionA.x, 2) +
-			glm::pow(positionB.y - positionA.y, 2) +
-			glm::pow(positionB.z - positionA.z, 2);
+		return glm::pow(positionB.x - positionA.x, 2.0f) +
+			glm::pow(positionB.y - positionA.y, 2.0f) +
+			glm::pow(positionB.z - positionA.z, 2.0f);
 	}
 
 	constexpr int CUBE_SIZE = 1;
 	//384 Dev Distance
 	//Normal Distance = 864
 	//Far Distance = 1024
-	constexpr int VISIBILITY_DISTANCE = 864;
+	constexpr int VISIBILITY_DISTANCE = 1024;
 	constexpr int MAP_SIZE = 8000;
 	const std::string TEXTURE_DIRECTORY = "Textures/";
 	const std::string FONTS_DIRECTORY = "Fonts/";

@@ -579,7 +579,7 @@ int Chunk::getElevationAtPosition(int x, int z) const
 	elevation = glm::pow(elevation, 3.0f);
 	elevation = elevation * (float)Globals::CHUNK_HEIGHT - 1;
 
-	return elevation;
+	return static_cast<int>(elevation);
 }
 
 //elevation = (elevation - -1) / (1 - -1) * (Utilities::CHUNK_HEIGHT - 1) + 1;

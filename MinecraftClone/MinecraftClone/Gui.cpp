@@ -19,12 +19,12 @@ namespace
 	constexpr int FONT_TEXTURE_COLUMNS = 8;
 	constexpr float ITEM_OFFSET_X = 64.0f;
 	constexpr float ITEM_QUANTITY_OFFSET_X = 66.0f;
-	constexpr glm::vec2 FONT_TEXTURE_TILESIZE = { 32, 32 };
-	constexpr glm::vec2 FONT_TEXTURE_SIZE = { 256, 256 };
-	constexpr glm::vec2 ITEM_SIZE = { 36, 36 };
+	constexpr glm::ivec2 FONT_TEXTURE_TILESIZE = { 32, 32 };
+	constexpr glm::ivec2 FONT_TEXTURE_SIZE = { 256, 256 };
+	constexpr glm::ivec2 ITEM_SIZE = { 36, 36 };
 
-	constexpr glm::vec2 TOOLBAR_SIZE = { 580, 60 };
-	constexpr glm::vec2 SELECTION_BOX_SIZE = { 66, 60 };
+	constexpr glm::ivec2 TOOLBAR_SIZE = { 580, 60 };
+	constexpr glm::ivec2 SELECTION_BOX_SIZE = { 66, 60 };
 
 	glm::vec2 initialSelectionBoxPosition;
 	glm::vec2 firstItemPosition;
@@ -367,7 +367,7 @@ void Text::setText(const std::vector<glm::vec2>& positions, const std::vector<gl
 {
 	assert(!positions.empty() && !textCoords.empty());
 
-	m_vertexCount = positions.size();
+	m_vertexCount = static_cast<int>(positions.size());
 	glBindVertexArray(m_ID);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_positionsVBO);
