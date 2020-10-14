@@ -102,21 +102,22 @@ Camera::Camera()
 	front(),
 	right(),
 	up({ 0.0f, 1.0f, 0.0f }),
-	rotation(0.f, -20.f)
+	rotation()
 {
 	setFront();
 	right = glm::normalize(glm::cross(front, up));
 	up = glm::normalize(glm::cross(right, front));
 }
 
-void Camera::move(const sf::Window& window, float deltaTime)
+void Camera::update(const sf::Window& window, float deltaTime)
 {
 	rotation.x += (static_cast<int>(window.getSize().y / 2) - sf::Mouse::getPosition(window).y) * sensitivity * deltaTime;
 	rotation.y += (sf::Mouse::getPosition(window).x - static_cast<int>(window.getSize().x / 2)) * sensitivity * deltaTime;
 
-	//Reset mouse position to centre of screen
 	sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 	setFront();
+	right = glm::normalize(glm::cross(front, { 0.0f, 1.0f, 0.0f }));
+	up = glm::normalize(glm::cross(right, front));
 }
 
 void Camera::setFront()
@@ -448,7 +449,7 @@ void Player::handleInputEvents(const sf::Event& currentSFMLEvent,
 
 void Player::update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkManager& chunkManager, const sf::Window& window)
 {
-	m_camera.move(window, deltaTime);
+	m_camera.update(window, deltaTime);
 	m_placeCubeTimer.update(deltaTime);
 	m_destroyCubeTimer.update(deltaTime);
 
@@ -531,13 +532,13 @@ void Player::move(float deltaTime, const ChunkManager& chunkManager)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y + 90)) * movementSpeed;
-		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y + 90)) * movementSpeed;
+		m_velocity.x += m_camera.right.x * movementSpeed;
+		m_velocity.z += m_camera.right.z * movementSpeed;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y - 90)) * movementSpeed;
-		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y - 90)) * movementSpeed;
+		m_velocity.x -= m_camera.right.x * movementSpeed;
+		m_velocity.z -= m_camera.right.z * movementSpeed;
 	}
 
 	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Space))

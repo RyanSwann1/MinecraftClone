@@ -28,7 +28,6 @@ struct ChunkToAdd
 struct Rectangle;
 class Player;
 class Frustum;
-struct VertexArray;
 class ChunkManager : private NonCopyable, private NonMovable
 {
 public:
