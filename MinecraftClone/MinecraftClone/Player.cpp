@@ -522,24 +522,19 @@ void Player::move(const ChunkManager& chunkManager)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		m_velocity.x += m_camera.forward.x * movementSpeed;
-		m_velocity.z += m_camera.forward.z * movementSpeed;
+		m_velocity += m_camera.forward * movementSpeed;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
-		m_velocity.x -= m_camera.forward.x * movementSpeed;
-		m_velocity.z -= m_camera.forward.z * movementSpeed;
+		m_velocity -= m_camera.forward * movementSpeed;
 	}
-
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		m_velocity.x += m_camera.right.x * movementSpeed;
-		m_velocity.z += m_camera.right.z * movementSpeed;
+		m_velocity += m_camera.right * movementSpeed;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		m_velocity.x -= m_camera.right.x * movementSpeed;
-		m_velocity.z -= m_camera.right.z * movementSpeed;
+		m_velocity -= m_camera.right * movementSpeed;
 	}
 
 	if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
