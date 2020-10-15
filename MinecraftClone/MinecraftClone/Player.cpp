@@ -475,7 +475,7 @@ void Player::update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkMan
 		}
 	}
 
-	move(deltaTime, chunkManager);
+	move(chunkManager);
 	handleCollisions(chunkManager);
 	chunkInteractionLock.unlock();
 
@@ -496,7 +496,7 @@ void Player::update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkMan
 	}
 }
 
-void Player::move(float deltaTime, const ChunkManager& chunkManager)
+void Player::move(const ChunkManager& chunkManager)
 {
 	float movementSpeed = 0.0f;
 	float jumpSpeed = 0.0f;

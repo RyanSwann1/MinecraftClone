@@ -76,7 +76,7 @@ private:
 	Timer m_placeCubeTimer;
 	Timer m_destroyCubeTimer;
 
-	void move(float deltaTime, const ChunkManager& chunkManager);
+	void move(const ChunkManager& chunkManager);
 	void handleCollisions(const ChunkManager& chunkManager);
 	void discardItem();
 	void placeBlock(ChunkManager& chunkManager);
