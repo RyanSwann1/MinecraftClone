@@ -118,6 +118,7 @@ void Camera::update(const sf::Window& window, float deltaTime)
 	setFront();
 	right = glm::normalize(glm::cross(front, { 0.0f, 1.0f, 0.0f }));
 	up = glm::normalize(glm::cross(right, front));
+	forward = glm::normalize(glm::cross({ 0.0f, 1.0f, 0.0f }, right));
 }
 
 void Camera::setFront()
@@ -521,13 +522,13 @@ void Player::move(float deltaTime, const ChunkManager& chunkManager)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
-		m_velocity.x += glm::cos(glm::radians(m_camera.rotation.y)) * movementSpeed;
-		m_velocity.z += glm::sin(glm::radians(m_camera.rotation.y)) * movementSpeed;
+		m_velocity.x += m_camera.forward.x * movementSpeed;
+		m_velocity.z += m_camera.forward.z * movementSpeed;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
-		m_velocity.x -= glm::cos(glm::radians(m_camera.rotation.y)) * movementSpeed;
-		m_velocity.z -= glm::sin(glm::radians(m_camera.rotation.y)) * movementSpeed;
+		m_velocity.x -= m_camera.forward.x * movementSpeed;
+		m_velocity.z -= m_camera.forward.z * movementSpeed;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
