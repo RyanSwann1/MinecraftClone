@@ -51,6 +51,32 @@ private:
 	Object* next;
 };
 
+template <class Object>
+struct ObjectQueueDerivedNode : public ObjectQueueNode<ObjectQueueDerivedNode<Object>>
+{
+	ObjectQueueDerivedNode(const glm::ivec3& position, Object&& object)
+		: ObjectQueueNode<ObjectQueueDerivedNode<Object>>(position),
+		object(std::move(object))
+	{}
+	ObjectQueueDerivedNode(const glm::ivec3& position, Object& object)
+		: ObjectQueueNode<ObjectQueueDerivedNode<Object>>(position),
+		object(object)
+	{}
+	ObjectQueueDerivedNode(ObjectQueueDerivedNode&& orig) noexcept
+		: ObjectQueueNode<ObjectQueueDerivedNode<Object>>(std::move(orig)),
+		object(std::move(orig.object))
+	{}
+	ObjectQueueDerivedNode& operator=(ObjectQueueDerivedNode&& orig) noexcept
+	{
+		ObjectQueueNode<ObjectQueueDerivedNode<Object>>::operator=(std::move(orig));
+		object = std::move(orig.object);
+
+		return *this;
+	}
+
+	Object object;
+};
+
 struct PositionNode : public ObjectQueueNode<PositionNode>
 {
 	PositionNode(const glm::ivec3& position)
