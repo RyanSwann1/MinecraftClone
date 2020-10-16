@@ -292,7 +292,7 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 				m_deletionQueue.pop();
 			}
 
-			m_generatedChunkQueue.update(m_chunks);
+			handleGeneratedChunkQueue();
 			handleGeneratedChunkMeshQueue();
 		}
 	}
@@ -475,5 +475,19 @@ void ChunkManager::handleGeneratedChunkMeshQueue()
 			std::forward_as_tuple(std::move(generatedChunkMesh.object)));
 
 		m_generatedChunkMeshQueue.pop();
+	}
+}
+
+void ChunkManager::handleGeneratedChunkQueue()
+{
+	if (!m_generatedChunkQueue.isEmpty())
+	{
+		ObjectQueueDerivedNode<ObjectFromPool<Chunk>>& generatedChunk = m_generatedChunkQueue.front();
+
+		m_chunks.emplace(std::piecewise_construct,
+			std::forward_as_tuple(generatedChunk.getPosition()),
+			std::forward_as_tuple(std::move(generatedChunk.object)));
+
+		m_generatedChunkQueue.pop();
 	}
 }

@@ -4,7 +4,6 @@
 #include "Chunk.h"
 #include "VertexArray.h"
 #include "ObjectQueue.h"
-#include "GeneratedChunkQueue.h"
 #include <vector>
 #include <unordered_map>
 #include <mutex>
@@ -50,13 +49,15 @@ private:
 	ObjectQueue<PositionNode> m_chunkMeshesToGenerateQueue;
 	ObjectQueue<PositionNode> m_deletionQueue;
 	ObjectQueue<ObjectQueueDerivedNode<ObjectFromPool<VertexArray>>> m_generatedChunkMeshQueue;
-	GeneratedChunkQueue m_generatedChunkQueue;
+	ObjectQueue<ObjectQueueDerivedNode<ObjectFromPool<Chunk>>> m_generatedChunkQueue;
 	ObjectQueue<ObjectQueueDerivedNode<std::reference_wrapper<VertexArray>>> m_chunkMeshRegenerationQueue;
 	
 	void deleteChunks(const glm::ivec3& playerPosition, const Rectangle& visibilityRect);
 	void addChunks(const glm::ivec3& playerPosition);
 	void clearQueues(const glm::ivec3& playerPosition, const Rectangle& visibilityRect);
+	
 	void handleChunkMeshesToGenerateQueue();
 	void handleChunkMeshRegenerationQueue();
 	void handleGeneratedChunkMeshQueue();
+	void handleGeneratedChunkQueue();
 };
