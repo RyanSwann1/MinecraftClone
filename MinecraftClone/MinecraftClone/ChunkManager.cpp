@@ -191,7 +191,6 @@ bool ChunkManager::destroyCubeAtPosition(const glm::ivec3& blockToDestroy, eCube
 	if (chunk->second.object.get().destroyCubeAtPosition(blockToDestroy, destroyedCubeType))
 	{
 		auto chunkMesh = m_chunkMeshes.find(chunkStartingPosition);
-
 		if (!m_chunkMeshRegenerationQueue.contains(chunkStartingPosition))
 		{
 			m_chunkMeshRegenerationQueue.add({ chunkStartingPosition, chunkMesh->second.object });
@@ -262,7 +261,7 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 		clearQueues(playerPosition, visibilityRect);
 		deleteChunks(playerPosition, visibilityRect);
 		addChunks(playerPosition);
-		m_chunkMeshesToGenerateQueue.update(m_chunkMeshPool, m_chunks, m_generatedChunkMeshesQueue);
+		handleGeneratedChunkMeshesQueue();
 
 		playerLock.lock();
 		std::lock_guard<std::mutex> renderingLock(renderingMutex); 
@@ -392,4 +391,47 @@ void ChunkManager::clearQueues(const glm::ivec3& playerPosition, const Rectangle
 	m_generatedChunkMeshesQueue.removeOutOfBoundsElements(visibilityRect);
 	m_generatedChunkQueue.removeOutOfBoundsElements(visibilityRect);
 	m_chunkMeshRegenerationQueue.removeOutOfBoundsElements(visibilityRect);
+}
+
+void ChunkManager::handleGeneratedChunkMeshesQueue()
+{
+	if (m_chunkMeshesToGenerateQueue.isEmpty())
+	{
+		return;
+	}
+
+	PositionNode* chunkMeshToGenerate = &m_chunkMeshesToGenerateQueue.front();
+	while (chunkMeshToGenerate)
+	{
+		const glm::ivec3& chunkStartingPosition = chunkMeshToGenerate->getPosition();
+		if (isAllNeighbouringChunksAvailable(m_chunks, chunkStartingPosition))
+		{
+			if (m_chunkMeshPool.isObjectAvailable())
+			{
+				ObjectFromPool<VertexArray> chunkMeshFromPool = m_chunkMeshPool.getAvailableObject();
+				auto chunk = m_chunks.find(chunkStartingPosition);
+				if (chunk != m_chunks.cend())
+				{
+					MeshGenerator::generateChunkMesh(chunkMeshFromPool.object, chunk->second.object,
+						getAllNeighbouringChunks(m_chunks, chunkStartingPosition));
+
+					m_generatedChunkMeshesQueue.add({ chunkStartingPosition, std::move(chunkMeshFromPool) });
+
+					chunkMeshToGenerate = m_chunkMeshesToGenerateQueue.remove(chunkMeshToGenerate);
+				}
+				else
+				{
+					chunkMeshToGenerate = m_chunkMeshesToGenerateQueue.next(chunkMeshToGenerate);
+				}
+			}
+			else
+			{
+				chunkMeshToGenerate = m_chunkMeshesToGenerateQueue.next(chunkMeshToGenerate);
+			}
+		}
+		else
+		{
+			chunkMeshToGenerate = m_chunkMeshesToGenerateQueue.next(chunkMeshToGenerate);
+		}
+	}
 }

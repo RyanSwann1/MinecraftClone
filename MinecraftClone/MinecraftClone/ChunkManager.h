@@ -7,7 +7,6 @@
 #include "ChunkMeshRegenerationQueue.h"
 #include "GeneratedChunkMeshQueue.h"
 #include "GeneratedChunkQueue.h"
-#include "ChunkMeshesToGenerateQueue.h"
 #include <vector>
 #include <unordered_map>
 #include <mutex>
@@ -52,7 +51,7 @@ private:
 	std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>> m_chunks;
 	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_chunkMeshes;
 	std::vector<ChunkToAdd> m_chunksToAdd;
-	ChunkMeshesToGenerateQueue m_chunkMeshesToGenerateQueue;
+	ObjectQueue<PositionNode> m_chunkMeshesToGenerateQueue;
 	ObjectQueue<PositionNode> m_deletionQueue;
 	GeneratedChunkMeshQueue m_generatedChunkMeshesQueue;
 	GeneratedChunkQueue m_generatedChunkQueue;
@@ -61,4 +60,6 @@ private:
 	void deleteChunks(const glm::ivec3& playerPosition, const Rectangle& visibilityRect);
 	void addChunks(const glm::ivec3& playerPosition);
 	void clearQueues(const glm::ivec3& playerPosition, const Rectangle& visibilityRect);
+
+	void handleGeneratedChunkMeshesQueue();
 };
