@@ -49,7 +49,13 @@ namespace
 	}
 }
 
-//ChunkGenerator
+//ChunkToAdd
+ChunkToAdd::ChunkToAdd(float distanceFromCamera, const glm::ivec3& startingPosition)
+	: distanceFromCamera(distanceFromCamera),
+	startingPosition(startingPosition)
+{}
+
+//ChunkManager
 ChunkManager::ChunkManager()
 	: m_chunkPool(getMaxChunksSize()),
 	m_chunkMeshPool(getMaxChunksSize()),
@@ -58,7 +64,7 @@ ChunkManager::ChunkManager()
 	m_chunksToAdd(),
 	m_chunkMeshesToGenerateQueue(),
 	m_deletionQueue(),
-	m_generatedChunkMeshesQueue(),
+	m_generatedChunkMeshQueue(),
 	m_generatedChunkQueue(),
 	m_chunkMeshRegenerationQueue()
 {
@@ -261,7 +267,7 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 		clearQueues(playerPosition, visibilityRect);
 		deleteChunks(playerPosition, visibilityRect);
 		addChunks(playerPosition);
-		handleGeneratedChunkMeshesQueue();
+		handleChunkMeshesToGenerateQueue();
 
 		playerLock.lock();
 		std::lock_guard<std::mutex> renderingLock(renderingMutex); 
@@ -287,7 +293,7 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 			}
 
 			m_generatedChunkQueue.update(m_chunks);
-			m_generatedChunkMeshesQueue.update(m_chunkMeshes);
+			handleGeneratedChunkMeshQueue();
 		}
 	}
 }
@@ -354,7 +360,7 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 			if (m_chunks.find(chunkStartingPosition) == m_chunks.cend() && 
 				m_chunkMeshes.find(chunkStartingPosition) == m_chunkMeshes.cend() && 
 				!m_chunkMeshesToGenerateQueue.contains(chunkStartingPosition) &&
-				!m_generatedChunkMeshesQueue.contains(chunkStartingPosition) && 
+				!m_generatedChunkMeshQueue.contains(chunkStartingPosition) && 
 				!m_generatedChunkQueue.contains(chunkStartingPosition))
 			{
 				m_chunksToAdd.emplace_back(Globals::getSqrMagnitude(chunkStartingPosition, playerPosition), chunkStartingPosition);
@@ -388,12 +394,12 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 void ChunkManager::clearQueues(const glm::ivec3& playerPosition, const Rectangle& visibilityRect)
 {
 	m_chunkMeshesToGenerateQueue.removeOutOfBoundsElements(visibilityRect);
-	m_generatedChunkMeshesQueue.removeOutOfBoundsElements(visibilityRect);
+	m_generatedChunkMeshQueue.removeOutOfBoundsElements(visibilityRect);
 	m_generatedChunkQueue.removeOutOfBoundsElements(visibilityRect);
 	m_chunkMeshRegenerationQueue.removeOutOfBoundsElements(visibilityRect);
 }
 
-void ChunkManager::handleGeneratedChunkMeshesQueue()
+void ChunkManager::handleChunkMeshesToGenerateQueue()
 {
 	if (m_chunkMeshesToGenerateQueue.isEmpty())
 	{
@@ -415,7 +421,8 @@ void ChunkManager::handleGeneratedChunkMeshesQueue()
 					MeshGenerator::generateChunkMesh(chunkMeshFromPool.object, chunk->second.object,
 						getAllNeighbouringChunks(m_chunks, chunkStartingPosition));
 
-					m_generatedChunkMeshesQueue.add({ chunkStartingPosition, std::move(chunkMeshFromPool) });
+					m_generatedChunkMeshQueue.add(
+						ObjectQueueDerivedNode<ObjectFromPool<VertexArray>>(chunkStartingPosition, std::move(chunkMeshFromPool) ));
 
 					chunkMeshToGenerate = m_chunkMeshesToGenerateQueue.remove(chunkMeshToGenerate);
 				}
@@ -454,5 +461,19 @@ void ChunkManager::handleChunkMeshRegenerationQueue()
 
 			regenNode = m_chunkMeshRegenerationQueue.remove(regenNode);
 		}
+	}
+}
+
+void ChunkManager::handleGeneratedChunkMeshQueue()
+{
+	if (!m_generatedChunkMeshQueue.isEmpty())
+	{
+		ObjectQueueDerivedNode<ObjectFromPool<VertexArray>>& generatedChunkMesh = m_generatedChunkMeshQueue.front();
+
+		m_chunkMeshes.emplace(std::piecewise_construct,
+			std::forward_as_tuple(generatedChunkMesh.getPosition()),
+			std::forward_as_tuple(std::move(generatedChunkMesh.object)));
+
+		m_generatedChunkMeshQueue.pop();
 	}
 }

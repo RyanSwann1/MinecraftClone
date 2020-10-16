@@ -4,7 +4,6 @@
 #include "Chunk.h"
 #include "VertexArray.h"
 #include "ObjectQueue.h"
-#include "GeneratedChunkMeshQueue.h"
 #include "GeneratedChunkQueue.h"
 #include <vector>
 #include <unordered_map>
@@ -13,34 +12,9 @@
 #include <atomic>
 #include <functional>
 
-template <class Object>
-struct ObjectQueueDerivedNode : public ObjectQueueNode<ObjectQueueDerivedNode<Object>>
-{
-	ObjectQueueDerivedNode(const glm::ivec3& position, Object& object)
-		: ObjectQueueNode<ObjectQueueDerivedNode<Object>>(position),
-		object(object)
-	{}
-	ObjectQueueDerivedNode(ObjectQueueDerivedNode&& orig) noexcept
-		: ObjectQueueNode<ObjectQueueDerivedNode<Object>>(std::move(orig)),
-		object(std::move(orig.object))
-	{}
-	ObjectQueueDerivedNode& operator=(ObjectQueueDerivedNode&& orig) noexcept
-	{
-		ObjectQueueNode<ObjectQueueDerivedNode<Object>>::operator=(std::move(orig));
-		object = std::move(orig.object);
-
-		return *this;
-	}
-
-	Object object;
-};
-
 struct ChunkToAdd
 {
-	ChunkToAdd(float distanceFromCamera, const glm::ivec3& startingPosition)
-		: distanceFromCamera(distanceFromCamera),
-		startingPosition(startingPosition)
-	{}
+	ChunkToAdd(float distanceFromCamera, const glm::ivec3& startingPosition);
 
 	float distanceFromCamera;
 	glm::ivec3 startingPosition;
@@ -75,13 +49,14 @@ private:
 	std::vector<ChunkToAdd> m_chunksToAdd;
 	ObjectQueue<PositionNode> m_chunkMeshesToGenerateQueue;
 	ObjectQueue<PositionNode> m_deletionQueue;
-	GeneratedChunkMeshQueue m_generatedChunkMeshesQueue;
+	ObjectQueue<ObjectQueueDerivedNode<ObjectFromPool<VertexArray>>> m_generatedChunkMeshQueue;
 	GeneratedChunkQueue m_generatedChunkQueue;
 	ObjectQueue<ObjectQueueDerivedNode<std::reference_wrapper<VertexArray>>> m_chunkMeshRegenerationQueue;
 	
 	void deleteChunks(const glm::ivec3& playerPosition, const Rectangle& visibilityRect);
 	void addChunks(const glm::ivec3& playerPosition);
 	void clearQueues(const glm::ivec3& playerPosition, const Rectangle& visibilityRect);
-	void handleGeneratedChunkMeshesQueue();
+	void handleChunkMeshesToGenerateQueue();
 	void handleChunkMeshRegenerationQueue();
+	void handleGeneratedChunkMeshQueue();
 };
