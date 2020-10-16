@@ -73,23 +73,21 @@ public:
 		assert(m_availableObjects.size() == m_maxSize);
 	}
 
-	ObjectFromPool<Object> getNextAvailableObject()
-	{	
-		if (!m_availableObjects.empty())
+	bool isObjectAvailable() const
+	{
+		return !m_availableObjects.empty();
+	}
+
+	ObjectFromPool<Object> getAvailableObject()
+	{
+		assert(isObjectAvailable());
+
+		Object& objectInPool = m_availableObjects.top();
+		m_availableObjects.pop();
+		return ObjectFromPool<Object>(&objectInPool, [this](Object& objectInPool)
 		{
-			assert(!m_objectPool.empty());
-			
-			Object& objectInPool = m_availableObjects.top();
-			m_availableObjects.pop();
-			return ObjectFromPool<Object>(&objectInPool, [this](Object& objectInPool)
-			{
-				return releaseObject(objectInPool);
-			});
-		}
-		else
-		{
-			return ObjectFromPool<Object>();
-		}
+			return releaseObject(objectInPool);
+		});
 	}
 
 private:

@@ -372,9 +372,9 @@ void ChunkManager::addChunks(const glm::ivec3& playerPosition)
 
 		for (const auto& chunkToAdd : m_chunksToAdd)
 		{
-			ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getNextAvailableObject();
-			if (chunkFromPool.getObject())
+			if (m_chunkPool.isObjectAvailable())
 			{
+				ObjectFromPool<Chunk> chunkFromPool = m_chunkPool.getAvailableObject();
 				chunkFromPool.getObject()->reuse(chunkToAdd.startingPosition);
 				m_generatedChunkQueue.add({ chunkToAdd.startingPosition, std::move(chunkFromPool) });
 

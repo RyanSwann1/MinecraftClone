@@ -23,9 +23,9 @@ void ChunkMeshesToGenerateQueue::update(ObjectPool<VertexArray>& chunkMeshPool, 
 		const glm::ivec3& chunkStartingPosition = chunkMeshToGenerate->getPosition();
 		if (isAllNeighbouringChunksAvailable(chunks, chunkStartingPosition))
 		{
-			ObjectFromPool<VertexArray> chunkMeshFromPool = chunkMeshPool.getNextAvailableObject();
-			if (chunkMeshFromPool.getObject())
+			if (chunkMeshPool.isObjectAvailable())
 			{
+				ObjectFromPool<VertexArray> chunkMeshFromPool = chunkMeshPool.getAvailableObject();
 				auto chunk = chunks.find(chunkStartingPosition);
 				if (chunk != chunks.cend())
 				{
