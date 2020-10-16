@@ -54,9 +54,6 @@
     <ClCompile Include="NeighbouringChunks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedChunkMeshQueue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedChunkQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -222,9 +219,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="NeighbouringChunks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedChunkMeshQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedChunkQueue.h">
