@@ -10,45 +10,37 @@
 template <class Object>
 struct ObjectFromPool : private NonCopyable
 {
-	ObjectFromPool(Object* objectInPool = nullptr, std::function<void(Object&)> onDestroyFunction = nullptr)
-		: objectInPool(objectInPool),
+	ObjectFromPool(Object& object, std::function<void(Object&)> onDestroyFunction)
+		: object(object),
 		onDestroyFunction(onDestroyFunction)
-	{
-		assert((objectInPool && onDestroyFunction) || (!objectInPool && !onDestroyFunction));
-	}
+	{}
 	~ObjectFromPool()
 	{
-		if (objectInPool)
+		if (onDestroyFunction)
 		{
-			objectInPool->reset();
-			onDestroyFunction(*objectInPool);
+			object.get().reset();
+			onDestroyFunction(object);
 		}
 	}
 	ObjectFromPool(ObjectFromPool&& orig) noexcept
-		: objectInPool(orig.objectInPool),
+		: object(orig.object),
 		onDestroyFunction(orig.onDestroyFunction)
 	{
 		orig.onDestroyFunction = nullptr;
-		orig.objectInPool = nullptr;
 	}
 	ObjectFromPool& operator=(ObjectFromPool&& orig) noexcept
 	{
-		objectInPool = orig.objectInPool;
+		object = orig.object;
 		onDestroyFunction = orig.onDestroyFunction;
 
 		orig.onDestroyFunction = nullptr;
-		orig.objectInPool = nullptr;
 
 		return *this;
 	}
 
-	Object* getObject() const 
-	{
-		return (objectInPool ? objectInPool : nullptr);
-	}
+	std::reference_wrapper<Object> object;
 
 private:
-	Object* objectInPool;
 	std::function<void(Object&)> onDestroyFunction;
 };
 
@@ -84,7 +76,7 @@ public:
 
 		Object& objectInPool = m_availableObjects.top();
 		m_availableObjects.pop();
-		return ObjectFromPool<Object>(&objectInPool, [this](Object& objectInPool)
+		return ObjectFromPool<Object>(objectInPool, [this](Object& objectInPool)
 		{
 			return releaseObject(objectInPool);
 		});
