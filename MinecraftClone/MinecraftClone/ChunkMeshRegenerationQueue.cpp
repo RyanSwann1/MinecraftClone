@@ -40,7 +40,7 @@ void ChunkMeshRegenerationQueue::update(const std::unordered_map<glm::ivec3, Obj
 			auto chunk = chunks.find(chunkStartingPosition);
 			assert(chunk != chunks.cend());
 
-			MeshGenerator::generateChunkMesh(regenNode->chunkMeshToRegenerate.get(), *chunk->second.getObject(),
+			MeshGenerator::generateChunkMesh(regenNode->chunkMeshToRegenerate.get(), chunk->second.object,
 				getAllNeighbouringChunks(chunks, chunkStartingPosition));
 
 			regenNode = remove(regenNode);

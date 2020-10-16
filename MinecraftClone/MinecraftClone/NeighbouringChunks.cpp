@@ -47,8 +47,8 @@ NeighbouringChunks getAllNeighbouringChunks(const std::unordered_map<glm::ivec3,
 		forwardChunk != chunks.cend() &&
 		backChunk != chunks.cend());
 
-	return NeighbouringChunks(*leftChunk->second.getObject(), *rightChunk->second.getObject(),
-		*forwardChunk->second.getObject(), *backChunk->second.getObject());
+	return NeighbouringChunks(leftChunk->second.object, rightChunk->second.object,
+		forwardChunk->second.object, backChunk->second.object);
 }
 
 //NeighbouringChunks

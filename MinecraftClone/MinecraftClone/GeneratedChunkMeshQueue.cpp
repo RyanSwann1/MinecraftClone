@@ -29,7 +29,6 @@ void GeneratedChunkMeshQueue::update(std::unordered_map<glm::ivec3, ObjectFromPo
 	if (!isEmpty())
 	{
 		GeneratedChunkMesh& generatedChunkMesh = front();
-		assert(generatedChunkMesh.chunkMeshFromPool.getObject());
 
 		chunkMeshes.emplace(std::piecewise_construct,
 			std::forward_as_tuple(generatedChunkMesh.getPosition()),
