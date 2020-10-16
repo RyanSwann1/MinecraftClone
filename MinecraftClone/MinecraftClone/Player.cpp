@@ -350,11 +350,15 @@ void Player::spawn(const ChunkManager& chunkManager, std::mutex& chunkInteractio
 		std::lock_guard<std::mutex> playerLock(chunkInteractionMutex);
 		if (chunkManager.isChunkAtPosition(Globals::PLAYER_STARTING_POSITION))
 		{
-			m_position = chunkManager.getHighestCubeAtPosition(Globals::PLAYER_STARTING_POSITION);
-			m_position.y += HEAD_HEIGHT;
-			m_velocity = glm::vec3();
-			m_currentState = ePlayerState::InAir;
-			spawned = true;
+			glm::vec3 highestCubePosition = { 0.0f, 0.0f, 0.0f };
+			if (chunkManager.getHighestCubeAtPosition(Globals::PLAYER_STARTING_POSITION, highestCubePosition))
+			{
+				m_position = highestCubePosition;
+				m_position.y += HEAD_HEIGHT;
+				m_velocity = glm::vec3();
+				m_currentState = ePlayerState::InAir;
+				spawned = true;
+			}
 		}
 	}
 }

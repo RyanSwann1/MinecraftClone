@@ -66,31 +66,36 @@ ChunkManager::ChunkManager()
 	addChunks(Globals::PLAYER_STARTING_POSITION);
 }
 
-glm::ivec3 ChunkManager::getHighestCubeAtPosition(const glm::vec3& playerPosition) const
+bool ChunkManager::getHighestCubeAtPosition(const glm::vec3& playerPosition, glm::vec3& position) const
 {
 	glm::ivec3 closestChunkStartingPosition = getClosestChunkStartingPosition(playerPosition);
 	auto chunk = m_chunks.find(closestChunkStartingPosition);
-	assert(chunk != m_chunks.cend());
+	if (chunk != m_chunks.cend())
+	{
+		position = chunk->second.getObject()->getHighestCubeAtPosition(playerPosition);
+		return true;
+	}
 
-	return chunk->second.getObject()->getHighestCubeAtPosition(playerPosition);
+	return false;
 }
 
 bool ChunkManager::isCubeAtPosition(const glm::vec3& playerPosition) const
 {
 	glm::ivec3 closestChunkStartingPosition = getClosestChunkStartingPosition(playerPosition);
 	auto chunk = m_chunks.find(closestChunkStartingPosition);
-	assert(chunk != m_chunks.cend());
+	if (chunk != m_chunks.cend())
+	{
+		return chunk->second.getObject()->isCubeAtPosition(playerPosition);
+	}
 
-	return chunk->second.getObject()->isCubeAtPosition(playerPosition);
+	return false;
 }
 
 bool ChunkManager::isCubeAtPosition(const glm::vec3& playerPosition, eCubeType& cubeType) const
 {
 	glm::ivec3 closestChunkStartingPosition = getClosestChunkStartingPosition(playerPosition);
 	auto chunk = m_chunks.find(closestChunkStartingPosition);
-	assert(chunk != m_chunks.cend());
-
- 	if (chunk->second.getObject()->isCubeAtPosition(playerPosition))
+  	if (chunk != m_chunks.cend() && chunk->second.getObject()->isCubeAtPosition(playerPosition))
 	{
 		cubeType = static_cast<eCubeType>(chunk->second.getObject()->getCubeDetailsWithoutBoundsCheck(playerPosition));
 		return true;
@@ -111,14 +116,15 @@ bool ChunkManager::placeCubeAtPosition(const glm::ivec3& placementPosition, eCub
 {
 	glm::ivec3 chunkStartingPosition = getClosestChunkStartingPosition(placementPosition);
 	auto chunk = m_chunks.find(chunkStartingPosition);
-	assert(chunk != m_chunks.end());
+	if (chunk == m_chunks.cend())
+	{
+		return false;
+	}
 
 	if (chunk->second.getObject()->addCubeAtPosition(placementPosition, getAllNeighbouringChunks(m_chunks, chunkStartingPosition), cubeTypeToPlace))
 	{
 		auto chunkMesh = m_chunkMeshes.find(chunkStartingPosition);
-		assert(chunkMesh != m_chunkMeshes.end());
-
-		if (!m_chunkMeshRegenerationQueue.contains(chunkStartingPosition))
+		if (chunkMesh != m_chunkMeshes.cend() &&  !m_chunkMeshRegenerationQueue.contains(chunkStartingPosition))
 		{
 			m_chunkMeshRegenerationQueue.add({ chunkStartingPosition, *chunkMesh->second.getObject() });
 		}
@@ -128,8 +134,10 @@ bool ChunkManager::placeCubeAtPosition(const glm::ivec3& placementPosition, eCub
 		if (leftChunkStartingPosition != chunkStartingPosition && !m_chunkMeshRegenerationQueue.contains(leftChunkStartingPosition))
 		{
 			auto leftChunkMesh = m_chunkMeshes.find(leftChunkStartingPosition);
-			assert(leftChunkMesh != m_chunkMeshes.end());
-			m_chunkMeshRegenerationQueue.add({ leftChunkStartingPosition, *leftChunkMesh->second.getObject() });
+			if (leftChunkMesh != m_chunkMeshes.cend())
+			{
+				m_chunkMeshRegenerationQueue.add({ leftChunkStartingPosition, *leftChunkMesh->second.getObject() });
+			}
 		}
 
 		//Right Chunk
@@ -137,8 +145,10 @@ bool ChunkManager::placeCubeAtPosition(const glm::ivec3& placementPosition, eCub
 		if (rightChunkStartingPosition != chunkStartingPosition && !m_chunkMeshRegenerationQueue.contains(rightChunkStartingPosition))
 		{
 			auto rightChunkMesh = m_chunkMeshes.find(rightChunkStartingPosition);
-			assert(rightChunkMesh != m_chunkMeshes.end());
-			m_chunkMeshRegenerationQueue.add({ rightChunkStartingPosition, *rightChunkMesh->second.getObject() });
+			if (rightChunkMesh != m_chunkMeshes.cend())
+			{
+				m_chunkMeshRegenerationQueue.add({ rightChunkStartingPosition, *rightChunkMesh->second.getObject() });
+			}
 		}
 
 		//Forward Chunk
@@ -146,8 +156,10 @@ bool ChunkManager::placeCubeAtPosition(const glm::ivec3& placementPosition, eCub
 		if (forwardChunkStartingPosition != chunkStartingPosition && !m_chunkMeshRegenerationQueue.contains(forwardChunkStartingPosition))
 		{
 			auto forwardChunkMesh = m_chunkMeshes.find(forwardChunkStartingPosition);
-			assert(forwardChunkMesh != m_chunkMeshes.end());
-			m_chunkMeshRegenerationQueue.add({ forwardChunkStartingPosition, *forwardChunkMesh->second.getObject() });
+			if (forwardChunkMesh != m_chunkMeshes.cend())
+			{
+				m_chunkMeshRegenerationQueue.add({ forwardChunkStartingPosition, *forwardChunkMesh->second.getObject() });
+			}
 		}
 
 		//Back Chunk
@@ -155,8 +167,10 @@ bool ChunkManager::placeCubeAtPosition(const glm::ivec3& placementPosition, eCub
 		if (backChunkStartingPosition != chunkStartingPosition && !m_chunkMeshRegenerationQueue.contains(backChunkStartingPosition))
 		{
 			auto backChunkMesh = m_chunkMeshes.find(backChunkStartingPosition);
-			assert(backChunkMesh != m_chunkMeshes.end());
-			m_chunkMeshRegenerationQueue.add({ backChunkStartingPosition, *backChunkMesh->second.getObject() });
+			if (backChunkMesh != m_chunkMeshes.cend())
+			{
+				m_chunkMeshRegenerationQueue.add({ backChunkStartingPosition, *backChunkMesh->second.getObject() });
+			}
 		}
 
 		return true;
@@ -169,12 +183,14 @@ bool ChunkManager::destroyCubeAtPosition(const glm::ivec3& blockToDestroy, eCube
 {
 	glm::ivec3 chunkStartingPosition = getClosestChunkStartingPosition(blockToDestroy);
 	auto chunk = m_chunks.find(chunkStartingPosition);
-	assert(chunk != m_chunks.end());
+	if (chunk == m_chunks.cend())
+	{
+		return false;
+	}
 	
 	if (chunk->second.getObject()->destroyCubeAtPosition(blockToDestroy, destroyedCubeType))
 	{
 		auto chunkMesh = m_chunkMeshes.find(chunkStartingPosition);
-		assert(chunkMesh != m_chunkMeshes.end());
 
 		if (!m_chunkMeshRegenerationQueue.contains(chunkStartingPosition))
 		{
@@ -186,8 +202,10 @@ bool ChunkManager::destroyCubeAtPosition(const glm::ivec3& blockToDestroy, eCube
 		if (leftChunkStartingPosition != chunkStartingPosition && !m_chunkMeshRegenerationQueue.contains(leftChunkStartingPosition))
 		{
 			auto leftChunkMesh = m_chunkMeshes.find(leftChunkStartingPosition);
-			assert(leftChunkMesh != m_chunkMeshes.end());
-			m_chunkMeshRegenerationQueue.add({ leftChunkStartingPosition, *leftChunkMesh->second.getObject() });
+			if (leftChunkMesh != m_chunkMeshes.cend())
+			{
+				m_chunkMeshRegenerationQueue.add({ leftChunkStartingPosition, *leftChunkMesh->second.getObject() });
+			}
 		}
 		
 		//Right Chunk
@@ -195,8 +213,10 @@ bool ChunkManager::destroyCubeAtPosition(const glm::ivec3& blockToDestroy, eCube
 		if (rightChunkStartingPosition != chunkStartingPosition && !m_chunkMeshRegenerationQueue.contains(rightChunkStartingPosition))
 		{
 			auto rightChunkMesh = m_chunkMeshes.find(rightChunkStartingPosition);
-			assert(rightChunkMesh != m_chunkMeshes.end());
-			m_chunkMeshRegenerationQueue.add({ rightChunkStartingPosition, *rightChunkMesh->second.getObject() });
+			if (rightChunkMesh != m_chunkMeshes.cend())
+			{
+				m_chunkMeshRegenerationQueue.add({ rightChunkStartingPosition, *rightChunkMesh->second.getObject() });
+			}
 		}
 		
 		//Forward Chunk
@@ -204,8 +224,10 @@ bool ChunkManager::destroyCubeAtPosition(const glm::ivec3& blockToDestroy, eCube
 		if (forwardChunkStartingPosition != chunkStartingPosition && !m_chunkMeshRegenerationQueue.contains(forwardChunkStartingPosition))
 		{
 			auto forwardChunkMesh = m_chunkMeshes.find(forwardChunkStartingPosition);
-			assert(forwardChunkMesh != m_chunkMeshes.end());
-			m_chunkMeshRegenerationQueue.add({ forwardChunkStartingPosition, *forwardChunkMesh->second.getObject() });
+			if (forwardChunkMesh != m_chunkMeshes.cend())
+			{
+				m_chunkMeshRegenerationQueue.add({ forwardChunkStartingPosition, *forwardChunkMesh->second.getObject() });
+			}
 		}
 		
 		//Back Chunk
@@ -213,8 +235,10 @@ bool ChunkManager::destroyCubeAtPosition(const glm::ivec3& blockToDestroy, eCube
 		if (backChunkStartingPosition != chunkStartingPosition && !m_chunkMeshRegenerationQueue.contains(backChunkStartingPosition))
 		{
 			auto backChunkMesh = m_chunkMeshes.find(backChunkStartingPosition);
-			assert(backChunkMesh != m_chunkMeshes.end());
-			m_chunkMeshRegenerationQueue.add({ backChunkStartingPosition, *backChunkMesh->second.getObject() });
+			if (backChunkMesh != m_chunkMeshes.cend())
+			{
+				m_chunkMeshRegenerationQueue.add({ backChunkStartingPosition, *backChunkMesh->second.getObject() });
+			}
 		}
 		
 		return true;

@@ -33,15 +33,13 @@ class ChunkManager : private NonCopyable, private NonMovable
 public:
 	ChunkManager();
 
-	glm::ivec3 getHighestCubeAtPosition(const glm::vec3& playerPosition) const;
+	bool getHighestCubeAtPosition(const glm::vec3& playerPosition, glm::vec3& position) const;
 	bool isCubeAtPosition(const glm::vec3& playerPosition) const;
 	bool isCubeAtPosition(const glm::vec3& playerPosition, eCubeType& cubeType) const;
-
 	bool isChunkAtPosition(const glm::vec3& position) const;
 
 	bool placeCubeAtPosition(const glm::ivec3& placementPosition, eCubeType cubeType);
 	bool destroyCubeAtPosition(const glm::ivec3& blockToDestroy, eCubeType& destroyedCubeType);
-
 	void update(const Player& player, const sf::Window& window, std::atomic<bool>& resetGame, 
 		std::mutex& chunkInteractionMutex, std::mutex& renderingMutex);
 
