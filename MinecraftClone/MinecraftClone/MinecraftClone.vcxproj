@@ -129,7 +129,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ChunkMeshRegenerationQueue.cpp" />
     <ClCompile Include="CollisionHandler.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="GameMessenger.cpp" />
@@ -159,7 +158,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoundingBox.h" />
-    <ClInclude Include="ChunkMeshRegenerationQueue.h" />
     <ClInclude Include="CollisionHandler.h" />
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="GameMessenger.h" />
