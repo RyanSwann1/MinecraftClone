@@ -265,7 +265,7 @@ void ChunkManager::update(const Player& player, const sf::Window& window, std::a
 
 		playerLock.lock();
 		std::lock_guard<std::mutex> renderingLock(renderingMutex); 
-		m_chunkMeshRegenerationQueue.update(m_chunks);
+		handleChunkMeshRegenerationQueue();
 		for (int i = 0; i < THREAD_TRANSFER_PER_FRAME; ++i)
 		{
 			if (!m_deletionQueue.isEmpty())
@@ -432,6 +432,27 @@ void ChunkManager::handleGeneratedChunkMeshesQueue()
 		else
 		{
 			chunkMeshToGenerate = m_chunkMeshesToGenerateQueue.next(chunkMeshToGenerate);
+		}
+	}
+}
+
+void ChunkManager::handleChunkMeshRegenerationQueue()
+{
+	if (!m_chunkMeshRegenerationQueue.isEmpty())
+	{
+		ObjectQueueDerivedNode<std::reference_wrapper<VertexArray>>* regenNode = &m_chunkMeshRegenerationQueue.front();
+		while (regenNode)
+		{
+			regenNode->object.get().reset();
+
+			const glm::ivec3& chunkStartingPosition = regenNode->getPosition();
+			auto chunk = m_chunks.find(chunkStartingPosition);
+			assert(chunk != m_chunks.cend());
+
+			MeshGenerator::generateChunkMesh(regenNode->object.get(), chunk->second.object,
+				getAllNeighbouringChunks(m_chunks, chunkStartingPosition));
+
+			regenNode = m_chunkMeshRegenerationQueue.remove(regenNode);
 		}
 	}
 }
