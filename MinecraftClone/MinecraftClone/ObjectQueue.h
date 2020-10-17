@@ -10,17 +10,16 @@
 
 template <class Object>
 class ObjectQueue;
-template <class Object>
-class ObjectQueueNode: private NonCopyable
+class ObjectQueuePositionNode: private NonCopyable
 {
-	friend class ObjectQueue<Object>;
+	friend class ObjectQueue<ObjectQueuePositionNode>;
 public:
-	ObjectQueueNode(const glm::ivec3& position)
+	ObjectQueuePositionNode(const glm::ivec3& position)
 		: position(position),
 		previous(nullptr),
 		next(nullptr)
 	{}
-	ObjectQueueNode(ObjectQueueNode&& orig) noexcept
+	ObjectQueuePositionNode(ObjectQueuePositionNode&& orig) noexcept
 		: position(orig.position),
 		previous(orig.previous),
 		next(orig.next)
@@ -28,7 +27,7 @@ public:
 		orig.previous = nullptr;
 		orig.next = nullptr;
 	}
-	ObjectQueueNode& operator=(ObjectQueueNode&& orig) noexcept
+	ObjectQueuePositionNode& operator=(ObjectQueuePositionNode&& orig) noexcept
 	{
 		position = orig.position;
 		previous = orig.previous;
@@ -47,41 +46,61 @@ public:
 
 private:
 	glm::ivec3 position;
-	Object* previous;
-	Object* next;
+	ObjectQueuePositionNode* previous;
+	ObjectQueuePositionNode* next;
 };
 
+template<class Object>
+class ObjectQueue;
 template <class Object>
-struct ObjectQueueDerivedNode : public ObjectQueueNode<ObjectQueueDerivedNode<Object>>
+struct ObjectQueueObjectNode : private NonCopyable
 {
-	ObjectQueueDerivedNode(const glm::ivec3& position, Object&& object)
-		: ObjectQueueNode<ObjectQueueDerivedNode<Object>>(position),
-		object(std::move(object))
+	friend class ObjectQueue<ObjectQueueObjectNode<Object>>;
+	ObjectQueueObjectNode(const glm::ivec3& position, Object&& object)
+		: object(std::move(object)),
+		position(position),
+		previous(nullptr),
+		next(nullptr)
 	{}
-	ObjectQueueDerivedNode(const glm::ivec3& position, Object& object)
-		: ObjectQueueNode<ObjectQueueDerivedNode<Object>>(position),
-		object(object)
+	ObjectQueueObjectNode(const glm::ivec3& position, Object& object)
+		: object(object),
+		position(position),
+		previous(nullptr),
+		next(nullptr)
 	{}
-	ObjectQueueDerivedNode(ObjectQueueDerivedNode&& orig) noexcept
-		: ObjectQueueNode<ObjectQueueDerivedNode<Object>>(std::move(orig)),
-		object(std::move(orig.object))
-	{}
-	ObjectQueueDerivedNode& operator=(ObjectQueueDerivedNode&& orig) noexcept
+	ObjectQueueObjectNode(ObjectQueueObjectNode&& orig) noexcept
+		: object(std::move(orig.object)),
+		position(orig.position),
+		previous(orig.previous),
+		next(orig.next)
 	{
-		ObjectQueueNode<ObjectQueueDerivedNode<Object>>::operator=(std::move(orig));
+		orig.previous = nullptr;
+		orig.next = nullptr;
+	}
+	ObjectQueueObjectNode& operator=(ObjectQueueObjectNode&& orig) noexcept
+	{
 		object = std::move(orig.object);
+		position = orig.position;
+		previous = orig.previous;
+		next = orig.next;
+
+		orig.previous = nullptr;
+		orig.next = nullptr;
 
 		return *this;
 	}
 
-	Object object;
-};
+	const glm::ivec3& getPosition() const
+	{
+		return position;
+	}
 
-struct PositionNode : public ObjectQueueNode<PositionNode>
-{
-	PositionNode(const glm::ivec3& position)
-		: ObjectQueueNode(position)
-	{}
+	Object object;
+
+private:
+	glm::ivec3 position;
+	ObjectQueueObjectNode* previous;
+	ObjectQueueObjectNode* next;
 };
 
 template <class Object>
