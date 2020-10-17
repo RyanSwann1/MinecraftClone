@@ -46,11 +46,11 @@ private:
 	std::unordered_map<glm::ivec3, ObjectFromPool<Chunk>> m_chunks;
 	std::unordered_map<glm::ivec3, ObjectFromPool<VertexArray>> m_chunkMeshes;
 	std::vector<ChunkToAdd> m_chunksToAdd;
-	ObjectQueue<PositionNode> m_chunkMeshesToGenerateQueue;
-	ObjectQueue<PositionNode> m_deletionQueue;
-	ObjectQueue<ObjectQueueDerivedNode<ObjectFromPool<VertexArray>>> m_generatedChunkMeshQueue;
-	ObjectQueue<ObjectQueueDerivedNode<ObjectFromPool<Chunk>>> m_generatedChunkQueue;
-	ObjectQueue<ObjectQueueDerivedNode<std::reference_wrapper<VertexArray>>> m_chunkMeshRegenerationQueue;
+	ObjectQueue<ObjectQueuePositionNode> m_chunkMeshesToGenerateQueue;
+	ObjectQueue<ObjectQueuePositionNode> m_deletionQueue;
+	ObjectQueue<ObjectQueueObjectNode<ObjectFromPool<VertexArray>>> m_generatedChunkMeshQueue;
+	ObjectQueue<ObjectQueueObjectNode<ObjectFromPool<Chunk>>> m_generatedChunkQueue;
+	ObjectQueue<ObjectQueueObjectNode<std::reference_wrapper<VertexArray>>> m_chunkMeshRegenerationQueue;
 	
 	void deleteChunks(const glm::ivec3& playerPosition, const Rectangle& visibilityRect);
 	void addChunks(const glm::ivec3& playerPosition);

@@ -406,7 +406,7 @@ void ChunkManager::handleChunkMeshesToGenerateQueue()
 		return;
 	}
 
-	PositionNode* chunkMeshToGenerate = &m_chunkMeshesToGenerateQueue.front();
+	ObjectQueuePositionNode* chunkMeshToGenerate = &m_chunkMeshesToGenerateQueue.front();
 	while (chunkMeshToGenerate)
 	{
 		const glm::ivec3& chunkStartingPosition = chunkMeshToGenerate->getPosition();
@@ -422,7 +422,7 @@ void ChunkManager::handleChunkMeshesToGenerateQueue()
 						getAllNeighbouringChunks(m_chunks, chunkStartingPosition));
 
 					m_generatedChunkMeshQueue.add(
-						ObjectQueueDerivedNode<ObjectFromPool<VertexArray>>(chunkStartingPosition, std::move(chunkMeshFromPool) ));
+						ObjectQueueObjectNode<ObjectFromPool<VertexArray>>(chunkStartingPosition, std::move(chunkMeshFromPool) ));
 
 					chunkMeshToGenerate = m_chunkMeshesToGenerateQueue.remove(chunkMeshToGenerate);
 				}
@@ -447,7 +447,7 @@ void ChunkManager::handleChunkMeshRegenerationQueue()
 {
 	if (!m_chunkMeshRegenerationQueue.isEmpty())
 	{
-		ObjectQueueDerivedNode<std::reference_wrapper<VertexArray>>* regenNode = &m_chunkMeshRegenerationQueue.front();
+		ObjectQueueObjectNode<std::reference_wrapper<VertexArray>>* regenNode = &m_chunkMeshRegenerationQueue.front();
 		while (regenNode)
 		{
 			regenNode->object.get().reset();
@@ -468,7 +468,7 @@ void ChunkManager::handleGeneratedChunkMeshQueue()
 {
 	if (!m_generatedChunkMeshQueue.isEmpty())
 	{
-		ObjectQueueDerivedNode<ObjectFromPool<VertexArray>>& generatedChunkMesh = m_generatedChunkMeshQueue.front();
+		ObjectQueueObjectNode<ObjectFromPool<VertexArray>>& generatedChunkMesh = m_generatedChunkMeshQueue.front();
 
 		m_chunkMeshes.emplace(std::piecewise_construct,
 			std::forward_as_tuple(generatedChunkMesh.getPosition()),
@@ -482,7 +482,7 @@ void ChunkManager::handleGeneratedChunkQueue()
 {
 	if (!m_generatedChunkQueue.isEmpty())
 	{
-		ObjectQueueDerivedNode<ObjectFromPool<Chunk>>& generatedChunk = m_generatedChunkQueue.front();
+		ObjectQueueObjectNode<ObjectFromPool<Chunk>>& generatedChunk = m_generatedChunkQueue.front();
 
 		m_chunks.emplace(std::piecewise_construct,
 			std::forward_as_tuple(generatedChunk.getPosition()),
