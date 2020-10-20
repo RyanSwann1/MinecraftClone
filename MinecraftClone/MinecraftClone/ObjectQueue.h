@@ -53,9 +53,10 @@ private:
 template<class Object>
 class ObjectQueue;
 template <class Object>
-struct ObjectQueueObjectNode : private NonCopyable
+class ObjectQueueObjectNode : private NonCopyable
 {
 	friend class ObjectQueue<ObjectQueueObjectNode<Object>>;
+public:
 	ObjectQueueObjectNode(const glm::ivec3& position, Object&& object)
 		: object(std::move(object)),
 		position(position),
