@@ -78,9 +78,7 @@ namespace
 //Texture
 Texture::Texture(unsigned int ID)
 	: m_ID(ID)
-{
-
-}
+{}
 
 Texture::~Texture()
 {
@@ -91,11 +89,6 @@ Texture::~Texture()
 void Texture::bind() const
 {
 	glBindTexture(GL_TEXTURE_2D, m_ID);
-}
-
-void Texture::unbind() const
-{
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 std::unique_ptr<Texture> Texture::create(const std::string& textureName)
@@ -117,11 +110,8 @@ std::unique_ptr<Texture> Texture::create(const std::string& textureName)
 
 //Texture Array
 TextureArray::TextureArray(unsigned int ID)
-	: m_slot(0),
-	m_ID(ID)
-{
-	//glActiveTexture(GL_TEXTURE0 + m_slot);
-}
+	: m_ID(ID)
+{}
 
 std::unique_ptr<TextureArray> TextureArray::create()
 {
@@ -160,19 +150,7 @@ TextureArray::~TextureArray()
 	glDeleteTextures(1, &m_ID);
 }
 
-unsigned int TextureArray::getCurrentSlot() const
-{
-	return m_slot;
-}
-
 void TextureArray::bind() const
 {
-	//glActiveTexture(GL_TEXTURE0 + m_ID);
-	//glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, m_ID);
-}
-
-void TextureArray::unbind() const
-{
-	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 }
