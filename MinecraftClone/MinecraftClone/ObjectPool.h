@@ -84,7 +84,7 @@ public:
 
 private:
 	const size_t m_maxSize;
-	std::stack<std::reference_wrapper<Object>> m_availableObjects;
+	std::stack<std::reference_wrapper<Object>, std::vector<std::reference_wrapper<Object>>> m_availableObjects;
 	std::vector<Object> m_objectPool;
 
 	void releaseObject(Object& objectInPool)

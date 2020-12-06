@@ -120,7 +120,7 @@ void Pickup::update(const Player& player, float deltaTime, const ChunkManager& c
 	if (m_onGround)
 	{
 		m_timeElasped += deltaTime;
-		m_yOffset += glm::sin(m_timeElasped * 2.5f) * 0.005f;
+		m_yOffset = glm::sin(m_timeElasped * 2.0f) * 0.1f; 
 	}
 
 	m_collectionTimer.update(deltaTime);
