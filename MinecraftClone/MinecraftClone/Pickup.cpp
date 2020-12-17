@@ -48,27 +48,31 @@ Pickup::Pickup(eCubeType cubeType, const glm::vec3& position)
 	MeshGenerator::generatePickUpMesh(m_vertexArray.m_opaqueVertexBuffer, m_cubeType);
 }
 
-Pickup::Pickup(Pickup&& orig) noexcept
-	: m_collectionTimer(orig.m_collectionTimer),
-	m_cubeType(orig.m_cubeType),
-	m_position(orig.m_position),
-	m_velocity(orig.m_velocity),
-	m_yOffset(orig.m_yOffset),
-	m_vertexArray(std::move(orig.m_vertexArray)),
-	m_onGround(orig.m_onGround),
-	m_timeElasped(orig.m_timeElasped)
+Pickup::Pickup(Pickup&& rhs) noexcept
+	: m_collectionTimer(rhs.m_collectionTimer),
+	m_cubeType(rhs.m_cubeType),
+	m_position(rhs.m_position),
+	m_velocity(rhs.m_velocity),
+	m_yOffset(rhs.m_yOffset),
+	m_vertexArray(std::move(rhs.m_vertexArray)),
+	m_onGround(rhs.m_onGround),
+	m_timeElasped(rhs.m_timeElasped)
 {}
 
-Pickup& Pickup::operator=(Pickup&& orig) noexcept
+Pickup& Pickup::operator=(Pickup&& rhs) noexcept
 {
-	m_collectionTimer = orig.m_collectionTimer;
-	m_cubeType = orig.m_cubeType;
-	m_position = orig.m_position;
-	m_velocity = orig.m_velocity;
-	m_yOffset = orig.m_yOffset;
-	m_vertexArray = std::move(orig.m_vertexArray);
-	m_onGround = orig.m_onGround;
-	m_timeElasped = orig.m_timeElasped;
+	assert(this != &rhs);
+	if (this != &rhs)
+	{
+		m_collectionTimer = rhs.m_collectionTimer;
+		m_cubeType = rhs.m_cubeType;
+		m_position = rhs.m_position;
+		m_velocity = rhs.m_velocity;
+		m_yOffset = rhs.m_yOffset;
+		m_vertexArray = std::move(rhs.m_vertexArray);
+		m_onGround = rhs.m_onGround;
+		m_timeElasped = rhs.m_timeElasped;
+	}
 
 	return *this;
 }
