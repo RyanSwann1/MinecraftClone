@@ -48,23 +48,7 @@ VertexBuffer& VertexBuffer::operator=(VertexBuffer&& rhs) noexcept
 	assert(this != &rhs);
 	if (this != &rhs)
 	{
-		if (positionsID != Globals::INVALID_OPENGL_ID &&
-			lightIntensityID != Globals::INVALID_OPENGL_ID &&
-			textCoordsID != Globals::INVALID_OPENGL_ID &&
-			indiciesID != Globals::INVALID_OPENGL_ID)
-		{
-			glDeleteBuffers(1, &positionsID);
-			glDeleteBuffers(1, &lightIntensityID);
-			glDeleteBuffers(1, &textCoordsID);
-			glDeleteBuffers(1, &indiciesID);
-		}
-		else
-		{
-			assert(positionsID == Globals::INVALID_OPENGL_ID &&
-				lightIntensityID == Globals::INVALID_OPENGL_ID &&
-				textCoordsID == Globals::INVALID_OPENGL_ID &&
-				indiciesID == Globals::INVALID_OPENGL_ID);
-		}
+		onDestroy();
 
 		elementBufferIndex = rhs.elementBufferIndex;
 		bindToVAO = rhs.bindToVAO;
@@ -92,23 +76,7 @@ VertexBuffer& VertexBuffer::operator=(VertexBuffer&& rhs) noexcept
 
 VertexBuffer::~VertexBuffer()
 {
-	if (positionsID != Globals::INVALID_OPENGL_ID &&
-		lightIntensityID != Globals::INVALID_OPENGL_ID &&
-		textCoordsID != Globals::INVALID_OPENGL_ID &&
-		indiciesID != Globals::INVALID_OPENGL_ID)
-	{
-		glDeleteBuffers(1, &positionsID);
-		glDeleteBuffers(1, &lightIntensityID);
-		glDeleteBuffers(1, &textCoordsID);
-		glDeleteBuffers(1, &indiciesID);
-	}
-	else
-	{
-		assert(positionsID == Globals::INVALID_OPENGL_ID &&
-			lightIntensityID == Globals::INVALID_OPENGL_ID &&
-			textCoordsID == Globals::INVALID_OPENGL_ID &&
-			indiciesID == Globals::INVALID_OPENGL_ID);
-	}
+	onDestroy();
 }
 
 void VertexBuffer::bind()
@@ -178,4 +146,25 @@ void VertexBuffer::clear()
 	
 	std::vector<unsigned int> newIndicies;
 	indicies.swap(newIndicies);
+}
+
+void VertexBuffer::onDestroy()
+{
+	if (positionsID != Globals::INVALID_OPENGL_ID &&
+		lightIntensityID != Globals::INVALID_OPENGL_ID &&
+		textCoordsID != Globals::INVALID_OPENGL_ID &&
+		indiciesID != Globals::INVALID_OPENGL_ID)
+	{
+		glDeleteBuffers(1, &positionsID);
+		glDeleteBuffers(1, &lightIntensityID);
+		glDeleteBuffers(1, &textCoordsID);
+		glDeleteBuffers(1, &indiciesID);
+	}
+	else
+	{
+		assert(positionsID == Globals::INVALID_OPENGL_ID &&
+			lightIntensityID == Globals::INVALID_OPENGL_ID &&
+			textCoordsID == Globals::INVALID_OPENGL_ID &&
+			indiciesID == Globals::INVALID_OPENGL_ID);
+	}
 }

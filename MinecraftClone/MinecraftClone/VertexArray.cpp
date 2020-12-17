@@ -16,16 +16,7 @@ VertexArray::VertexArray()
 
 VertexArray::~VertexArray()
 {
-	if (m_opaqueID != Globals::INVALID_OPENGL_ID &&
-		m_transparentID != Globals::INVALID_OPENGL_ID)
-	{
-		glDeleteVertexArrays(1, &m_opaqueID);
-		glDeleteVertexArrays(1, &m_transparentID);
-	}
-	else
-	{
-		assert(m_opaqueID == Globals::INVALID_OPENGL_ID && m_transparentID == Globals::INVALID_OPENGL_ID);
-	}
+	onDestroy();
 }
 
 VertexArray::VertexArray(VertexArray&& rhs) noexcept
@@ -43,16 +34,7 @@ VertexArray& VertexArray::operator=(VertexArray&& rhs) noexcept
 	assert(this != &rhs);
 	if (this != &rhs)
 	{
-		if (m_opaqueID != Globals::INVALID_OPENGL_ID &&
-			m_transparentID != Globals::INVALID_OPENGL_ID)
-		{
-			glDeleteVertexArrays(1, &m_opaqueID);
-			glDeleteVertexArrays(1, &m_transparentID);
-		}
-		else
-		{
-			assert(m_opaqueID == Globals::INVALID_OPENGL_ID && m_transparentID == Globals::INVALID_OPENGL_ID);
-		}
+		onDestroy();
 
 		m_opaqueVertexBuffer = std::move(rhs.m_opaqueVertexBuffer);
 		m_transparentVertexBuffer = std::move(rhs.m_transparentVertexBuffer);
@@ -93,4 +75,18 @@ void VertexArray::bindOpaqueVAO() const
 void VertexArray::bindTransparentVAO() const
 {
 	glBindVertexArray(m_transparentID);
+}
+
+void VertexArray::onDestroy()
+{
+	if (m_opaqueID != Globals::INVALID_OPENGL_ID &&
+		m_transparentID != Globals::INVALID_OPENGL_ID)
+	{
+		glDeleteVertexArrays(1, &m_opaqueID);
+		glDeleteVertexArrays(1, &m_transparentID);
+	}
+	else
+	{
+		assert(m_opaqueID == Globals::INVALID_OPENGL_ID && m_transparentID == Globals::INVALID_OPENGL_ID);
+	}
 }

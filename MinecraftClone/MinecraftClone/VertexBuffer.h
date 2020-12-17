@@ -28,4 +28,7 @@ struct VertexBuffer : private NonCopyable
 	std::vector<glm::vec3> textCoords;
 	unsigned int indiciesID;
 	std::vector<unsigned int> indicies;
+
+private:
+	void onDestroy();
 };
