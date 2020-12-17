@@ -28,25 +28,41 @@ VertexArray::~VertexArray()
 	}
 }
 
-VertexArray::VertexArray(VertexArray&& orig) noexcept
-	: m_opaqueVertexBuffer(std::move(orig.m_opaqueVertexBuffer)),
-	m_transparentVertexBuffer(std::move(orig.m_transparentVertexBuffer)),
-	m_opaqueID(orig.m_opaqueID),
-	m_transparentID(orig.m_transparentID)
+VertexArray::VertexArray(VertexArray&& rhs) noexcept
+	: m_opaqueVertexBuffer(std::move(rhs.m_opaqueVertexBuffer)),
+	m_transparentVertexBuffer(std::move(rhs.m_transparentVertexBuffer)),
+	m_opaqueID(rhs.m_opaqueID),
+	m_transparentID(rhs.m_transparentID)
 {
-	orig.m_opaqueID = Globals::INVALID_OPENGL_ID; 
-	orig.m_transparentID = Globals::INVALID_OPENGL_ID;
+	rhs.m_opaqueID = Globals::INVALID_OPENGL_ID; 
+	rhs.m_transparentID = Globals::INVALID_OPENGL_ID;
 }
 
-VertexArray& VertexArray::operator=(VertexArray&& orig) noexcept
+VertexArray& VertexArray::operator=(VertexArray&& rhs) noexcept
 {
-	m_opaqueVertexBuffer = std::move(orig.m_opaqueVertexBuffer);
-	m_transparentVertexBuffer = std::move(orig.m_transparentVertexBuffer);
-	m_opaqueID = orig.m_opaqueID;
-	m_transparentID = orig.m_transparentID;
+	assert(this != &rhs);
+	if (this != &rhs)
+	{
+		if (m_opaqueID != Globals::INVALID_OPENGL_ID &&
+			m_transparentID != Globals::INVALID_OPENGL_ID)
+		{
+			glDeleteVertexArrays(1, &m_opaqueID);
+			glDeleteVertexArrays(1, &m_transparentID);
+		}
+		else
+		{
+			assert(m_opaqueID == Globals::INVALID_OPENGL_ID && m_transparentID == Globals::INVALID_OPENGL_ID);
+		}
 
-	orig.m_opaqueID = Globals::INVALID_OPENGL_ID;
-	orig.m_transparentID = Globals::INVALID_OPENGL_ID;
+		m_opaqueVertexBuffer = std::move(rhs.m_opaqueVertexBuffer);
+		m_transparentVertexBuffer = std::move(rhs.m_transparentVertexBuffer);
+
+		m_opaqueID = rhs.m_opaqueID;
+		m_transparentID = rhs.m_transparentID;
+
+		rhs.m_opaqueID = Globals::INVALID_OPENGL_ID;
+		rhs.m_transparentID = Globals::INVALID_OPENGL_ID;
+	}
 
 	return *this;
 }
