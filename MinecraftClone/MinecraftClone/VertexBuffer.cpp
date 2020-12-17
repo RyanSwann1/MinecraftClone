@@ -21,50 +21,72 @@ VertexBuffer::VertexBuffer()
 	glGenBuffers(1, &indiciesID);
 }
 
-VertexBuffer::VertexBuffer(VertexBuffer&& orig) noexcept
-	: elementBufferIndex(orig.elementBufferIndex),
-	bindToVAO(orig.bindToVAO),
-	displayable(orig.displayable),
-	positionsID(orig.positionsID),
-	positions(std::move(orig.positions)),
-	lightIntensityID(orig.lightIntensityID),
-	lightIntensityVertices(std::move(orig.lightIntensityVertices)),
-	textCoordsID(orig.textCoordsID),
-	textCoords(std::move(orig.textCoords)),
-	indiciesID(orig.indiciesID),
-	indicies(std::move(orig.indicies))
+VertexBuffer::VertexBuffer(VertexBuffer&& rhs) noexcept
+	: elementBufferIndex(rhs.elementBufferIndex),
+	bindToVAO(rhs.bindToVAO),
+	displayable(rhs.displayable),
+	positionsID(rhs.positionsID),
+	positions(std::move(rhs.positions)),
+	lightIntensityID(rhs.lightIntensityID),
+	lightIntensityVertices(std::move(rhs.lightIntensityVertices)),
+	textCoordsID(rhs.textCoordsID),
+	textCoords(std::move(rhs.textCoords)),
+	indiciesID(rhs.indiciesID),
+	indicies(std::move(rhs.indicies))
 {
-	orig.elementBufferIndex = 0;
-	orig.bindToVAO = false;
-	orig.displayable = false;
-	orig.positionsID = Globals::INVALID_OPENGL_ID;
-	orig.textCoordsID = Globals::INVALID_OPENGL_ID;
-	orig.indiciesID = Globals::INVALID_OPENGL_ID;
-	orig.lightIntensityID = Globals::INVALID_OPENGL_ID;
+	rhs.elementBufferIndex = 0;
+	rhs.bindToVAO = false;
+	rhs.displayable = false;
+	rhs.positionsID = Globals::INVALID_OPENGL_ID;
+	rhs.textCoordsID = Globals::INVALID_OPENGL_ID;
+	rhs.indiciesID = Globals::INVALID_OPENGL_ID;
+	rhs.lightIntensityID = Globals::INVALID_OPENGL_ID;
 }
 
-VertexBuffer& VertexBuffer::operator=(VertexBuffer&& orig) noexcept
+VertexBuffer& VertexBuffer::operator=(VertexBuffer&& rhs) noexcept
 {
-	elementBufferIndex = orig.elementBufferIndex;
-	bindToVAO = orig.bindToVAO;
-	displayable = orig.displayable;
-	positionsID = orig.positionsID;
-	positions = std::move(orig.positions);
-	lightIntensityID = orig.lightIntensityID;
-	lightIntensityVertices = std::move(orig.lightIntensityVertices);
-	textCoordsID = orig.textCoordsID;
-	textCoords = std::move(orig.textCoords);
-	indiciesID = orig.indiciesID;
-	indicies = std::move(orig.indicies);
+	assert(this != &rhs);
+	if (this != &rhs)
+	{
+		if (positionsID != Globals::INVALID_OPENGL_ID &&
+			lightIntensityID != Globals::INVALID_OPENGL_ID &&
+			textCoordsID != Globals::INVALID_OPENGL_ID &&
+			indiciesID != Globals::INVALID_OPENGL_ID)
+		{
+			glDeleteBuffers(1, &positionsID);
+			glDeleteBuffers(1, &lightIntensityID);
+			glDeleteBuffers(1, &textCoordsID);
+			glDeleteBuffers(1, &indiciesID);
+		}
+		else
+		{
+			assert(positionsID == Globals::INVALID_OPENGL_ID &&
+				lightIntensityID == Globals::INVALID_OPENGL_ID &&
+				textCoordsID == Globals::INVALID_OPENGL_ID &&
+				indiciesID == Globals::INVALID_OPENGL_ID);
+		}
 
-	orig.elementBufferIndex = 0;
-	orig.bindToVAO = false;
-	orig.displayable = false;
-	orig.positionsID = Globals::INVALID_OPENGL_ID;
-	orig.textCoordsID = Globals::INVALID_OPENGL_ID;
-	orig.indiciesID = Globals::INVALID_OPENGL_ID;
-	orig.lightIntensityID = Globals::INVALID_OPENGL_ID;
+		elementBufferIndex = rhs.elementBufferIndex;
+		bindToVAO = rhs.bindToVAO;
+		displayable = rhs.displayable;
+		positionsID = rhs.positionsID;
+		positions = std::move(rhs.positions);
+		lightIntensityID = rhs.lightIntensityID;
+		lightIntensityVertices = std::move(rhs.lightIntensityVertices);
+		textCoordsID = rhs.textCoordsID;
+		textCoords = std::move(rhs.textCoords);
+		indiciesID = rhs.indiciesID;
+		indicies = std::move(rhs.indicies);
 
+		rhs.elementBufferIndex = 0;
+		rhs.bindToVAO = false;
+		rhs.displayable = false;
+		rhs.positionsID = Globals::INVALID_OPENGL_ID;
+		rhs.textCoordsID = Globals::INVALID_OPENGL_ID;
+		rhs.indiciesID = Globals::INVALID_OPENGL_ID;
+		rhs.lightIntensityID = Globals::INVALID_OPENGL_ID;
+	}
+	
 	return *this;
 }
 
