@@ -2,117 +2,48 @@
 
 #include "Globals.h"
 
-enum class eGameMessageType;
+//https://stackoverflow.com/questions/4173254/what-is-the-curiously-recurring-template-pattern-crtp
 namespace GameMessages
 {
-	//CRTP - C++
-	template <eGameMessageType T>
-	struct BaseMessage
-	{		
-		static eGameMessageType getType() { return T; };
-	};
-
-	struct SpawnPickUp : public BaseMessage<eGameMessageType::SpawnPickup>
+	struct SpawnPickUp 
 	{
-		SpawnPickUp(eCubeType type, const glm::vec3& position)
-			: type(type),
-			position(position)
-		{}
-
 		const eCubeType type;
 		const glm::vec3 position;
 	};
 
-	struct PlayerDisgardPickup : public BaseMessage<eGameMessageType::PlayerDisgardPickup>
+	struct PlayerDisgardPickup
 	{
-		PlayerDisgardPickup(eCubeType cubeType, const glm::vec3& position, const glm::vec3& initialVelocity)
-			: cubeType(cubeType),
-			position(position),
-			initialVelocity(initialVelocity)
-		{}
-		
 		const eCubeType cubeType;
 		const glm::vec3 position;
 		const glm::vec3 initialVelocity;
 	};
 
-	struct AddToInventory : public BaseMessage<eGameMessageType::AddToPlayerInventory>
+	struct AddToInventory { const eCubeType type; };
+
+	struct DestroyCubeReset {};
+
+	struct DestroyCubeSetPosition
 	{
-		AddToInventory(eCubeType type)
-			: type(type)
-		{}
-
-		const eCubeType type;
-	};
-
-	struct DestroyCubeReset : public BaseMessage<eGameMessageType::DestroyCubeReset>
-	{};
-
-	struct DestroyCubeSetPosition : public BaseMessage<eGameMessageType::DestroyCubeSetPosition>
-	{
-		DestroyCubeSetPosition(const glm::vec3& position, float destroyCubeTimerExpire)
-			: position(position),
-			destroyCubeTimerExpire(destroyCubeTimerExpire)
-		{}
-
 		const glm::vec3 position;
 		const float destroyCubeTimerExpire;
 	};
 
-	struct SelectedCubeSetPosition : public BaseMessage<eGameMessageType::SelectedCubeSetPosition>
+	struct SelectedCubeSetPosition { const glm::vec3 position; };
+
+	struct SelectedCubeSetActive { const bool active; }; 
+
+	struct AddItemGUI
 	{
-		SelectedCubeSetPosition(const glm::vec3& position)
-			: position(position)
-		{}
-
-		const glm::vec3 position;
-	};
-
-	struct SelectedCubeSetActive : public BaseMessage<eGameMessageType::SelectedCubeSetActive>
-	{
-		SelectedCubeSetActive(bool active)
-			: active(active)
-		{}
-
-		const bool active;
-	}; 
-
-	struct AddItemGUI : public BaseMessage<eGameMessageType::AddItemGUI>
-	{
-		AddItemGUI(eCubeType type, eInventoryIndex index)
-			: type(type),
-			index(index)
-		{}
-
 		const eCubeType type;
 		const eInventoryIndex index;
 	};
 
-	struct RemoveItemGUI : public BaseMessage<eGameMessageType::RemoveItemGUI>
+	struct RemoveItemGUI { const eInventoryIndex index; };
+
+	struct UpdateSelectionBoxGUI { const eInventoryIndex index; };
+
+	struct UpdateItemQuantityGUI
 	{
-		RemoveItemGUI(eInventoryIndex index)
-			: index(index)
-		{}
-
-		const eInventoryIndex index;
-	};
-
-	struct UpdateSelectionBoxGUI : public BaseMessage<eGameMessageType::UpdateSelectionBoxGUI>
-	{
-		UpdateSelectionBoxGUI(eInventoryIndex index)
-			: index(index)
-		{}
-
-		const eInventoryIndex index;
-	};
-
-	struct UpdateItemQuantityGUI : public BaseMessage<eGameMessageType::UpdateItemQuantityGUI>
-	{
-		UpdateItemQuantityGUI(eInventoryIndex index, int quantity)
-			:index(index),
-			quantity(quantity)
-		{}
-
 		const eInventoryIndex index;
 		const int quantity;
 	};
