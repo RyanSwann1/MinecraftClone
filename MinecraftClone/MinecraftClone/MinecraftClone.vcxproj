@@ -131,7 +131,6 @@
   <ItemGroup>
     <ClCompile Include="CollisionHandler.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
-    <ClCompile Include="GameMessenger.cpp" />
     <ClCompile Include="Gui.cpp" />
     <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="DestroyBlockVisual.cpp" />

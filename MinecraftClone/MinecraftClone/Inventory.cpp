@@ -118,11 +118,11 @@ void Inventory::reduceSelectedItem()
 	assert(!isSelectedItemEmpty());
 
 	getSelectedItem().reduce();
-	GameMessenger::getInstance().broadcast<GameMessages::UpdateItemQuantityGUI>({ m_currentSelectedItem, getSelectedItem().getSize() });
+	broadcastToMessenger<GameMessages::UpdateItemQuantityGUI>({ m_currentSelectedItem, getSelectedItem().getSize() });
 	
 	if (getSelectedItem().isEmpty())
 	{
-		GameMessenger::getInstance().broadcast<GameMessages::RemoveItemGUI>({ m_currentSelectedItem });
+		broadcastToMessenger<GameMessages::RemoveItemGUI>({ m_currentSelectedItem });
 	}
 }
 
@@ -140,7 +140,7 @@ void Inventory::add(eCubeType cubeTypeToAdd)
 			m_items[i].incrementQuantity();
 			itemAdded = true;
 			
-			GameMessenger::getInstance().broadcast<GameMessages::UpdateItemQuantityGUI>({ static_cast<eInventoryIndex>(i), m_items[i].getSize() });
+			broadcastToMessenger<GameMessages::UpdateItemQuantityGUI>({ static_cast<eInventoryIndex>(i), m_items[i].getSize() });
 
 			break;
 		}
@@ -154,10 +154,8 @@ void Inventory::add(eCubeType cubeTypeToAdd)
 			m_items[i].reset(convertedCubeType);
 			m_items[i].incrementQuantity();
 
-			GameMessenger::getInstance().broadcast<GameMessages::AddItemGUI>({ convertedCubeType, static_cast<eInventoryIndex>(i) });
-
-			GameMessenger::getInstance().broadcast<GameMessages::UpdateItemQuantityGUI>({ static_cast<eInventoryIndex>(i), m_items[i].getSize() });
-			
+			broadcastToMessenger<GameMessages::AddItemGUI>({ convertedCubeType, static_cast<eInventoryIndex>(i) });
+			broadcastToMessenger<GameMessages::UpdateItemQuantityGUI>({ static_cast<eInventoryIndex>(i), m_items[i].getSize() });
 			break;
 		}
 	}
@@ -224,7 +222,7 @@ void Inventory::handleInputEvents(const sf::Event& currentSFMLEvent)
 		m_currentSelectedItem = static_cast<eInventoryIndex>(rawCurrentSelectedItem);
 	}
 
-	GameMessenger::getInstance().broadcast<GameMessages::UpdateSelectionBoxGUI>({ m_currentSelectedItem });
+	broadcastToMessenger<GameMessages::UpdateSelectionBoxGUI>({ m_currentSelectedItem });
 }
 
 const Item& Inventory::getSelectedItem() const

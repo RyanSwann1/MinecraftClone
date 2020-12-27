@@ -8,16 +8,16 @@
 PickupManager::PickupManager()
 	: m_pickUps()
 {
-	GameMessenger::getInstance().subscribe<GameMessages::SpawnPickUp>(
-		[this](const GameMessages::SpawnPickUp& gameMessage) { return onSpawnPickUp(gameMessage); }, this);
-	GameMessenger::getInstance().subscribe<GameMessages::PlayerDisgardPickup>(
+	subscribeToMessenger<GameMessages::SpawnPickUp>([this](const GameMessages::SpawnPickUp& message) { return onSpawnPickUp(message); }, this);
+	
+	subscribeToMessenger<GameMessages::PlayerDisgardPickup>(
 		[this](const GameMessages::PlayerDisgardPickup& gameMessage) { return onPlayerDisgardPickup(gameMessage); }, this);
 }
 
 PickupManager::~PickupManager()
 {
-	GameMessenger::getInstance().unsubscribe<GameMessages::SpawnPickUp>(this);
-	GameMessenger::getInstance().unsubscribe<GameMessages::PlayerDisgardPickup>(this);
+	unsubscribeToMessenger<GameMessages::SpawnPickUp>(this);
+	unsubscribeToMessenger<GameMessages::PlayerDisgardPickup>(this);
 }
 
 void PickupManager::update(float deltaTime, const Player& player, std::mutex& chunkInteractionMutex, const ChunkManager& chunkManager)
@@ -33,7 +33,9 @@ void PickupManager::update(float deltaTime, const Player& player, std::mutex& ch
 		}
 		else if (pickup->isInReachOfPlayer(player.getMiddlePosition()))
 		{
-			GameMessenger::getInstance().broadcast<GameMessages::AddToInventory>({ pickup->getCubeType() });
+			broadcastToMessenger<GameMessages::AddToInventory>({ pickup->getCubeType() });
+			//GameMessenger<GameMessages::AddToInventory>::getInstance().broadcast({ pickup->getCubeType() });
+			//GameMessenger::getInstance().broadcast<GameMessages::AddToInventory>({ pickup->getCubeType() });
 			pickup = m_pickUps.erase(pickup);
 		}
 		else

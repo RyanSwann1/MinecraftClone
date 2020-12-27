@@ -8,17 +8,17 @@ SelectedVoxelVisual::SelectedVoxelVisual()
 	m_position(),
 	m_active(false)
 {
-	GameMessenger::getInstance().subscribe<GameMessages::SelectedCubeSetActive>(
+	subscribeToMessenger<GameMessages::SelectedCubeSetActive>(
 		[this](const GameMessages::SelectedCubeSetActive& gameMessage) { return onSetActive(gameMessage); }, this);
-
-	GameMessenger::getInstance().subscribe<GameMessages::SelectedCubeSetPosition>(
+	
+	subscribeToMessenger<GameMessages::SelectedCubeSetPosition>(
 		[this](const GameMessages::SelectedCubeSetPosition& gameMessage) { return onSetPosition(gameMessage); }, this);
 }
 
 SelectedVoxelVisual::~SelectedVoxelVisual()
 {
-	GameMessenger::getInstance().unsubscribe<GameMessages::SelectedCubeSetActive>(this);
-	GameMessenger::getInstance().unsubscribe<GameMessages::SelectedCubeSetPosition>(this);
+	unsubscribeToMessenger<GameMessages::SelectedCubeSetActive>(this);
+	unsubscribeToMessenger<GameMessages::SelectedCubeSetPosition>(this);
 }
 
 void SelectedVoxelVisual::render()

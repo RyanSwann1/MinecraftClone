@@ -460,22 +460,20 @@ Gui::Gui(const glm::uvec2& windowSize)
 	m_characterIDMap.insert({ '8', 24 });
 	m_characterIDMap.insert({ '9', 25 });
 
-	GameMessenger::getInstance().subscribe<GameMessages::AddItemGUI>(
-		[this](const GameMessages::AddItemGUI& gameMessage) { return onAddItem(gameMessage); }, this);
-	GameMessenger::getInstance().subscribe<GameMessages::RemoveItemGUI>(
-		[this](const GameMessages::RemoveItemGUI& gameMessage) { return onRemoveItem(gameMessage); }, this);
-	GameMessenger::getInstance().subscribe<GameMessages::UpdateSelectionBoxGUI>(
+	subscribeToMessenger<GameMessages::AddItemGUI>([this](const GameMessages::AddItemGUI& gameMessage) { return onAddItem(gameMessage); }, this);
+	subscribeToMessenger<GameMessages::RemoveItemGUI>([this](const GameMessages::RemoveItemGUI& gameMessage) { return onRemoveItem(gameMessage); }, this);
+	subscribeToMessenger<GameMessages::UpdateSelectionBoxGUI>(
 		[this](const GameMessages::UpdateSelectionBoxGUI& gameMessage) { return onUpdateSelectionBox(gameMessage); }, this);
-	GameMessenger::getInstance().subscribe<GameMessages::UpdateItemQuantityGUI>(
+	subscribeToMessenger<GameMessages::UpdateItemQuantityGUI>(
 		[this](const GameMessages::UpdateItemQuantityGUI& gameMessage) { return onUpdateItemQuantity(gameMessage); }, this);
 }
 
 Gui::~Gui()
 {
-	GameMessenger::getInstance().unsubscribe<GameMessages::AddItemGUI>(this);
-	GameMessenger::getInstance().unsubscribe<GameMessages::RemoveItemGUI>(this);
-	GameMessenger::getInstance().unsubscribe<GameMessages::UpdateSelectionBoxGUI>(this);
-	GameMessenger::getInstance().unsubscribe<GameMessages::UpdateItemQuantityGUI>(this);
+	unsubscribeToMessenger<GameMessages::AddItemGUI>(this);
+	unsubscribeToMessenger<GameMessages::RemoveItemGUI>(this);
+	unsubscribeToMessenger<GameMessages::UpdateSelectionBoxGUI>(this);
+	unsubscribeToMessenger<GameMessages::UpdateItemQuantityGUI>(this);
 }
 
 void Gui::render(ShaderHandler& shaderHandler, const Texture& widgetTexture, const Texture& fontTexture) const

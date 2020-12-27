@@ -11,17 +11,17 @@ DestroyBlockVisual::DestroyBlockVisual()
 	m_index(eDestroyCubeIndex::One),
 	m_currentCubePosition()
 {
-	GameMessenger::getInstance().subscribe<GameMessages::DestroyCubeSetPosition>(
+	subscribeToMessenger<GameMessages::DestroyCubeSetPosition>(
 		[this](const GameMessages::DestroyCubeSetPosition& gameMessage) { return onSetPosition(gameMessage); }, this);
 
-	GameMessenger::getInstance().subscribe<GameMessages::DestroyCubeReset>(
+	subscribeToMessenger<GameMessages::DestroyCubeReset>(
 		[this](const GameMessages::DestroyCubeReset& gameMessage) { return onReset(gameMessage); }, this);
 }
 
 DestroyBlockVisual::~DestroyBlockVisual()
 {
-	GameMessenger::getInstance().unsubscribe<GameMessages::DestroyCubeSetPosition>(this);
-	GameMessenger::getInstance().unsubscribe<GameMessages::DestroyCubeReset>(this);
+	unsubscribeToMessenger<GameMessages::DestroyCubeSetPosition>(this);
+	unsubscribeToMessenger<GameMessages::DestroyCubeReset>(this);
 }
 
 void DestroyBlockVisual::update(float deltaTime)
