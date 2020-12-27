@@ -7,78 +7,83 @@
 #include <assert.h>
 #include <array>
 
-enum class eGameMessageType
+template <typename Message>
+class GameMessenger : private NonCopyable, private NonMovable
 {
-	AddItemGUI = 0,
-	RemoveItemGUI,
-	UpdateSelectionBoxGUI,
-	UpdateItemQuantityGUI,
-	DestroyCubeSetPosition, 
-	DestroyCubeReset,
-	SelectedCubeSetPosition,
-	SelectedCubeSetActive,
-	SpawnPickup,
-	PlayerDisgardPickup,
-	AddToPlayerInventory,
-	Max = AddToPlayerInventory
-};
+	struct Listener
+	{ 
+		Listener(const std::function<void(const Message&)>& callback, const void* ownerAddress)
+			: callback(callback),
+			ownerAddress(ownerAddress)
+		{}
 
-struct Listener : private NonCopyable
-{
-	Listener(const std::function<void(const void*)>& fp, const void* ownerAddress);
-	Listener(Listener&&) noexcept;
-	Listener& operator=(Listener&&) noexcept;
+		std::function<void(const Message&)> callback;
+		const void* ownerAddress;
+	};
 
-	std::function<void(const void*)> m_listener;
-	const void* m_ownerAddress;
-};
-
-class GameMessenger : private NonCopyable, private NonMovable 
-{
 public:
-	static GameMessenger& getInstance()
+	static GameMessenger<Message>& getInstance()
 	{
-		static GameMessenger instance;
+		static GameMessenger<Message> instance;
 		return instance;
 	}
 
-	template <typename GameMessage>
-	void subscribe(const std::function<void(const GameMessage&)>& gameMessage, const void* ownerAddress)
+	void subscribe(const std::function<void(const Message&)>& callback, const void* ownerAddress)
 	{
-		auto& listeners = m_listeners[static_cast<int>(GameMessage::getType())];
-		assert(!isOwnerAlreadyRegistered(listeners, GameMessage::getType(), ownerAddress));
+		assert(!isRegistered(ownerAddress));
+		m_listeners.emplace_back(callback, ownerAddress);
+	}	
 
-		listeners.emplace_back(reinterpret_cast<std::function<void(const void*)> const&>(gameMessage), ownerAddress);
-	}
-
-	template <typename GameMessage>
 	void unsubscribe(const void* ownerAddress)
 	{
-		auto& listeners = m_listeners[static_cast<int>(GameMessage::getType())];
-		assert(isOwnerAlreadyRegistered(listeners, GameMessage::getType(), ownerAddress));
-
-		auto iter = std::find_if(listeners.begin(), listeners.end(), [ownerAddress](const auto& listener)
+		assert(isRegistered(ownerAddress));
+		auto listener = std::find_if(m_listeners.begin(), m_listeners.end(), [ownerAddress](const auto& listener)
 		{
-			return listener.m_ownerAddress == ownerAddress;
+			return listener.ownerAddress == ownerAddress;
 		});
-
-		assert(iter != listeners.end());
-		listeners.erase(iter);
+		assert(listener != m_listeners.cend());
+		m_listeners.erase(listener);
 	}
 
-	template <typename GameMessage>
-	void broadcast(GameMessage gameMessage)
+	void broadcast(const Message& message) const
 	{
-		const auto& listeners = m_listeners[static_cast<int>(GameMessage::getType())];
-		for (const auto& listener : listeners)
+		assert(!m_listeners.empty());
+		for (const auto& listener : m_listeners)
 		{
-			reinterpret_cast<std::function<void(const GameMessage&)> const&>(listener.m_listener)(gameMessage);
+			listener.callback(message);
 		}
 	}
 
 private:
 	GameMessenger() {}
-	std::array<std::vector<Listener>, static_cast<size_t>(eGameMessageType::Max) + 1> m_listeners;
 
-	bool isOwnerAlreadyRegistered(const std::vector<Listener>& listeners, eGameMessageType gameMessageType, const void* ownerAddress) const;
+	std::vector<Listener> m_listeners;
+
+	bool isRegistered(const void* ownerAddress) const
+	{
+		auto listener = std::find_if(m_listeners.cbegin(), m_listeners.cend(), [ownerAddress](const auto& listener)
+		{
+			return listener.ownerAddress == ownerAddress;
+		});
+
+		return listener != m_listeners.cend();
+	}
 };
+
+template <typename Message>
+void subscribeToMessenger(const std::function<void(const Message&)>& callback, const void* ownerAddress)
+{
+	GameMessenger<Message>::getInstance().subscribe(callback, ownerAddress);
+}
+
+template <typename Message>
+void unsubscribeToMessenger(const void* ownerAddress)
+{
+	GameMessenger<Message>::getInstance().unsubscribe(ownerAddress);
+}
+
+template <typename Message>
+void broadcastToMessenger(const Message& message)
+{
+	GameMessenger<Message>::getInstance().broadcast(message);
+}
