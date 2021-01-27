@@ -203,12 +203,6 @@ const Inventory& Player::getInventory() const
 	return m_inventory;
 }
 
-void Player::resetDestroyCubeTimer()
-{
-	m_destroyCubeTimer.resetElaspedTime();
-	m_destroyCubeTimer.setActive(false);
-}
-
 void Player::placeBlock(ChunkManager& chunkManager)
 {
 	if (m_inventory.isSelectedItemEmpty())
@@ -287,8 +281,9 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager)
 		{
 			broadcastToMessenger<GameMessages::SpawnPickUp>({ cubeTypeToDestroy, m_cubeToDestroyPosition });
 		}
-
-		broadcastToMessenger<GameMessages::DestroyCubeReset>({});
+		
+		m_destroyBlockVisual.reset();
+		//broadcastToMessenger<GameMessages::DestroyCubeReset>({});
 	}
 	
 	for (int i = 0; i <= std::ceil(DESTROY_BLOCK_MAX_DISTANCE / DESTROY_BLOCK_INCREMENT); ++i)
@@ -322,7 +317,8 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager)
 					m_destroyCubeTimer.setNewExpirationTime(destroyTime);
 					m_destroyCubeTimer.setActive(true);
 					
-					broadcastToMessenger<GameMessages::DestroyCubeSetPosition>({ m_cubeToDestroyPosition, m_destroyCubeTimer.getExpirationTime() });
+					m_destroyBlockVisual.set(m_cubeToDestroyPosition, m_destroyCubeTimer.getExpirationTime());
+					//broadcastToMessenger<GameMessages::DestroyCubeSetPosition>({ m_cubeToDestroyPosition, m_destroyCubeTimer.getExpirationTime() });
 				}
 			}
 			else
@@ -445,11 +441,17 @@ void Player::handleInputEvents(const sf::Event& currentSFMLEvent,
 	case sf::Event::MouseWheelMoved:
 		m_inventory.handleInputEvents(currentSFMLEvent);
 		break;
+	case sf::Event::MouseButtonReleased:
+		m_destroyCubeTimer.resetElaspedTime();
+		m_destroyCubeTimer.setActive(false);
+		m_destroyBlockVisual.reset();
+		break;
 	}
 }
 
 void Player::update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkManager& chunkManager, const sf::Window& window)
 {
+	m_destroyBlockVisual.update(deltaTime);
 	m_camera.update(window, deltaTime);
 	m_placeCubeTimer.update(deltaTime);
 	m_destroyCubeTimer.update(deltaTime);
@@ -494,6 +496,11 @@ void Player::update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkMan
 	default:
 		assert(false);
 	}
+}
+
+void Player::renderDestroyBlock()
+{
+	m_destroyBlockVisual.render();
 }
 
 void Player::move(const ChunkManager& chunkManager)

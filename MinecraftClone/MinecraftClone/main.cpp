@@ -145,7 +145,6 @@ int main()
 	PickupManager pickupManager;
 	FrameBuffer frameBuffer(windowSize);
 	SelectedVoxelVisual selectedVoxelVisual;
-	DestroyBlockVisual destroyBlockVisual;
 	Gui gui(windowSize);
 	Frustum frustum;
 	Player player;
@@ -179,7 +178,7 @@ int main()
 			{
 				window.close();
 			}
-			if (currentSFMLEvent.type == sf::Event::KeyPressed)
+			else if (currentSFMLEvent.type == sf::Event::KeyPressed)
 			{
 				switch (currentSFMLEvent.key.code)
 				{
@@ -201,19 +200,12 @@ int main()
 					break;
 				}
 			}
-			if (currentSFMLEvent.type == sf::Event::MouseButtonReleased)
-			{
-				player.resetDestroyCubeTimer();
-
-				destroyBlockVisual.reset();
-			}
 
 			player.handleInputEvents(currentSFMLEvent, *chunkManager, chunkInteractionMutex, window);
 		}
 
 		//Update
 		player.update(deltaTime, chunkInteractionMutex, *chunkManager.get(), window);
-		destroyBlockVisual.update(deltaTime);
 		pickupManager.update(deltaTime, player, chunkInteractionMutex, *chunkManager);
 
 		glm::mat4 view = glm::lookAt(player.getPosition(), player.getPosition() + player.getCamera().front, player.getCamera().up);
@@ -250,7 +242,7 @@ int main()
 		shaderHandler->switchToShader(eShaderType::DestroyBlock);
 		shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uView", view);
 		shaderHandler->setUniformMat4f(eShaderType::DestroyBlock, "uProjection", projection);
-		destroyBlockVisual.render();
+		player.renderDestroyBlock();
 
 		if (!player.getDestroyCubeTimer().isActive())
 		{

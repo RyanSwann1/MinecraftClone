@@ -9,6 +9,7 @@
 #include "Globals.h"
 #include "Inventory.h"
 #include "Timer.h"
+#include "DestroyBlockVisual.h"
 #include <mutex>
 #include <SFML/Graphics.hpp>
 #include <vector>
@@ -57,13 +58,14 @@ public:
 	const Camera& getCamera() const;
 	const Inventory& getInventory() const;
 
-	void resetDestroyCubeTimer();
 	void spawn(const ChunkManager& chunkManager, std::mutex& chunkInteractionMutex);
 	void handleInputEvents(const sf::Event& currentSFMLEvent,
 		ChunkManager& chunkManager, std::mutex& chunkInteractionMutex, const sf::Window& window);
 	void update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkManager& chunkManager, const sf::Window& window);
+	void renderDestroyBlock();
 
 private:
+	DestroyBlockVisual m_destroyBlockVisual;
 	Camera m_camera;
 	ePlayerState m_currentState;
 	glm::vec3 m_position;
