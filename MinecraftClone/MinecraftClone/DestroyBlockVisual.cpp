@@ -10,19 +10,7 @@ DestroyBlockVisual::DestroyBlockVisual()
 	m_timer(),
 	m_index(eDestroyCubeIndex::One),
 	m_currentCubePosition()
-{
-	subscribeToMessenger<GameMessages::DestroyCubeSetPosition>(
-		[this](const GameMessages::DestroyCubeSetPosition& gameMessage) { return onSetPosition(gameMessage); }, this);
-
-	subscribeToMessenger<GameMessages::DestroyCubeReset>(
-		[this](const GameMessages::DestroyCubeReset& gameMessage) { return onReset(gameMessage); }, this);
-}
-
-DestroyBlockVisual::~DestroyBlockVisual()
-{
-	unsubscribeToMessenger<GameMessages::DestroyCubeSetPosition>(this);
-	unsubscribeToMessenger<GameMessages::DestroyCubeReset>(this);
-}
+{}
 
 void DestroyBlockVisual::update(float deltaTime)
 {
@@ -60,19 +48,14 @@ void DestroyBlockVisual::render()
 	}
 }
 
-void DestroyBlockVisual::onSetPosition(const GameMessages::DestroyCubeSetPosition& gameMessage)
+void DestroyBlockVisual::set(const glm::vec3& position, float expirationTime)
 {
 	reset();
 	m_timer.setActive(true);
-	m_timer.setNewExpirationTime(gameMessage.destroyCubeTimerExpire / ((static_cast<float>(eDestroyCubeIndex::Max) + 1.0f)));
-	m_currentCubePosition = gameMessage.position;
+	m_timer.setNewExpirationTime(expirationTime / ((static_cast<float>(eDestroyCubeIndex::Max) + 1.0f)));
+	m_currentCubePosition = position;
 
 	MeshGenerator::generateDestroyBlockMesh(m_mesh.m_transparentVertexBuffer, m_index, m_currentCubePosition);
-}
-
-void DestroyBlockVisual::onReset(const GameMessages::DestroyCubeReset& gameMessage)
-{
-	reset();
 }
 
 void DestroyBlockVisual::reset()

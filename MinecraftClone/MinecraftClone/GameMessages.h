@@ -20,14 +20,6 @@ namespace GameMessages
 
 	struct AddToInventory { const eCubeType type; };
 
-	struct DestroyCubeReset {};
-
-	struct DestroyCubeSetPosition
-	{
-		const glm::vec3 position;
-		const float destroyCubeTimerExpire;
-	};
-
 	struct SelectedCubeSetPosition { const glm::vec3 position; };
 
 	struct SelectedCubeSetActive { const bool active; }; 
