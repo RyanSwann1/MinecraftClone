@@ -144,7 +144,6 @@ int main()
 	std::unique_ptr<ChunkManager> chunkManager = std::make_unique<ChunkManager>();
 	PickupManager pickupManager;
 	FrameBuffer frameBuffer(windowSize);
-	SelectedVoxelVisual selectedVoxelVisual;
 	Gui gui(windowSize);
 	Frustum frustum;
 	Player player;
@@ -253,7 +252,7 @@ int main()
 			shaderHandler->switchToShader(eShaderType::SelectedVoxel);
 			shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uView", view);
 			shaderHandler->setUniformMat4f(eShaderType::SelectedVoxel, "uProjection", projection);
-			selectedVoxelVisual.render();
+			player.renderSelectedVoxel();
 			glDisable(GL_POLYGON_OFFSET_FILL);
 		}
 

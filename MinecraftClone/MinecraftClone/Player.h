@@ -10,6 +10,7 @@
 #include "Inventory.h"
 #include "Timer.h"
 #include "DestroyBlockVisual.h"
+#include "SelectedVoxelVisual.h"
 #include <mutex>
 #include <SFML/Graphics.hpp>
 #include <vector>
@@ -63,9 +64,11 @@ public:
 		ChunkManager& chunkManager, std::mutex& chunkInteractionMutex, const sf::Window& window);
 	void update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkManager& chunkManager, const sf::Window& window);
 	void renderDestroyBlock();
+	void renderSelectedVoxel();
 
 private:
 	DestroyBlockVisual m_destroyBlockVisual;
+	SelectedVoxelVisual m_selectedBlockVisual;
 	Camera m_camera;
 	ePlayerState m_currentState;
 	glm::vec3 m_position;

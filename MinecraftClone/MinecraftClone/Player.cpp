@@ -138,7 +138,9 @@ void Camera::setFront()
 
 //Player
 Player::Player()
-	: m_camera(),
+	: m_destroyBlockVisual(),
+	m_selectedBlockVisual(),
+	m_camera(),
 	m_currentState(ePlayerState::InAir),
 	m_position(),
 	m_velocity(),
@@ -283,7 +285,6 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager)
 		}
 		
 		m_destroyBlockVisual.reset();
-		//broadcastToMessenger<GameMessages::DestroyCubeReset>({});
 	}
 	
 	for (int i = 0; i <= std::ceil(DESTROY_BLOCK_MAX_DISTANCE / DESTROY_BLOCK_INCREMENT); ++i)
@@ -318,7 +319,6 @@ void Player::destroyFacingBlock(ChunkManager& chunkManager)
 					m_destroyCubeTimer.setActive(true);
 					
 					m_destroyBlockVisual.set(m_cubeToDestroyPosition, m_destroyCubeTimer.getExpirationTime());
-					//broadcastToMessenger<GameMessages::DestroyCubeSetPosition>({ m_cubeToDestroyPosition, m_destroyCubeTimer.getExpirationTime() });
 				}
 			}
 			else
@@ -400,8 +400,7 @@ void Player::handleSelectedCube(const ChunkManager& chunkManager)
 		if (chunkManager.isCubeAtPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) }, selectedCubeType) &&
 			!NON_SELECTABLE_CUBE_TYPES.isMatch(selectedCubeType))
 		{
-			broadcastToMessenger<GameMessages::SelectedCubeSetPosition>(
-				{ { std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) } });
+			m_selectedBlockVisual.setPosition({ std::floor(rayPosition.x), std::floor(rayPosition.y), std::floor(rayPosition.z) });
 			selectedCubeFound = true;
 			break;
 		}
@@ -409,7 +408,7 @@ void Player::handleSelectedCube(const ChunkManager& chunkManager)
 
 	if (!selectedCubeFound)
 	{
-		broadcastToMessenger<GameMessages::SelectedCubeSetActive>({ false });
+		m_selectedBlockVisual.setActive(false);
 	}
 }
 
@@ -501,6 +500,11 @@ void Player::update(float deltaTime, std::mutex& chunkInteractionMutex, ChunkMan
 void Player::renderDestroyBlock()
 {
 	m_destroyBlockVisual.render();
+}
+
+void Player::renderSelectedVoxel()
+{
+	m_selectedBlockVisual.render();
 }
 
 void Player::move(const ChunkManager& chunkManager)
