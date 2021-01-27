@@ -20,10 +20,6 @@ namespace GameMessages
 
 	struct AddToInventory { const eCubeType type; };
 
-	struct SelectedCubeSetPosition { const glm::vec3 position; };
-
-	struct SelectedCubeSetActive { const bool active; }; 
-
 	struct AddItemGUI
 	{
 		const eCubeType type;

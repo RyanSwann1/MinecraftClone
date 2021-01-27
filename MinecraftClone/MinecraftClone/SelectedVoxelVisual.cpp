@@ -7,18 +7,23 @@ SelectedVoxelVisual::SelectedVoxelVisual()
 	: m_mesh(),
 	m_position(),
 	m_active(false)
+{}
+
+void SelectedVoxelVisual::setPosition(const glm::vec3& position)
 {
-	subscribeToMessenger<GameMessages::SelectedCubeSetActive>(
-		[this](const GameMessages::SelectedCubeSetActive& gameMessage) { return onSetActive(gameMessage); }, this);
-	
-	subscribeToMessenger<GameMessages::SelectedCubeSetPosition>(
-		[this](const GameMessages::SelectedCubeSetPosition& gameMessage) { return onSetPosition(gameMessage); }, this);
+	if (m_position != position || !m_active)
+	{
+		m_position = position;
+		m_mesh.m_transparentVertexBuffer.clear();
+		MeshGenerator::generateVoxelSelectionMesh(m_mesh.m_transparentVertexBuffer, m_position);
+
+		m_active = true;
+	}
 }
 
-SelectedVoxelVisual::~SelectedVoxelVisual()
+void SelectedVoxelVisual::setActive(bool active)
 {
-	unsubscribeToMessenger<GameMessages::SelectedCubeSetActive>(this);
-	unsubscribeToMessenger<GameMessages::SelectedCubeSetPosition>(this);
+	m_active = active;
 }
 
 void SelectedVoxelVisual::render()
@@ -36,21 +41,4 @@ void SelectedVoxelVisual::render()
 			glDrawElements(GL_TRIANGLES, m_mesh.m_transparentVertexBuffer.indicies.size(), GL_UNSIGNED_INT, nullptr);
 		}
 	}
-}
-
-void SelectedVoxelVisual::onSetPosition(const GameMessages::SelectedCubeSetPosition& gameMessage)
-{
-	if (m_position != gameMessage.position || !m_active)
-	{
-		m_position = gameMessage.position;
-		m_mesh.m_transparentVertexBuffer.clear();
-		MeshGenerator::generateVoxelSelectionMesh(m_mesh.m_transparentVertexBuffer, m_position);
-
-		m_active = true;
-	}
-}
-
-void SelectedVoxelVisual::onSetActive(const GameMessages::SelectedCubeSetActive& gameMessage)
-{
-	m_active = gameMessage.active;
 }
